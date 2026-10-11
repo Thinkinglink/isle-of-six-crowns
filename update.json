@@ -1,6 +1,6 @@
 {
   "applicationId": "com.akinya.sixcrowns",
-  "version": "1.9.0",
-  "resourcesURL": "https://raw.githubusercontent.com/Thinkinglink/isle-of-six-crowns/main/resources.neu",
-  "data": { "size": 930618 }
+  "version": "1.9.1",
+  "resourcesURL": "https://raw.githubusercontent.com/Thinkinglink/isle-of-six-crowns/fe08da65953f965392b5b44200839b7581d70cfd/resources.neu",
+  "data": { "size": 933185 }
 }
