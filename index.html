@@ -741,7 +741,7 @@ const BOSS_LOOT={
  lanternmaw:{w:['daggers','Abyssal Fangs',['Leeching','Frostbite','Swift']],a:['Lanternmaw Scale Mail',['Vital','Fleet','Renewing'],'#163a4a'],r:['storm','The Deep Lantern']},
  echotyrant:{w:['hammer','Tyrant\'s Silence',['Thundering','Critical','Executioner']],a:['Echo-Crystal Plate',['Sturdy','Vital','Renewing'],'#1c2630'],r:['ward','Heart of Echoes']},
  sculkmonstrosity:{w:['axe','Veinsplitter',['Leeching','Burning','Critical']],a:['Monstrosity Hide',['Vital','Renewing','Sturdy'],'#0c2a30'],r:['nova','Pulsing Sculk Core']},
- monarch:{w:['sword','Monarch\'s Wingblade',['Swift','Critical','Leeching']],a:['Royal Wing Mantle',['Fleet','Vital','Sturdy'],'#4a2a6a'],r:['gale','Crown of Wings']},
+ monarch:{w:['sword','Monarch\'s Slasher',['Swift','Critical','Leeching']],a:['Royal Clawguard Mantle',['Fleet','Vital','Sturdy'],'#4a2a6a'],r:['gale','Crown of Claws']},
  harmonizer:{w:['spear','Bloomlance',['Frostbite','Critical','Swift']],a:['Petalweave Armor',['Renewing','Fleet','Vital'],'#4a8a2a'],r:['totem','Song of Harmony']},
  corruptedsinger:{w:['daggers','Last Verse',['Leeching','Thundering','Critical','Swift']],a:['Mantle of the Final Song',['Sturdy','Vital','Renewing','Fleet'],'#2a1a3a'],r:['lightning','The Corrupted Hymn']}};
 function bossItem(slot,id,bi){const D=BOSS_LOOT[id]; let it;
@@ -901,7 +901,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.4.1', SAVE_VERSION=6;
+const APP_VERSION='2.4.2', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1628,24 +1628,34 @@ function buildBoss(b){
     u.tentacles=[]; for(let i=0;i<6;i++){const a2=i/6*TAU+.3, g=new THREE.Group(); g.position.set(Math.cos(a2)*.55,.8,Math.sin(a2)*.5); g.rotation.y=-a2; B.add(g); const segs=[]; let p=g;
       for(let k=0;k<4;k++){const sg=new THREE.Group(); sg.position.x=k?.2:0; p.add(sg); add(sg,gSph,k%2?flesh:flesh2,.1,0,0,.09-k*.015,.07-k*.01,.07-k*.01); if(k===3) add(sg,gSph,pus,.2,0,0,.04); segs.push(sg); p=sg;} u.tentacles.push(segs);}
     break;}
-  case 'monarch':{const u=R.userData; const st={metalness:.55,roughness:.3}; const h=humanoid({body:'#4a2a6a',bodyOpt:st,skin:'#e8d0b0',sleeve:'#3a1a5a',legC:'#2a1a3a',eye:'#ffb02a',eyeGlow:true});
+  case 'monarch':{const u=R.userData; const st={metalness:.55,roughness:.3}; const h=humanoid({body:'#4a2a6a',bodyOpt:st,skin:'#e8d0b0',sleeve:'#3a1a5a',legC:'#2a1a3a',eye:'#ffb02a',eyeGlow:true,armsFwd:.25});
     const gold=M('#e8c860',{metalness:.75,roughness:.25}); add(h.torso,gBox,gold,0,.3,.16,.3,.34,.02); add(h.torso,gSph,gold,-.3,.46,0,.13,.09,.13); add(h.torso,gSph,gold,.3,.46,0,.13,.09,.13);
-    add(h.torso,gCone,M('#3a1a5a',{roughness:.8}),0,.0,0,.34,.7,.3).rotation.x=Math.PI; crown(h.head,.2,1.35,'#ffc04a');
-    const wc=document.createElement('canvas'); wc.width=wc.height=128; const g=wc.getContext('2d'); g.fillStyle='#1a1018'; g.fillRect(0,0,128,128); g.fillStyle='#ff9a1a'; g.beginPath(); g.ellipse(64,64,52,54,0,0,TAU); g.fill();
-    g.strokeStyle='#1a1018'; g.lineWidth=5; for(let i=0;i<6;i++){g.beginPath(); g.moveTo(8,64); g.quadraticCurveTo(64,20+i*18,124,10+i*22); g.stroke();} g.fillStyle='#fff'; for(let i=0;i<14;i++){const a2=i/14*TAU; g.beginPath(); g.arc(64+Math.cos(a2)*58,64+Math.sin(a2)*58,3,0,TAU); g.fill();}
-    const wt=new THREE.CanvasTexture(wc); texCache.set(wc,wt); const wm=M('#ffffff',{map:wt,side:THREE.DoubleSide,transparent:true,opacity:.96,roughness:.6});
-    u.wings=[]; for(const s2 of [-1,1]){const w=new THREE.Group(); w.position.set(s2*.1,.5,-.17); h.torso.add(w); const top=add(w,gCircle,wm,s2*.42,.22,0,.42,.5,1); top.rotation.y=s2*.2; const bot=add(w,gCircle,wm,s2*.3,-.22,0,.28,.32,1); bot.rotation.y=s2*.2; u.wings.push(w);}
-    const hd=hand(h.aR); add(hd,gCyl,gold,0,.25,0,.025,.9,.025); u.core=add(hd,gSph,glow('#ffb02a',2.2),0,.72,0,.07); for(let i=0;i<4;i++){const a2=i/4*TAU; add(hd,gCone,gold,Math.cos(a2)*.06,.66,Math.sin(a2)*.06,.02,.1,.02);}
-    break;}
-  case 'harmonizer':{const u=R.userData; const stem=M('#4a8a2a',{roughness:.7}), leaf=M('#6aaa3a',{roughness:.6,side:THREE.DoubleSide}), petal=M('#ffd8f0',{roughness:.5,side:THREE.DoubleSide}), petal2=M('#ffb8e0',{roughness:.5,side:THREE.DoubleSide}), root=M('#6a4a2a',{roughness:.9});
-    u.legs=[limb(B,-.16,.5,0,.5,.1,root),limb(B,.16,.5,0,.5,.1,root)]; for(const l of u.legs) for(let i=0;i<3;i++) add(l,gCone,root,(i-1)*.06,-.5,.05,.03,.14,.03).rotation.x=Math.PI*.6;
-    const torso=new THREE.Group(); torso.position.y=.5; B.add(torso); u.torso=torso; add(torso,gCyl,stem,0,.4,0,.13,.8,.13); add(torso,gSph,stem,0,.25,0,.24,.22,.2);
-    for(let i=0;i<4;i++) add(torso,gSph,leaf,(i%2?.16:-.16),.45+i*.1,.05,.12,.03,.2).rotation.z=(i%2?-.6:.6);
-    const head=new THREE.Group(); head.position.y=.95; torso.add(head); u.head=head; u.core=add(head,gSph,glow('#ffe86a',1.4),0,0,.05,.18,.18,.08);
-    u.petals=new THREE.Group(); head.add(u.petals); for(let i=0;i<12;i++){const a2=i/12*TAU; const p=add(u.petals,gSph,i%2?petal:petal2,Math.cos(a2)*.3,Math.sin(a2)*.3,0,.16,.07,.03); p.rotation.z=a2;}
-    const ey=glow('#4a2a10',.2); add(head,gSph,M('#3a2a10'),-.06,.04,.12,.025); add(head,gSph,M('#3a2a10'),.06,.04,.12,.025);
-    const aL=limb(torso,-.2,.6,0,.5,.06,stem), aR=limb(torso,.2,.6,0,.5,.06,stem); u.arms=[aL,aR]; for(const a of [aL,aR]) add(a,gSph,leaf,0,-.5,.04,.14,.04,.24);
-    u.orbit=[0,1,2,3,4].map(i=>add(B,gSph,glow(i%2?'#ffe86a':'#ffd8f0',1.4),0,1,0,.06)); u.floatOrbit=true; break;}
+    add(h.torso,gCone,M('#3a1a5a',{roughness:.8,side:THREE.DoubleSide}),0,.05,-.12,.36,.8,.18).rotation.x=Math.PI+.12; crown(h.head,.2,1.35,'#ffc04a');
+    // giant sculk-infected hands with slasher blades for fingers
+    const sk=M('#0c2a30',{roughness:.65}), sk2=M('#123a40',{roughness:.6}), vein=glow('#2affe0',2.2), blade=M('#cfe8ec',{metalness:.85,roughness:.18}), edge=glow('#5affff',1.6);
+    u.claws=[];
+    for(const arm of [h.aL,h.aR]){add(arm,gSph,sk2,0,-.22,0,.09,.14,.09); for(let i=0;i<3;i++) add(arm,gSph,vein,(i-1)*.04,-.14-i*.06,.07,.018);
+      const hd=hand(arm,-.42); hd.scale.setScalar(1.55); add(hd,gSph,sk,0,0,0,.13,.11,.12); add(hd,gSph,sk2,0,.02,-.04,.1,.08,.1);
+      for(let i=0;i<6;i++){const sp=add(hd,gSph,vein,Math.cos(i*1.3)*.1,Math.sin(i*2.1)*.07,.07+(i%2)*.03,.02+(i%3)*.006); sp.castShadow=false;}
+      const fing=new THREE.Group(); hd.add(fing); u.claws.push(fing);
+      for(let i=0;i<4;i++){const x=-.09+i*.06; const kn=add(fing,gSph,sk,x,-.08,.07,.035); const bl=add(fing,gCone,blade,x,-.24,.13,.022,.32,.05); bl.rotation.x=Math.PI-.45; const e2=add(fing,gBox,edge,x,-.24,.142,.004,.26,.004); e2.rotation.x=-.45;}
+      add(fing,gCone,blade,.13,-.12,.06,.02,.2,.04).rotation.set(Math.PI-.3,0,.6);}
+    u.core=add(h.torso,gSph,vein,0,.32,.18,.035); break;}
+  case 'harmonizer':{const u=R.userData; u.float=true; u.legs=[]; u.arms=[]; const stem=M('#4a8a2a',{roughness:.7}), bulb=M('#6aaa3a',{roughness:.55}), leaf=M('#8ad05a',{roughness:.6,side:THREE.DoubleSide});
+    add(B,gSph,bulb,0,.8,0,.3,.34,.3); add(B,gSph,stem,0,.56,0,.2,.12,.2); for(let i=0;i<6;i++){const a2=i/6*TAU; const l=add(B,gSph,leaf,Math.cos(a2)*.26,.98,Math.sin(a2)*.26,.14,.03,.08); l.rotation.y=-a2; l.rotation.z=.4;}
+    // long hanging tentacles
+    u.tentacles=[]; for(let i=0;i<7;i++){const a2=i/7*TAU, g=new THREE.Group(); g.position.set(Math.cos(a2)*.17,.5,Math.sin(a2)*.17); g.rotation.y=-a2; B.add(g); const segs=[]; let p=g;
+      for(let k=0;k<7;k++){const sg=new THREE.Group(); sg.position.y=k?-.12:0; p.add(sg); add(sg,gSph,k%2?stem:bulb,0,-.06,0,.05-k*.004,.07,.05-k*.004); if(k===6) add(sg,gSph,glow('#ffe86a',1.6),0,-.13,0,.03); segs.push(sg); p=sg;} u.tentacles.push(segs);}
+    // head with a mouth
+    const head=new THREE.Group(); head.position.y=1.28; B.add(head); u.head=head; add(head,gSph,M('#9ad868',{roughness:.5}),0,0,0,.25,.23,.22);
+    add(head,gSph,M('#2a0e0a'),0,-.07,.17,.13,.08,.06); add(head,gSph,M('#c04a5a'),0,-.1,.18,.07,.03,.04);
+    for(let i=0;i<6;i++){add(head,gCone,M('#f0ecd8'),-.09+i*.036,-.02,.21,.012,.04,.012).rotation.x=Math.PI; add(head,gCone,M('#f0ecd8'),-.08+i*.036,-.12,.205,.011,.035,.011);}
+    u.core=add(head,gSph,glow('#ffe86a',2),-.08,.07,.18,.035); add(head,gSph,glow('#ffe86a',2),.08,.07,.18,.035);
+    // four big petals that keep changing colour
+    u.petals=new THREE.Group(); u.petals.position.z=-.06; head.add(u.petals); u.petalMats=[];
+    for(let i=0;i<4;i++){const a2=i/4*TAU+Math.PI/4; const pm=new THREE.MeshStandardMaterial({color:0xffd8f0,roughness:.45,side:THREE.DoubleSide,emissive:new THREE.Color(0xffd8f0),emissiveIntensity:.35}); u.petalMats.push(pm);
+      const p=add(u.petals,gSph,pm,Math.cos(a2)*.42,Math.sin(a2)*.42,0,.3,.13,.04); p.rotation.z=a2;}
+    u.orbit=[0,1,2,3,4].map(i=>add(B,gSph,glow(i%2?'#ffe86a':'#ffd8f0',1.4),0,1,0,.06)); break;}
   case 'corruptedsinger':{const u=R.userData; u.float=true; u.legs=[]; u.arms=[]; const gown=M('#2a1a3a',{roughness:.6}), gown2=M('#3a2a5a',{roughness:.5}), skin=M('#d8d0e8',{roughness:.4}), mask=M('#f0ece4',{roughness:.3}), vio=glow('#b47aff',2.4), cy=glow('#2affe0',2);
     add(B,gCone,gown,0,.6,0,.42,1.2,.38); add(B,gCone,gown2,0,.45,0,.48,.5,.44).rotation.x=Math.PI; add(B,gSph,gown,0,1.25,0,.22,.26,.18);
     const head=new THREE.Group(); head.position.y=1.6; B.add(head); u.head=head; add(head,gSph,skin,0,0,0,.17,.2,.17); add(head,gCap,mask,0,0,.02,.18,.2,.16).rotation.x=Math.PI/2;
@@ -1709,6 +1719,8 @@ function animBoss(m,b){const u=m.userData;
   if(u.tentacles) u.tentacles.forEach((segs,i)=>segs.forEach((sg,k)=>{sg.rotation.z=Math.sin(time*2.4+i+k*.8)*.35; sg.rotation.y=Math.cos(time*1.9+i*2+k)*.3;}));
   if(u.ribbons) u.ribbons.forEach((segs,i)=>segs.forEach((sg,k)=>{sg.rotation.x=Math.sin(time*2.2+i+k*.7)*.25; sg.rotation.z=Math.cos(time*1.6+i+k*.5)*.2;}));
   if(u.petals) u.petals.rotation.z=time*.8;
+  if(u.petalMats) u.petalMats.forEach((pm,i)=>{pm.color.setHSL((time*.12+i*.25)%1,.75,.72); pm.emissive.setHSL((time*.12+i*.25)%1,.8,.45);});
+  if(u.claws) u.claws.forEach((c,i)=>{c.rotation.x=Math.max(0,Math.sin(time*2.2+i*Math.PI))*.35;});
   if(u.souls) u.souls.forEach((sg,i)=>{const a2=time*(1.4+i*.17)+i*TAU/u.souls.length, r=.07+.08*((Math.sin(time*1.3+i*2)+1)/2); sg.position.set(Math.cos(a2)*r,Math.sin(a2)*r*.75,.03+.03*Math.sin(time*3+i)); sg.rotation.z=a2+Math.PI/2;});
   if(u.maw) u.maw.scale.y=1.3*(1+.12*Math.sin(time*2.4));
   if(u.heart){const k2=1+.15*Math.sin(time*5); u.heart.scale.set(.16*k2,.24*k2,.16*k2);}
@@ -2278,7 +2290,7 @@ const BOSS_STORY={
  lanternmaw:{ep:'Terror of the Deep Harvest',stir:'A small light bobs in the dark water ahead. It is far too friendly.',taunt:'Follow the light, little swimmer. Everyone does.'},
  echotyrant:{ep:'Guardian of the Great Portal',stir:'The cavern falls silent. A crystal heartbeat echoes through the stone.',taunt:'Every sound you make, I hear. Every step brings you closer to silence.'},
  sculkmonstrosity:{ep:'Heart of the Obsession',stir:'The veins on the floor pulse faster and faster, all flowing to one place.',taunt:'More. MORE. Everything becomes part of me.'},
- monarch:{ep:'King of Wings',stir:'Golden wings unfold across the throne room. Trumpets sound.',taunt:'You stand before a king. Kneel, or be swept away by my wings.'},
+ monarch:{ep:'The Clawed King',stir:'Trumpets sound. Two enormous sculk-veined hands scrape across the throne room floor.',taunt:'You stand before a king. Kneel, or be torn apart by my claws.'},
  harmonizer:{ep:'Conductor of the Meadow',stir:'Every flower turns at once. The meadow begins to hum in perfect time.',taunt:'Out of tune. Out of place. I will fix you.'},
  corruptedsinger:{ep:'Voice of the Broken Song',stir:'A beautiful note rings out... then cracks into a scream.',taunt:'Listen closely. This is the last song you will ever hear.'}};
 let cine=null;
@@ -2361,7 +2373,7 @@ function bossCine(b){const s=BOSS_STORY[b.id]||{ep:'',stir:'Something stirs.',ta
     cam:k=>{const a=fa+.5, r=7*sc; return [bx+ux*2*sc+Math.cos(a)*r,lerp(2.2*sc,1.2*sc,k),bz+uz*2*sc+Math.sin(a)*r,b.x*S,1.2*sc+(b.jy||0)*.6,b.y*S];}},
    {dur:1.8,enter(){shake(8); CFX.burst(b,F.c); b.roar=.8;},tick:(()=>{const f=fxTick(b,true); return (t,dt)=>{f(t,dt); b.spin=Math.sin(t*9)*.25; b.walk+=dt*8;};})(),
     cam:k=>{const a=fa+1.2+k*1.2, r=lerp(5*sc,8.5*sc,k); return [b.x*S+Math.cos(a)*r,lerp(2*sc,6*sc,k),b.y*S+Math.sin(a)*r,b.x*S,1.2*sc,b.y*S];}},
-   {dur:2.0,fast:true,speaker:b.name,text:s.taunt,enter(){b.spin=0; b.roar=1.2; shake(6);},tick(t,dt){if(Math.random()<.25) CFX.ring(b,F.c);},
+   {dur:2.0,fast:true,speaker:b.name,text:s.taunt,enter(){b.spin=0; b.roar=0; shake(6);},tick(t,dt){if(Math.random()<.25) CFX.ring(b,F.c);},
     cam:k=>{const qx=b.x*S,qz=b.y*S,vx=P.x*S-qx,vz=P.y*S-qz,vl=Math.hypot(vx,vz)||1,wx=vx/vl,wz=vz/vl, r=lerp(5*sc,3.2*sc,k); return [qx+wx*r,lerp(2.2*sc,1.8*sc,k),qz+wz*r,qx,1.55*sc,qz];}}];
   shots.cleanup=()=>{if(circ){circ.remove(); circ=null;} b.cineHide=false; b.rise=1; b.jy=0; b.spin=0;};
   return shots;}
