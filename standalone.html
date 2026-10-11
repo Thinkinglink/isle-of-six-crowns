@@ -723,7 +723,7 @@ const BOSSES={
  lanternmaw:{name:'Lanternmaw',hp:880,r:36,spd:86,c1:'#163a4a',c2:'#d8ff6a',acts:['whirl','strikes','tidal','summon','charge'],shot:'#9fffd0',minion:'bomb'},
  echotyrant:{name:'The Echo Tyrant',hp:960,r:48,spd:90,c1:'#1c2630',c2:'#9a7cff',acts:['tidal','charge','ringshot','summon','strikes'],shot:'#b48cff',minion:'lunge'},
  sculkmonstrosity:{name:'The Sculk Monstrosity',hp:1000,r:40,spd:72,c1:'#0c2a30',c2:'#2affe0',acts:['whirl','tidal','summon','fan','strikes'],shot:'#5affff',minion:'bomb'},
- monarch:{name:'The Monarch',hp:1020,r:32,spd:100,c1:'#4a2a6a',c2:'#ffb02a',acts:['fan','strikes','charge','summon','ringshot'],shot:'#ffc04a',minion:'melee'},
+ monarch:{name:'The Monarch',hp:1020,r:32,spd:100,c1:'#1e1428',c2:'#7affb0',acts:['fan','strikes','charge','summon','ringshot'],shot:'#7affb0',minion:'melee'},
  harmonizer:{name:'The Harmonizer',hp:1060,r:36,spd:80,c1:'#4a8a2a',c2:'#ffd8f0',acts:['ringshot','whirl','vines','summon','fan'],shot:'#ffe0f4',minion:'lunge'},
  corruptedsinger:{name:'The Corrupted Singer',hp:1150,r:34,spd:96,c1:'#2a1a3a',c2:'#b47aff',acts:['ringshot','whirl','strikes','tidal','summon','fan'],shot:'#c89aff',minion:'caster'}
 };
@@ -970,7 +970,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.6.0', SAVE_VERSION=6;
+const APP_VERSION='2.6.1', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1739,19 +1739,32 @@ function buildBoss(b){
     u.tentacles=[]; for(let i=0;i<6;i++){const a2=i/6*TAU+.3, g=new THREE.Group(); g.position.set(Math.cos(a2)*.55,.8,Math.sin(a2)*.5); g.rotation.y=-a2; B.add(g); const segs=[]; let p=g;
       for(let k=0;k<4;k++){const sg=new THREE.Group(); sg.position.x=k?.2:0; p.add(sg); add(sg,gSph,k%2?flesh:flesh2,.1,0,0,.09-k*.015,.07-k*.01,.07-k*.01); if(k===3) add(sg,gSph,pus,.2,0,0,.04); segs.push(sg); p=sg;} u.tentacles.push(segs);}
     break;}
-  case 'monarch':{const u=R.userData; const st={metalness:.55,roughness:.3}; const h=humanoid({body:'#4a2a6a',bodyOpt:st,skin:'#e8d0b0',sleeve:'#3a1a5a',legC:'#2a1a3a',eye:'#ffb02a',eyeGlow:true,armsFwd:.25});
-    const gold=M('#e8c860',{metalness:.75,roughness:.25}); add(h.torso,gBox,gold,0,.3,.16,.3,.34,.02); add(h.torso,gSph,gold,-.3,.46,0,.13,.09,.13); add(h.torso,gSph,gold,.3,.46,0,.13,.09,.13);
-    add(h.torso,gCone,M('#3a1a5a',{roughness:.8,side:THREE.DoubleSide}),0,.05,-.12,.36,.8,.18).rotation.x=Math.PI+.12; crown(h.head,.2,1.35,'#ffc04a');
+  case 'monarch':{const u=R.userData; const st={metalness:.45,roughness:.35}; const h=humanoid({body:'#1e1428',bodyOpt:st,skin:'#3a3048',sleeve:'#160e1e',legC:'#100a16',eye:'#7affb0',eyeGlow:true,armsFwd:.25});
+    // darker, corrupted armour with glowing spots
+    const trim=M('#4a3e3a',{metalness:.7,roughness:.35}); add(h.torso,gBox,trim,0,.3,.16,.3,.34,.02); add(h.torso,gSph,trim,-.3,.46,0,.13,.09,.13); add(h.torso,gSph,trim,.3,.46,0,.13,.09,.13);
+    const cape=add(h.torso,gCone,M('#140c1c',{roughness:.85,side:THREE.DoubleSide}),0,.05,-.12,.36,.8,.18); cape.rotation.x=Math.PI+.12;
+    const spT=glow('#2affe0',2.4), spV=glow('#c04aff',2.2), spG=glow('#7affb0',2); u.spots=[];
+    const spot=(p,x,y,z,r,m)=>{const o=add(p,gSph,m,x,y,z,r*1.45); o.castShadow=false; u.spots.push(o); return o;};
+    [[-.12,.36,.165,.022],[.08,.2,.165,.018],[.15,.42,.15,.016],[-.05,.1,.15,.02],[0,.5,.15,.014],[-.18,.18,.12,.016],[.2,.28,.1,.018],[-.28,.5,.08,.02],[.3,.5,.07,.017],[-.08,.28,-.15,.02],[.1,.4,-.15,.016]].forEach(([x,y,z,r],i)=>spot(h.torso,x,y,z,r,i%3===0?spV:i%3===1?spT:spG));
+    [[-.06,.08,.16,.012],[.09,-.04,.15,.01],[-.1,-.07,.13,.011]].forEach(([x,y,z,r],i)=>spot(h.head,x,y,z,r,i?spT:spV));
+    for(const lg of u.legs) for(let i=0;i<3;i++) spot(lg,(i-1)*.03,-.08-i*.1,.075,.014,i%2?spT:spV);
+    for(let i=0;i<7;i++) spot(cape,Math.cos(i*1.9)*.14,-.1+i*.07,-.13+Math.sin(i)*.04,.02,i%2?spT:spV);
+    // jagged crown of crystals
+    {const cr=new THREE.Group(); cr.position.y=.2; h.head.add(cr); add(cr,gBand,M('#2a2030',{metalness:.6,roughness:.3,side:THREE.DoubleSide}),0,0,0,.17,.05,.17);
+     const cA=M('#2affe0',{emissive:new THREE.Color('#14b0a0'),emissiveIntensity:1.3,metalness:.3,roughness:.15,transparent:true,opacity:.92}), cB=M('#c04aff',{emissive:new THREE.Color('#7a1ad0'),emissiveIntensity:1.3,metalness:.3,roughness:.15,transparent:true,opacity:.92});
+     const H=[.3,.16,.24,.12,.34,.14,.22,.18,.28]; H.forEach((hh,i)=>{const a=i/H.length*TAU; const c=add(cr,gOct,i%2?cB:cA,Math.cos(a)*.16,hh*.5,Math.sin(a)*.16,.045,hh,.045); c.rotation.set(Math.sin(a)*.35,a,-Math.cos(a)*.35); c.castShadow=false;});
+     u.crown=cr;}
     // giant sculk-infected hands with slasher blades for fingers
-    const sk=M('#0c2a30',{roughness:.65}), sk2=M('#123a40',{roughness:.6}), vein=glow('#2affe0',2.2), blade=M('#cfe8ec',{metalness:.85,roughness:.18}), edge=glow('#5affff',1.6);
+    const sk=M('#0c2a30',{roughness:.65}), sk2=M('#123a40',{roughness:.6}), vein=glow('#2affe0',2.2), blade=M('#3aff7a',{emissive:new THREE.Color('#1ad05a'),emissiveIntensity:1.5,metalness:.35,roughness:.2}), edge=glow('#d8ffe0',2.2);
     u.claws=[];
     for(const arm of [h.aL,h.aR]){add(arm,gSph,sk2,0,-.22,0,.09,.14,.09); for(let i=0;i<3;i++) add(arm,gSph,vein,(i-1)*.04,-.14-i*.06,.07,.018);
       const hd=hand(arm,-.42); hd.scale.setScalar(1.55); add(hd,gSph,sk,0,0,0,.13,.11,.12); add(hd,gSph,sk2,0,.02,-.04,.1,.08,.1);
       for(let i=0;i<6;i++){const sp=add(hd,gSph,vein,Math.cos(i*1.3)*.1,Math.sin(i*2.1)*.07,.07+(i%2)*.03,.02+(i%3)*.006); sp.castShadow=false;}
       const fing=new THREE.Group(); hd.add(fing); u.claws.push(fing);
-      for(let i=0;i<4;i++){const x=-.09+i*.06; const kn=add(fing,gSph,sk,x,-.08,.07,.035); const bl=add(fing,gCone,blade,x,-.24,.13,.022,.32,.05); bl.rotation.x=Math.PI-.45; const e2=add(fing,gBox,edge,x,-.24,.142,.004,.26,.004); e2.rotation.x=-.45;}
-      add(fing,gCone,blade,.13,-.12,.06,.02,.2,.04).rotation.set(Math.PI-.3,0,.6);}
-    u.core=add(h.torso,gSph,vein,0,.32,.18,.035); break;}
+      for(let i=0;i<4;i++){const x=-.09+i*.06; const kn=add(fing,gSph,sk,x,-.08,.07,.035); const bl=add(fing,gCone,blade,x,-.34,.18,.024,.58,.055); bl.rotation.x=Math.PI-.45; const e2=add(fing,gBox,edge,x,-.34,.195,.005,.48,.005); e2.rotation.x=-.45;}
+      {const gl=new THREE.PointLight(0x5aff8a,.9,3); gl.position.set(0,-.4,.2); fing.add(gl);}
+      add(fing,gCone,blade,.16,-.17,.08,.022,.36,.045).rotation.set(Math.PI-.3,0,.6);}
+    u.core=add(h.torso,gSph,spT,0,.32,.18,.035); break;}
   case 'harmonizer':{const u=R.userData; u.float=true; u.legs=[]; u.arms=[]; const stem=M('#4a8a2a',{roughness:.7}), bulb=M('#6aaa3a',{roughness:.55}), leaf=M('#8ad05a',{roughness:.6,side:THREE.DoubleSide});
     add(B,gSph,bulb,0,.8,0,.3,.34,.3); add(B,gSph,stem,0,.56,0,.2,.12,.2); for(let i=0;i<6;i++){const a2=i/6*TAU; const l=add(B,gSph,leaf,Math.cos(a2)*.26,.98,Math.sin(a2)*.26,.14,.03,.08); l.rotation.y=-a2; l.rotation.z=.4;}
     // long hanging tentacles
@@ -1833,6 +1846,7 @@ function animBoss(m,b){const u=m.userData;
       for(let k=0;k<7;k++){const t=k/6, j=k&&k<6?.09:0; p.setXYZ(k,a.x+(c.x-a.x)*t+rand(-j,j),a.y+(c.y-a.y)*t+rand(-j,j),a.z+(c.z-a.z)*t+rand(-j,j));} p.needsUpdate=true; l.visible=!b.hidden&&Math.random()<.75;});}}
   if(u.vines) u.vines.forEach((g,i)=>{g.rotation.x=Math.sin(time*2+i)*.25; g.rotation.z=Math.cos(time*1.7+i)*.2;});
   if(u.spots&&u.spots[0]) u.spots[0].material.emissiveIntensity=1.2+Math.sin(time*3)*.8;
+  if(u.crown) u.crown.rotation.y=Math.sin(time*.8)*.15;
   if(u.flame) u.flame.scale.set(.07,.1+Math.sin(time*12)*.025,.07);
   if(u.fins) u.fins.forEach((g,i)=>g.rotation.y=(i?-1:1)*Math.sin(time*4)*.4);
   if(u.tail) u.tail.rotation.y=Math.sin(time*3)*.35;
@@ -2494,7 +2508,7 @@ const BOSS_FX={bramble:{c:['#7fb04f','#c9ff6a','#4a6b2a'],a:['ring','burst']},su
   sov2:{c:['#d48cff','#b45cff','#e0b0ff'],a:['spiral','bolts']},pumpking:{c:['#ff8a1a','#ffd84a','#9a6aff'],a:['burst','rain']},
   stormsentinel:{c:['#7fd8ff','#e8f8ff','#5fc8f0'],a:['bolts','ring']},mossback:{c:['#c8e070','#7aa83f','#e8c860'],a:['quake','ring']},
   lanternmaw:{c:['#9fffd0','#d8ff6a','#bff8ff'],a:['spiral','burst']},echotyrant:{c:['#7af0ff','#b48cff','#e8fff8'],a:['souls','spiral']},
-  sculkmonstrosity:{c:['#2affe0','#5affff','#0c2a30'],a:['burst','quake']},monarch:{c:['#ffb02a','#ffd86a','#b47aff'],a:['spiral','rain']},
+  sculkmonstrosity:{c:['#2affe0','#5affff','#0c2a30'],a:['burst','quake']},monarch:{c:['#7affb0','#2affe0','#c04aff'],a:['spiral','rain']},
   harmonizer:{c:['#ffd8f0','#ffe86a','#8ad05a'],a:['spiral','burst']},corruptedsinger:{c:['#b47aff','#2affe0','#ffd8f0'],a:['ring','spiral']}};
 function fxTick(b,heavy){const F=BOSS_FX[b.id]||BOSS_FX.bramble; let acc=0;
   return (t,dt)=>{acc-=dt; if(acc>0) return; acc=heavy?.22:.4; for(const a of F.a){if(a==='spiral'||a==='rain'||a==='souls') CFX[a](b,F.c,t); else if(Math.random()<(heavy?.6:.35)) CFX[a](b,F.c,t);}};}
