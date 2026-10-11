@@ -842,7 +842,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.2.1', SAVE_VERSION=6;
+const APP_VERSION='2.3.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -2104,12 +2104,13 @@ const dolly=(a,b)=>k=>a.map((v,i)=>lerp(v,b[i],k));
 const orbit=(cx,cz,r,h,a0,a1,ly)=>k=>{const a=lerp(a0,a1,k); return [cx+Math.cos(a)*r,h,cz+Math.sin(a)*r,cx,ly,cz];};
 const cEl=$('#cine');
 function startCine(shots,onEnd){cine={shots,i:0,t:0,onEnd,typed:0}; mode='cutscene'; $('#hud').hidden=true; cEl.hidden=false; cEl.classList.remove('in'); void cEl.offsetWidth; cEl.classList.add('in'); for(const k in keys) keys[k]=false; mouse.l=mouse.r=false; enterShot();}
-function enterShot(){const sh=cine.shots[cine.i]; cine.t=0; cine.typed=0; if(sh.text) sh.dur=Math.max(sh.dur,sh.text.length/50+1.8); if(sh.enter) sh.enter();
+function enterShot(){const sh=cine.shots[cine.i]; cine.t=0; cine.typed=0; if(sh.text) sh.dur=Math.max(sh.dur,sh.fast?sh.text.length/80+.8:sh.text.length/50+1.8); if(sh.enter) sh.enter();
   const ti=cEl.querySelector('.ctitle'); ti.classList.toggle('show',!!sh.title); if(sh.title){ti.querySelector('b').textContent=sh.title; ti.querySelector('span').textContent=sh.sub||'';}
   const lab=cEl.querySelector('.clabel'); lab.hidden=!sh.label; if(sh.label){lab.textContent=sh.label;}
   const sub=cEl.querySelector('.csub'); sub.hidden=!sh.text; sub.querySelector('em').textContent=sh.speaker||''; sub.querySelector('em').hidden=!sh.speaker; sub.querySelector('p').textContent='';}
 function updCine(dt){const sh=cine.shots[cine.i]; cine.t+=dt;
-  if(sh.text){const n=Math.min(sh.text.length,Math.floor(cine.typed+=dt*50)); cEl.querySelector('.csub p').textContent=sh.text.slice(0,n);}
+  if(sh.tick) sh.tick(cine.t,dt);
+  if(sh.text){const n=Math.min(sh.text.length,Math.floor(cine.typed+=dt*(sh.fast?80:50))); cEl.querySelector('.csub p').textContent=sh.text.slice(0,n);}
   shakeT=Math.max(0,shakeT-dt); if(shakeT<=0) shakeA=0; flashT=Math.max(0,flashT-dt);
   if(boss&&boss.roar>0) boss.roar-=dt;
   for(const p of parts){p.x+=p.vx*dt; p.y+=p.vy*dt; p.vx*=.95; p.vy*=.95; p.z=(p.z||0)+(p.vz||0)*dt; p.vz=(p.vz||0)-260*dt; if(p.z<0){p.z=0;p.vz*=-.3;} p.life-=dt;} parts=parts.filter(p=>p.life>0);
@@ -2128,14 +2129,39 @@ function biomeCine(bi){const st=STORY[bi],B=BIOMES[bi],px=P.x*S,pz=P.y*S;
   if(tgt){const ex=tgt.x*S,ez=tgt.y*S; shots.push({dur:4.4,text:st.lines[1],label:`${tgt.name} · ${ROLE[tgt.type][0]}`,enter(){tgt.face=Math.PI/2;},cam:dolly([ex+3,3.4,ez+4.6,ex,.7,ez],[ex+1,1.7,ez+2.6,ex,.8,ez])});}
   else shots.push({dur:4.4,text:st.lines[1],cam:orbit(px,pz,8,6,1,2,0)});
   shots.push(heroShot(st.hero)); return shots;}
-function bossCine(b){const s=BOSS_STORY[b.id],bx=b.x*S,bz=b.y*S,px=P.x*S,pz=P.y*S,dx=px-bx,dz=pz-bz,dl=Math.hypot(dx,dz)||1,ux=dx/dl,uz=dz/dl,sc=b.r/13*.85,fa=Math.atan2(uz,ux);
-  return [{dur:3.2,text:s.stir,cam:dolly([px+ux*3.6,2.8,pz+uz*3.6,bx,1.2*sc,bz],[px+ux*2.4,2.2,pz+uz*2.4,bx,1.4*sc,bz])},
-   {dur:3.8,title:b.name,sub:s.ep,enter(){b.roar=2.2; shake(10); puff(b.x,b.y,b.c2,40,220,1,6);},cam:orbit(bx,bz,4.4*sc,1.1*sc,fa-.9,fa+.5,1.5*sc)},
-   {dur:3.6,speaker:b.name,text:s.taunt,cam:dolly([bx+ux*5*sc,2.5*sc,bz+uz*5*sc,bx,1.9*sc,bz],[bx+ux*3.7*sc,2.2*sc,bz+uz*3.7*sc,bx,2*sc,bz])}];}
-function transformCine(b){const bx=b.x*S,bz=b.y*S,sc=b.r/13; const dx=P.x-b.x,dz=P.y-b.y,dl=Math.hypot(dx,dz)||1,ux=dx/dl,uz=dz/dl;
-  return [{dur:3.6,title:'Form II',sub:'The Sovereign Unbound',enter(){flashT=.7; flashCol='#e0b0ff'; shake(10); puff(b.x,b.y,'#b45cff',60,260,1.2,6);},cam:orbit(bx,bz,5*sc,2*sc,0,TAU*.6,1.6*sc)},
-   {dur:3.4,speaker:'The Sovereign Unbound',text:'You thought the mask was me?',cam:dolly([bx+ux*5*sc,2.2*sc,bz+uz*5*sc,bx,1.6*sc,bz],[bx+ux*3.5*sc,1.8*sc,bz+uz*3.5*sc,bx,1.7*sc,bz])},
-   {dur:3.6,speaker:'The Sovereign Unbound',text:'I am what remains when an island loses all of its kings.',cam:orbit(bx,bz,3.6*sc,1*sc,Math.atan2(uz,ux)-.3,Math.atan2(uz,ux)+.3,1.7*sc)}];}
+// ---- boss entrance cutscenes: about 8 seconds, fast cameras, a roar and each boss's signature power ----
+const FXP=(x,y,z,vx,vy,vz,col,life,sz)=>parts.push({x,y,z,vx,vy,vz,life,max:life,col,sz});
+const CFX={
+  ring(b,c){for(let i=0;i<40;i++){const a=i/40*TAU; FXP(b.x+Math.cos(a)*24,b.y+Math.sin(a)*24,10,Math.cos(a)*520,Math.sin(a)*520,40,c[i%c.length],.7,7);} shake(7);},
+  burst(b,c){for(let i=0;i<26;i++){const a=Math.random()*TAU,s2=rand(40,180); FXP(b.x,b.y,b.r*1.6,Math.cos(a)*s2,Math.sin(a)*s2,rand(260,460),c[i%c.length],1.1,rand(5,9));}},
+  spiral(b,c,t){for(let k=0;k<3;k++){const a=t*7+k*TAU/3, r=30+((t*160)%180); FXP(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r,10+r*.25,Math.cos(a+1.6)*140,Math.sin(a+1.6)*140,120,c[k%c.length],.8,7);}},
+  rain(b,c){for(let i=0;i<3;i++){const x=b.x+rand(-280,280),y=b.y+rand(-220,220); FXP(x,y,320,0,0,-520,c[i%c.length],.7,8); if(Math.random()<.35) puff(x,y,c[0],6,120,.4,5);}},
+  bolts(b){bolt({x:b.x+rand(-260,260),y:b.y+rand(-200,200)}); flashT=.12; flashCol='#e8f8ff'; shake(4);},
+  quake(b,c){puff(b.x+rand(-200,200),b.y+rand(-160,160),c[0],10,160,.6,6); shake(5);}};
+const BOSS_FX={bramble:{c:['#7fb04f','#c9ff6a','#4a6b2a'],a:['ring','burst']},sultan:{c:['#f0d08a','#e2c387','#ffd98a'],a:['spiral','quake']},
+  witch:{c:['#b7f06a','#8e7aa8','#d8ff6a'],a:['burst','spiral']},warden:{c:['#cfefff','#ffffff','#9fd3e8'],a:['rain','ring']},
+  golem:{c:['#ff6a2a','#ffb24a','#ff8a3a'],a:['rain','quake']},sov1:{c:['#c8b8ff','#b45cff','#ffffff'],a:['spiral','ring']},
+  sov2:{c:['#d48cff','#b45cff','#e0b0ff'],a:['spiral','bolts']},pumpking:{c:['#ff8a1a','#ffd84a','#9a6aff'],a:['burst','rain']},
+  stormsentinel:{c:['#7fd8ff','#e8f8ff','#5fc8f0'],a:['bolts','ring']},mossback:{c:['#c8e070','#7aa83f','#e8c860'],a:['quake','ring']},
+  lanternmaw:{c:['#9fffd0','#d8ff6a','#bff8ff'],a:['spiral','burst']}};
+// play a boss's signature effects for the length of a shot
+function fxTick(b,heavy){const F=BOSS_FX[b.id]||BOSS_FX.bramble; let acc=0;
+  return (t,dt)=>{acc-=dt; if(acc>0) return; acc=heavy?.22:.4; for(const a of F.a){if(a==='spiral'||a==='rain') CFX[a](b,F.c,t); else if(Math.random()<(heavy?.6:.35)) CFX[a](b,F.c,t);} b.walk+=dt*10;};}
+function bossCine(b){const s=BOSS_STORY[b.id]||{ep:'',stir:'Something stirs.',taunt:'...'},bx=b.x*S,bz=b.y*S,px=P.x*S,pz=P.y*S,dx=px-bx,dz=pz-bz,dl=Math.hypot(dx,dz)||1,ux=dx/dl,uz=dz/dl,sc=b.r/13*.85,fa=Math.atan2(uz,ux);
+  const F=BOSS_FX[b.id]||BOSS_FX.bramble;
+  return [
+   {dur:1.7,fast:true,text:s.stir,enter(){shake(4);},tick(t){if(Math.random()<.3) puff(b.x+rand(-120,120),b.y+rand(-120,120),F.c[0],3,60,.5,4); if(t>1) shake(3);},
+    cam:dolly([px+ux*3.4,1.4,pz+uz*3.4,bx,1.6*sc,bz],[px+ux*1.6-uz*.8,1.9,pz+uz*1.6+ux*.8,bx,1.8*sc,bz])},
+   {dur:2.0,title:b.name,sub:s.ep,enter(){b.roar=2.0; shake(12); flashT=.4; flashCol='#fff'; CFX.ring(b,F.c); puff(b.x,b.y,b.c2,50,240,1,7);},tick:fxTick(b,false),
+    cam:orbit(bx,bz,3.9*sc,1.0*sc,fa-1.5,fa+.6,1.5*sc)},
+   {dur:2.2,enter(){shake(8); CFX.burst(b,F.c);},tick:fxTick(b,true),
+    cam:k=>{const a=fa+.6+k*1.1, r=lerp(5*sc,8*sc,k); return [bx+Math.cos(a)*r,lerp(2*sc,5.5*sc,k),bz+Math.sin(a)*r,bx,1.2*sc,bz];}},
+   {dur:2.1,fast:true,speaker:b.name,text:s.taunt,enter(){b.roar=1.2; shake(6);},tick(t,dt){if(Math.random()<.25) CFX.ring(b,F.c); b.walk+=dt*4;},
+    cam:dolly([bx+ux*5*sc,2.4*sc,bz+uz*5*sc,bx,1.9*sc,bz],[bx+ux*3.2*sc,2.0*sc,bz+uz*3.2*sc,bx,2*sc,bz])}];}
+function transformCine(b){const bx=b.x*S,bz=b.y*S,sc=b.r/13; const dx=P.x-b.x,dz=P.y-b.y,dl=Math.hypot(dx,dz)||1,ux=dx/dl,uz=dz/dl,fa=Math.atan2(uz,ux); const F=BOSS_FX.sov2;
+  return [{dur:2.2,title:'Form II',sub:'The Sovereign Unbound',enter(){flashT=.7; flashCol='#e0b0ff'; shake(12); puff(b.x,b.y,'#b45cff',70,280,1.2,7); CFX.ring(b,F.c);},tick:fxTick(b,true),cam:orbit(bx,bz,5*sc,2*sc,0,TAU*.7,1.6*sc)},
+   {dur:2.0,fast:true,speaker:'The Sovereign Unbound',text:'You thought the mask was me?',enter(){b.roar=1.6; CFX.burst(b,F.c);},tick:fxTick(b,false),cam:dolly([bx+ux*5*sc,2.2*sc,bz+uz*5*sc,bx,1.6*sc,bz],[bx+ux*3.2*sc,1.8*sc,bz+uz*3.2*sc,bx,1.7*sc,bz])},
+   {dur:2.4,fast:true,speaker:'The Sovereign Unbound',text:'I am what remains when an island loses all of its kings.',enter(){shake(10); CFX.ring(b,F.c);},tick:fxTick(b,true),cam:k=>{const a=fa-.4+k*.9,r=lerp(3.4*sc,7*sc,k); return [bx+Math.cos(a)*r,lerp(1*sc,4.5*sc,k),bz+Math.sin(a)*r,bx,1.6*sc,bz];}}];}
 function victoryCine(b){const bx=b.x*S,bz=b.y*S,px=P.x*S,pz=P.y*S, cols=['#c9e27a','#ffd98a','#b7f06a','#cfefff','#ff8a3a','#c8b8ff'];
   const burst=n=>()=>{for(let i=0;i<6;i++) puff(b.x+Math.cos(i/6*TAU)*120,b.y+Math.sin(i/6*TAU)*120,cols[i],n,200,1.4,6); flashT=.35; flashCol='#fff';};
   return [{dur:3.6,title:'The Sovereign falls',sub:'All six crowns are free',enter:burst(30),cam:orbit(bx,bz,7,5,0,1.2,.4)},
