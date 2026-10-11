@@ -20,6 +20,16 @@ Open **Friends & Party** from the main menu or the map (key **F**).
 - **Harder together:** mobs in every level and boss health are multiplied by the number of players (2 players = ×2, 4 players = ×4).
 - The party leader picks the level. Everyone gets their own loot, and a fallen player gets back up next to a teammate.
 
+## 🌊 The Outer Isles
+
+Beat the Hollow Sovereign to save the isle, then press **→** at the bottom right of the map to sail to a second map:
+
+- **Tempest Monument**: a storm-wracked island ruled by Thunderhead the Storm Sentinel.
+- **Overgrown Temple**: jungle ruins guarded by the Mossback Behemoth.
+- **Deep Harvest Sea**: an underwater reef where you have 30 seconds of air. Stand on the glowing air pods to breathe. Lanternmaw hunts in the deepest trench.
+
+Each has 4 levels and a boss, with cutscenes and its own loot.
+
 ## 🎃 Halloween event (until October 31)
 
 Hollowshade Isle has risen off the coast. Fight through 7 haunted levels and face the Pumpkin King in the 8th. Anything you find there stays in your pack after the event.
