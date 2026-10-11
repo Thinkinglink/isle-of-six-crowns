@@ -701,7 +701,7 @@ const BOSSES={
  stormsentinel:{name:'Thunderhead the Storm Sentinel',hp:760,r:32,spd:84,c1:'#3a4250',c2:'#7fd8ff',acts:['strikes','ringshot','fan','summon','whirl'],shot:'#7fd8ff',minion:'lunge'},
  mossback:{name:'The Mossback Behemoth',hp:820,r:38,spd:70,c1:'#5a6a3a',c2:'#e8c860',acts:['charge','tidal','vines','summon','fan'],shot:'#c8e070',minion:'melee'},
  lanternmaw:{name:'Lanternmaw',hp:880,r:36,spd:86,c1:'#163a4a',c2:'#d8ff6a',acts:['whirl','strikes','tidal','summon','charge'],shot:'#9fffd0',minion:'bomb'},
- echotyrant:{name:'The Echo Tyrant',hp:960,r:38,spd:90,c1:'#1c2630',c2:'#9a7cff',acts:['tidal','charge','ringshot','summon','strikes'],shot:'#b48cff',minion:'lunge'},
+ echotyrant:{name:'The Echo Tyrant',hp:960,r:48,spd:90,c1:'#1c2630',c2:'#9a7cff',acts:['tidal','charge','ringshot','summon','strikes'],shot:'#b48cff',minion:'lunge'},
  sculkmonstrosity:{name:'The Sculk Monstrosity',hp:1000,r:40,spd:72,c1:'#0c2a30',c2:'#2affe0',acts:['whirl','tidal','summon','fan','strikes'],shot:'#5affff',minion:'bomb'},
  monarch:{name:'The Monarch',hp:1020,r:32,spd:100,c1:'#4a2a6a',c2:'#ffb02a',acts:['fan','strikes','charge','summon','ringshot'],shot:'#ffc04a',minion:'melee'},
  harmonizer:{name:'The Harmonizer',hp:1060,r:36,spd:80,c1:'#4a8a2a',c2:'#ffd8f0',acts:['ringshot','whirl','vines','summon','fan'],shot:'#ffe0f4',minion:'lunge'},
@@ -894,7 +894,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.4.0', SAVE_VERSION=6;
+const APP_VERSION='2.4.1', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1595,10 +1595,18 @@ function buildBoss(b){
   case 'echotyrant':{const u=R.userData; const hide=M('#3a4654',{roughness:.7}), plate=M('#4a5866',{roughness:.5,metalness:.25}), dark=M('#0a0e12'), vio=glow('#b48cff',2.4), cyn=glow('#3affe0',1.6);
     u.legs=[limb(B,-.2,.62,0,.6,.13,hide,plate),limb(B,.2,.62,0,.6,.13,hide,plate)];
     const torso=new THREE.Group(); torso.position.y=.62; B.add(torso); u.torso=torso; torso.userData.rx0=.12; torso.rotation.x=.12;
-    add(torso,gSph,hide,0,.42,0,.42,.46,.32); add(torso,gBox,plate,0,.5,.22,.46,.36,.1); add(torso,gSph,plate,-.42,.72,0,.2,.16,.2); add(torso,gSph,plate,.42,.72,0,.2,.16,.2);
+    add(torso,gSph,hide,0,.42,0,.42,.46,.32); add(torso,gBox,plate,0,.8,.2,.5,.14,.1); add(torso,gSph,plate,-.42,.72,0,.2,.16,.2); add(torso,gSph,plate,.42,.72,0,.2,.16,.2);
     for(const s2 of [-1,1]) for(let i=0;i<3;i++){const c=add(torso,gOct,i%2?cyn:M('#3a5a6a',{metalness:.4,roughness:.3}),s2*(.38+i*.07),.86+i*.06,-.04+i*.05,.05,.18+i*.04,.05); c.rotation.z=-s2*(.3+i*.25);}
     u.heart=add(torso,gOct,vio,0,.6,-.33,.16,.24,.16); u.heart.castShadow=false; for(let i=0;i<5;i++){const a2=i/5*TAU; add(torso,gCone,M('#3a5a6a'),Math.cos(a2)*.2,.6+Math.sin(a2)*.2,-.3,.03,.14,.03).rotation.set(Math.PI/2,0,a2);}
-    const head=new THREE.Group(); head.position.y=.98; torso.add(head); u.head=head; add(head,gBox,plate,0,.08,.04,.32,.3,.32); add(head,gBox,dark,0,.04,.2,.26,.14,.02);
+    const maw=new THREE.Group(); maw.position.set(0,.46,.31); maw.scale.setScalar(1.3); torso.add(maw); u.maw=maw;
+    add(maw,gSph,M('#05060a'),0,0,0,.26,.2,.08); add(maw,gTor,M('#4a5866',{metalness:.3,roughness:.4}),0,0,.02,.27,.21,.25);
+    for(let i=0;i<14;i++){const a2=i/14*TAU; const t=add(maw,gCone,M('#e8e4d8',{roughness:.4}),Math.cos(a2)*.22,Math.sin(a2)*.16,.05,.03,.1,.03); t.rotation.z=a2+Math.PI/2;}
+    const soulM=[glow('#7af0ff',2.6),glow('#b48cff',2.4),glow('#e8fff8',2.2)]; u.souls=[];
+    for(let i=0;i<7;i++){const sg=new THREE.Group(); maw.add(sg); const o=add(sg,gSph,soulM[i%3],0,0,0,.05,.065,.05); o.castShadow=false; add(sg,gCone,soulM[i%3],0,-.06,0,.022,.07,.022).rotation.x=Math.PI; u.souls.push(sg);}
+    {const pl=new THREE.PointLight(0x9af0ff,1.6,6); pl.position.set(0,0,.25); maw.add(pl);}
+    const head=new THREE.Group(); head.position.y=1.0; head.scale.setScalar(1.35); torso.add(head); u.head=head; add(head,gBox,plate,0,.08,.04,.32,.3,.32); add(head,gBox,dark,0,.04,.2,.26,.14,.02);
+    add(head,gBox,plate,0,-.1,.12,.36,.08,.16); for(let i=0;i<5;i++) add(head,gCone,M('#e8e4d8'),-.12+i*.06,-.04,.2,.02,.07,.02).rotation.x=Math.PI;
+    for(let i=0;i<5;i++){const c2=add(head,gOct,i%2?cyn:vio,-.16+i*.08,.3+(i===2?.08:0),-.02,.035,.12+(i===2?.06:0),.035); c2.rotation.z=(i-2)*.25;}
     const ey=glow('#b48cff',3); u.core=add(head,gBox,ey,-.08,.06,.215,.05,.025,.01); add(head,gBox,ey,.08,.06,.215,.05,.025,.01); add(head,gBox,ey,0,.12,.215,.04,.025,.01);
     add(head,gCone,plate,-.13,.32,0,.05,.22,.05).rotation.z=.4; add(head,gCone,plate,.13,.32,0,.05,.22,.05).rotation.z=-.4;
     const aL=limb(torso,-.52,.72,0,.62,.12,hide,plate), aR=limb(torso,.52,.72,0,.62,.12,hide,plate); u.arms=[aL,aR]; u.armsFwd=.2;
@@ -1694,6 +1702,8 @@ function animBoss(m,b){const u=m.userData;
   if(u.tentacles) u.tentacles.forEach((segs,i)=>segs.forEach((sg,k)=>{sg.rotation.z=Math.sin(time*2.4+i+k*.8)*.35; sg.rotation.y=Math.cos(time*1.9+i*2+k)*.3;}));
   if(u.ribbons) u.ribbons.forEach((segs,i)=>segs.forEach((sg,k)=>{sg.rotation.x=Math.sin(time*2.2+i+k*.7)*.25; sg.rotation.z=Math.cos(time*1.6+i+k*.5)*.2;}));
   if(u.petals) u.petals.rotation.z=time*.8;
+  if(u.souls) u.souls.forEach((sg,i)=>{const a2=time*(1.4+i*.17)+i*TAU/u.souls.length, r=.07+.08*((Math.sin(time*1.3+i*2)+1)/2); sg.position.set(Math.cos(a2)*r,Math.sin(a2)*r*.75,.03+.03*Math.sin(time*3+i)); sg.rotation.z=a2+Math.PI/2;});
+  if(u.maw) u.maw.scale.y=1.3*(1+.12*Math.sin(time*2.4));
   if(u.heart){const k2=1+.15*Math.sin(time*5); u.heart.scale.set(.16*k2,.24*k2,.16*k2);}
   if(u.smallArms) u.smallArms.forEach((a,i)=>a.rotation.x=-.6+Math.sin(time*4+i*Math.PI)*.4);
   if(u.jaw) u.jaw.rotation.x=.15+Math.sin(time*1.5)*.12;
@@ -2316,17 +2326,18 @@ const CFX={
   inward(b,c,t){for(let k=0;k<4;k++){const a=Math.random()*TAU, r=rand(150,240); FXP(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r,rand(10,60),-Math.cos(a)*r*1.6,-Math.sin(a)*r*1.6,rand(20,80),c[k%c.length],.6,6);}},
   rain(b,c){for(let i=0;i<3;i++){const x=b.x+rand(-280,280),y=b.y+rand(-220,220); FXP(x,y,320,0,0,-520,c[i%c.length],.7,8); if(Math.random()<.35) puff(x,y,c[0],6,120,.4,5);}},
   bolts(b){bolt({x:b.x+rand(-260,260),y:b.y+rand(-200,200)}); flashT=.12; flashCol='#e8f8ff'; shake(4);},
+  souls(b,c){for(let i=0;i<6;i++){const a=rand(-.8,.8)+(b.face||0); FXP(b.x+Math.cos(b.face||0)*b.r*.5,b.y+Math.sin(b.face||0)*b.r*.5,b.r*1.1,Math.cos(a)*rand(60,200),Math.sin(a)*rand(60,200),rand(80,220),c[i%c.length],1.3,rand(5,8));}},
   quake(b,c){puff(b.x+rand(-200,200),b.y+rand(-160,160),c[0],10,160,.6,6); shake(5);}};
 const BOSS_FX={bramble:{c:['#7fb04f','#c9ff6a','#4a6b2a'],a:['ring','burst']},sultan:{c:['#f0d08a','#e2c387','#ffd98a'],a:['spiral','quake']},
   witch:{c:['#b7f06a','#8e7aa8','#d8ff6a'],a:['burst','spiral']},warden:{c:['#cfefff','#ffffff','#9fd3e8'],a:['rain','ring']},
   golem:{c:['#ff6a2a','#ffb24a','#ff8a3a'],a:['rain','quake']},sov1:{c:['#c8b8ff','#b45cff','#ffffff'],a:['spiral','ring']},
   sov2:{c:['#d48cff','#b45cff','#e0b0ff'],a:['spiral','bolts']},pumpking:{c:['#ff8a1a','#ffd84a','#9a6aff'],a:['burst','rain']},
   stormsentinel:{c:['#7fd8ff','#e8f8ff','#5fc8f0'],a:['bolts','ring']},mossback:{c:['#c8e070','#7aa83f','#e8c860'],a:['quake','ring']},
-  lanternmaw:{c:['#9fffd0','#d8ff6a','#bff8ff'],a:['spiral','burst']},echotyrant:{c:['#b48cff','#3affe0','#7a5cff'],a:['quake','spiral']},
+  lanternmaw:{c:['#9fffd0','#d8ff6a','#bff8ff'],a:['spiral','burst']},echotyrant:{c:['#7af0ff','#b48cff','#e8fff8'],a:['souls','spiral']},
   sculkmonstrosity:{c:['#2affe0','#5affff','#0c2a30'],a:['burst','quake']},monarch:{c:['#ffb02a','#ffd86a','#b47aff'],a:['spiral','rain']},
   harmonizer:{c:['#ffd8f0','#ffe86a','#8ad05a'],a:['spiral','burst']},corruptedsinger:{c:['#b47aff','#2affe0','#ffd8f0'],a:['ring','spiral']}};
 function fxTick(b,heavy){const F=BOSS_FX[b.id]||BOSS_FX.bramble; let acc=0;
-  return (t,dt)=>{acc-=dt; if(acc>0) return; acc=heavy?.22:.4; for(const a of F.a){if(a==='spiral'||a==='rain') CFX[a](b,F.c,t); else if(Math.random()<(heavy?.6:.35)) CFX[a](b,F.c,t);}};}
+  return (t,dt)=>{acc-=dt; if(acc>0) return; acc=heavy?.22:.4; for(const a of F.a){if(a==='spiral'||a==='rain'||a==='souls') CFX[a](b,F.c,t); else if(Math.random()<(heavy?.6:.35)) CFX[a](b,F.c,t);}};}
 // Entrance: summoning circle → the boss rises out of it → roar → it leaps and slams down → shows its power → taunt.
 function bossCine(b){const s=BOSS_STORY[b.id]||{ep:'',stir:'Something stirs.',taunt:'...'},bx=b.x*S,bz=b.y*S,px=P.x*S,pz=P.y*S,dx=px-bx,dz=pz-bz,dl=Math.hypot(dx,dz)||1,ux=dx/dl,uz=dz/dl,sc=b.r/13*.85,fa=Math.atan2(uz,ux);
   const F=BOSS_FX[b.id]||BOSS_FX.bramble; let circ=null, leap=null;
@@ -2344,7 +2355,7 @@ function bossCine(b){const s=BOSS_STORY[b.id]||{ep:'',stir:'Something stirs.',ta
    {dur:1.8,enter(){shake(8); CFX.burst(b,F.c); b.roar=.8;},tick:(()=>{const f=fxTick(b,true); return (t,dt)=>{f(t,dt); b.spin=Math.sin(t*9)*.25; b.walk+=dt*8;};})(),
     cam:k=>{const a=fa+1.2+k*1.2, r=lerp(5*sc,8.5*sc,k); return [b.x*S+Math.cos(a)*r,lerp(2*sc,6*sc,k),b.y*S+Math.sin(a)*r,b.x*S,1.2*sc,b.y*S];}},
    {dur:2.0,fast:true,speaker:b.name,text:s.taunt,enter(){b.spin=0; b.roar=1.2; shake(6);},tick(t,dt){if(Math.random()<.25) CFX.ring(b,F.c);},
-    cam:k=>{const qx=b.x*S,qz=b.y*S,vx=P.x*S-qx,vz=P.y*S-qz,vl=Math.hypot(vx,vz)||1,wx=vx/vl,wz=vz/vl, r=lerp(5*sc,3.2*sc,k); return [qx+wx*r,lerp(2.4*sc,2.0*sc,k),qz+wz*r,qx,1.9*sc,qz];}}];
+    cam:k=>{const qx=b.x*S,qz=b.y*S,vx=P.x*S-qx,vz=P.y*S-qz,vl=Math.hypot(vx,vz)||1,wx=vx/vl,wz=vz/vl, r=lerp(5*sc,3.2*sc,k); return [qx+wx*r,lerp(2.2*sc,1.8*sc,k),qz+wz*r,qx,1.55*sc,qz];}}];
   shots.cleanup=()=>{if(circ){circ.remove(); circ=null;} b.cineHide=false; b.rise=1; b.jy=0; b.spin=0;};
   return shots;}
 function portalCine(){const ex=L.exit, gx=ex.x*S, gz=ex.y*S; ex.grow=0; const cols=['#3affe0','#b48cff','#ffffff'];
