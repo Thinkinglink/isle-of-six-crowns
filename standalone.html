@@ -894,7 +894,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.4.2', SAVE_VERSION=6;
+const APP_VERSION='2.4.3', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1645,9 +1645,9 @@ function buildBoss(b){
     for(let i=0;i<6;i++){add(head,gCone,M('#f0ecd8'),-.09+i*.036,-.02,.21,.012,.04,.012).rotation.x=Math.PI; add(head,gCone,M('#f0ecd8'),-.08+i*.036,-.12,.205,.011,.035,.011);}
     u.core=add(head,gSph,glow('#ffe86a',2),-.08,.07,.18,.035); add(head,gSph,glow('#ffe86a',2),.08,.07,.18,.035);
     // four big petals that keep changing colour
-    u.petals=new THREE.Group(); u.petals.position.z=-.06; head.add(u.petals); u.petalMats=[];
+    u.petals=new THREE.Group(); u.petals.position.y=1.1; u.petals.rotation.x=-Math.PI/2; B.add(u.petals); u.petalMats=[];
     for(let i=0;i<4;i++){const a2=i/4*TAU+Math.PI/4; const pm=new THREE.MeshStandardMaterial({color:0xffd8f0,roughness:.45,side:THREE.DoubleSide,emissive:new THREE.Color(0xffd8f0),emissiveIntensity:.35}); u.petalMats.push(pm);
-      const p=add(u.petals,gSph,pm,Math.cos(a2)*.42,Math.sin(a2)*.42,0,.3,.13,.04); p.rotation.z=a2;}
+      const p=add(u.petals,gSph,pm,Math.cos(a2)*.4,Math.sin(a2)*.4,-.04,.28,.14,.035); p.rotation.z=a2; p.rotation.y=.3*Math.cos(a2); p.rotation.x=-.3*Math.sin(a2);}
     u.orbit=[0,1,2,3,4].map(i=>add(B,gSph,glow(i%2?'#ffe86a':'#ffd8f0',1.4),0,1,0,.06)); break;}
   case 'corruptedsinger':{const u=R.userData; u.float=true; u.legs=[]; u.arms=[]; const gown=M('#2a1a3a',{roughness:.6}), gown2=M('#3a2a5a',{roughness:.5}), skin=M('#d8d0e8',{roughness:.4}), mask=M('#f0ece4',{roughness:.3}), vio=glow('#b47aff',2.4), cy=glow('#2affe0',2);
     add(B,gCone,gown,0,.6,0,.42,1.2,.38); add(B,gCone,gown2,0,.45,0,.48,.5,.44).rotation.x=Math.PI; add(B,gSph,gown,0,1.25,0,.22,.26,.18);
