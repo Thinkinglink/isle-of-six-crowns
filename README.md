@@ -63,7 +63,7 @@ Press **Difficulty** at the top of the map to switch between **Easy** (monsters 
 
 ## ✦ Enchanting
 
-Select any weapon, armor or artifact in your Pack and press **✦ Enchant** (above the Equip button). It costs shards, and each item can be enchanted once. An enchanted item gets:
+Select any weapon, armor or artifact in your Pack and press **✦ Enchant** (above the Equip button). It is free, and each item can be enchanted once. An enchanted item gets:
 
 - **+25% power**, and its damage, health or strength goes up
 - **a new enchantment** it didn't have yet

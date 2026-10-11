@@ -977,7 +977,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.6.1', SAVE_VERSION=6;
+const APP_VERSION='2.6.2', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -2386,13 +2386,12 @@ function renderDetail(){const box=$('#detail'); let it=null, inBag=false;
    <ul>${itemLines(it).map(([a,b])=>`<li>${a}: <b>${b}</b></li>`).join('')}${ench}</ul>
    ${it.slot==='artifact'?`<div style="color:var(--mute)">${it.kind==='summon'&&MINIONS[it.minion]?`Summons ${it.count>1?it.count+' ':'a '}${MINIONS[it.minion].n}${it.count>1?'s':''} that ${ROLE_TXT[MINIONS[it.minion].role][it.count>1?1:0]}, for ${Math.round(20*(it.dur||1))} seconds.`:ARTS[it.kind].desc}</div>`:''}
    ${inBag?cmp(it,eqFor):''}
-   <div class="actions encrow">${it.encd?`<span class="enctag">✦ Enchanted: +25% power, a new enchantment and ${SOUL_ABIL[it.slot][0]}</span>`:`<button class="btn small enchbtn" data-act="ench" ${SAVE.shards<ec?'aria-disabled="true"':''}>✦ Enchant · <img src="${iconURL('shard','#7fe0c8','#e8fff8')}" alt="">${ec}</button>`}</div>
+   <div class="actions encrow">${it.encd?`<span class="enctag">✦ Enchanted: +25% power, a new enchantment and ${SOUL_ABIL[it.slot][0]}</span>`:`<button class="btn small enchbtn" data-act="ench">✦ Enchant · Free</button>`}</div>
    <div class="actions">${inBag?(it.slot==='artifact'?`<button class="btn small gold" data-act="eq1">Slot 1</button><button class="btn small gold" data-act="eq2">Slot 2</button><button class="btn small gold" data-act="eq3">Slot 3</button><button class="btn small gold" data-act="eq4">Slot 4</button><button class="btn small gold" data-act="eq5">Slot 5</button><button class="btn small gold" data-act="eq6">Slot 6</button><button class="btn small gold" data-act="eq7">Slot 7</button><button class="btn small gold" data-act="eq8">Slot 8</button>`:`<button class="btn small gold" data-act="eq">Equip</button>`)+`<button class="btn small danger" data-act="salv">Salvage +${salv}</button>`
      :(it.slot==='artifact'?`<button class="btn small" data-act="uneq">Unequip</button>`:`<span class="empty">Equipped</span>`)}</div>`;
   box.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>invAction(b.dataset.act,it));}
-const enchCost=it=>Math.max(20,Math.round(it.pow*.8));
-function enchantItem(it){if(it.encd) return false; const c=enchCost(it); if(SAVE.shards<c){toast(`You need ${c} shards to enchant this`,'#e2504a'); return false;}
-  SAVE.shards-=c; it.encd=true; it.pow=Math.round(it.pow*1.25);
+const enchCost=it=>0;
+function enchantItem(it){if(it.encd) return false; it.encd=true; it.pow=Math.round(it.pow*1.25);
   if(it.dmg) it.dmg=Math.round(it.dmg*1.2); if(it.hp) it.hp=Math.round(it.hp*1.2); if(it.red) it.red=+Math.min(.5,it.red+.03).toFixed(2); if(it.pot) it.pot=+(it.pot*1.2).toFixed(2);
   const pool=Object.keys(it.slot==='weapon'?W_ENCH:it.slot==='armor'?A_ENCH:R_ENCH).filter(n=>!it.ench.includes(n));
   if(pool.length){const n=choice(pool); it.ench.push(n); it.newEnch=n;
