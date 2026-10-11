@@ -1054,7 +1054,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.9.0', SAVE_VERSION=6;
+const APP_VERSION='2.9.1', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1077,7 +1077,7 @@ async function deskInit(){try{Neutralino.init(); addEventListener('keydown',e=>{
     for(const n of ['save.json','save-backup.json']){try{const s=JSON.parse(await Neutralino.filesystem.readFile(DESK.dir+'/'+n)); if(isSave(s)) return s;}catch(e){}}
   }catch(e){console.error('Desktop save unavailable',e); DESK.on=false;} return null;}
 // Keep the installed app's own icon (desktop shortcut, Start menu, Dock, Finder) in step with the game's icon.
-const ICON_ID='halloween-2026';
+const ICON_ID='sculk-pumpkin-2026';
 async function syncAppIcon(){if(!DESK.on||!DESK.dir||typeof NL_PATH==='undefined') return; const fs=Neutralino.filesystem, mark=DESK.dir+'/app-icon.txt';
   try{if((await fs.readFile(mark)).trim()===ICON_ID) return;}catch(e){}
   try{const os=window.NL_OS, root=String(NL_PATH).replace(/[\\/]+$/,'');
