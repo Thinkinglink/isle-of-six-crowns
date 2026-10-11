@@ -74,6 +74,11 @@ Select any weapon, armor or artifact in your Pack and press **✦ Enchant** (abo
 
 50 new artifacts summon allies that fight beside you: wolves, golems, knights, skeleton archers, exploding mites, healing sprites and more. Every boss of the Outer Isles and the Shift Dimension now drops its own guardian summoning artifact as well as its normal one.
 
+## 🏠 Home menu rewards
+
+- Reach the **Outer Isles** and the home menu shows a floating, broken, corrupted heart fragment.
+- Reach the **Deep Dark** and the **Shift Dimension** and it changes to swirling souls.
+
 ## 🛒 Shop
 
 Open it from the map with **Shop** (key **B**): weekly limited weapons, armor and artifacts, 9 permanent upgrades, and 125 skins from Common to Mythic.

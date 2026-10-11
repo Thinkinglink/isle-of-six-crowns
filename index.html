@@ -982,7 +982,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.7.1', SAVE_VERSION=6;
+const APP_VERSION='2.8.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1315,7 +1315,7 @@ function update(dt){
   // exit
   if(L.exit&&!P.dead&&!run.done&&mode==='play'&&Math.hypot(P.x-L.exit.x,P.y-L.exit.y)<(L.exit.big?60:30)){
     if(L.exit.cine){L.exit.cine=false; startCine(portalCine(),()=>{SAVE.portalOpen=true; completeLevel(); mapWorld=4; setTimeout(()=>toast('Unlocked: swirling souls on the home menu','#5affe8'),900);});}
-    else if(L.exit.final){L.exit=null; run.done=true; persist(); showResult('victory');}
+    else if(L.exit.final){L.exit=null; run.done=true; persist(); showResult('victory'); setTimeout(()=>toast('Unlocked: the corrupted heart on the home menu','#ff5a7a'),900);}
     else if(!L.exit.big) completeLevel();}
   if(run.endT>0){run.endT-=dt; if(run.endT<=0) showResult(run.victory?'victory':'dead');}
   updAmb(dt);
@@ -2199,7 +2199,8 @@ const SCREENS=['menu','mapScr','hud','inv','pause','result','how','codex','cine'
 function showOnly(...ids){SCREENS.forEach(s=>$('#'+s).hidden=!ids.includes(s));}
 function crownsHTML(){let n=0; for(let b=0;b<6;b++) if(SAVE&&SAVE.cleared[b+'-2']) n++; let h=''; for(let i=0;i<6;i++) h+=`<span class="pip${i<n?' on':''}" title="${BIOMES[i].name}"></span>`; return h+`<span>${n} of 6 crowns claimed</span>`;}
 const soulsUnlocked=()=>!!(SAVE&&worldOpen(3)&&worldOpen(4));
-function toMenu(){mode='menu'; showOnly('menu'); $('#menu').classList.toggle('souls',soulsUnlocked()); if(soulsUnlocked()) startSouls(); else SOULS.on=false; renderAcct(); $('#menuCrowns').innerHTML=crownsHTML(); $('#btnContinue').disabled=!SAVE; $('#btnNew').textContent='New Expedition'; newArmed=false;
+const menuBg=()=>soulsUnlocked()?'souls':SAVE&&outerOpen()?'heart':null;
+function toMenu(){mode='menu'; showOnly('menu'); const mb=menuBg(); SOULS.mode=mb; $('#menu').classList.toggle('souls',!!mb); if(mb) startSouls(); else SOULS.on=false; renderAcct(); $('#menuCrowns').innerHTML=crownsHTML(); $('#btnContinue').disabled=!SAVE; $('#btnNew').textContent='New Expedition'; newArmed=false;
   if(!L||L.boss||!L.menu){L=genLevel(0,false); L.bi=0; L.tier=0; L.seen=new Uint8Array(L.w*L.h); L.menu=true; L.chests.forEach(c=>c.open=false); ents=[];loot=[];hazards=[];projs=[];parts=[];texts=[];boss=null;P=null; L.spawns.slice(0,10).forEach(p=>spawnEnemy(pickType(0),p.x,p.y)); amb=[]; buildLevel3D();}
   ($('#btnContinue').disabled?$('#btnNew'):$('#btnContinue')).focus();}
 /* Home menu background: drifting soul particles */
@@ -2220,7 +2221,7 @@ function soulsResize(){const c=SOULS.cv; SOULS.dpr=Math.min(1.5,devicePixelRatio
 function startSouls(){if(!SOULS.cv){SOULS.cv=$('#soulsBg'); SOULS.g=SOULS.cv.getContext('2d'); addEventListener('resize',()=>{if(SOULS.on) soulsResize();});
     addEventListener('pointermove',e=>{SOULS.mx=e.clientX/innerWidth-.5; SOULS.my=e.clientY/innerHeight-.5;});}
   soulsResize(); if(SOULS.on) return; SOULS.on=true; SOULS.last=performance.now(); requestAnimationFrame(soulsFrame);}
-function soulsFrame(now){if($('#menu').hidden||!$('#menu').classList.contains('souls')){SOULS.on=false; return;} requestAnimationFrame(soulsFrame);
+function soulsFrame(now){if($('#menu').hidden||!$('#menu').classList.contains('souls')){SOULS.on=false; return;} requestAnimationFrame(soulsFrame); if(SOULS.mode==='heart'){heartFrame(now); return;}
   const dt=Math.min(.05,(now-SOULS.last)/1000); SOULS.last=now; const g=SOULS.g, w=SOULS.w, h=SOULS.h, t=now/1000, slow=REDUCED?.35:1, m=Math.max(w,h);
   g.setTransform(SOULS.dpr,0,0,SOULS.dpr,0,0); g.globalCompositeOperation='source-over';
   const bg=g.createLinearGradient(0,0,0,h); bg.addColorStop(0,'#03050c'); bg.addColorStop(.55,'#060d18'); bg.addColorStop(1,'#08161e'); g.fillStyle=bg; g.fillRect(0,0,w,h);
@@ -2246,6 +2247,66 @@ function soulsFrame(now){if($('#menu').hidden||!$('#menu').classList.contains('s
     if(p.wisp) for(let i=1;i<p.tr.length;i++){const k=1-i/p.tr.length, s2=p.r*6.5*k; g.globalAlpha=a*k*.5; g.drawImage(spr,p.tr[i][0]-s2,p.tr[i][1]-s2,s2*2,s2*2);}
     const s2=p.r*(p.wisp?9:7); g.globalAlpha=a; g.drawImage(spr,x-s2,y-s2,s2*2,s2*2);}
   g.globalAlpha=1; g.globalCompositeOperation='source-over';}
+/* Outer Isles reward: a floating, broken, corrupted piece of a heart */
+const HEART={built:false};
+function heartBuild(){const r=srand(777), pts=[];
+  for(let i=0;i<=34;i++){const t=Math.PI+i/34*Math.PI; pts.push([16*Math.pow(Math.sin(t),3),-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))]);}
+  // jagged broken edge from the top dip back down to the bottom tip
+  const top=pts[pts.length-1], bot=pts[0], brk=[]; const N=11; for(let i=1;i<N;i++){const f=i/N; brk.push([lerp(top[0],bot[0],f)+(i%2?2.6:-.4)+r()*2.2,lerp(top[1],bot[1],f)+(r()-.5)*1.6]);}
+  let outline=pts.concat(brk);
+  // a chip missing from the left lobe
+  outline=outline.map(([x,y],i)=>i>=9&&i<=12?[x+3.2*(1-Math.abs(i-10.5)/2),y+1.2]:[x,y]);
+  const cx=outline.reduce((a,p)=>a+p[0],0)/outline.length, cy=outline.reduce((a,p)=>a+p[1],0)/outline.length;
+  const veins=[]; for(let k=0;k<7;k++){const s0=brk[(k*1.4|0)%brk.length]; let x=s0[0],y=s0[1]; const v=[[x,y]]; let a=Math.PI+(r()-.5)*1.2; for(let j=0;j<9;j++){a+=(r()-.5)*.9; x+=Math.cos(a)*1.6; y+=Math.sin(a)*1.6; v.push([x,y]);} veins.push(v);}
+  const cracks=[]; for(let k=0;k<4;k++){const s0=brk[2+k*2]; let x=s0[0],y=s0[1]; const v=[[x,y]]; for(let j=0;j<4;j++){x-=2+r()*2.5; y+=(r()-.5)*3; v.push([x,y]);} cracks.push(v);}
+  const debris=[]; for(let i=0;i<16;i++){const sz=.7+r()*1.8; debris.push({a:r()*TAU,R:22+r()*14,sp:(.15+r()*.25)*(r()<.5?-1:1),y:(r()-.5)*24,spin:(r()-.5)*2,rot:r()*TAU,sz,pts:[[0,-sz],[sz*.9,sz*.4+r()*.4],[-sz*.8,sz*.6]],cor:r()<.5});}
+  Object.assign(HEART,{built:true,outline,cx,cy,veins,cracks,debris,brk,embers:[]});}
+function heartFrame(now){if(!HEART.built) heartBuild(); const g=SOULS.g, w=SOULS.w, h=SOULS.h, t=now/1000*(REDUCED?.4:1), m=Math.min(w,h), H=HEART;
+  const dt=Math.min(.05,(now-(H.last||now))/1000); H.last=now;
+  const bp=t%1.3, beat=Math.exp(-Math.pow((bp-.05)/.06,2))+.7*Math.exp(-Math.pow((bp-.3)/.07,2));
+  g.setTransform(SOULS.dpr,0,0,SOULS.dpr,0,0); g.globalCompositeOperation='source-over';
+  const bg=g.createLinearGradient(0,0,0,h); bg.addColorStop(0,'#07030b'); bg.addColorStop(.6,'#120612'); bg.addColorStop(1,'#1c0814'); g.fillStyle=bg; g.fillRect(0,0,w,h);
+  const wide=w>h*1.1, hx=w*(wide?.68:.5), hy=h*(wide?.47:.19)+Math.sin(t*.9)*m*.02, sc=m*(wide?.0165:.0085);
+  g.globalCompositeOperation='lighter';
+  [['rgba(160,20,60,',.16,.6,.5,.6,.05],['rgba(120,40,200,',.12,.85,.2,.45,.07],['rgba(90,10,40,',.14,.2,.8,.5,.06],['rgba(200,40,90,',.07,.4,.25,.35,.09]].forEach(([c,al,fx,fy,rr,sp],i)=>{
+    const x=(fx+Math.sin(t*sp+i*1.7)*.12)*w, y=(fy+Math.cos(t*sp*.8+i)*.1)*h, r=rr*Math.max(w,h)*(1+.1*Math.sin(t*.3+i)); const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,c+al+')'); gr.addColorStop(1,c+'0)'); g.fillStyle=gr; g.fillRect(0,0,w,h);});
+  // slow light rays from the fragment
+  g.save(); g.translate(hx,hy); for(let i=0;i<9;i++){const a=t*.06+i*TAU/9; g.rotate(TAU/9); const gr=g.createLinearGradient(0,0,m*.8,0); gr.addColorStop(0,`rgba(255,60,120,${.05+.05*beat})`); gr.addColorStop(1,'rgba(255,60,120,0)'); g.fillStyle=gr; g.beginPath(); g.moveTo(0,0); g.lineTo(m*.8,-m*.04); g.lineTo(m*.8,m*.04); g.closePath(); g.fill();} g.restore();
+  const glow=g.createRadialGradient(hx,hy,0,hx,hy,m*.42); glow.addColorStop(0,`rgba(255,60,110,${.22+.2*beat})`); glow.addColorStop(.45,`rgba(150,40,200,${.08+.06*beat})`); glow.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=glow; g.fillRect(0,0,w,h);
+  g.globalCompositeOperation='source-over';
+  const th=Math.sin(t*.45)*.55+SOULS.mx*.4, tilt=Math.sin(t*.33)*.12+SOULS.my*.08, cs=Math.cos(th), sn=Math.sin(th);
+  const P2=([x,y])=>[hx+(x-H.cx)*sc*cs,hy+(y-H.cy)*sc];
+  // orbiting debris behind
+  const drawDeb=(front)=>{for(const d of H.debris){d.a+=d.sp*dt; d.rot+=d.spin*dt; const z=Math.sin(d.a); if((z>0)!==front) continue; const x=hx+Math.cos(d.a)*d.R*sc, y=hy+d.y*sc+Math.sin(t+d.R)*sc*1.5, k=1+z*.25;
+    g.save(); g.translate(x,y); g.rotate(d.rot); g.scale(sc*k,sc*k); g.beginPath(); d.pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.closePath();
+    g.fillStyle=d.cor?'#2a0c2e':'#a01a36'; g.globalAlpha=front?1:.6; g.fill(); g.strokeStyle=d.cor?'#b44aff':'#ff5a7a'; g.lineWidth=.18; g.shadowColor=g.strokeStyle; g.shadowBlur=8; g.stroke(); g.restore(); g.globalAlpha=1;}};
+  drawDeb(false);
+  g.save(); g.translate(hx,hy); g.rotate(tilt); g.translate(-hx,-hy);
+  // thickness: stacked darker copies give the piece depth
+  for(let k=6;k>=1;k--){g.beginPath(); H.outline.forEach((p,i)=>{const [x,y]=P2(p); i?g.lineTo(x+sn*k*sc*.55,y+k*sc*.12):g.moveTo(x+sn*k*sc*.55,y+k*sc*.12);}); g.closePath(); g.fillStyle=k===6?'#1a040c':`rgb(${60-k*6},${8},${24-k*2})`; g.fill();}
+  // faceted front face
+  const C=P2([H.cx,H.cy]); const n=H.outline.length;
+  for(let i=0;i<n;i++){const a=P2(H.outline[i]), b=P2(H.outline[(i+1)%n]); const mx=(H.outline[i][0]+H.outline[(i+1)%n][0])/2-H.cx, my=(H.outline[i][1]+H.outline[(i+1)%n][1])/2-H.cy;
+    const lit=clamp(.55+.35*(-mx*.6*cs+mx*.3*sn-my*.5)/14+.25*sn*(mx>0?1:-1),.15,1), cor=H.outline[i][0]>-2?.6:0;
+    const R2=Math.round(lerp(200*lit+30,70*lit+20,cor)), G2=Math.round(lerp(30*lit+8,20*lit+8,cor)), B2=Math.round(lerp(60*lit+20,110*lit+30,cor));
+    g.beginPath(); g.moveTo(C[0],C[1]); g.lineTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.closePath(); g.fillStyle=`rgb(${R2},${G2},${B2})`; g.fill(); g.strokeStyle='rgba(255,140,170,.12)'; g.lineWidth=1; g.stroke();}
+  // glowing core that beats
+  const cg=g.createRadialGradient(C[0]-sc*2,C[1]-sc*2,0,C[0],C[1],sc*12); cg.addColorStop(0,`rgba(255,190,210,${.55+.45*beat})`); cg.addColorStop(.35,`rgba(255,60,110,${.35+.3*beat})`); cg.addColorStop(1,'rgba(255,40,90,0)');
+  g.save(); g.beginPath(); H.outline.forEach((p,i)=>{const [x,y]=P2(p); i?g.lineTo(x,y):g.moveTo(x,y);}); g.closePath(); g.clip(); g.globalCompositeOperation='lighter'; g.fillStyle=cg; g.fillRect(C[0]-sc*14,C[1]-sc*14,sc*28,sc*28);
+  // corruption veins creeping from the broken edge
+  g.globalCompositeOperation='source-over'; g.lineCap='round';
+  for(const v of H.veins){g.beginPath(); v.forEach((p,i)=>{const [x,y]=P2(p); i?g.lineTo(x,y):g.moveTo(x,y);}); g.strokeStyle='#14020e'; g.lineWidth=sc*.9; g.stroke(); g.strokeStyle=`rgba(190,80,255,${.5+.4*beat})`; g.lineWidth=sc*.3; g.shadowColor='#b44aff'; g.shadowBlur=12; g.stroke(); g.shadowBlur=0;}
+  for(const v of H.cracks){g.beginPath(); v.forEach((p,i)=>{const [x,y]=P2(p); i?g.lineTo(x,y):g.moveTo(x,y);}); g.strokeStyle='rgba(20,0,8,.9)'; g.lineWidth=sc*.35; g.stroke(); g.strokeStyle=`rgba(255,120,150,${.35+.4*beat})`; g.lineWidth=sc*.12; g.stroke();}
+  g.restore();
+  // the broken edge glows
+  g.beginPath(); H.brk.forEach((p,i)=>{const [x,y]=P2(p); i?g.lineTo(x,y):g.moveTo(x,y);}); g.strokeStyle=`rgba(200,90,255,${.6+.4*beat})`; g.lineWidth=sc*.45; g.shadowColor='#b44aff'; g.shadowBlur=18; g.stroke(); g.shadowBlur=0;
+  g.restore();
+  drawDeb(true);
+  // embers and corruption motes rising off the break
+  if(H.embers.length<70&&Math.random()<.8){const p=H.brk[(Math.random()*H.brk.length)|0], [x,y]=P2(p); H.embers.push({x,y,vx:rand(10,50),vy:-rand(20,70),life:rand(1.5,3.5),max:3.5,c:Math.random()<.6?'rgba(190,90,255,1)':'rgba(255,80,120,1)'});}
+  g.globalCompositeOperation='lighter';
+  for(const e of H.embers){e.life-=dt; e.x+=e.vx*dt; e.y+=e.vy*dt; e.vx+=Math.sin(now/400+e.y*.02)*12*dt; const a=Math.max(0,e.life/e.max), s2=sc*1.6*(.5+a); g.globalAlpha=a; g.drawImage(soulSprite(e.c),e.x-s2,e.y-s2,s2*2,s2*2);}
+  H.embers=H.embers.filter(e=>e.life>0); g.globalAlpha=1; g.globalCompositeOperation='source-over';}
 function menuCam(dt){if(!L) return; cam.x=L.w*T/2+Math.cos(time*.07)*L.w*T*.32; cam.y=L.h*T/2+Math.sin(time*.05)*L.h*T*.3; for(const e of ents){e.walk+=dt*4;}}
 let newArmed=false;
 $('#btnNew').onclick=()=>{if(SAVE&&!newArmed){newArmed=true; $('#btnNew').textContent='Erase progress and start over?'; return;} SAVE=newSave(); persist(); openMap();};
