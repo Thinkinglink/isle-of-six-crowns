@@ -51,7 +51,14 @@ On the other side of the portal are four lands, each with 4 levels and a boss in
 - **Grass of Harmony**: seedlings, sprouts, sentinels, nesters and pollinators, led by the Harmonizer.
 - **Singer's Meadows**: sculk-infected and soul-corrupted versions of the meadow creatures, and the Corrupted Singer.
 
-Click the portal on either map to travel between the Deep Dark and the Shift Dimension. Every boss now arrives through a summoning circle in its own action cutscene.
+## 🔥 The Forge and 🌌 The Void
+
+Once the great portal is open, the Deep Dark map has **three portals**: the Shift, the Forge and the Void. The first level of each is open straight away.
+
+- **The Forge** (fire, lava and iron): Cinder Foundry (the Foundry Colossus), Brimstone Wastes (the Brimstone Wyrm), Iron Citadel (the Iron Warlord) and The Molten Throne (the Forge King).
+- **The Void** (an endless starless dark): Starless Expanse (the Hollow Watcher), Shattered Rift (the Rift Weaver), Null Gardens (the Null Bloom) and The Endless Edge (the Endless One).
+
+Each land has 4 levels and a boss, its own monsters and its own weapons, armor and artifacts. Every boss also drops its own summoning artifact. Click the portal on a dimension's map to go back to the Deep Dark. Every boss now arrives through a summoning circle in its own action cutscene.
 
 ## 🎃 Halloween event (until October 31)
 
