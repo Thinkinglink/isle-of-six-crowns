@@ -30,6 +30,21 @@ Beat the Hollow Sovereign to save the isle, then press **→** at the bottom rig
 
 Each has 4 levels and a boss, with cutscenes and its own loot.
 
+## 🕳️ The Deep Dark
+
+Defeat Lanternmaw and a new **→** appears on the Outer Isles map. The Deep Dark is one enormous cavern with 6 levels, and the Echo Tyrant guards the great portal in the 7th. Beat it to open the portal and step through.
+
+## 🌀 The Shift Dimension
+
+On the other side of the portal are four lands, each with 4 levels and a boss in the 5th:
+
+- **Sculk Obsession**: sculk-infected creatures and the Sculk Monstrosity.
+- **Monarch Kingdom**: the Monarch's knights, hounds and mages, and the Monarch himself.
+- **Grass of Harmony**: seedlings, sprouts, sentinels, nesters and pollinators, led by the Harmonizer.
+- **Singer's Meadows**: sculk-infected and soul-corrupted versions of the meadow creatures, and the Corrupted Singer.
+
+Click the portal on either map to travel between the Deep Dark and the Shift Dimension. Every boss now arrives through a summoning circle in its own action cutscene.
+
 ## 🎃 Halloween event (until October 31)
 
 Hollowshade Isle has risen off the coast. Fight through 7 haunted levels and face the Pumpkin King in the 8th. Anything you find there stays in your pack after the event.
