@@ -95,7 +95,7 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #mini.big{width:min(76vmin,560px);height:min(76vmin,560px);right:50%;transform:translateX(50%);top:12vh}
 .hud-bot{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;align-items:center}
 .hprow{display:flex;gap:10px;align-items:center;font-family:var(--display);font-variant-numeric:tabular-nums}
-.hp{width:min(320px,52vw);height:22px;background:#1a0d0d;border:3px solid var(--rim);position:relative}
+.hp{width:min(320px,52vw);height:22px;background:#1a0d0d;border:3px solid var(--rim);position:relative;overflow:hidden}
 .hp i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(#ff6a5e,#c8352f);box-shadow:inset 0 -5px 0 rgba(0,0,0,.25)}
 .hp span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;text-shadow:0 2px 0 #000}
 .slots{display:flex;gap:10px;align-items:flex-end}
@@ -849,7 +849,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.2.0', SAVE_VERSION=6;
+const APP_VERSION='2.2.1', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1882,12 +1882,12 @@ function setCd(el,v,max){const f=max?v/max:0; el.querySelector('.cd').style.heig
 let hudAcc=0;
 function hudTick(dt){hudAcc+=dt; miniT+=dt; if(miniT>.15){miniT=0; drawMini();}
   if(hudAcc<.08) return; hudAcc=0;
-  hpFill.style.width=(P.hp/ST.maxhp*100)+'%'; hpText.textContent=Math.ceil(P.hp)+' / '+ST.maxhp;
+  if(P.hp>ST.maxhp) P.hp=ST.maxhp; hpFill.style.width=clamp(P.hp/ST.maxhp*100,0,100)+'%'; hpText.textContent=Math.ceil(P.hp)+' / '+ST.maxhp;
   if(L.water){const a=P.air==null?AIR_MAX:P.air; $('#airFill').style.width=(a/AIR_MAX*100)+'%'; $('#airText').textContent='Air '+Math.ceil(a)+'s'; $('#airBar').classList.toggle('low',a<10);}
   setCd($('#sPot'),P.pot,18);
   for(const s of ['a1','a2','a3','a4','a5','a6','a7','a8']){const it=SAVE.eq[s]; setCd($('#s'+s.toUpperCase()),P.acd[s],it?Math.round(ARTS[it.kind].cd*(it.cdm||1)):0);}
   $('#arrowCt').textContent=SAVE.arrows; $('#shardCt').textContent=SAVE.shards;
-  if(boss&&!boss.dead&&boss.awake){$('#bossName').textContent=boss.name; $('#bossFill').style.width='calc('+(boss.hp/boss.max*100)+'% - 4px)';}}
+  if(boss&&!boss.dead&&boss.awake){$('#bossName').textContent=boss.name; $('#bossFill').style.width='calc('+clamp(boss.hp/boss.max*100,0,100)+'% - 4px)';}}
 let bannerTO=0;
 function banner(a,b){const el=$('#banner'); el.querySelector('b').textContent=a; el.querySelector('span').textContent=b||''; el.classList.add('show'); clearTimeout(bannerTO); bannerTO=setTimeout(()=>el.classList.remove('show'),2600);}
 function toast(s,col){const el=document.createElement('div'); el.className='toast'; el.textContent=s; if(col) el.style.borderLeftColor=col; const box=$('#toasts'); box.appendChild(el); while(box.children.length>5) box.firstChild.remove(); setTimeout(()=>el.remove(),2600);}
