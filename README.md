@@ -57,6 +57,10 @@ Click the portal on either map to travel between the Deep Dark and the Shift Dim
 
 Hollowshade Isle has risen off the coast. Fight through 7 haunted levels and face the Pumpkin King in the 8th. Anything you find there stays in your pack after the event.
 
+## ⚔️ Difficulty
+
+Press **Difficulty** at the top of the map to switch between **Easy** (monsters and bosses hit softer and move slower), **Medium** (normal) and **Hard** (they hit harder and move faster). In co-op, the party leader's setting is used.
+
 ## 🛒 Shop
 
 Open it from the map with **Shop** (key **B**): weekly limited weapons, armor and artifacts, 9 permanent upgrades, and 125 skins from Common to Mythic.
