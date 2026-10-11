@@ -2,6 +2,14 @@
 
 A 3D dungeon crawler across six island regions, with guardians, loot, a shop, 125 skins and online co-op for up to 4 players.
 
+## ▶ Play now (no download, no warnings)
+
+**[Play Isle of Six Crowns](https://thinkinglink.github.io/isle-of-six-crowns/)** on any computer, phone or tablet.
+
+Just open the link. Nothing to allow in settings, and it works on Windows, Mac, Chromebook, Android, iPhone and iPad. Your progress is saved, and co-op with friends works the same as in the apps.
+
+Want it as an app with its own icon? Click **Install the app** in the game's menu (Chrome or Edge on a computer, Chrome on Android), or on iPhone/iPad tap **Share → Add to Home Screen** in Safari.
+
 ## Download
 
 | Device | Get it | How to install |
