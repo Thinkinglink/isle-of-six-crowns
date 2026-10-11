@@ -1,26 +1,33 @@
 # Isle of Six Crowns
 
-A 3D dungeon crawler across six island regions, with guardians, loot, a Codex of 1,800 items and a two-form final boss.
-
-## 🎃 Halloween event (until October 31)
-
-Hollowshade Isle has risen off the coast. Fight through 7 haunted levels and face the Pumpkin King in the 8th. 45 Halloween items drop there: 10 weapons, 10 armors and 10 artifacts, plus 5 unique of each. The island disappears from the map on November 1, but anything you found stays in your pack.
-
-## 🛒 Shop
-
-Open it from the map with **Shop** (or press **B**) and spend your shards:
-
-- **Weekly deals:** 10 limited weapons, armor and artifacts, one of each. The stock changes every Monday.
-- **Upgrades:** 9 permanent upgrades, such as more health, damage, speed, arrows and faster artifacts.
-- **Skins:** 125 skins from Common to Mythic. The best ones have wings, halos, orbiting gems and particle trails. Your skin shows on your character in every level.
+A 3D dungeon crawler across six island regions, with guardians, loot, a shop, 125 skins and online co-op for up to 4 players.
 
 ## Download
 
-- **Windows:** [Isle-of-Six-Crowns-Setup.exe](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns-Setup.exe)
-  If Windows shows "Windows protected your PC", click **More info**, then **Run anyway**.
-- **Mac:** [Isle-of-Six-Crowns-Mac.zip](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns-Mac.zip)
-  Unzip, drag the app into Applications, then right-click it and choose **Open** the first time.
+| Device | Get it | How to install |
+|---|---|---|
+| **Windows** | [Isle-of-Six-Crowns-Setup.exe](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns-Setup.exe) | Run it. If Windows shows "Windows protected your PC", click **More info**, then **Run anyway**. |
+| **Mac** | [Isle-of-Six-Crowns.dmg](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.dmg) | Open it and drag the game onto **Applications**. The first time, right-click the game and choose **Open** (on newer Macs: System Settings → Privacy & Security → **Open Anyway**). |
+| **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
+| **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
+
+## Play together
+
+Open **Friends & Party** from the main menu or the map (key **F**).
+
+- **Add friends:** share your 8-digit friend code, or let them scan your QR code. You're added to each other's lists automatically.
+- **Invite:** press **Invite** next to an online friend. Up to 4 players, on any mix of Windows, Mac, Android, iPhone and iPad.
+- **Harder together:** mobs in every level and boss health are multiplied by the number of players (2 players = ×2, 4 players = ×4).
+- The party leader picks the level. Everyone gets their own loot, and a fallen player gets back up next to a teammate.
+
+## 🎃 Halloween event (until October 31)
+
+Hollowshade Isle has risen off the coast. Fight through 7 haunted levels and face the Pumpkin King in the 8th. Anything you find there stays in your pack after the event.
+
+## 🛒 Shop
+
+Open it from the map with **Shop** (key **B**): weekly limited weapons, armor and artifacts, 9 permanent upgrades, and 125 skins from Common to Mythic.
 
 ## Updates
 
-The game updates itself: press **Update** on the main menu, or just close the game and it installs the newest version. Your progress is always kept.
+The game updates itself when you open it, on every device. Your progress is always kept.
