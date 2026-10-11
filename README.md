@@ -61,6 +61,19 @@ Hollowshade Isle has risen off the coast. Fight through 7 haunted levels and fac
 
 Press **Difficulty** at the top of the map to switch between **Easy** (monsters and bosses have a third less health, hit softer and move slower), **Medium** (normal) and **Hard** (they hit harder and move faster). In co-op, the party leader's setting is used.
 
+## ✦ Enchanting
+
+Select any weapon, armor or artifact in your Pack and press **✦ Enchant** (above the Equip button). It costs shards, and each item can be enchanted once. An enchanted item gets:
+
+- **+25% power**, and its damage, health or strength goes up
+- **a new enchantment** it didn't have yet
+- **a soul ability**: Soul Strike for weapons, Soul Barrier for armor, Soul Echo for artifacts
+- **a purple aura**, both in your pack and around your hero in the game
+
+## 🐺 Summoning artifacts
+
+50 new artifacts summon allies that fight beside you: wolves, golems, knights, skeleton archers, exploding mites, healing sprites and more. Every boss of the Outer Isles and the Shift Dimension now drops its own guardian summoning artifact as well as its normal one.
+
 ## 🛒 Shop
 
 Open it from the map with **Shop** (key **B**): weekly limited weapons, armor and artifacts, 9 permanent upgrades, and 125 skins from Common to Mythic.
