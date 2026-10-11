@@ -2,6 +2,10 @@
 
 A 3D dungeon crawler across six island regions, with guardians, loot, a Codex of 1,800 items and a two-form final boss.
 
+## 🎃 Halloween event (until October 31)
+
+Hollowshade Isle has risen off the coast. Fight through 7 haunted levels and face the Pumpkin King in the 8th. 45 Halloween items drop there: 10 weapons, 10 armors and 10 artifacts, plus 5 unique of each. The island disappears from the map on November 1, but anything you found stays in your pack.
+
 ## Download
 
 - **Windows:** [Isle-of-Six-Crowns-Setup.exe](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns-Setup.exe)
