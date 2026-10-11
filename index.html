@@ -849,7 +849,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.1.0', SAVE_VERSION=6;
+const APP_VERSION='2.2.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1496,31 +1496,51 @@ function buildBoss(b){
     const cape=add(h.torso,gBox,M('#3a1a4a',{roughness:.9}),0,.1,-.18,.46,.78,.03); cape.rotation.x=.1;
     const hd=hand(h.aR); const sw=weaponMesh('sword','#c8b8ff'); sw.scale.set(1.4,1.4,1.6); hd.add(sw);
     crown(h.head,.24,1.2,'#c8b8ff'); break;}
-  case 'stormsentinel':{R.userData.float=true; R.userData.legs=[]; R.userData.arms=[];
-    const st=M('#4a5262',{roughness:.7,flatShading:true}), st2=M('#6a7486',{roughness:.6,flatShading:true}), cy=glow('#7fd8ff',2.2);
-    add(B,gPrism,st,0,1.05,0,.34,1.1,.34); add(B,gCone,st2,0,1.82,0,.3,.45,.3); add(B,gCone,st2,0,.42,0,.3,.36,.3).rotation.x=Math.PI;
-    R.userData.core=add(B,gSph,cy,0,1.32,.33,.11,.11,.06); for(let i=0;i<4;i++){const a=i/4*TAU+Math.PI/4; add(B,gBox,cy,Math.cos(a)*.32,1.0,Math.sin(a)*.32,.03,.72,.03);}
-    add(B,gBox,st2,0,1.55,0,.5,.06,.5); const cloud=M('#9aa4b4',{roughness:1,flatShading:true}); for(let i=0;i<7;i++){const a=i/7*TAU; add(B,gIco,cloud,Math.cos(a)*.42,.28+(i%2)*.06,Math.sin(a)*.42,.2);}
-    R.userData.orbit=[0,1,2,3,4,5].map(i=>add(B,gOct,i%2?cy:st2,0,1,0,.09,.16,.09)); break;}
-  case 'mossback':{R.userData.legType='quad'; const skin=M('#5a5a46',{flatShading:true,roughness:.9}), moss=M('#5f8a32',{flatShading:true,roughness:1}), stone=M('#a89a78',{flatShading:true}), gold=M('#e8c860',{metalness:.6,roughness:.3});
-    add(B,gSph,skin,0,.75,0,.62,.4,.78); add(B,gCap,moss,0,.9,0,.78,.62,.92);
-    add(B,gBox,stone,0,1.45,-.05,.42,.06,.42); for(const [x,z] of [[-.16,-.24],[.16,-.24],[-.16,.12],[.16,.12]]) add(B,gCyl,stone,x,1.6,z,.035,.28,.035);
-    add(B,gCone,stone,0,1.86,-.05,.34,.22,.34).rotation.y=Math.PI/4; add(B,gSphL,glow('#e8c860',1.4),0,1.62,-.05,.07); add(B,gBox,gold,0,1.47,.17,.2,.04,.02);
-    const head=new THREE.Group(); head.position.set(0,.75,.78); B.add(head); R.userData.head=head; add(head,gSph,skin,0,0,.12,.3,.24,.34); add(head,gBox,M('#3a3a2c'),0,-.1,.4,.34,.05,.1);
-    const em=glow('#ffb02a',2); R.userData.core=add(head,gSphL,em,-.14,.1,.36,.05); add(head,gSphL,em,.14,.1,.36,.05);
-    R.userData.legs=[]; for(const [x,z] of [[-.45,.45],[.45,.45],[-.45,-.45],[.45,-.45]]){const g=new THREE.Group(); g.position.set(x,.55,z); B.add(g); add(g,gCyl,skin,0,-.25,0,.14,.5,.14); add(g,gSph,skin,0,-.5,.04,.17,.08,.2); R.userData.legs.push(g);}
-    R.userData.arms=[]; for(let i=0;i<8;i++){const a=i/8*TAU; add(B,gCyl,moss,Math.cos(a)*.7,.55,Math.sin(a)*.85,.025,.4,.025);}
-    const leaf=M('#7fb04f',{flatShading:true}); for(let i=0;i<6;i++){const a=i/6*TAU+.3; add(B,gIco,leaf,Math.cos(a)*.55,1.2,Math.sin(a)*.6,.12);} break;}
-  case 'lanternmaw':{R.userData.float=true; R.userData.legs=[]; R.userData.arms=[]; const sk=M('#163a4a',{roughness:.6,flatShading:true}), belly=M('#2a5a62',{flatShading:true}), fin=M('#1f4a5a',{side:THREE.DoubleSide,flatShading:true}), teeth=M('#f0f0e0');
-    const body=new THREE.Group(); body.position.y=1.0; B.add(body); add(body,gSph,sk,0,0,0,.62,.55,.7); add(body,gSph,belly,0,-.18,.12,.5,.36,.6);
-    add(body,gSph,sk,0,-.32,.32,.5,.2,.45); add(body,gSph,M('#05080a'),0,-.12,.5,.38,.2,.24);
-    for(let i=0;i<9;i++){const x=-.32+i*.08; add(body,gCone,teeth,x,-.02,.62-Math.abs(x)*.3,.025,.12,.025).rotation.x=Math.PI; add(body,gCone,teeth,x,-.26,.62-Math.abs(x)*.3,.025,.1,.025);}
-    const em=glow('#d8ff6a',1.6); add(body,gSphL,em,-.3,.24,.45,.06); add(body,gSphL,em,.3,.24,.45,.06);
-    const stalk=new THREE.Group(); stalk.position.set(0,.5,.2); body.add(stalk); seg(stalk,[0,0,0],[0,.5,.25],.025,sk); seg(stalk,[0,.5,.25],[0,.45,.6],.02,sk);
-    const lure=add(stalk,gSph,glow('#d8ff6a',3),0,.42,.66,.1); lure.castShadow=false; R.userData.core=lure; const pl=new THREE.PointLight(0xd8ff6a,1.2,6); pl.position.set(0,.42,.66); stalk.add(pl);
-    for(const s2 of [-1,1]){const f=add(body,gCone,fin,s2*.62,-.05,0,.08,.4,.3); f.rotation.z=-s2*1.3;}
-    add(body,gCone,fin,0,.58,-.2,.05,.4,.4).rotation.x=-.4; add(body,gCone,fin,0,0,-.9,.06,.5,.42).rotation.x=-Math.PI/2;
-    ['#ff7a8a','#ffb05a','#ff7a8a','#ffd84a','#c86aff'].forEach((c,i)=>{add(body,gCyl,M(c),-.25+i*.12,.5+Math.sin(i)*.05,-.25+(i%2)*.1,.03,.25,.03).rotation.z=(i-2)*.3;}); break;}
+  case 'stormsentinel':{const u=R.userData; u.float=true; u.legs=[]; u.arms=[];
+    const st=M('#4a5262',{roughness:.65}), st2=M('#6e7890',{roughness:.5,metalness:.15}), dark=M('#262c38',{roughness:.8}), cy=glow('#8fe4ff',2.4), cs=glow('#5fc8f0',1.2);
+    add(B,gPrism,st,0,1.05,0,.34,1.1,.34); for(const y of [.62,1.0,1.42]) add(B,gPrism,st2,0,y,0,.37,.07,.37);
+    add(B,gCone,st2,0,1.86,0,.31,.5,.31); add(B,gCone,st,0,.4,0,.3,.38,.3).rotation.x=Math.PI; add(B,gOct,cy,0,2.18,0,.06,.12,.06);
+    for(let i=0;i<7;i++){const a2=i/7*TAU; for(const y of [.8,1.2]){const r=add(B,gBox,cs,Math.cos(a2)*.335,y,Math.sin(a2)*.335,.05,.12,.012); r.rotation.y=-a2+Math.PI/2; r.castShadow=false;}}
+    add(B,gTor,dark,0,1.3,.31,.12,.12,.12); u.core=add(B,gSph,cy,0,1.3,.32,.1,.1,.07); add(B,gSph,M('#0a1a2a'),0,1.3,.385,.035,.035,.02);
+    u.plates=[0,1,2,3].map(i=>{const g=new THREE.Group(); g.position.y=1.0; B.add(g); add(g,gBox,st2,.54,0,0,.08,.52,.24); add(g,gBox,st,.5,.3,0,.06,.08,.2); const ln=add(g,gBox,cs,.585,0,0,.012,.36,.04); ln.castShadow=false; g.rotation.y=i*TAU/4; return g;});
+    const cloud=M('#a8b2c2',{roughness:1}), cloud2=M('#8892a4',{roughness:1}); for(let i=0;i<12;i++){const a2=i/12*TAU; add(B,gSph,i%3?cloud:cloud2,Math.cos(a2)*(.42+(i%2)*.08),.22+(i%2)*.08,Math.sin(a2)*(.42+(i%2)*.08),.19+(i%3)*.04);}
+    u.orbit=[0,1,2,3,4,5].map(i=>add(B,gOct,i%2?cy:st2,0,1,0,.09,.16,.09));
+    u.arcs=[0,1,2].map(()=>{const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(21),3)); const l=new THREE.Line(g,new THREE.LineBasicMaterial({color:0xd8f8ff,transparent:true,opacity:.9})); l.frustumCulled=false; B.add(l); return l;});
+    break;}
+  case 'mossback':{const u=R.userData; u.legType='quad';
+    const skin=M('#5e5a48',{roughness:.85}), belly=M('#7a7258',{roughness:.9}), moss=M('#5f8a32',{roughness:1}), moss2=M('#7aa83f',{roughness:1}), stone=M('#b0a282',{roughness:.8}), gold=M('#e8c860',{metalness:.65,roughness:.3}), horn=M('#d8cfb0',{roughness:.5});
+    add(B,gSph,skin,0,.72,0,.64,.42,.8); add(B,gSph,belly,0,.5,.1,.5,.2,.62);
+    add(B,gCap,moss,0,.86,0,.8,.62,.94); add(B,gCap,stone,0,.84,0,.84,.18,.98);
+    for(let i=0;i<10;i++){const a2=i/10*TAU; const p=add(B,gCap,i%2?moss2:moss,Math.cos(a2)*.48,1.1,Math.sin(a2)*.58,.24,.16,.24); p.rotation.set(Math.sin(a2)*.5,0,-Math.cos(a2)*.5);}
+    const gm=glow('#c8ff6a',1.4); u.spots=[]; for(let i=0;i<9;i++){const a2=i/9*TAU+.2; const sp=add(B,gSphL,gm,Math.cos(a2)*.6,1.02+(i%3)*.08,Math.sin(a2)*.7,.04); sp.castShadow=false; u.spots.push(sp);}
+    add(B,gBox,stone,0,1.46,-.05,.46,.06,.46); add(B,gBox,stone,0,1.51,-.05,.38,.04,.38);
+    for(const [x,z] of [[-.17,-.25],[.17,-.25],[-.17,.15],[.17,.15]]){add(B,gCyl,stone,x,1.67,z,.04,.3,.04); add(B,gBox,stone,x,1.83,z,.07,.03,.07);}
+    const roof=add(B,gCone,M('#8a7a5a',{roughness:.7}),0,1.99,-.05,.38,.26,.38); roof.rotation.y=Math.PI/4; add(B,gSphL,gold,0,2.14,-.05,.04);
+    u.flame=add(B,gSph,glow('#ffd86a',2.4),0,1.66,-.05,.07,.1,.07); u.flame.castShadow=false; add(B,gBox,gold,0,1.47,.19,.22,.04,.02);
+    const head=new THREE.Group(); head.position.set(0,.72,.82); B.add(head); u.head=head;
+    add(head,gSph,skin,0,0,.12,.3,.25,.36); add(head,gBox,skin,0,.15,.22,.36,.07,.2); add(head,gSph,belly,0,-.12,.3,.24,.1,.24);
+    for(const s2 of [-1,1]){const t=add(head,gCone,horn,s2*.2,-.1,.4,.035,.16,.035); t.rotation.set(-.8,0,s2*.4); const h2=add(head,gCone,horn,s2*.22,.2,0,.05,.26,.05); h2.rotation.set(-.6,0,s2*.9);}
+    const em=glow('#ffb02a',2.4); u.core=add(head,gSph,em,-.14,.08,.42,.055,.045,.03); add(head,gSph,em,.14,.08,.42,.055,.045,.03);
+    u.legs=[]; for(const [x,z] of [[-.48,.48],[.48,.48],[-.48,-.48],[.48,-.48]]){const g=new THREE.Group(); g.position.set(x,.55,z); B.add(g); add(g,gCyl,skin,0,-.22,0,.15,.46,.15); add(g,gSph,skin,0,-.02,0,.18); add(g,gSph,belly,0,-.5,.05,.19,.09,.22); for(const c of [-.08,0,.08]) add(g,gCone,horn,c,-.52,.2,.02,.06,.02).rotation.x=Math.PI/2; u.legs.push(g);}
+    u.arms=[]; u.vines=[]; for(let i=0;i<10;i++){const a2=i/10*TAU; const g=new THREE.Group(); g.position.set(Math.cos(a2)*.74,.9,Math.sin(a2)*.88); B.add(g); add(g,gCyl,moss,0,-.2,0,.022,.4,.022); add(g,gSph,moss2,0,-.42,0,.045); u.vines.push(g);}
+    break;}
+  case 'lanternmaw':{const u=R.userData; u.float=true; u.legs=[]; u.arms=[];
+    const sk=M('#173e4e',{roughness:.45,metalness:.1}), belly=M('#3a7078',{roughness:.6}), fin=M('#2a6a7a',{transparent:true,opacity:.78,side:THREE.DoubleSide,roughness:.4}), teeth=M('#f2f0e0',{roughness:.3}), lumi=glow('#7affd8',2);
+    const body=new THREE.Group(); body.position.y=1.0; B.add(body);
+    add(body,gSph,sk,0,0,0,.64,.56,.72); add(body,gSph,belly,0,-.2,.14,.52,.36,.6); add(body,gSph,sk,0,.12,-.45,.5,.44,.5);
+    for(const s2 of [-1,1]) add(body,gSph,sk,s2*.3,.33,.36,.18,.07,.16);
+    const jaw=new THREE.Group(); jaw.position.set(0,-.2,.3); body.add(jaw); u.jaw=jaw; add(jaw,gSph,sk,0,-.08,.06,.52,.18,.44);
+    add(body,gSph,M('#030608'),0,-.1,.48,.4,.2,.25);
+    for(let i=0;i<11;i++){const x=-.36+i*.072, z=.62-Math.abs(x)*.35; add(body,gCone,teeth,x,0,z,.022,.13-(i%2)*.04,.022).rotation.x=Math.PI; add(jaw,gCone,teeth,x,.02,z-.3,.022,.11-(i%2)*.03,.022);}
+    const em=glow('#d8ff6a',1.8); for(const s2 of [-1,1]){add(body,gSph,M('#0a1418'),s2*.32,.24,.44,.08); add(body,gSph,em,s2*.33,.25,.47,.045);}
+    u.spots=[]; for(let i=0;i<14;i++){const s2=i%2?1:-1, k=(i>>1)/7; const sp=add(body,gSphL,lumi,s2*(.58-k*.08),-.05+Math.sin(k*6)*.08,.4-k*1.0,.03); sp.castShadow=false; u.spots.push(sp);}
+    const stalk=new THREE.Group(); stalk.position.set(0,.5,.2); body.add(stalk); u.stalk=stalk; seg(stalk,[0,0,0],[0,.45,.15],.03,sk); seg(stalk,[0,.45,.15],[0,.55,.45],.025,sk); seg(stalk,[0,.55,.45],[0,.45,.68],.02,sk);
+    const lure=add(stalk,gSph,glow('#e8ff7a',3.2),0,.38,.72,.1); lure.castShadow=false; u.core=lure; const pl=new THREE.PointLight(0xd8ff6a,1.4,7); pl.position.set(0,.38,.72); stalk.add(pl);
+    u.fins=[]; for(const s2 of [-1,1]){const g=new THREE.Group(); g.position.set(s2*.6,-.08,.05); body.add(g); const f=add(g,gCone,fin,s2*.12,0,0,.06,.42,.32); f.rotation.z=-s2*Math.PI/2; u.fins.push(g);}
+    for(let i=0;i<5;i++) add(body,gCone,fin,0,.6-i*.02,.05-i*.18,.03,.24-i*.02,.12).rotation.x=-.5;
+    const tail=new THREE.Group(); tail.position.set(0,.05,-.85); body.add(tail); u.tail=tail; add(tail,gCone,sk,0,0,.05,.22,.4,.22).rotation.x=-Math.PI/2; add(tail,gCone,fin,0,0,-.35,.05,.5,.45).rotation.x=-Math.PI/2;
+    ['#ff7a8a','#ffb05a','#ff7a8a','#ffd84a','#c86aff','#ff9a8a'].forEach((c,i)=>{const cm=M(c,{roughness:.8}); const x=-.26+i*.1, z=-.15-(i%2)*.18; add(body,gCyl,cm,x,.52,z,.03,.24,.03).rotation.z=(i-2.5)*.25; add(body,gSph,cm,x+(i-2.5)*.03,.64,z,.05);});
+    break;}
   case 'pumpking':{const h=humanoid({body:'#2a1a2a',skin:'#2a1a2a',sleeve:'#3a1f3a',legC:'#1a101a',hunch:.12}); h.head.children[0].visible=false;
     add(h.torso,gCone,M('#24142a',{roughness:.9}),0,.12,0,.4,.95,.34); add(h.torso,gBand,M('#ff8a1a'),0,.12,0,.22,.05,.17);
     const cape=add(h.torso,gBox,M('#4a1a3a',{roughness:.9}),0,.12,-.2,.5,.8,.03); cape.rotation.x=.12;
@@ -1536,7 +1556,45 @@ function buildBoss(b){
     R.userData.crown=crown(head,.34,1.3,'#b45cff');
     R.userData.orbit=[0,1,2,3,4,5].map(i=>add(B,gOct,glow(i%2?'#b45cff':'#e0b0ff',1.4),0,1,0,.07,.14,.07)); break;}
   }
+  bossTex(); detailize(R); addBossAura(R,(BOSSES[id]||{}).c2||'#ffffff');
   R.scale.setScalar(b.r/13*(id==='sov2'?.95:.85)); CUR=null; return R;}
+// Shared surface textures: a soft glow for auras and a stone/skin grain that gives every boss a real surface.
+const BTEX={};
+function bossTex(){if(BTEX.detail) return BTEX;
+  const gc=document.createElement('canvas'); gc.width=gc.height=128; const g=gc.getContext('2d'); const gr=g.createRadialGradient(64,64,0,64,64,64);
+  gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(.35,'rgba(255,255,255,.55)'); gr.addColorStop(1,'rgba(255,255,255,0)'); g.fillStyle=gr; g.fillRect(0,0,128,128);
+  BTEX.glow=new THREE.CanvasTexture(gc); texCache.set(gc,BTEX.glow);
+  const dc=document.createElement('canvas'); dc.width=dc.height=256; const d=dc.getContext('2d'), r=srand(4242);
+  d.fillStyle='#e4e4e4'; d.fillRect(0,0,256,256);
+  for(let i=0;i<1500;i++){const v=150+((r()*105)|0); d.fillStyle=`rgba(${v},${v},${v},.22)`; d.beginPath(); d.arc(r()*256,r()*256,1.5+r()*11,0,TAU); d.fill();}
+  d.strokeStyle='rgba(90,90,90,.45)'; d.lineWidth=1; for(let i=0;i<46;i++){let x=r()*256,y=r()*256; d.beginPath(); d.moveTo(x,y); for(let k=0;k<6;k++){x+=(r()-.5)*30; y+=(r()-.5)*30; d.lineTo(x,y);} d.stroke();}
+  const im=d.getImageData(0,0,256,256), px=im.data; for(let i=0;i<px.length;i+=4){const n=(r()-.5)*26; px[i]=clamp(px[i]+n,0,255); px[i+1]=clamp(px[i+1]+n,0,255); px[i+2]=clamp(px[i+2]+n,0,255);} d.putImageData(im,0,0);
+  BTEX.detail=new THREE.CanvasTexture(dc); BTEX.detail.wrapS=BTEX.detail.wrapT=THREE.RepeatWrapping; BTEX.detail.repeat.set(2,2); texCache.set(dc,BTEX.detail); return BTEX;}
+function detailize(R){R.traverse(o=>{const m=o.material; if(!o.isMesh||!m||!m.isMeshStandardMaterial||m.map||m.transparent) return; if(m.emissive&&m.emissive.getHex()!==0) return;
+  m.map=BTEX.detail; m.bumpMap=BTEX.detail; m.bumpScale=.025; m.flatShading=false; m.needsUpdate=true;});}
+function addBossAura(R,col){const u=R.userData, c=new THREE.Color(col), add2=(g,mat,y,sc)=>{const me=new THREE.Mesh(g,mat); me.position.y=y; me.scale.setScalar(sc); me.rotation.x=-Math.PI/2; R.add(me); return me;};
+  const disc=add2(gCircle,new THREE.MeshBasicMaterial({map:BTEX.glow,color:c,transparent:true,opacity:.45,depthWrite:false,blending:THREE.AdditiveBlending}),.04,1.8);
+  const ring=add2(gRing,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.5,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}),.06,1.2);
+  const ring2=add2(gRing,new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.3,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide}),.07,1.55);
+  const gs=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:c,transparent:true,opacity:.32,depthWrite:false,blending:THREE.AdditiveBlending})); gs.position.y=1.15; gs.scale.set(3.8,3.8,1); R.add(gs);
+  const gs2=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:c,transparent:true,opacity:.3,depthWrite:false,blending:THREE.AdditiveBlending})); gs2.position.y=.9; gs2.scale.set(4.6,4.6,1); R.add(gs2);
+  const light=new THREE.PointLight(c,1.3,7); light.position.y=1.2; R.add(light);
+  u.auraFx={disc,ring,ring2,glow:gs,glow2:gs2,light,col:'#'+c.getHexString()};}
+// Moving parts and the aura, every frame
+function animBoss(m,b){const u=m.userData;
+  if(u.plates) u.plates.forEach((g,i)=>{g.rotation.y=i*TAU/4+time*.7; g.position.y=1.0+Math.sin(time*2+i)*.05;});
+  if(u.arcs&&u.orbit&&u.core){u.arcT=(u.arcT||0)-1/60; if(u.arcT<=0){u.arcT=.08; const c=u.core.position; u.arcs.forEach(l=>{const a=u.orbit[(Math.random()*u.orbit.length)|0].position, p=l.geometry.attributes.position;
+      for(let k=0;k<7;k++){const t=k/6, j=k&&k<6?.09:0; p.setXYZ(k,a.x+(c.x-a.x)*t+rand(-j,j),a.y+(c.y-a.y)*t+rand(-j,j),a.z+(c.z-a.z)*t+rand(-j,j));} p.needsUpdate=true; l.visible=!b.hidden&&Math.random()<.75;});}}
+  if(u.vines) u.vines.forEach((g,i)=>{g.rotation.x=Math.sin(time*2+i)*.25; g.rotation.z=Math.cos(time*1.7+i)*.2;});
+  if(u.spots&&u.spots[0]) u.spots[0].material.emissiveIntensity=1.2+Math.sin(time*3)*.8;
+  if(u.flame) u.flame.scale.set(.07,.1+Math.sin(time*12)*.025,.07);
+  if(u.fins) u.fins.forEach((g,i)=>g.rotation.y=(i?-1:1)*Math.sin(time*4)*.4);
+  if(u.tail) u.tail.rotation.y=Math.sin(time*3)*.35;
+  if(u.jaw) u.jaw.rotation.x=.15+Math.sin(time*1.5)*.12;
+  if(u.stalk) u.stalk.rotation.x=Math.sin(time*1.8)*.12;
+  const A=u.auraFx; if(A){const k=.75+.25*Math.sin(time*3), on=!b.hidden&&!b.dead; A.disc.visible=A.ring.visible=A.ring2.visible=A.glow.visible=A.glow2.visible=on; A.light.intensity=on?1.1+.4*k:0;
+    A.disc.material.opacity=.75*k; A.ring.rotation.z=time*.9; A.ring2.rotation.z=-time*.6; A.ring.material.opacity=.85*k; A.ring2.material.opacity=.5*k; A.glow.material.opacity=.5*k; A.glow2.material.opacity=.35*(1.4-k); A.glow2.scale.setScalar(4.6+Math.sin(time*2)*.4);
+    if(on&&!REDUCED) for(let q=0;q<2;q++) parts.push({x:b.x+rand(-b.r,b.r),y:b.y+rand(-b.r*.6,b.r*.6),z:rand(4,24),vx:rand(-10,10),vy:rand(-10,10),vz:rand(70,150),life:.9,max:.9,col:A.col,sz:rand(3,6)});}}
 
 function buildChest(){const R=model(); const wood=M('#7a4a24',{roughness:.85}), gold=M('#f0b84a',{metalness:.7,roughness:.3});
   add(R,gBox,wood,0,.2,0,.62,.4,.42); add(R,gBox,gold,-.27,.2,0,.06,.42,.44); add(R,gBox,gold,.27,.2,0,.06,.42,.44);
@@ -1709,7 +1767,7 @@ function syncBoss(){const b=boss; moundMesh.visible=false; teleLine.visible=fals
   const m=ensure(b,()=>buildBoss(b),b.id); const u=m.userData;
   m.position.set(b.x*S,0,b.y*S); m.rotation.y=yawOf(b.face); m.visible=!b.hidden;
   if(b.hidden){moundMesh.visible=true; moundMesh.position.set(b.x*S,0,b.y*S); moundMesh.scale.set(.9+Math.sin(time*10)*.06,.35,.9);}
-  animLimbs(m,b.walk,true);
+  animLimbs(m,b.walk,true); animBoss(m,b);
   if(u.float){u.body.position.y=.25+Math.sin(time*2)*.12;}
   if(u.orbit) u.orbit.forEach((o,i)=>{const a=time*1.6+i*TAU/u.orbit.length; o.position.set(Math.cos(a)*.75,(u.float?1.0:1.25)+Math.sin(time*3+i)*.12,Math.sin(a)*.75); o.rotation.y=time*3;});
   if(u.core) u.core.material.emissiveIntensity=1.6+Math.sin(time*5)*.6;
