@@ -894,7 +894,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.4.3', SAVE_VERSION=6;
+const APP_VERSION='2.4.4', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1643,6 +1643,15 @@ function buildBoss(b){
     const head=new THREE.Group(); head.position.y=1.28; B.add(head); u.head=head; add(head,gSph,M('#9ad868',{roughness:.5}),0,0,0,.25,.23,.22);
     add(head,gSph,M('#2a0e0a'),0,-.07,.17,.13,.08,.06); add(head,gSph,M('#c04a5a'),0,-.1,.18,.07,.03,.04);
     for(let i=0;i<6;i++){add(head,gCone,M('#f0ecd8'),-.09+i*.036,-.02,.21,.012,.04,.012).rotation.x=Math.PI; add(head,gCone,M('#f0ecd8'),-.08+i*.036,-.12,.205,.011,.035,.011);}
+    // curling horns made of twisted vines
+    {const vA=M('#3a6a22',{roughness:.75}), vB=M('#5a8a2e',{roughness:.7}), lf=M('#8ad05a',{roughness:.6,side:THREE.DoubleSide}), th=M('#d8e0b0',{roughness:.5});
+     for(const sd of [-1,1]){let p=new THREE.Group(); p.position.set(sd*.14,.15,-.02); p.rotation.z=-sd*.5; head.add(p);
+      for(let k=0;k<8;k++){const sg=new THREE.Group(); sg.position.y=k?.075:0; sg.rotation.z=-sd*(k<3?.18:-.28); sg.rotation.x=k<4?-.1:-.26; p.add(sg); const r=.062-k*.006;
+        add(sg,gCyl,vA,0,.04,0,r,.085,r); for(let j=0;j<2;j++){const w=add(sg,gCyl,vB,Math.cos(k*1.7+j*Math.PI)*r*.9,.04,Math.sin(k*1.7+j*Math.PI)*r*.9,r*.38,.09,r*.38); w.rotation.y=k; w.rotation.z=.5;}
+        if(k%2===1){const l=add(sg,gSph,lf,sd*r*1.6,.05,.02,.045,.012,.025); l.rotation.z=sd*.7;}
+        if(k===3){const l2=add(sg,gSph,lf,-sd*r*1.5,.03,-.02,.04,.01,.022); l2.rotation.z=-sd*.7;}
+        if(k===7) add(sg,gCone,th,0,.11,0,.018,.06,.018);
+        p=sg;}}}
     u.core=add(head,gSph,glow('#ffe86a',2),-.08,.07,.18,.035); add(head,gSph,glow('#ffe86a',2),.08,.07,.18,.035);
     // four big petals that keep changing colour
     u.petals=new THREE.Group(); u.petals.position.y=1.1; u.petals.rotation.x=-Math.PI/2; B.add(u.petals); u.petalMats=[];
