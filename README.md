@@ -59,7 +59,7 @@ Hollowshade Isle has risen off the coast. Fight through 7 haunted levels and fac
 
 ## ⚔️ Difficulty
 
-Press **Difficulty** at the top of the map to switch between **Easy** (monsters and bosses hit softer and move slower), **Medium** (normal) and **Hard** (they hit harder and move faster). In co-op, the party leader's setting is used.
+Press **Difficulty** at the top of the map to switch between **Easy** (monsters and bosses have a third less health, hit softer and move slower), **Medium** (normal) and **Hard** (they hit harder and move faster). In co-op, the party leader's setting is used.
 
 ## 🛒 Shop
 

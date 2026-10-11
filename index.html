@@ -903,7 +903,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.5.0', SAVE_VERSION=6;
+const APP_VERSION='2.5.1', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1009,17 +1009,17 @@ function startLevel(bi,li,forceIntro,seed){
   if(!isBoss&&li===0&&(forceIntro||!SAVE.intros[bi])){SAVE.intros[bi]=1; persist(); startCine(biomeCine(bi),()=>banner(L.name,B.name));} else banner(L.name,B.name);
 }
 function pickType(bi){const t=['melee','melee','ranged','lunge']; if(bi>=1)t.push('bomb'); if(bi>=2)t.push('caster'); if(bi>=3)t.push('brute'); if(bi>=5)t.push('brute','caster'); return choice(t);}
-const DIFF={easy:{name:'Easy',dmg:.6,spd:.8},normal:{name:'Medium',dmg:1,spd:1},hard:{name:'Hard',dmg:1.5,spd:1.25}};
+const DIFF={easy:{name:'Easy',dmg:.6,spd:.8,hp:2/3},normal:{name:'Medium',dmg:1,spd:1,hp:1},hard:{name:'Hard',dmg:1.5,spd:1.25,hp:1}};
 const DF=()=>DIFF[(SAVE&&SAVE.diff)||'normal']||DIFF.normal;
 function renderDiff(){const k=(SAVE&&SAVE.diff)||'normal', b=$('#mapDiff'); if(!b) return; b.className='btn small diffbtn '+k; b.querySelector('b').textContent=DIFF[k].name;
   b.title=k==='easy'?'Easy: monsters and bosses hit softer and move slower. Press to change.':k==='hard'?'Hard: monsters and bosses hit harder and move faster. Press to change.':'Medium: normal difficulty. Press to change.';}
 function makeEnemy(type,x,y,summoned){
   const bi=L.tier,A=ARCH[type],sk=BIOMES[L.bi].skins[type], hm=1+.6*bi, dm=1+.42*bi;
-  return {id:MP.nextId++,type,ai:type==='brute'?'melee':type,name:sk[0],c1:sk[1],c2:sk[2],x,y,r:A.r,hp:Math.round(A.hp*hm),max:Math.round(A.hp*hm),spd:A.spd*(rand(.9,1.1))*DF().spd,dmg:A.dmg*dm*DF().dmg,
+  return {id:MP.nextId++,type,ai:type==='brute'?'melee':type,name:sk[0],c1:sk[1],c2:sk[2],x,y,r:A.r,hp:Math.round(A.hp*hm*DF().hp),max:Math.round(A.hp*hm*DF().hp),spd:A.spd*(rand(.9,1.1))*DF().spd,dmg:A.dmg*dm*DF().dmg,
     state:'chase',t:0,cd:rand(.5,2),flash:0,stun:0,burn:0,kx:0,ky:0,alert:!!summoned,face:Math.PI/2,walk:Math.random()*6,summoned:!!summoned,hx:x,hy:y};}
 function spawnEnemy(type,x,y,summoned){const e=makeEnemy(type,x,y,summoned); if(blocked(x,y,e.r)) return null; ents.push(e); return e;}
 function spawnBoss(id){const D=BOSSES[id],bi=L.bi,tr=L.tier;
-  boss={id,bi,isBoss:true,x:L.bossAt.x,y:L.bossAt.y,r:D.r,max:Math.round(D.hp*(1+.6*tr)),dm:(1+.45*tr)*DF().dmg,spd:D.spd*DF().spd,c1:D.c1,c2:D.c2,name:D.name,acts:D.acts,a:null,cd:1.4,flash:0,awake:false,face:Math.PI/2,walk:0,hidden:false,inv:false,burn:0,stun:0,trans:0,dead:false,form:1};
+  boss={id,bi,isBoss:true,x:L.bossAt.x,y:L.bossAt.y,r:D.r,max:Math.round(D.hp*(1+.6*tr)*DF().hp),dm:(1+.45*tr)*DF().dmg,spd:D.spd*DF().spd,c1:D.c1,c2:D.c2,name:D.name,acts:D.acts,a:null,cd:1.4,flash:0,awake:false,face:Math.PI/2,walk:0,hidden:false,inv:false,burn:0,stun:0,trans:0,dead:false,form:1};
   boss.hp=boss.max;}
 
 /* ---------------- player actions ---------------- */
@@ -1151,9 +1151,9 @@ function bossDown(b,fromNet){if(!fromNet&&MP.role==='host'&&MP.inGame) bcast({t:
   for(let i=0;i<12;i++) dropLoot(b.x,b.y,{kind:'shard',amt:3});
   dropLoot(b.x,b.y,{kind:'arrows',amt:12});
   for(const sl of ['weapon','armor','artifact']) dropLoot(b.x,b.y,{kind:'item',item:bossItem(sl,b.id,L.tier)});
-  if(b.id==='sov2'){banner('The Sovereign falls','All six crowns are yours'); SAVE.cleared[L.bi+'-'+L.li]=true; SAVE.won=true; persist(); run.victory=true; startCine(victoryCine(b),()=>showResult('victory'));}
-  else if(b.id==='echotyrant'){L.exit={x:b.x,y:b.y-60,big:true}; banner('The Echo Tyrant falls','The great portal awakens'); setTimeout(()=>{if(L&&L.exit&&L.exit.big&&!run.done) startCine(portalCine(),()=>{SAVE.portalOpen=true; completeLevel(true); mapWorld=4;});},1400);}
-  else {banner('Guardian defeated','A portal opens'); L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h-3)*T};}
+  if(b.id==='sov2'){banner('The Sovereign falls','All six crowns are yours'); SAVE.cleared[L.bi+'-'+L.li]=true; SAVE.won=true; persist(); run.victory=true; startCine(victoryCine(b),()=>{L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T,final:true}; banner('Collect your loot','Then step into the portal');});}
+  else if(b.id==='echotyrant'){L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T,big:true,cine:true}; banner('The Echo Tyrant falls','Collect your loot, then enter the great portal');}
+  else {banner('Guardian defeated','Collect your loot, then enter the portal'); L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T};}
 }
 function finishTransform(){const D=BOSSES.sov2,b=boss; Object.assign(b,{id:'sov2',name:D.name,r:D.r,spd:D.spd,c1:D.c1,c2:D.c2,acts:D.acts,max:Math.round(D.hp*(1+.6*5))*(L.mpN||1),inv:false,cd:1.2,form:2,last:null});
   b.hp=b.max; L.form2=true; b.face=angTo(b,P); startCine(transformCine(b),()=>{radial(b,24,200,8*b.dm,'#d48cff'); shake(8);}); if(MP.role==='host'&&MP.inGame) bcast({t:'cine',k:'trans'});}
@@ -1223,7 +1223,10 @@ function update(dt){
   // explore
   const ptx=P.x/T|0, pty=P.y/T|0; for(let y=pty-7;y<=pty+7;y++) for(let x=ptx-8;x<=ptx+8;x++) if(x>=0&&y>=0&&x<L.w&&y<L.h&&(x-ptx)**2+(y-pty)**2<60) L.seen[y*L.w+x]=1;
   // exit
-  if(L.exit&&!P.dead&&!run.done&&Math.hypot(P.x-L.exit.x,P.y-L.exit.y)<30) completeLevel();
+  if(L.exit&&!P.dead&&!run.done&&mode==='play'&&Math.hypot(P.x-L.exit.x,P.y-L.exit.y)<(L.exit.big?60:30)){
+    if(L.exit.cine){L.exit.cine=false; startCine(portalCine(),()=>{SAVE.portalOpen=true; completeLevel(); mapWorld=4;});}
+    else if(L.exit.final){L.exit=null; run.done=true; persist(); showResult('victory');}
+    else if(!L.exit.big) completeLevel();}
   if(run.endT>0){run.endT-=dt; if(run.endT<=0) showResult(run.victory?'victory':'dead');}
   updAmb(dt);
   hudTick(dt);
