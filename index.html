@@ -47,9 +47,11 @@ h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0}
 kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--ink);padding:1px 5px;border-bottom:2px solid #000}
 
 /* Main menu */
-#menu{justify-content:flex-end;align-items:flex-start;padding-left:max(16px,6vw);padding-bottom:max(32px,9vh);background:linear-gradient(90deg,rgba(6,14,18,.9),rgba(6,14,18,.35) 55%,rgba(6,14,18,0))}
+#menu{justify-content:flex-end;align-items:flex-start;padding-left:max(16px,6vw);padding-bottom:max(20px,4vh);background:#05080f;isolation:isolate}
+#menu::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,rgba(4,8,14,.82),rgba(4,8,14,.3) 55%,rgba(4,8,14,0))}
+#soulsBg{position:fixed;inset:0;width:100%;height:100%;z-index:-2;display:block;pointer-events:none}
 .eyebrow{font-family:var(--display);color:var(--leaf);font-size:18px;letter-spacing:.18em;text-transform:uppercase}
-#menu h1{font-size:clamp(46px,9.5vw,112px);line-height:.88;color:var(--crown);text-shadow:0 5px 0 var(--crown-d),0 11px 0 rgba(0,0,0,.45);margin:6px 0 18px}
+#menu h1{font-size:clamp(36px,min(9.5vw,10.5vh),112px);line-height:.88;color:var(--crown);text-shadow:0 5px 0 var(--crown-d),0 11px 0 rgba(0,0,0,.45);margin:6px 0 18px}
 .crowns{display:flex;gap:8px;align-items:center;margin-bottom:26px;color:var(--mute);font-size:14px;flex-wrap:wrap}
 .pip{width:24px;height:17px;background:#2b4650;clip-path:polygon(0 100%,0 22%,25% 56%,50% 0,75% 56%,100% 22%,100% 100%)}
 .pip.on{background:var(--crown)}
@@ -399,6 +401,7 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 <canvas id="game"></canvas>
 
 <section id="menu" class="screen">
+  <canvas id="soulsBg" aria-hidden="true"></canvas>
   <div class="acct" id="acct"></div>
   <div class="updbar" id="updBar" hidden role="status"></div>
   <div class="eyebrow">A dungeon crawl across</div>
@@ -977,7 +980,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.6.2', SAVE_VERSION=6;
+const APP_VERSION='2.7.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -2126,7 +2129,7 @@ function render(){
   if(cine){const c=cineCam(); camera.position.set(c[0]+sx,c[1],c[2]+sz); camera.lookAt(c[3],c[4],c[5]); lx=c[3]; lz=c[5];}
   else {camera.position.set(tx+sx,15*k,tz+10.4*k+sz); camera.lookAt(tx+sx,.3,tz+sz);}
   sun.position.set(lx+5,14,lz+7); sun.target.position.set(lx,0,lz); sun.target.updateMatrixWorld();
-  R3.render(scene,camera);
+  if(!(mode==='menu'&&SOULS.on)) R3.render(scene,camera);
   drawOverlay();
 }
 function drawOverlay(){
@@ -2193,9 +2196,53 @@ function toast(s,col){const el=document.createElement('div'); el.className='toas
 const SCREENS=['menu','mapScr','hud','inv','pause','result','how','codex','cine','signin','shop','friends'];
 function showOnly(...ids){SCREENS.forEach(s=>$('#'+s).hidden=!ids.includes(s));}
 function crownsHTML(){let n=0; for(let b=0;b<6;b++) if(SAVE&&SAVE.cleared[b+'-2']) n++; let h=''; for(let i=0;i<6;i++) h+=`<span class="pip${i<n?' on':''}" title="${BIOMES[i].name}"></span>`; return h+`<span>${n} of 6 crowns claimed</span>`;}
-function toMenu(){mode='menu'; showOnly('menu'); renderAcct(); $('#menuCrowns').innerHTML=crownsHTML(); $('#btnContinue').disabled=!SAVE; $('#btnNew').textContent='New Expedition'; newArmed=false;
+function toMenu(){mode='menu'; showOnly('menu'); startSouls(); renderAcct(); $('#menuCrowns').innerHTML=crownsHTML(); $('#btnContinue').disabled=!SAVE; $('#btnNew').textContent='New Expedition'; newArmed=false;
   if(!L||L.boss||!L.menu){L=genLevel(0,false); L.bi=0; L.tier=0; L.seen=new Uint8Array(L.w*L.h); L.menu=true; L.chests.forEach(c=>c.open=false); ents=[];loot=[];hazards=[];projs=[];parts=[];texts=[];boss=null;P=null; L.spawns.slice(0,10).forEach(p=>spawnEnemy(pickType(0),p.x,p.y)); amb=[]; buildLevel3D();}
   ($('#btnContinue').disabled?$('#btnNew'):$('#btnContinue')).focus();}
+/* Home menu background: drifting soul particles */
+const SOULS={on:false,cv:null,g:null,ps:[],w:0,h:0,dpr:1,last:0,sprites:{},mx:0,my:0,fog:0};
+function soulSprite(col){if(SOULS.sprites[col]) return SOULS.sprites[col]; const c=document.createElement('canvas'); c.width=c.height=64; const g=c.getContext('2d');
+  const gr=g.createRadialGradient(32,32,0,32,32,32); gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(.12,col); gr.addColorStop(.4,col.replace('1)','.35)')); gr.addColorStop(1,col.replace('1)','0)'));
+  g.fillStyle=gr; g.fillRect(0,0,64,64); return SOULS.sprites[col]=c;}
+const SOUL_COLS=['rgba(90,255,232,1)','rgba(90,255,232,1)','rgba(120,230,255,1)','rgba(122,184,255,1)','rgba(180,140,255,1)','rgba(150,255,210,1)'];
+// Souls circle around a few slowly drifting whirlpools, spiralling inwards, then fade and are reborn on the outside.
+const SWIRLS=[{fx:.66,fy:.48,ax:.08,ay:.06,sp:.11,dir:1,big:1},{fx:.88,fy:.22,ax:.05,ay:.05,sp:.15,dir:-1,big:.55},{fx:.28,fy:.82,ax:.06,ay:.04,sp:.13,dir:1,big:.6}];
+function swirlAt(i,t){const S2=SWIRLS[i]; return {x:(S2.fx+Math.sin(t*S2.sp+i)*S2.ax)*SOULS.w, y:(S2.fy+Math.cos(t*S2.sp*1.3+i*2)*S2.ay)*SOULS.h};}
+function soulNew(anywhere){const z=Math.random()*.75+.25, m=Math.max(SOULS.w,SOULS.h), sw=Math.random()<.62?0:Math.random()<.5?1:2;
+  const R=(anywhere?(.06+Math.random()*.5):(.38+Math.random()*.2))*m*SWIRLS[sw].big;
+  return {sw,R,ang:Math.random()*TAU,z,r:(1.4+Math.random()*2.6)*z,ph:Math.random()*TAU,in:6+Math.random()*16,wob:4+Math.random()*14,
+    col:SOUL_COLS[(Math.random()*SOUL_COLS.length)|0],wisp:Math.random()<.22,tr:[],fl:Math.random()*TAU,age:anywhere?1:0};}
+function soulsResize(){const c=SOULS.cv; SOULS.dpr=Math.min(1.5,devicePixelRatio||1); SOULS.w=innerWidth; SOULS.h=innerHeight; c.width=Math.round(SOULS.w*SOULS.dpr); c.height=Math.round(SOULS.h*SOULS.dpr);
+  const want=Math.min(320,Math.round(SOULS.w*SOULS.h/4800)); while(SOULS.ps.length<want) SOULS.ps.push(soulNew(true)); SOULS.ps.length=Math.min(SOULS.ps.length,want);}
+function startSouls(){if(!SOULS.cv){SOULS.cv=$('#soulsBg'); SOULS.g=SOULS.cv.getContext('2d'); addEventListener('resize',()=>{if(SOULS.on) soulsResize();});
+    addEventListener('pointermove',e=>{SOULS.mx=e.clientX/innerWidth-.5; SOULS.my=e.clientY/innerHeight-.5;});}
+  soulsResize(); if(SOULS.on) return; SOULS.on=true; SOULS.last=performance.now(); requestAnimationFrame(soulsFrame);}
+function soulsFrame(now){if($('#menu').hidden){SOULS.on=false; return;} requestAnimationFrame(soulsFrame);
+  const dt=Math.min(.05,(now-SOULS.last)/1000); SOULS.last=now; const g=SOULS.g, w=SOULS.w, h=SOULS.h, t=now/1000, slow=REDUCED?.35:1, m=Math.max(w,h);
+  g.setTransform(SOULS.dpr,0,0,SOULS.dpr,0,0); g.globalCompositeOperation='source-over';
+  const bg=g.createLinearGradient(0,0,0,h); bg.addColorStop(0,'#03050c'); bg.addColorStop(.55,'#060d18'); bg.addColorStop(1,'#08161e'); g.fillStyle=bg; g.fillRect(0,0,w,h);
+  g.globalCompositeOperation='lighter';
+  // drifting colour clouds
+  const clouds=[['rgba(30,170,170,',.16,.62,.55,.55,.07],['rgba(110,70,220,',.12,.85,.2,.4,.09],['rgba(40,110,200,',.10,.25,.75,.45,.06],['rgba(60,220,190,',.08,.45,.3,.35,.11]];
+  clouds.forEach(([c,al,fx,fy,rr,sp],i)=>{const x=(fx+Math.sin(t*sp*slow+i*1.7)*.12)*w, y=(fy+Math.cos(t*sp*.8*slow+i)*.1)*h, r=rr*m*(1+.12*Math.sin(t*.3+i));
+    const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,c+(al*(.8+.2*Math.sin(t*.7+i)))+')'); gr.addColorStop(1,c+'0)'); g.fillStyle=gr; g.fillRect(0,0,w,h);});
+  // slowly spinning spiral arms of faint light around each whirlpool
+  for(let i=0;i<SWIRLS.length;i++){const c=swirlAt(i,t*slow), S2=SWIRLS[i], arms=3;
+    for(let k=0;k<arms;k++){g.beginPath(); for(let j=0;j<=40;j++){const f=j/40, rr=f*.42*m*S2.big, an=t*.25*S2.dir*slow+k*TAU/arms+S2.dir*f*3.2; const x=c.x+Math.cos(an)*rr, y=c.y+Math.sin(an)*rr*.62; j?g.lineTo(x,y):g.moveTo(x,y);}
+      g.strokeStyle=i===1?'rgba(170,130,255,.05)':'rgba(90,255,230,.05)'; g.lineWidth=18*S2.big; g.stroke(); g.lineWidth=4*S2.big; g.strokeStyle=i===1?'rgba(190,160,255,.07)':'rgba(140,255,240,.08)'; g.stroke();}
+    const cg=g.createRadialGradient(c.x,c.y,0,c.x,c.y,.09*m*S2.big); cg.addColorStop(0,`rgba(${i===1?'190,150,255':'150,255,240'},${.22+.08*Math.sin(t*1.6+i)})`); cg.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=cg; g.fillRect(c.x-.1*m,c.y-.1*m,.2*m,.2*m);}
+  // the souls
+  const C=[swirlAt(0,t*slow),swirlAt(1,t*slow),swirlAt(2,t*slow)];
+  for(const p of SOULS.ps){const S2=SWIRLS[p.sw], c=C[p.sw];
+    p.age=Math.min(1,p.age+dt*.6); p.ang+=S2.dir*dt*slow*(.25+38/Math.sqrt(p.R+30))*(.6+.6*p.z); p.R-=p.in*dt*slow; p.ph+=dt*1.3*slow;
+    if(p.R<10){Object.assign(p,soulNew(false)); continue;}
+    const rr=p.R+Math.sin(p.ph)*p.wob, x=c.x+Math.cos(p.ang)*rr+SOULS.mx*-30*p.z, y=c.y+Math.sin(p.ang)*rr*.62+SOULS.my*-18*p.z-Math.sin(p.ph*.7)*6;
+    if(p.wisp){p.tr.unshift([x,y]); if(p.tr.length>16) p.tr.pop();}
+    const inner=Math.min(1,p.R/(.05*m)), tw=.65+.35*Math.sin(t*2.3+p.fl), a=Math.min(1,p.age*inner*tw*(.5+.7*p.z));
+    const spr=soulSprite(p.col);
+    if(p.wisp) for(let i=1;i<p.tr.length;i++){const k=1-i/p.tr.length, s2=p.r*6.5*k; g.globalAlpha=a*k*.5; g.drawImage(spr,p.tr[i][0]-s2,p.tr[i][1]-s2,s2*2,s2*2);}
+    const s2=p.r*(p.wisp?9:7); g.globalAlpha=a; g.drawImage(spr,x-s2,y-s2,s2*2,s2*2);}
+  g.globalAlpha=1; g.globalCompositeOperation='source-over';}
 function menuCam(dt){if(!L) return; cam.x=L.w*T/2+Math.cos(time*.07)*L.w*T*.32; cam.y=L.h*T/2+Math.sin(time*.05)*L.h*T*.3; for(const e of ents){e.walk+=dt*4;}}
 let newArmed=false;
 $('#btnNew').onclick=()=>{if(SAVE&&!newArmed){newArmed=true; $('#btnNew').textContent='Erase progress and start over?'; return;} SAVE=newSave(); persist(); openMap();};
