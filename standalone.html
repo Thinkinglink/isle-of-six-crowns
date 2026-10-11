@@ -40,7 +40,9 @@ h1,h2,h3{font-family:var(--display);font-weight:700;text-wrap:balance;margin:0}
 kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--ink);padding:1px 5px;border-bottom:2px solid #000}
 
 /* Main menu */
-#menu{justify-content:flex-end;align-items:flex-start;padding-left:max(16px,6vw);padding-bottom:max(20px,4vh);background:#05080f;isolation:isolate}
+#menu{justify-content:flex-end;align-items:flex-start;padding-left:max(16px,6vw);padding-bottom:max(20px,4vh);background:linear-gradient(90deg,rgba(6,14,18,.9),rgba(6,14,18,.35) 55%,rgba(6,14,18,0));isolation:isolate}
+#menu.souls{background:#05080f}
+#menu:not(.souls)::before,#menu:not(.souls) #soulsBg{display:none}
 #menu::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,rgba(4,8,14,.82),rgba(4,8,14,.3) 55%,rgba(4,8,14,0))}
 #soulsBg{position:fixed;inset:0;width:100%;height:100%;z-index:-2;display:block;pointer-events:none}
 .eyebrow{font-family:var(--display);color:var(--leaf);font-size:18px;letter-spacing:.18em;text-transform:uppercase}
@@ -973,7 +975,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.7.0', SAVE_VERSION=6;
+const APP_VERSION='2.7.1', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1305,7 +1307,7 @@ function update(dt){
   const ptx=P.x/T|0, pty=P.y/T|0; for(let y=pty-7;y<=pty+7;y++) for(let x=ptx-8;x<=ptx+8;x++) if(x>=0&&y>=0&&x<L.w&&y<L.h&&(x-ptx)**2+(y-pty)**2<60) L.seen[y*L.w+x]=1;
   // exit
   if(L.exit&&!P.dead&&!run.done&&mode==='play'&&Math.hypot(P.x-L.exit.x,P.y-L.exit.y)<(L.exit.big?60:30)){
-    if(L.exit.cine){L.exit.cine=false; startCine(portalCine(),()=>{SAVE.portalOpen=true; completeLevel(); mapWorld=4;});}
+    if(L.exit.cine){L.exit.cine=false; startCine(portalCine(),()=>{SAVE.portalOpen=true; completeLevel(); mapWorld=4; setTimeout(()=>toast('Unlocked: swirling souls on the home menu','#5affe8'),900);});}
     else if(L.exit.final){L.exit=null; run.done=true; persist(); showResult('victory');}
     else if(!L.exit.big) completeLevel();}
   if(run.endT>0){run.endT-=dt; if(run.endT<=0) showResult(run.victory?'victory':'dead');}
@@ -2189,7 +2191,8 @@ function toast(s,col){const el=document.createElement('div'); el.className='toas
 const SCREENS=['menu','mapScr','hud','inv','pause','result','how','codex','cine','signin','shop','friends'];
 function showOnly(...ids){SCREENS.forEach(s=>$('#'+s).hidden=!ids.includes(s));}
 function crownsHTML(){let n=0; for(let b=0;b<6;b++) if(SAVE&&SAVE.cleared[b+'-2']) n++; let h=''; for(let i=0;i<6;i++) h+=`<span class="pip${i<n?' on':''}" title="${BIOMES[i].name}"></span>`; return h+`<span>${n} of 6 crowns claimed</span>`;}
-function toMenu(){mode='menu'; showOnly('menu'); startSouls(); renderAcct(); $('#menuCrowns').innerHTML=crownsHTML(); $('#btnContinue').disabled=!SAVE; $('#btnNew').textContent='New Expedition'; newArmed=false;
+const soulsUnlocked=()=>!!(SAVE&&worldOpen(3)&&worldOpen(4));
+function toMenu(){mode='menu'; showOnly('menu'); $('#menu').classList.toggle('souls',soulsUnlocked()); if(soulsUnlocked()) startSouls(); else SOULS.on=false; renderAcct(); $('#menuCrowns').innerHTML=crownsHTML(); $('#btnContinue').disabled=!SAVE; $('#btnNew').textContent='New Expedition'; newArmed=false;
   if(!L||L.boss||!L.menu){L=genLevel(0,false); L.bi=0; L.tier=0; L.seen=new Uint8Array(L.w*L.h); L.menu=true; L.chests.forEach(c=>c.open=false); ents=[];loot=[];hazards=[];projs=[];parts=[];texts=[];boss=null;P=null; L.spawns.slice(0,10).forEach(p=>spawnEnemy(pickType(0),p.x,p.y)); amb=[]; buildLevel3D();}
   ($('#btnContinue').disabled?$('#btnNew'):$('#btnContinue')).focus();}
 /* Home menu background: drifting soul particles */
@@ -2210,7 +2213,7 @@ function soulsResize(){const c=SOULS.cv; SOULS.dpr=Math.min(1.5,devicePixelRatio
 function startSouls(){if(!SOULS.cv){SOULS.cv=$('#soulsBg'); SOULS.g=SOULS.cv.getContext('2d'); addEventListener('resize',()=>{if(SOULS.on) soulsResize();});
     addEventListener('pointermove',e=>{SOULS.mx=e.clientX/innerWidth-.5; SOULS.my=e.clientY/innerHeight-.5;});}
   soulsResize(); if(SOULS.on) return; SOULS.on=true; SOULS.last=performance.now(); requestAnimationFrame(soulsFrame);}
-function soulsFrame(now){if($('#menu').hidden){SOULS.on=false; return;} requestAnimationFrame(soulsFrame);
+function soulsFrame(now){if($('#menu').hidden||!$('#menu').classList.contains('souls')){SOULS.on=false; return;} requestAnimationFrame(soulsFrame);
   const dt=Math.min(.05,(now-SOULS.last)/1000); SOULS.last=now; const g=SOULS.g, w=SOULS.w, h=SOULS.h, t=now/1000, slow=REDUCED?.35:1, m=Math.max(w,h);
   g.setTransform(SOULS.dpr,0,0,SOULS.dpr,0,0); g.globalCompositeOperation='source-over';
   const bg=g.createLinearGradient(0,0,0,h); bg.addColorStop(0,'#03050c'); bg.addColorStop(.55,'#060d18'); bg.addColorStop(1,'#08161e'); g.fillStyle=bg; g.fillRect(0,0,w,h);
