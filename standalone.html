@@ -1108,7 +1108,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='3.4.0', SAVE_VERSION=6;
+const APP_VERSION='3.5.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -2170,7 +2170,7 @@ function buildBoss(b){
     R.userData.crown=crown(head,.34,1.3,'#b45cff');
     R.userData.orbit=[0,1,2,3,4,5].map(i=>add(B,gOct,glow(i%2?'#b45cff':'#e0b0ff',1.4),0,1,0,.07,.14,.07)); break;}
   }
-  bossTex(); detailize(R); addBossAura(R,(BOSSES[id]||{}).c2||'#ffffff');
+  bossTex(); applyHi(R); detailize(R); {const FC=(BOSS_FX[id]||{}).c||[(BOSSES[id]||{}).c2||'#ffffff',(BOSSES[id]||{}).c1||'#888888','#ffffff']; corruptize(R,id==='corruptedsinger'?'#2affe0':FC[0]); addBossAura(R,(BOSSES[id]||{}).c2||'#ffffff'); addMegaAura(R,FC); if(id==='corruptedsinger') tintSetup(R);}
   R.scale.setScalar(b.r/13*(id==='sov2'?.95:.85)); CUR=null; return R;}
 // Shared surface textures: a soft glow for auras and a stone/skin grain that gives every boss a real surface.
 const BTEX={};
@@ -2194,6 +2194,218 @@ function addBossAura(R,col){const u=R.userData, c=new THREE.Color(col), add2=(g,
   const gs2=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:c,transparent:true,opacity:.3,depthWrite:false,blending:THREE.AdditiveBlending})); gs2.position.y=.9; gs2.scale.set(4.6,4.6,1); R.add(gs2);
   const light=new THREE.PointLight(c,1.3,7); light.position.y=1.2; R.add(light);
   u.auraFx={disc,ring,ring2,glow:gs,glow2:gs2,light,col:'#'+c.getHexString()};}
+
+/* ===== v3.5 boss overhaul: finer geometry, glowing corruption veins, immense auras, cutscene props ===== */
+const HIGEO=new Map();
+function roundBox(seg,r){const g=new THREE.BoxGeometry(1,1,1,seg,seg,seg), p=g.attributes.position, nm=g.attributes.normal, v=new THREE.Vector3(), c=new THREE.Vector3(), h=.5-r;
+  for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i); c.set(clamp(v.x,-h,h),clamp(v.y,-h,h),clamp(v.z,-h,h)); v.sub(c); if(v.lengthSq()>1e-9){v.setLength(r); nm.setXYZ(i,v.x/r,v.y/r,v.z/r);} p.setXYZ(i,c.x+v.x,c.y+v.y,c.z+v.z);} return g;}
+function hiGeo(){if(HIGEO.size) return HIGEO; const hq=QT==='high', seg=hq?40:28;
+  const lump=(det,amt)=>{const g=new THREE.IcosahedronGeometry(1,det), p=g.attributes.position; for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i); const k=1+amt*(Math.sin(x*5.1+y*2.3)*.5+Math.sin(y*6.7-z*3.1)*.3+Math.sin(z*7.3+x*4.4)*.2); p.setXYZ(i,x*k,y*k,z*k);} g.computeVertexNormals(); return g;};
+  const m=[[gSph,new THREE.SphereGeometry(1,seg,Math.round(seg*.7))],[gSphL,new THREE.SphereGeometry(1,Math.round(seg*.7),Math.round(seg*.45))],[gCyl,new THREE.CylinderGeometry(1,1,1,seg,3)],
+   [gCone,new THREE.ConeGeometry(1,1,seg,4)],[gBox,roundBox(hq?5:3,.09)],[gIco,lump(1,.08)],[gTor,new THREE.TorusGeometry(1,.18,hq?20:14,hq?72:48)],[gHalfTor,new THREE.TorusGeometry(1,.07,12,40,Math.PI)],
+   [gTaper,new THREE.CylinderGeometry(1,.55,1,seg,3)],[gBand,new THREE.CylinderGeometry(1,1,1,seg,1,true)],[gCap,new THREE.SphereGeometry(1,seg,Math.round(seg*.4),0,TAU,0,Math.PI/2)]];
+  for(const [a,b] of m){b.userData.cached=true; HIGEO.set(a,b);} return HIGEO;}
+function applyHi(R){if(QT==='low') return; const H=hiGeo(); R.traverse(o=>{if(o.isMesh){const g=H.get(o.geometry); if(g) o.geometry=g;}});}
+function lineTex(key,seed,jag,blur){if(BTEX[key]) return BTEX[key]; const c=document.createElement('canvas'); c.width=c.height=256; const d=c.getContext('2d'), r=srand(seed); d.fillStyle='#000'; d.fillRect(0,0,256,256); d.lineCap='round'; d.lineJoin='round'; d.shadowColor='#fff'; d.shadowBlur=blur; d.strokeStyle='#fff';
+  const br=(x,y,a,w,n)=>{d.beginPath(); d.moveTo(x,y); for(let k=0;k<n;k++){x+=Math.cos(a)*9; y+=Math.sin(a)*9; d.lineTo(x,y); a+=(r()-.5)*jag; if(r()<.1&&w>.9&&n-k>4){d.lineWidth=w; d.stroke(); br(x,y,a+(r()<.5?1:-1)*.9,w*.6,((n-k)*.6)|0); d.beginPath(); d.moveTo(x,y);}} d.lineWidth=w; d.stroke();};
+  for(let i=0;i<14;i++) br(r()*256,r()*256,r()*TAU,2.4,20);
+  d.shadowBlur=0; for(let i=0;i<50;i++){d.fillStyle=`rgba(255,255,255,${.3+r()*.7})`; d.beginPath(); d.arc(r()*256,r()*256,.8+r()*2,0,TAU); d.fill();}
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; texCache.set(c,t); BTEX[key]=t; return t;}
+function canvasTex(key,size,draw){if(BTEX[key]) return BTEX[key]; const c=document.createElement('canvas'); c.width=c.height=size; draw(c.getContext('2d'),srand(size+key.length*7)); const t=new THREE.CanvasTexture(c); texCache.set(c,t); BTEX[key]=t; return t;}
+const runeTex=()=>canvasTex('rune',512,(d,r)=>{d.translate(256,256); d.strokeStyle='#fff'; d.fillStyle='#fff'; d.shadowColor='#fff'; d.shadowBlur=8;
+  const ring=(rad,w)=>{d.lineWidth=w; d.beginPath(); d.arc(0,0,rad,0,TAU); d.stroke();}; ring(250,5); ring(236,2); ring(178,3); ring(166,1.5); ring(96,3);
+  for(let i=0;i<28;i++){d.save(); d.rotate(i/28*TAU); d.translate(0,-207); d.lineWidth=2.4; d.beginPath(); const k=3+((r()*3)|0); for(let q=0;q<k;q++){d.moveTo((r()-.5)*16,(r()-.5)*18); d.lineTo((r()-.5)*16,(r()-.5)*18);} d.stroke(); d.restore();}
+  for(let i=0;i<12;i++){d.save(); d.rotate(i/12*TAU); d.beginPath(); d.moveTo(-10,-166); d.lineTo(0,-108); d.lineTo(10,-166); d.closePath(); d.fill(); d.restore();}
+  d.lineWidth=2; for(let i=0;i<6;i++){const a=i/6*TAU, b2=a+TAU/3; d.beginPath(); d.moveTo(Math.cos(a)*166,Math.sin(a)*166); d.lineTo(Math.cos(b2)*166,Math.sin(b2)*166); d.stroke();}});
+const groundCrackTex=()=>canvasTex('gcrk',256,(d,r)=>{d.translate(128,128); d.strokeStyle='#fff'; d.shadowColor='#fff'; d.shadowBlur=6; d.lineCap='round';
+  for(let i=0;i<16;i++){let a=i/16*TAU+r()*.3, x=Math.cos(a)*14, y=Math.sin(a)*14; d.beginPath(); d.moveTo(x,y); for(let k=0;k<10;k++){a+=(r()-.5)*.7; x+=Math.cos(a)*11; y+=Math.sin(a)*11; d.lineTo(x,y);} d.lineWidth=3-i%2; d.stroke();}
+  const g=d.createRadialGradient(0,0,0,0,0,44); g.addColorStop(0,'rgba(255,255,255,.9)'); g.addColorStop(1,'rgba(255,255,255,0)'); d.fillStyle=g; d.fillRect(-128,-128,256,256);});
+const smokeTex=()=>canvasTex('smoke',128,(d,r)=>{for(let i=0;i<26;i++){const x=64+(r()-.5)*60,y=64+(r()-.5)*50,rad=18+r()*30, g=d.createRadialGradient(x,y,0,x,y,rad); g.addColorStop(0,'rgba(255,255,255,.22)'); g.addColorStop(1,'rgba(255,255,255,0)'); d.fillStyle=g; d.fillRect(0,0,128,128);}});
+// Dark corruption veins that glow in the boss's own colour, pulsing like a heartbeat
+function corruptize(R,col){const u=R.userData, c=new THREE.Color(col); u.veins=[];
+  for(const m of u.mats){if(!m.isMeshStandardMaterial||m.transparent) continue; if(m.emissive.getHex()!==0){if(m.emissiveIntensity<1.8) m.emissiveIntensity*=1.35; m.userData.ei=m.emissiveIntensity; continue;}
+    m.color.multiplyScalar(.88); m.emissive.copy(c); m.emissiveMap=lineTex('vein',777,.9,6); m.emissiveIntensity=.85; m.userData.e0=m.emissive.clone(); m.userData.ei=.85; m.userData.vein=true; m.needsUpdate=true; u.veins.push(m);}}
+const AURA_VS='varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}';
+const AURA_FS=`uniform float t,amp,per; uniform vec3 c1,c2; varying vec2 vUv;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p,float P){vec2 i=floor(p),f=fract(p); f=f*f*(3.-2.*f); float x0=mod(i.x,P),x1=mod(i.x+1.,P); return mix(mix(h(vec2(x0,i.y)),h(vec2(x1,i.y)),f.x),mix(h(vec2(x0,i.y+1.)),h(vec2(x1,i.y+1.)),f.x),f.y);}
+float fbm(vec2 p,float P){float v=0.,a=.5; for(int i=0;i<4;i++){v+=a*n(p,P); p*=2.; P*=2.; a*=.5;} return v;}
+void main(){float y=vUv.y; vec2 p=vec2(vUv.x*per,y*2.4-t*1.7); float w=fbm(p+vec2(0.,t*.3),per); float f=fbm(p+vec2(floor(w*3.)*0.,w*1.4),per);
+ float shape=smoothstep(0.,.1,y)*(1.-smoothstep(.2,1.,y)); float fl=smoothstep(.3+y*.45,.9,f+(1.-y)*.32);
+ vec3 col=mix(c2,c1,smoothstep(.3,.85,f))+vec3(.3)*fl*fl; gl_FragColor=vec4(col,fl*shape*amp);}`;
+const MEGA_GEO={}; function megaGeo(){if(MEGA_GEO.flame) return MEGA_GEO; MEGA_GEO.flame=new THREE.CylinderGeometry(1,1.3,1,48,1,true); MEGA_GEO.flame.translate(0,.5,0); MEGA_GEO.circle=new THREE.PlaneGeometry(1,1); MEGA_GEO.circle.rotateX(-Math.PI/2); for(const k in MEGA_GEO) MEGA_GEO[k].userData.cached=true; return MEGA_GEO;}
+// The immense aura: flame shell, spinning rune circle, glowing ground cracks, shock rings, a vortex of motes, crackling arcs, orbiting rubble and smoke
+function addMegaAura(R,cols){const lvl=QT==='high'?2:QT==='medium'?1:0, G=megaGeo(), g=new THREE.Group(); R.add(g); const c1=new THREE.Color(cols[0]), c2=new THREE.Color(cols[1]||cols[0]), c3=new THREE.Color(cols[2]||cols[0]);
+  const A={g,lvl,amp:0,flames:[],rings:[],bolts:[],rocks:[]};
+  // On bright floors additive light washes out to white, so the aura is toned to the arena's brightness
+  {let lum=.15; try{const E=B3[BIOMES[L.bi].id], f=new THREE.Color(E.fl[0]); lum=(.3*f.r+.59*f.g+.11*f.b)*(E.si+E.hi)/1.6;}catch(e){} A.k=clamp(1.25-lum*1.5,.28,1);} const basic=o=>new THREE.MeshBasicMaterial(Object.assign({transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false},o));
+  A.rune=new THREE.Mesh(G.circle,basic({map:runeTex(),color:c1,opacity:.9})); A.rune.scale.set(4.6,1,4.6); A.rune.position.y=.05; g.add(A.rune);
+  A.crack=new THREE.Mesh(G.circle,basic({map:groundCrackTex(),color:c2,opacity:.9})); A.crack.scale.set(3.6,1,3.6); A.crack.position.y=.06; g.add(A.crack);
+  for(let i=0;i<2;i++){const r=new THREE.Mesh(gRing,basic({color:i?c3:c1,opacity:.6,side:THREE.DoubleSide})); r.rotation.x=-Math.PI/2; r.position.y=.08; g.add(r); A.rings.push(r);}
+  for(let i=0;i<lvl;i++){const mat=new THREE.ShaderMaterial({uniforms:{t:{value:0},amp:{value:0},per:{value:i?7:5},c1:{value:(i?c3:c1).clone()},c2:{value:(i?c1:c2).clone()}},vertexShader:AURA_VS,fragmentShader:AURA_FS,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,fog:false});
+    const f=new THREE.Mesh(G.flame,mat); f.scale.set(i?1.75:1.25,i?2.6:3.4,i?1.75:1.25); f.renderOrder=3; g.add(f); A.flames.push(f);}
+  const NP=lvl===2?110:lvl===1?60:24, pg=new THREE.BufferGeometry(); pg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(NP*3),3)); pg.userData.own=true;
+  A.pts=new THREE.Points(pg,new THREE.PointsMaterial({map:BTEX.glow,color:c2,size:.32,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false})); A.pts.frustumCulled=false; g.add(A.pts); A.ph=[...Array(NP)].map(()=>[Math.random(),Math.random(),rand(.7,1.5)]);
+  for(let i=0;i<(lvl===2?4:lvl===1?3:2);i++){const lg=new THREE.BufferGeometry(); lg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(30),3)); lg.userData.own=true; const l=new THREE.Line(lg,new THREE.LineBasicMaterial({color:i%2?0xffffff:c2,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,fog:false})); l.frustumCulled=false; g.add(l); A.bolts.push(l);}
+  const rockM=new THREE.MeshStandardMaterial({color:0x2a2630,roughness:.9,emissive:c1,emissiveIntensity:.3,map:BTEX.detail}), rg=QT==='low'?gIco:hiGeo().get(gIco);
+  for(let i=0;i<(lvl===2?9:lvl===1?6:4);i++){const rk=new THREE.Mesh(rg,rockM), sc=rand(.07,.16); rk.scale.set(sc,sc*rand(.7,1.2),sc); rk.userData.o=[rand(1.5,2.4),rand(.3,2.4),Math.random()*TAU,rand(.3,.7)*(Math.random()<.5?-1:1)]; rk.castShadow=true; g.add(rk); A.rocks.push(rk);}
+  if(lvl>=1) A.smoke=[0,1,2].map(i=>{const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:smokeTex(),color:c1.clone().multiplyScalar(.4),transparent:true,opacity:0,depthWrite:false,fog:false})); sp.position.y=.6+i*.5; sp.scale.set(4.5,3,1); g.add(sp); return sp;});
+  R.userData.mega=A; return A;}
+function updMega(A,b){let tgt=(!b.hidden&&!b.dead&&!b.noAura)?1:0; tgt*=1-(b.purity||0); if(b.powerDown) tgt*=(1-b.powerDown)*(Math.random()<.25?.15:1); if(b.a&&tgt) tgt*=1.35; if(b.auraBoost) tgt*=1+b.auraBoost;
+  A.amp+=(tgt-A.amp)*.12; A.g.visible=A.amp>.02; if(!A.g.visible) return; const a=A.amp*A.k;
+  A.rune.rotation.y=time*.35; A.rune.material.opacity=Math.min(1,.85*a*(.8+.2*Math.sin(time*4))); A.crack.material.opacity=Math.min(1,.7*a*(.6+.4*Math.sin(time*2.2))); A.crack.rotation.y=-time*.1;
+  A.rings.forEach((r,i)=>{const k=(time*.62+i*.5)%1; r.scale.setScalar(.6+k*2.6); r.material.opacity=(1-k)*.8*Math.min(1,a);});
+  A.flames.forEach((f,i)=>{f.material.uniforms.t.value=time*(i?1.3:1); f.material.uniforms.amp.value=Math.min(1,a)*A.k*(i?.26:.4); f.rotation.y=time*(i?-.25:.18);});
+  const p=A.pts.geometry.attributes.position; for(let i=0;i<A.ph.length;i++){const q=A.ph[i], k=(time*.32*q[2]+q[0])%1, an=q[1]*TAU+time*q[2]*2.2+k*5, rad=1.7-k*1.1; p.setXYZ(i,Math.cos(an)*rad,k*3.6,Math.sin(an)*rad);} p.needsUpdate=true; A.pts.material.opacity=Math.min(1,a);
+  A.bt=(A.bt||0)-1/60; if(A.bt<=0){A.bt=.06; A.bolts.forEach(l=>{const q=l.geometry.attributes.position; l.visible=Math.random()<.45; if(!l.visible) return; const a0=Math.random()*TAU, a1=a0+rand(-.8,.8), y0=rand(.5,1.7), r1=rand(1.3,2.3), up=Math.random()<.3;
+      const sx=Math.cos(a0)*.4, sz=Math.sin(a0)*.4, ex=Math.cos(a1)*r1, ez=Math.sin(a1)*r1, ey=up?y0+rand(1.2,2.2):.05; for(let k=0;k<10;k++){const t=k/9, j=k&&k<9?.16:0; q.setXYZ(k,lerp(sx,ex,t)+rand(-j,j),lerp(y0,ey,t)+rand(-j,j)*.8,lerp(sz,ez,t)+rand(-j,j));} q.needsUpdate=true; l.material.opacity=Math.min(1,a);});}
+  A.rocks.forEach((rk,i)=>{const o=rk.userData.o, an=o[2]+time*o[3]; rk.position.set(Math.cos(an)*o[0],o[1]+Math.sin(time*1.3+i)*.18,Math.sin(an)*o[0]); rk.rotation.x+=.01*(i%3+1); rk.rotation.y+=.013; rk.visible=A.amp>.3;});
+  if(A.smoke) A.smoke.forEach((sp,i)=>{sp.material.opacity=.32*Math.min(1,a)*(.7+.3*Math.sin(time*.9+i*2)); sp.material.rotation=time*.15*(i%2?1:-1); sp.scale.set(4.4+Math.sin(time*.7+i)*.4,3,1);});}
+// Singer only: its colours can be lerped between corrupted (0) and healed (1)
+function tintSetup(R){const u=R.userData, pure=new THREE.Color('#f6efff'), gold=new THREE.Color('#ffe2a0');
+  u.tintMats=u.mats.map(m=>{const em=m.userData.e0&&m.userData.e0.getHex()!==0&&!m.userData.vein; return {m,c0:m.color.clone(),cp:em?gold.clone():m.color.clone().lerp(pure,.72),e0:m.userData.e0.clone(),ep:(em||m.userData.vein)?gold.clone():m.userData.e0.clone()};});}
+function setPurity(u,k){for(const t of u.tintMats){t.m.color.copy(t.c0).lerp(t.cp,k); t.m.userData.e0.copy(t.e0).lerp(t.ep,k); if(!u.fl) t.m.emissive.copy(t.m.userData.e0);}}
+// Extra life on every boss: breathing, head tracking, footstep dust, vein pulse, power-down and healing
+function bossExtra(m,b){const u=m.userData; if(u.mega){updMega(u.mega,b); const k=u.mega.k, F=u.auraFx; if(F&&k<1){F.disc.material.opacity*=k; F.ring.material.opacity*=k; F.ring2.material.opacity*=k; F.glow.material.opacity*=k*k; F.glow2.material.opacity*=k*k; F.light.intensity*=k;}} const pd=b.powerDown||0, pk=b.purity||0;
+  if(u.tintMats&&u.pk!==pk){u.pk=pk; setPurity(u,pk);}
+  if(u.veins&&!u.fl){const k=(1-pd*(Math.random()<.3?1:.75))*(1-pk*.15); for(let i=0;i<u.veins.length;i++){const mt=u.veins[i]; mt.emissiveIntensity=mt.userData.ei*k*(.55+.45*Math.sin(time*2.6+i*.7));}}
+  if(!u.body) return;
+  if(pd>0){if(u.spots&&u.spots[0]) u.spots[0].material.emissiveIntensity*=(1-pd)*(Math.random()<.2?.2:1); if(u.core) u.core.material.emissiveIntensity*=1-pd*.9; u.body.rotation.x+=.35*pd; u.body.scale.y*=1-.14*pd;}
+  else if(!(b.roar>0)){const br=Math.sin(time*1.8+(u.ph||0)); u.body.scale.set(u.body.scale.x*(1+.012*br),u.body.scale.y*(1+.028*br),u.body.scale.z*(1+.012*br));}
+  if(u.head&&!(b.roar>0)&&P&&!b.dead&&!b.hidden){const hd=u.head; if(hd.userData.ry0==null){hd.userData.ry0=hd.rotation.y; hd.userData.rx0=hd.rotation.x;} const rel=clamp(((b.face-angTo(b,P))%TAU+TAU*1.5)%TAU-Math.PI,-.7,.7); u.hy=lerp(u.hy||0,rel,.08); hd.rotation.y=hd.userData.ry0+u.hy; hd.rotation.x=hd.userData.rx0+Math.sin(time*1.3+(u.ph||0))*.05;}
+  if(u.legs&&u.legs.length&&!b.dead&&!b.hidden){const sg=Math.sin(b.walk||0)>=0?1:-1; if(u.stepS&&sg!==u.stepS&&b.walk!==u.lw) puff(b.x+rand(-b.r*.4,b.r*.4),b.y+rand(-6,6),'#7a7064',4,80,.45,5); u.stepS=sg; u.lw=b.walk;}}
+/* ---- cutscene props ---- */
+const CPROPS=[]; function propAdd(o){scene.add(o); CPROPS.push(o); return o;}
+function propClear(){for(const o of CPROPS){scene.remove(o); if(o.userData&&o.userData.mats) disposeModel(o); else o.traverse(q=>{if(q.geometry&&q.geometry.userData.own) q.geometry.dispose(); if(q.material&&q.material.dispose) q.material.dispose();});} CPROPS.length=0;}
+const soulTex=()=>{if(BTEX.soul) return BTEX.soul; const t=canvasTex('soul',32,(d,r)=>{for(let y=0;y<32;y++) for(let x=0;x<32;x++){const v=r(); d.fillStyle=v<.55?'#06262b':v<.8?'#0f4a52':v<.93?'#2affe0':'#c8fff6'; d.fillRect(x,y,1,1);}
+  d.fillStyle='#d8fffa'; for(const q of [[9,10,4,5],[19,10,4,5],[11,20,10,3],[13,23,6,2]]) d.fillRect(...q);}); t.magFilter=t.minFilter=THREE.NearestFilter; return t;};
+function makeSoulBlock(size){bossTex(); const g=new THREE.Group(), tx=soulTex();
+  const core=new THREE.Mesh(hiGeo().get(gBox),new THREE.MeshStandardMaterial({color:0x0a3036,map:tx,emissive:new THREE.Color('#2affe0'),emissiveMap:tx,emissiveIntensity:1.4,roughness:.35,metalness:.1}));
+  const shell=new THREE.Mesh(gBox,new THREE.MeshBasicMaterial({color:0x7affef,transparent:true,opacity:.25,depthWrite:false,blending:THREE.AdditiveBlending,fog:false})); shell.scale.setScalar(1.18);
+  const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0x2affe0,transparent:true,opacity:.7,depthWrite:false,blending:THREE.AdditiveBlending,fog:false})); gl.scale.set(3,3,1);
+  g.add(core,shell,gl); g.scale.setScalar(size); g.userData.core=core; g.userData.shell=shell; return g;}
+const sculkTex=()=>canvasTex('sculk',128,(d,r)=>{const gr=d.createRadialGradient(64,64,10,64,64,64); gr.addColorStop(0,'rgba(8,34,40,1)'); gr.addColorStop(.75,'rgba(8,34,40,.95)'); gr.addColorStop(1,'rgba(8,34,40,0)'); d.fillStyle=gr; d.fillRect(0,0,128,128);
+  for(let i=0;i<80;i++){const a=r()*TAU, rr=r()*52; d.fillStyle=r()<.7?'rgba(20,90,100,.85)':'rgba(42,255,224,.95)'; d.fillRect(64+Math.cos(a)*rr,64+Math.sin(a)*rr,2+r()*3,2+r()*3);}});
+function makeSculkFloor(x,y,rad,n){const g=new THREE.Group(); g.position.set(x*S,0,y*S); const tx=sculkTex(), mat=new THREE.MeshStandardMaterial({map:tx,emissive:new THREE.Color('#2affe0'),emissiveMap:tx,emissiveIntensity:.9,transparent:true,depthWrite:false,roughness:.8,polygonOffset:true,polygonOffsetFactor:-2}); const r=srand(n*7), R1=rad*S;
+  const ps=[]; for(let i=0;i<n;i++){const a=r()*TAU, d=Math.sqrt(r())*R1, sc=(.8+r()*1)*R1*.35, p=new THREE.Mesh(megaGeo().circle,mat); p.position.set(Math.cos(a)*d,.03+i*.0008,Math.sin(a)*d); p.rotation.y=r()*TAU; p.userData.s=sc; p.userData.d=d; p.scale.set(.001,1,.001); g.add(p); ps.push(p);}
+  g.userData.mat=mat; g.userData.grow=k=>ps.forEach(p=>{const kk=clamp(k*1.6-p.userData.d/R1*.6,0,1); p.scale.set(p.userData.s*kk+.001,1,p.userData.s*kk+.001);}); return g;}
+function makeCocoon(R0){const g=new THREE.Group(); bossTex();
+  const mat=new THREE.MeshStandardMaterial({color:0x0b2a30,roughness:.55,map:BTEX.detail,emissive:new THREE.Color('#2affe0'),emissiveMap:lineTex('crk',4242,1.6,4),emissiveIntensity:.15});
+  const lumpG=geo('cocoonLump',()=>{const q=new THREE.SphereGeometry(1,48,32), p=q.attributes.position; for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i), k=1+.09*Math.sin(x*7+y*3)+.06*Math.sin(y*11-z*5)+.05*Math.sin(z*9+x*6); p.setXYZ(i,x*k,y*k*1.35,z*k);} q.computeVertexNormals(); return q;});
+  const shell=new THREE.Mesh(lumpG,mat); shell.position.y=R0*1.25; shell.scale.setScalar(.001); shell.castShadow=true; g.add(shell);
+  const tm=new THREE.MeshStandardMaterial({color:0x0e3238,roughness:.5,emissive:new THREE.Color('#1aa898'),emissiveIntensity:.35}); const tend=[];
+  for(let i=0;i<16;i++){const a=i/16*TAU+rand(-.15,.15), tw=rand(.6,1.2)*(i%2?1:-1), pts=[]; for(let k=0;k<=6;k++){const t=k/6, an=a+tw*t, rr=R0*(1.55-t*1.3), yy=R0*2.7*Math.sin(t*Math.PI/2)-(t?0:.1); pts.push(new THREE.Vector3(Math.cos(an)*rr,yy,Math.sin(an)*rr));}
+    const tg=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),48,R0*rand(.06,.1),10,false); tg.userData.own=true; const tu=new THREE.Mesh(tg,tm); tu.castShadow=true; tg.setDrawRange(0,0); g.add(tu); tend.push(tu);}
+  Object.assign(g.userData,{shell,mat,R0,tend,shards:[],grow:k=>{tend.forEach((tu,i)=>{const kk=clamp(k*1.4-i*.025,0,1), n=tu.geometry.index.count; tu.geometry.setDrawRange(0,Math.floor(n*kk/6)*6);}); const ks=R0*1.1*easeOut(clamp((k-.35)/.65,0,1))+.001; shell.scale.set(ks,ks,ks);}}); return g;}
+function burstShards(g,n){const R0=g.userData.R0, rg=hiGeo().get(gIco); for(let i=0;i<n;i++){const a=Math.random()*TAU, m=new THREE.Mesh(rg,g.userData.mat), sc=R0*rand(.18,.38); m.scale.set(sc,sc*rand(.5,1),sc*rand(.6,1)); m.position.set(Math.cos(a)*R0*.9,R0*rand(1,2.4),Math.sin(a)*R0*.9);
+  m.userData.v=new THREE.Vector3(Math.cos(a)*rand(4,9),rand(3,8),Math.sin(a)*rand(4,9)).multiplyScalar(R0*.6); m.userData.w=new THREE.Vector3(rand(-6,6),rand(-6,6),rand(-6,6)); m.castShadow=true; g.add(m); g.userData.shards.push(m);}}
+function updShards(g,dt){if(!g) return; for(const m of g.userData.shards){const v=m.userData.v; v.y-=g.userData.R0*14*dt; m.position.addScaledVector(v,dt); if(m.position.y<m.scale.y*.5){m.position.y=m.scale.y*.5; v.y*=-.25; v.x*=.6; v.z*=.6;} m.rotation.x+=m.userData.w.x*dt; m.rotation.y+=m.userData.w.y*dt; m.rotation.z+=m.userData.w.z*dt;}}
+// Particles that fly home to a point (souls gathering, souls rising)
+function homeP(x,y,z,hx,hy,hz,col,life,sz){parts.push({x,y,z,vx:0,vy:0,vz:0,life,max:life,col,sz,hx,hy,hz});}
+function gatherSouls(cx,cy,hPx,n,cols){for(let q=0;q<n;q++){const a=Math.random()*TAU, rr=rand(150,250); homeP(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr,rand(10,90),cx,cy,hPx,cols[q%cols.length],rand(.8,1.2),rand(3,5));}}
+function riseSouls(x,y,z,n,cols,spread=60){for(let q=0;q<n;q++) homeP(x+rand(-10,10),y+rand(-10,10),z,x+rand(-spread,spread)*3,y+rand(-spread,spread)*3,z+rand(260,620),cols[q%cols.length],rand(1.2,2),rand(5,9));}
+function makeSingerProp(){const R=buildBoss({id:'corruptedsinger',r:34}); CUR=null; setPurity(R.userData,1); R.userData.pk=1; return R;}
+function propAnim(R,f){animBoss(R,f); const u=R.userData; u.body.position.y=.25+Math.sin(time*2)*.12; if(u.orbit) u.orbit.forEach((o,i)=>{const a=time*1.6+i*TAU/u.orbit.length; o.position.set(Math.cos(a)*.75,1.0+Math.sin(time*3+i)*.12,Math.sin(a)*.75);}); bossExtra(R,f);}
+const SOULC=['#2affe0','#5affff','#c8fff6'];
+function tauntCam(b,sc){return k=>{const qx=b.x*S,qz=b.y*S,vx=P.x*S-qx,vz=P.y*S-qz,vl=Math.hypot(vx,vz)||1,wx=vx/vl,wz=vz/vl, r=lerp(5*sc,3.2*sc,k); return [qx+wx*r,lerp(2.2*sc,1.8*sc,k),qz+wz*r,qx,1.55*sc,qz];};}
+/* ---- The Sculk Monstrosity is born: the Singer gathers souls, the sculk spins a cocoon, and it hatches ---- */
+function monstrosityIntro(b){const F=BOSS_FX[b.id]||BOSS_FX.bramble, st=BOSS_STORY[b.id]||{}, R0=b.r*S*1.6, bx=b.x*S, bz=b.y*S, sc=b.r/13*.85, fx=fxTick(b,true);
+  const ang=Math.atan2(P.y-b.y,P.x-b.x), ux=Math.cos(ang), uz=Math.sin(ang), d0=Math.hypot(P.x-b.x,P.y-b.y), stopD=Math.min(d0,b.r*5.5);
+  const stop={x:b.x+ux*stopD,y:b.y+uz*stopD}, sing={x:b.x-uz*b.r*2.4+ux*b.r*1.2,y:b.y+ux*b.r*2.4+uz*b.r*1.2}, sx=sing.x*S, sz=sing.y*S;
+  let floor=null, singer=null, sf=null, block=null, coc=null;
+  const shots=[
+   {dur:3.4,fast:true,speaker:profileName()||'You',text:'Every vein in this place leads here...',enter(){b.cineHide=true; b.rise=0; floor=propAdd(makeSculkFloor(b.x,b.y,b.r*4.5,26)); floor.userData.grow(.3);},
+    tick(t,dt){const d=Math.hypot(stop.x-P.x,stop.y-P.y); if(d>6){const sp=Math.min(d,150*dt); P.x+=(stop.x-P.x)/d*sp; P.y+=(stop.y-P.y)/d*sp; P.walk+=dt*10; P.face=Math.atan2(stop.y-P.y,stop.x-P.x);} else P.face=Math.atan2(b.y-P.y,b.x-P.x); floor.userData.grow(.3+t*.06);},
+    cam:k=>{const px=P.x*S,pz=P.y*S; return [px+ux*3.4+uz*1.3,lerp(2.4,3.3,k),pz+uz*3.4-ux*1.3,lerp(px,bx,.35+k*.4),1.0,lerp(pz,bz,.35+k*.4)];}},
+   {dur:3.4,label:'A Singer of the Deep',text:'The ground splits open. Something is rising out of it... and it is singing.',
+    enter(){singer=propAdd(makeSingerProp()); sf={x:sing.x,y:sing.y,r:34,hidden:true,purity:1,face:Math.atan2(b.y-sing.y,b.x-sing.x),walk:0}; singer.rotation.y=yawOf(sf.face); singer.position.set(sx,-singer.scale.x*2,sz); shake(6); puff(sing.x,sing.y,'#3a3a3a',30,200,1,8);},
+    tick(t,dt){const k=easeOut(clamp(t/2.6,0,1)); singer.position.y=-singer.scale.x*2*(1-k); propAnim(singer,sf); if(k<1&&Math.random()<.5){puff(sing.x+rand(-30,30),sing.y+rand(-20,20),'#3a3a3a',3,120,.6,6); if(Math.random()<.2) shake(3);}
+      if(Math.random()<.3) FXP(sing.x+rand(-20,20),sing.y+rand(-20,20),rand(40,120),rand(-40,40),rand(-40,40),rand(40,90),Math.random()<.5?'#d8c8ff':'#ffe8a0',1,rand(3,5)); floor.userData.grow(.5+t*.06);},
+    cam:k=>{const a=Math.atan2(P.y-sing.y,P.x-sing.x)+.5-k*.3, r=lerp(10,8.5,k); return [sx+Math.cos(a)*r,lerp(1.2,2.6,k),sz+Math.sin(a)*r,sx,lerp(.8,2.6,k),sz];}},
+   {dur:4.4,speaker:'The Singer',text:'Lost ones, wandering ones... come home. Gather close. Become one.',enter(){block=propAdd(makeSoulBlock(.01)); block.position.set(sx,singer.scale.x*2.3,sz);},
+    tick(t,dt){propAnim(singer,sf); const hd=singer.userData.head; if(hd) hd.rotation.x=-.35; if(Math.random()<.35) FXP(sing.x+rand(-10,10),sing.y+rand(-10,10),110+rand(0,30),rand(-70,70),rand(-70,70),rand(60,120),Math.random()<.5?'#d8c8ff':'#ffe8a0',1.2,rand(3,5));
+      gatherSouls(sing.x,sing.y,block.position.y/S,3,SOULC); const k=clamp(t/3.6,0,1); block.scale.setScalar(.02+easeOut(k)*R0*.5); block.rotation.y=t*1.5; block.rotation.x=t*.7;},
+    cam:k=>{const a=ang+1.3+k*.4, r=8.5; return [sx+Math.cos(a)*r,lerp(2.6,3.6,k),sz+Math.sin(a)*r,sx,singer.scale.x*1.9,sz];}},
+   {dur:3.0,enter(){sf.y0=singer.position.y; block.userData.from=block.position.clone();},
+    tick(t,dt){propAnim(singer,sf); const k=clamp(t/1.5,0,1), fr=block.userData.from; block.position.set(lerp(fr.x,bx,easeInOut(k)),lerp(fr.y,-R0*.15,k*k),lerp(fr.z,bz,easeInOut(k))); block.rotation.y+=dt*6;
+      if(k>=1&&!sf.landed){sf.landed=true; shake(12); flashT=.35; flashCol='#2affe0'; puff(b.x,b.y,'#2affe0',30,220,.8,7); for(let i=0;i<30;i++){const a=i/30*TAU; FXP(b.x,b.y,8,Math.cos(a)*300,Math.sin(a)*300,60,SOULC[i%3],.8,7);}}
+      const k2=clamp((t-.9)/1.6,0,1); singer.position.y=sf.y0-easeInOut(k2)*singer.scale.x*2.4; if(k2>0&&k2<1&&Math.random()<.4) puff(sing.x+rand(-25,25),sing.y+rand(-15,15),'#3a3a3a',3,100,.5,6); if(k2>=1) singer.visible=false; floor.userData.grow(.75+t*.12);},
+    cam:k=>{const a=ang+.9, r=10; return [bx+Math.cos(a)*r,lerp(4,5.2,k),bz+Math.sin(a)*r,lerp(sx,bx,k),lerp(2.2,.4,k),lerp(sz,bz,k)];}},
+   {dur:3.6,label:'The sculk answers',enter(){coc=propAdd(makeCocoon(R0)); coc.position.set(bx,0,bz);},
+    tick(t,dt){const k=clamp(t/3.2,0,1); coc.userData.grow(k); floor.userData.grow(1.1+k*.4); block.position.y=lerp(-R0*.15,R0*1.25,easeOut(clamp(t/1.2,0,1))); block.rotation.y+=dt*2; coc.rotation.y=t*.15;
+      if(Math.random()<.5) FXP(b.x+rand(-b.r*3,b.r*3),b.y+rand(-b.r*3,b.r*3),4,0,0,rand(60,140),'#0f4a52',.8,rand(5,8)); if(Math.random()<.08) shake(3); coc.userData.mat.emissiveIntensity=.15+.25*Math.sin(t*6)**2;},
+    cam:k=>{const a=ang+.5+k*1.4, r=lerp(11,8.5,k); return [bx+Math.cos(a)*r,lerp(3,4.6,k),bz+Math.sin(a)*r,bx,R0*1.4,bz];}},
+   {dur:3.0,fast:true,text:'Something inside is pushing back.',enter(){shake(6);},
+    tick(t,dt){const k=t/3; coc.userData.mat.emissiveIntensity=.3+k*k*5*(.7+.3*Math.sin(t*30)); coc.position.x=bx+Math.sin(t*50)*.05*k*R0; coc.position.z=bz+Math.cos(t*43)*.05*k*R0; if(Math.random()<.1+k*.4) shake(2+k*5); if(Math.random()<.3) sparks(b.x+rand(-b.r,b.r),b.y,Math.random()*TAU,'#2affe0',5,b.r*1.5);},
+    cam:k=>{const a=ang+1.9, r=lerp(8,6.4,k); return [bx+Math.cos(a)*r,R0*1.6,bz+Math.sin(a)*r,bx,R0*1.4,bz];}},
+   {dur:2.4,enter(){coc.position.set(bx,0,bz); coc.userData.shell.visible=false; coc.userData.tend.forEach(tu=>tu.visible=false); burstShards(coc,18); block.visible=false; b.cineHide=false; b.rise=1; b.spin=0; flashT=.8; flashCol='#c8fff6'; shake(18);
+      for(let i=0;i<70;i++){const a=Math.random()*TAU, sp=rand(150,520); FXP(b.x,b.y,b.r*1.2,Math.cos(a)*sp,Math.sin(a)*sp,rand(120,420),SOULC[i%3],rand(.8,1.4),rand(6,10));} CFX.ring(b,F.c); CFX.burst(b,F.c);},
+    tick(t,dt){updShards(coc,dt);},
+    cam:k=>{const a=ang+1.9+k*.7, r=lerp(6.5,11,k); return [bx+Math.cos(a)*r,lerp(R0*1.4,R0*2.8,k),bz+Math.sin(a)*r,bx,R0*1.3,bz];}},
+   {dur:2.2,title:b.name,sub:st.ep,enter(){b.roar=2.2; b.auraBoost=.3; shake(14); CFX.ring(b,F.c);},tick(t,dt){updShards(coc,dt); fx(t,dt);},cam:orbit(bx,bz,3.8*sc,1.0*sc,ang-1.6,ang+.4,1.5*sc)},
+   {dur:2.0,fast:true,speaker:b.name,text:st.taunt,enter(){b.roar=0; b.auraBoost=0;},tick(t,dt){updShards(coc,dt);},cam:tauntCam(b,sc)}];
+  shots.cleanup=()=>{propClear(); b.cineHide=false; b.rise=1; b.jy=0; b.spin=0; b.roar=0; b.auraBoost=0;};
+  return shots;}
+function monstrosityDeath(b){const F=BOSS_FX[b.id], fl=BOSS_FALL[b.id], R0=b.r*S*1.6, bx=b.x*S, bz=b.y*S, sc=b.r/13*.85, fa=Math.atan2(P.y-b.y,P.x-b.x); let block=null, floor=null;
+  const shots=[
+   {dur:3.0,fast:true,speaker:b.name,text:fl[0],enter(){b.fallCine=true; b.deadAt=null; b.flash=0; b.hidden=false; b.a=null; b.powerDown=0; b.roar=.8; shake(8); floor=propAdd(makeSculkFloor(b.x,b.y,b.r*4,24)); floor.userData.grow(1.4);},
+    tick(t,dt){b.flash=Math.max(0,(b.flash||0)-dt); b.burn=0; b.powerDown=clamp(t/2.6,0,1); b.spin=Math.sin(t*9)*.05*(1-b.powerDown); if(Math.random()<.25) sparks(b.x+rand(-b.r,b.r),b.y,Math.random()*TAU,'#2affe0',4,b.r*1.2); if(Math.random()<.12) shake(2);},
+    cam:k=>{const a=fa+.6-k*.3, r=lerp(6,4.8,k)*sc; return [bx+Math.cos(a)*r,lerp(1.8,2.3,k)*sc,bz+Math.sin(a)*r,bx,1.2*sc,bz];}},
+   {dur:2.8,text:'The light goes out of it. The whole mass sags... and splits open.',enter(){b.deadAt=time; b.powerDown=1; b.spin=0; block=propAdd(makeSoulBlock(R0*.5)); block.position.set(bx,R0*.4,bz); shake(10); CFX.burst(b,F.c);},
+    tick(t,dt){block.position.y=lerp(R0*.4,R0*1.1,easeOut(clamp(t/1.8,0,1))); block.rotation.y+=dt*1.2; if(Math.random()<.5) puff(b.x+rand(-b.r,b.r),b.y+rand(-b.r*.6,b.r*.6),'#0c2a30',3,120,.7,7);},
+    cam:k=>{const a=fa+.2+k*.6, r=lerp(5.5,7.5,k)*sc; return [bx+Math.cos(a)*r,lerp(2,3.4,k)*sc,bz+Math.sin(a)*r,bx,R0*.9,bz];}},
+   {dur:2.6,label:'The soul block',tick(t,dt){const k=t/2.6; block.position.x=bx+Math.sin(t*60)*.04*R0*(.3+k); block.position.z=bz+Math.cos(t*53)*.04*R0*(.3+k); block.rotation.y+=dt*(1+k*6); block.userData.core.material.emissiveIntensity=1.4+k*4*(.6+.4*Math.sin(t*25)); block.userData.shell.scale.setScalar(1.18+k*.3);
+      if(Math.random()<.2+k*.5){shake(1+k*4); sparks(b.x,b.y,Math.random()*TAU,'#c8fff6',5,R0*1.1/S);}},
+    cam:k=>{const a=fa+.8, r=lerp(4.2,3.2,k)*sc*.8; return [bx+Math.cos(a)*r,R0*1.4,bz+Math.sin(a)*r,bx,R0*1.1,bz];}},
+   {dur:2.8,title:b.name+' defeated',sub:(BOSS_STORY[b.id]||{}).ep||'',enter(){block.visible=false; flashT=1; flashCol='#e8fffb'; shake(20); riseSouls(b.x,b.y,R0*1.1/S,70,SOULC,90); for(let i=0;i<40;i++){const a=i/40*TAU; FXP(b.x,b.y,R0*1.1/S,Math.cos(a)*560,Math.sin(a)*560,80,SOULC[i%3],.9,8);}},
+    tick(t,dt){riseSouls(b.x,b.y,R0*1.1/S,3,SOULC,120);},
+    cam:k=>{const a=fa+1.1+k*.7, r=lerp(5,9,k)*sc; return [bx+Math.cos(a)*r,lerp(2,5,k)*sc,bz+Math.sin(a)*r,bx,lerp(R0,R0*2.4,k),bz];}},
+   {dur:3.4,text:'Hundreds of trapped souls drift upward, free at last. All around the chamber, the sculk shrivels and crumbles into grey dust.',
+    tick(t,dt){for(let q=0;q<2;q++){const a=Math.random()*TAU, rr=rand(20,160); riseSouls(b.x+Math.cos(a)*rr,b.y+Math.sin(a)*rr,rand(10,40),1,SOULC,30);} const k=clamp(t/3,0,1); floor.userData.grow(1.4*(1-k)); floor.userData.mat.emissiveIntensity=.9*(1-k); floor.userData.mat.color.setScalar(1-k*.35);
+      if(Math.random()<.3) puff(b.x+rand(-b.r*3,b.r*3),b.y+rand(-b.r*3,b.r*3),'#8a8a8a',4,60,.8,6);},
+    cam:k=>{const a=fa+1.8+k*.5, r=8*sc; return [bx+Math.cos(a)*r,lerp(2,6,k)*sc,bz+Math.sin(a)*r,bx,lerp(1.5,5,k),bz];}},
+   heroShot(fl[1],2.8)];
+  shots.cleanup=()=>{propClear(); b.powerDown=0; b.spin=0; b.roar=0; if(!b.deadAt) b.deadAt=time-3;};
+  return shots;}
+/* ---- The Singer: gathers the souls, the soul block is forced inside it, and the sculk takes it ---- */
+function singerIntro(b){const F=BOSS_FX[b.id]||BOSS_FX.bramble, st=BOSS_STORY[b.id]||{}, bx=b.x*S, bz=b.y*S, sc=b.r/13*.85, fa=Math.atan2(P.y-b.y,P.x-b.x), H=sc*1.9, fx=fxTick(b,true); let block=null;
+  const shots=[
+   {dur:3.4,fast:true,text:st.stir||'A note rings out from under the floor.',enter(){b.cineHide=false; b.purity=1; b.rise=0; b.face=fa; shake(6); puff(b.x,b.y,'#3a3a3a',30,200,1,8);},
+    tick(t,dt){b.rise=easeOut(clamp(t/2.8,0,1)); if(b.rise<1&&Math.random()<.5){puff(b.x+rand(-30,30),b.y+rand(-20,20),'#3a3a3a',3,120,.6,6); if(Math.random()<.2) shake(3);}},
+    cam:k=>{const a=fa+1.1-k*.4, r=lerp(7,5.5,k)*sc*.7; return [bx+Math.cos(a)*r,lerp(.8,1.8,k)*sc*.7,bz+Math.sin(a)*r,bx,lerp(.3,1.7,k)*sc*.7,bz];}},
+   {dur:4.4,speaker:'The Singer',text:'Lost ones, come to me... gather, gather... into one.',enter(){block=propAdd(makeSoulBlock(.01)); block.position.set(bx,H*1.35,bz);},
+    tick(t,dt){gatherSouls(b.x,b.y,block.position.y/S,3,SOULC); if(Math.random()<.35) FXP(b.x+rand(-10,10),b.y+rand(-10,10),H*1.1/S,rand(-70,70),rand(-70,70),rand(60,120),Math.random()<.5?'#d8c8ff':'#ffe8a0',1.2,rand(3,5));
+      const k=clamp(t/3.6,0,1); block.scale.setScalar(.02+easeOut(k)*sc*.42); block.rotation.y=t*1.5; block.rotation.x=t*.7;},
+    cam:k=>{const a=fa+.7+k*.5, r=7*sc*.7; return [bx+Math.cos(a)*r,lerp(2.2,3,k)*sc*.7,bz+Math.sin(a)*r,bx,H*1.05,bz];}},
+   {dur:2.6,speaker:'The Singer',fast:true,text:'No... too many voices... it is pulling me in—',enter(){block.userData.from=block.position.clone(); block.userData.s0=block.scale.x;},
+    tick(t,dt){const k=clamp(t/1.6,0,1); block.position.y=lerp(block.userData.from.y,H*.68,easeInOut(k)); block.scale.setScalar(lerp(block.userData.s0,block.userData.s0*.15,k*k)); block.rotation.y+=dt*8; b.spin=Math.sin(t*20)*.1*k;
+      if(k>=1&&block.visible){block.visible=false; flashT=.7; flashCol='#2affe0'; shake(14); CFX.burst(b,SOULC); b.roar=1.2;}},
+    cam:k=>{const a=fa+.3, r=lerp(5.5,4.2,k)*sc*.7; return [bx+Math.cos(a)*r,H*.85,bz+Math.sin(a)*r,bx,H*.8,bz];}},
+   {dur:3.6,text:'Sculk floods through its veins. The song cracks... and twists into something else.',enter(){b.spin=0;},
+    tick(t,dt){b.purity=1-easeInOut(clamp(t/3,0,1)); if(Math.random()<.6) FXP(b.x+rand(-b.r*1.4,b.r*1.4),b.y+rand(-b.r,b.r),rand(10,140),0,0,rand(-40,60),Math.random()<.6?'#0f4a52':'#2affe0',1,rand(5,9)); b.spin=Math.sin(t*14)*.06; if(Math.random()<.15) shake(3);},
+    cam:k=>{const a=fa+1.4-k*.9, r=lerp(6,4.5,k)*sc*.7; return [bx+Math.cos(a)*r,H*.8,bz+Math.sin(a)*r,bx,H*.75,bz];}},
+   {dur:2.2,title:b.name,sub:st.ep,enter(){b.purity=0; b.spin=0; b.roar=1.8; b.auraBoost=.3; shake(12); flashT=.35; flashCol='#fff'; CFX.ring(b,F.c); CFX.burst(b,F.c);},tick:fx,cam:orbit(bx,bz,3.8*sc,1.0*sc,fa-1.6,fa+.4,1.5*sc)},
+   {dur:2.0,fast:true,speaker:b.name,text:st.taunt,enter(){b.roar=0; b.auraBoost=0;},cam:tauntCam(b,sc)}];
+  shots.cleanup=()=>{propClear(); b.purity=0; b.cineHide=false; b.rise=1; b.spin=0; b.roar=0; b.auraBoost=0;};
+  return shots;}
+function singerDeath(b){const bx=b.x*S, bz=b.y*S, sc=b.r/13*.85, fa=Math.atan2(P.y-b.y,P.x-b.x), H=sc*1.9, gold=['#ffe7a8','#ffffff','#fff2c0']; let halo=null;
+  const flake=()=>FXP(b.x+rand(-b.r,b.r),b.y+rand(-b.r*.6,b.r*.6),rand(40,160),rand(-30,30),rand(-30,30),rand(-80,-20),Math.random()<.6?'#0c2a30':'#2affe0',1.1,rand(6,10));
+  const shots=[
+   {dur:3.0,fast:true,speaker:'The Singer',text:'The noise... the noise in my head... it is fading...',enter(){b.fallCine=true; b.deadAt=null; b.flash=0; b.hidden=false; b.a=null; b.purity=0; b.roar=0; shake(6);},
+    tick(t,dt){b.flash=Math.max(0,(b.flash||0)-dt); b.burn=0; b.purity=easeInOut(clamp(t/2.8,0,1))*.45; b.spin=Math.sin(t*10)*.06*(1-t/3); flake(); flake();},
+    cam:k=>{const a=fa+.5-k*.3, r=lerp(6,4.6,k)*sc*.7; return [bx+Math.cos(a)*r,H*.7,bz+Math.sin(a)*r,bx,H*.75,bz];}},
+   {dur:3.2,text:'The sculk peels away in black flakes. A trapped light slips out of its chest and breaks into a hundred freed souls.',
+    tick(t,dt){b.purity=.45+.55*easeInOut(clamp(t/2.6,0,1)); b.spin=0; if(Math.random()<.7) flake(); if(t>1&&!b._fr){b._fr=1; flashT=.4; flashCol='#c8fff6'; riseSouls(b.x,b.y,H*.68/S,60,SOULC,80);}},
+    cam:k=>{const a=fa+.9+k*.6, r=lerp(5.5,7.5,k)*sc*.7; return [bx+Math.cos(a)*r,lerp(.8,1.1,k)*H,bz+Math.sin(a)*r,bx,H*.8,bz];}},
+   {dur:3.6,title:'The Singer is healed',sub:'The broken song is mended',speaker:'The Singer',text:'Thank you, crown-bearer. I can hear my own song again.',
+    enter(){b.purity=1; halo=propAdd(new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0xffe7a8,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}))); halo.position.set(bx,H*.8,bz); halo.scale.set(H*2.4,H*2.4,1);},
+    tick(t,dt){halo.material.opacity=Math.min(.9,t*.5); if(t>1.8) b.jy=(b.jy||0)+dt*sc*.5; halo.position.y=H*.8+(b.jy||0); if(Math.random()<.6) FXP(b.x+rand(-b.r,b.r),b.y+rand(-b.r,b.r),rand(10,120),0,0,rand(60,160),gold[(Math.random()*3)|0],1.2,rand(5,8));},
+    cam:k=>{const a=fa+.2+k*.4, r=lerp(6,7.5,k)*sc*.7; return [bx+Math.cos(a)*r,H*.7,bz+Math.sin(a)*r,bx,H*.8+(b.jy||0)*.6,bz];}},
+   {dur:1.8,enter(){flashT=1; flashCol='#fff6dc'; shake(6); riseSouls(b.x,b.y,(H*.8+(b.jy||0))/S,60,gold,90); b.deadAt=time-3; if(halo) halo.visible=false;},
+    cam:k=>{const a=fa+.6+k*.4, r=8*sc*.7; return [bx+Math.cos(a)*r,lerp(1,1.6,k)*H,bz+Math.sin(a)*r,bx,lerp(H,H*2,k),bz];}},
+   heroShot('Its song belongs to it again.',2.8)];
+  shots.cleanup=()=>{propClear(); b.spin=0; b.jy=0; if(!b.deadAt) b.deadAt=time-3;};
+  return shots;}
 // Moving parts and the aura, every frame
 function animBoss(m,b){const u=m.userData; if(b.squirtT>0) b.squirtT-=1/60;
   if(u.plates) u.plates.forEach((g,i)=>{g.rotation.y=i*TAU/4+time*.7; g.position.y=1.0+Math.sin(time*2+i)*.05;});
@@ -2255,7 +2467,7 @@ function buildLoot(o){const R=model();
   else if(o.kind==='shard'){R.userData.spin=add(R,gOct,M('#7fe0c8',{emissive:new THREE.Color('#3fc0a0'),emissiveIntensity:.8,flatShading:true,roughness:.2}),0,.2,0,.08,.14,.08);}
   else {const g=new THREE.Group(); g.position.y=.08; R.add(g); for(let i=0;i<3;i++){const a=add(g,gCyl,M('#c9a066'),(i-1)*.05,0,0,.012,.42,.012); a.rotation.x=Math.PI/2; add(g,gCone,M('#d9dee0',{metalness:.6}),(i-1)*.05,0,.24,.022,.06,.022).rotation.x=Math.PI/2;} g.rotation.y=.6;}
   CUR=null; return R;}
-function disposeModel(m){if(m.userData.mats) m.userData.mats.forEach(x=>x.dispose()); m.traverse(o=>{if(o.material&&!m.userData.mats.includes(o.material)){if(o.material.map&&!texCache.has(o.material.map.image)) o.material.map.dispose(); o.material.dispose();}});}
+function disposeModel(m){if(m.userData.mats) m.userData.mats.forEach(x=>x.dispose()); m.traverse(o=>{if(o.geometry&&o.geometry.userData.own) o.geometry.dispose();if(o.material&&!m.userData.mats.includes(o.material)){if(o.material.map&&!texCache.has(o.material.map.image)) o.material.map.dispose(); o.material.dispose();}});}
 
 /* ---------------- level geometry ---------------- */
 const B3={
@@ -2393,7 +2605,7 @@ function buildLevel3D(){
 const REG=new Map(); let seenSet=new Set();
 function ensure(obj,build,key){let m=REG.get(obj); if(m&&m.userData.key!==key){scene.remove(m); disposeModel(m); REG.delete(obj); m=null;}
   if(!m){m=build(); CUR=null; m.userData.key=key; scene.add(m); REG.set(obj,m);} seenSet.add(obj); return m;}
-function setFlash(m,mode){if(m.userData.fl===mode) return; m.userData.fl=mode; for(const mt of m.userData.mats){ if(mode===1){mt.emissive.setRGB(1,1,1); mt.emissiveIntensity=.85;} else if(mode===2){mt.emissive.setRGB(1,.35,.05); mt.emissiveIntensity=.45;} else {mt.emissive.copy(mt.userData.e0); mt.emissiveIntensity=mt.userData.ei;}}}
+function setFlash(m,mode){if(m.userData.fl===mode) return; m.userData.fl=mode; for(const mt of m.userData.mats){ if(mt.userData.vein){const w=mode===0?BTEX.vein:null; if(mt.emissiveMap!==w){mt.emissiveMap=w; mt.needsUpdate=true;}} if(mode===1){mt.emissive.setRGB(1,1,1); mt.emissiveIntensity=.85;} else if(mode===2){mt.emissive.setRGB(1,.35,.05); mt.emissiveIntensity=.45;} else {mt.emissive.copy(mt.userData.e0); mt.emissiveIntensity=mt.userData.ei;}}}
 const easeOut=k=>1-Math.pow(1-k,3), easeInOut=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
 function animLimbs(m,walk,moving){const u=m.userData;
   if(u.legType==='crawl') u.legs.forEach(l=>l.rotation.y=moving?Math.sin(walk*1.4+l.userData.ph*1.57)*.32:0);
@@ -2488,7 +2700,7 @@ function syncBoss(){const b=boss; moundMesh.visible=false; teleLine.visible=fals
   if(!u.base) u.base=m.scale.x; const rz=b.rise!=null?b.rise:1; m.scale.setScalar(u.base*(.35+.65*rz));
   {let sx=1,sy=1,lean=0; if(b.a&&!b.hidden){const t=b.a.t; if(t<.45){const q=easeOut(t/.45); sx=1+.07*q; sy=1-.09*q; lean=-.12*q; if(u.auraFx) u.auraFx.light.intensity=1.3+2.4*q;} else if(t<.7){const q=1-(t-.45)/.25; sx=1-.04*q; sy=1+.1*q; lean=.15*q; if(u.auraFx) u.auraFx.light.intensity=1.3+1.2*q;} else if(u.auraFx) u.auraFx.light.intensity=1.3;}
    const fl=clamp((b.flash||0)/.1,0,1); if(fl>0){sx*=1+.05*fl; sy*=1-.05*fl; lean-=.08*fl;}
-   if(sx!==1||sy!==1) m.scale.set(m.scale.x*sx,m.scale.y*sy,m.scale.z*sx); if(u.body) u.body.rotation.x=lean;} m.position.set(b.x*S,(b.jy||0)-(1-rz)*2.8,b.y*S); m.rotation.y=yawOf(b.face)+(b.spin||0); m.visible=!b.hidden&&!b.cineHide;
+   if(sx!==1||sy!==1) m.scale.set(m.scale.x*sx,m.scale.y*sy,m.scale.z*sx); if(u.body) u.body.rotation.x=lean;} m.position.set(b.x*S,(b.jy||0)-(1-rz)*2.8,b.y*S); {const tg=yawOf(b.face)+(b.spin||0); if(u.yaw==null||Math.abs(b.spin||0)>.6) u.yaw=tg; else u.yaw+=(((tg-u.yaw)%TAU+TAU*1.5)%TAU-Math.PI)*.22; m.rotation.y=u.yaw;} m.visible=!b.hidden&&!b.cineHide;
   if(b.hidden){moundMesh.visible=true; moundMesh.position.set(b.x*S,0,b.y*S); moundMesh.scale.set(.9+Math.sin(time*10)*.06,.35,.9);}
   animLimbs(m,b.walk,true); animBoss(m,b);
   if(u.float){u.body.position.y=.25+Math.sin(time*2)*.12;}
@@ -2497,6 +2709,7 @@ function syncBoss(){const b=boss; moundMesh.visible=false; teleLine.visible=fals
   if(b.a&&b.a.tele){teleLine.visible=true; teleLine.position.set(b.x*S,.04,b.y*S); teleLine.rotation.y=-b.a.ang; teleMesh.position.x=3.25; teleMesh.scale.set(6.5,b.r*1.4*S,1); teleMesh.material.opacity=.25+.2*Math.sin(time*18);}
   if(b.roar>0){u.arms.forEach(a=>a.rotation.x=-2.7); if(u.torso) u.torso.rotation.x=-.25; u.body.scale.setScalar(1+Math.sin(time*30)*.025);} else {if(u.torso&&u.torso.userData.rx0!==undefined) u.torso.rotation.x=u.torso.userData.rx0; u.body.scale.setScalar(1);}
   if(b.trans>0){m.rotation.y+=time*6; u.body.position.y=Math.sin(time*20)*.05;}
+  bossExtra(m,b);
   setFlash(m,b.flash>0?1:b.burn>0?2:0);}
 function syncChest(c){const m=ensure(c,buildChest,'c'); m.position.set(c.x*S,0,c.y*S); m.rotation.y=0; const u=m.userData;
   u.lid.rotation.x+=((c.open?-1.9:0)-u.lid.rotation.x)*.2; u.glow.material.opacity=c.open?0:.12+.08*Math.sin(time*3);}
@@ -3109,7 +3322,7 @@ function updCine(dt){const sh=cine.shots[cine.i]; cine.t+=dt;
   if(sh.text){const n=Math.min(sh.text.length,Math.floor(cine.typed+=dt*(sh.fast?80:50))); cEl.querySelector('.csub p').textContent=sh.text.slice(0,n);}
   shakeT=Math.max(0,shakeT-dt); if(shakeT<=0) shakeA=0; flashT=Math.max(0,flashT-dt);
   if(boss&&boss.roar>0) boss.roar-=dt;
-  for(const p of parts){p.x+=p.vx*dt; p.y+=p.vy*dt; p.vx*=.95; p.vy*=.95; p.z=(p.z||0)+(p.vz||0)*dt; p.vz=(p.vz||0)-260*dt; if(p.z<0){p.z=0;p.vz*=-.3;} p.life-=dt;} parts=parts.filter(p=>p.life>0);
+  for(const p of parts){if(p.hx!=null){const k=Math.min(1,dt*3.2); p.x+=(p.hx-p.x)*k; p.y+=(p.hy-p.y)*k; p.z+=(p.hz-p.z)*k; p.life-=dt; continue;} p.x+=p.vx*dt; p.y+=p.vy*dt; p.vx*=.95; p.vy*=.95; p.z=(p.z||0)+(p.vz||0)*dt; p.vz=(p.vz||0)-260*dt; if(p.z<0){p.z=0;p.vz*=-.3;} p.life-=dt;} parts=parts.filter(p=>p.life>0);
   updAmb(dt);
   if(cine.t>=sh.dur) nextShot();}
 function nextShot(){if(!cine) return; cine.i++; if(cine.i>=cine.shots.length) endCine(); else enterShot();}
@@ -3170,7 +3383,8 @@ const BOSS_FX={bramble:{c:['#7fb04f','#c9ff6a','#4a6b2a'],a:['ring','burst']},su
 function fxTick(b,heavy){const F=BOSS_FX[b.id]||BOSS_FX.bramble; let acc=0;
   return (t,dt)=>{acc-=dt; if(acc>0) return; acc=heavy?.22:.4; for(const a of F.a){if(a==='spiral'||a==='rain'||a==='souls'||a==='shift'||a==='pages') CFX[a](b,F.c,t); else if(Math.random()<(heavy?.6:.35)) CFX[a](b,F.c,t);}};}
 // Entrance: summoning circle → the boss rises out of it → roar → it leaps and slams down → shows its power → taunt.
-function bossCine(b){const s=BOSS_STORY[b.id]||{ep:'',stir:'Something stirs.',taunt:'...'},bx=b.x*S,bz=b.y*S,px=P.x*S,pz=P.y*S,dx=px-bx,dz=pz-bz,dl=Math.hypot(dx,dz)||1,ux=dx/dl,uz=dz/dl,sc=b.r/13*.85,fa=Math.atan2(uz,ux);
+function bossCine(b){if(b.id==='sculkmonstrosity') return monstrosityIntro(b); if(b.id==='corruptedsinger') return singerIntro(b);
+  const s=BOSS_STORY[b.id]||{ep:'',stir:'Something stirs.',taunt:'...'},bx=b.x*S,bz=b.y*S,px=P.x*S,pz=P.y*S,dx=px-bx,dz=pz-bz,dl=Math.hypot(dx,dz)||1,ux=dx/dl,uz=dz/dl,sc=b.r/13*.85,fa=Math.atan2(uz,ux);
   const F=BOSS_FX[b.id]||BOSS_FX.bramble; let circ=null, leap=null;
   const shots=[
    {dur:2.4,fast:true,text:s.stir,enter(){b.cineHide=true; b.rise=0; circ=summonCircle(b.x,b.y,F.c[0]); shake(3);},
@@ -3212,7 +3426,8 @@ function transformCine(b){const bx=b.x*S,bz=b.y*S,sc=b.r/13; const dx=P.x-b.x,dz
    {dur:2.0,fast:true,speaker:'The Sovereign Unbound',text:'You thought the mask was me?',enter(){b.roar=1.6; CFX.burst(b,F.c);},tick:fxTick(b,false),cam:dolly([bx+ux*5*sc,2.2*sc,bz+uz*5*sc,bx,1.6*sc,bz],[bx+ux*3.2*sc,1.8*sc,bz+uz*3.2*sc,bx,1.7*sc,bz])},
    {dur:2.4,fast:true,speaker:'The Sovereign Unbound',text:'I am what remains when an island loses all of its kings.',enter(){shake(10); CFX.ring(b,F.c);},tick:fxTick(b,true),cam:k=>{const a=fa-.4+k*.9,r=lerp(3.4*sc,7*sc,k); return [bx+Math.cos(a)*r,lerp(1*sc,4.5*sc,k),bz+Math.sin(a)*r,bx,1.6*sc,bz];}}];}
 const BOSS_FALL={bramble:['No... my roots... my beautiful garden...','The thorns are falling away. The meadow can breathe again.'],sultan:['The sand... slips through my fingers...','Every grain is free now. Even the ones he swallowed.'],witch:['My pot... my lovely bubbling pot... gone cold...','The fen is going quiet. No more humming in the dark.'],warden:['Passed... someone finally... passed...','The ice is cracking. The pass is open.'],golem:['THE FORGE... GROWS... COLD...','Its heart is just a cinder now.'],sov2:['Six crowns... and still... not enough...',''],pumpking:['The candles... are going out... one... by... one...','Happy Halloween, your majesty.'],stormsentinel:['The sky... no longer answers...','The clouds are parting. Sunlight.'],mossback:['Mmmm... sleep... long... sleep...','Rest well, old giant. The shrine is quiet again.'],lanternmaw:['My light... my pretty little light...','No more following strange lights into the water.'],echotyrant:['The echoes... fall... silent...','The portal is still humming. Something is waiting on the other side.'],sculkmonstrosity:['More... I needed... more...','The veins stopped pulsing. It finally has enough.'],monarch:['My throne... my claws... my kingdom...','The Clawed King bows at last.'],harmonizer:['The song... ends... out of... tune...','The meadow is silent. It almost sounds peaceful.'],foundrycolossus:['The fire... inside me... is out...','The furnace doors are closing for good.'],brimstonewyrm:['Ssso... cold... ssso very... cold...','The wastes are cooling. The coils are still.'],ironwarlord:['My armour... was supposed to... hold...','The drums have stopped. The citadel is free.'],forgeking:['Every blade I made... and none... could stop you...','The anvil is quiet. The Molten Throne is empty.'],hollowwatcher:['I watched... everything... except this...','The eye is closing. The dark is just dark again.'],riftweaver:['My threads... unravel... all of them...','The paths are straight again.'],nullbloom:['Shh... let me... wilt... quietly...','The pale flowers are turning away. One by one.'],endlessone:['Even the end... has an end...','The stars are coming back.'],ancienttome:['So many pages... and none told me... how this ends...','The last page is turning. Its story is over.'],godofdestruction:['Broken... I am the one... broken...','Nothing left to break. The ground is still.'],radiantseraph:['My light... grows dim... guard... the core...','Six wings fold, one by one. The light softens.'],blightmother:['My children... my beautiful infection...','The poison is drying up. The marsh is clearing.'],forms3:['Every shape... and none of them... was enough...','No more forms. No more changing. It is over.'],corruptedsinger:['The last note... finally... breaks...','Silence. Real silence.']};
-function defeatCine(b,final){const D=BOSSES[b.id]||{}, s=BOSS_STORY[b.id]||{}, F=BOSS_FX[b.id]||BOSS_FX.bramble, fl=BOSS_FALL[b.id]||['No... this cannot be...','It is over.'], sc=Math.max(.8,b.r/13*.85);
+function defeatCine(b,final){if(!final&&b.id==='sculkmonstrosity') return monstrosityDeath(b); if(!final&&b.id==='corruptedsinger') return singerDeath(b);
+  const D=BOSSES[b.id]||{}, s=BOSS_STORY[b.id]||{}, F=BOSS_FX[b.id]||BOSS_FX.bramble, fl=BOSS_FALL[b.id]||['No... this cannot be...','It is over.'], sc=Math.max(.8,b.r/13*.85);
   const bx=b.x*S,bz=b.y*S, fa=Math.atan2(P.y-b.y,P.x-b.x), nm=(b.name||D.name||'The guardian').replace(/ · .*/,'');
   const souls=(n,sp)=>{for(let i=0;i<n;i++){const a=Math.random()*TAU, r=rand(0,b.r*1.6); FXP(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r,rand(10,b.r*2),Math.cos(a)*rand(10,40),Math.sin(a)*rand(10,40),rand(sp*.6,sp),F.c[i%F.c.length],rand(1,1.8),rand(4,8));}};
   const shots=[

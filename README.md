@@ -110,3 +110,9 @@ The game updates itself when you open it, on every device. Your progress is alwa
 ## 🎬 Boss defeat cutscenes
 
 Every boss now gets its own defeat cutscene: its last words, its collapse, souls rising out of the arena, and a final word from you.
+
+## 👹 Boss overhaul
+
+Every boss is now built from far finer, smoother geometry, with dark corruption veins that pulse in its own colour. Each one carries an immense aura: a roaring flame shell, a spinning rune circle, glowing ground cracks, shock rings, a vortex of motes, crackling arcs and floating rubble. The aura flares when the boss attacks and is toned to the arena so the boss always stays visible. Bosses also breathe, turn smoothly, track you with their heads and kick up dust as they walk.
+
+The Sculk Monstrosity and the Corrupted Singer have their own story cutscenes: the Singer gathers lost souls into a soul block, the sculk spins a cocoon around it and the Monstrosity hatches; later the soul block is forced into the Singer itself, and defeating it heals it.
