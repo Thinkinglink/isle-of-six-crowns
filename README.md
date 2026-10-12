@@ -81,6 +81,18 @@ Select any weapon, armor or artifact in your Pack and press **✦ Enchant** (abo
 
 50 new artifacts summon allies that fight beside you: wolves, golems, knights, skeleton archers, exploding mites, healing sprites and more. Every boss of the Outer Isles and the Shift Dimension now drops its own guardian summoning artifact as well as its normal one.
 
+## ✨ The Core of Creations
+
+Conquer the Shift, the Forge **and** the Void, then press **Core of Creations →** on the Deep Dark map. One great island, five cores, each with 4 levels and a boss:
+
+1. **Core of Knowledge**: the Ancient Tome, a giant living book that rains glowing runes on you.
+2. **Core of Destruction**: the God of Destruction, who smashes straight through rocks and walls. Don't hide behind cover for long.
+3. **Core of Immunity**: the Radiant Seraph, a six-winged god of light who raises walls of light around you and builds light towers that shoot.
+4. **Core of Infection**: the Blight Mother, who squirts poison that leaves puddles. Standing in a puddle hurts and slows you.
+5. **Core of Forms**: the Shapeless One, which fights in three forms: Stone, then Flame at 2/3 health, then Stars at 1/3 health, with a cutscene each time it changes.
+
+Every core has its own monsters, weapons, armor, artifacts and a guardian summoning artifact.
+
 ## 🏠 Home menu rewards
 
 - Reach the **Outer Isles** and the home menu shows a floating, broken, corrupted heart fragment.

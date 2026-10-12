@@ -218,6 +218,7 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #mapScr.w4{background:radial-gradient(ellipse at 50% 55%,#1a1238,#06040e 72%)}
 #mapScr.w5{background:radial-gradient(ellipse at 50% 55%,#3a0e06,#0e0302 72%)}
 #mapScr.w6{background:radial-gradient(ellipse at 50% 55%,#140a24,#000 72%)}
+#mapScr.w7{background:radial-gradient(ellipse at 55% 50%,#2a2048,#05040e 72%)}
 .mapportal.forge{border-color:#ffb03a;background:radial-gradient(circle,#1a0604 30%,#ff7a1a 55%,#ffd040 75%,rgba(0,0,0,0) 76%);box-shadow:0 0 18px #ff6a1a,0 0 36px rgba(255,160,40,.5)}
 .mapportal.void{border-color:#e0d0ff;background:radial-gradient(circle,#000 34%,#3a2a6a 55%,#b48cff 75%,rgba(0,0,0,0) 76%);box-shadow:0 0 18px #b48cff,0 0 36px rgba(255,255,255,.35)}
 
@@ -746,7 +747,23 @@ const BIOMES=[
   skins:{melee:['Pale Husk','#c8c0d8','#5a2aa0'],ranged:['Null Archer','#d8d0e8','#8a5ad0'],lunge:['Void Leech','#2a1a3a','#e8e0f0'],bomb:['Null Bloat','#8a7aa8','#2a1a3a'],caster:['Hollow Gardener','#3a2a4a','#e8e0f0'],brute:['Null Treant','#5a5470','#b48cff']}},
  {id:'edge',name:"The Endless Edge",world:6,lab:[510,610],levels:['Edge of Everything', 'Collapsing Paths', 'The Last Light', 'Into the Endless'],boss:'endlessone',
   floor:['#0a0812','#0e0a18'],wallF:'#000000',wallT:'#1a1428',deco:['#ffffff','#b48cff','#140e22'],accent:'#ffffff',amb:'void',map:['#0e0a18','#140e22','#08060e'],
-  skins:{melee:['Endless Shade','#0e0a18','#ffffff'],ranged:['Edge Archer','#1a1428','#e0d0ff'],lunge:['Void Hound','#08060e','#ffffff'],bomb:['Collapse Mite','#2a1a4a','#ffffff'],caster:['Starless Mage','#140e22','#e0d0ff'],brute:['Abyss Colossus','#1a1428','#ffffff']}}
+  skins:{melee:['Endless Shade','#0e0a18','#ffffff'],ranged:['Edge Archer','#1a1428','#e0d0ff'],lunge:['Void Hound','#08060e','#ffffff'],bomb:['Collapse Mite','#2a1a4a','#ffffff'],caster:['Starless Mage','#140e22','#e0d0ff'],brute:['Abyss Colossus','#1a1428','#ffffff']}},
+ // ---- The Core of Creations (after all three dimensions) ----
+ {id:'knowledge',name:"Core of Knowledge",world:7,lab:[0,0],levels:['The Endless Stacks', 'Hall of Whispers', 'The Ink Wells', 'Archive of Ages'],boss:'ancienttome',
+  floor:['#5a4630','#624c34'],wallF:'#2a1e12',wallT:'#7a5a36',deco:['#ffd36a','#7ab0ff','#4a3424'],accent:'#ffd36a',amb:'firefly',map:['#7a5a36','#86643c','#6a4e2e'],
+  skins:{melee:['Paper Golem','#d8ccb0','#3a2a1a'],ranged:['Ink Archer','#1a1a2a','#7ab0ff'],lunge:['Quill Darter','#e8e0d0','#2a2a3a'],bomb:['Scroll Bomb','#c8b890','#ff6a3a'],caster:['Rune Scholar','#3a2a5a','#ffd36a'],brute:['Library Guardian','#6a4a2a','#ffd36a']}},
+ {id:'destruction',name:"Core of Destruction",world:7,lab:[0,0],levels:['Shattered Plains', 'The Broken Road', 'Rubble Fields', 'The Crater'],boss:'godofdestruction',
+  floor:['#2a1c1c','#302020'],wallF:'#120808',wallT:'#4a2a24',deco:['#ff3a1a','#5a4a40','#2a1a1a'],accent:'#ff3a1a',amb:'ember',map:['#3a2420','#442a24','#30201c'],
+  skins:{melee:['Rubble Brute','#4a3a34','#ff5a2a'],ranged:['Shard Slinger','#3a2a2a','#ff8a3a'],lunge:['Ruin Hound','#2a1a18','#ff3a1a'],bomb:['Cracked Core','#ff5a2a','#2a1410'],caster:['Doom Caller','#2a1414','#ff3a1a'],brute:['Wreck Titan','#3a2a28','#ff5a2a']}},
+ {id:'immunity',name:"Core of Immunity",world:7,lab:[0,0],levels:['The White Steps', 'Hall of Shields', 'Garden of Light', 'The Bright Gate'],boss:'radiantseraph',
+  floor:['#d8d0c0','#e0d8c8'],wallF:'#8a8070',wallT:'#f0e8d8',deco:['#fff2b0','#ffffff','#c8b880'],accent:'#fff2b0',amb:'firefly',map:['#e8e0c8','#f0e8d0','#d8d0b8'],
+  skins:{melee:['Light Sentinel','#e8e0d0','#ffd36a'],ranged:['Ray Archer','#f0e8d8','#fff2b0'],lunge:['Halo Hound','#d8d0c0','#ffe88a'],bomb:['Sun Mote','#fff2b0','#c8a040'],caster:['Ward Keeper','#c8c0b0','#fff2b0'],brute:['Shield Bearer','#d8d0c0','#ffd36a']}},
+ {id:'infection',name:"Core of Infection",world:7,lab:[0,0],levels:['Blistered Marsh', 'The Seeping Hollow', 'Pustule Pits', "Mother's Nest"],boss:'blightmother',
+  floor:['#2e3a1e','#344222'],wallF:'#121a0a',wallT:'#4a5a2a',deco:['#9aff3a','#c8ff6a','#3a4a1a'],accent:'#9aff3a',amb:'spore',map:['#3a4a22','#425228','#32401c'],
+  skins:{melee:['Plague Husk','#4a5a2a','#9aff3a'],ranged:['Spitter','#3a4a2a','#c8ff6a'],lunge:['Blight Crawler','#2a3a1a','#9aff3a'],bomb:['Pus Bloat','#8ab03a','#2a3a10'],caster:['Rot Shaman','#3a2a3a','#9aff3a'],brute:['Swollen Brute','#5a6a3a','#c8ff6a']}},
+ {id:'forms',name:"Core of Forms",world:7,lab:[0,0],levels:['Shifting Floor', 'Hall of Mirrors', 'The Prism Way', 'Heart of Change'],boss:'forms1',
+  floor:['#1e1a2e','#241e36'],wallF:'#0a0814',wallT:'#3a3058',deco:['#7af0ff','#ffa030','#ffffff'],accent:'#7af0ff',amb:'void',map:['#2a2440','#322a4c','#221e36'],
+  skins:{melee:['Shifting Husk','#3a3058','#7af0ff'],ranged:['Prism Archer','#2a2448','#ffffff'],lunge:['Changeling','#1a1428','#ffa030'],bomb:['Unstable Form','#7af0ff','#1a1428'],caster:['Form Weaver','#2a1a3a','#ffa030'],brute:['Mirror Golem','#4a4a6a','#7af0ff']}}
 ];
 /* Halloween event: Hollowshade Isle is open until the start of November 1st (player's local time). */
 const EVENT_END=new Date(2026,10,1,0,0,0), EVENT_ACTIVE=()=>Date.now()<EVENT_END.getTime();
@@ -776,6 +793,13 @@ const BOSSES={
  riftweaver:{name:'The Rift Weaver',hp:1390,r:38,spd:116,c1:'#1a1030',c2:'#7af0ff',acts:['blink','strikes','shards','summon','whirl'],shot:'#9af8ff',minion:'lunge'},
  nullbloom:{name:'The Null Bloom',hp:1430,r:40,spd:72,c1:'#e8e0f0',c2:'#7a3ad0',acts:['vines','thorns','pools','ringshot','summon'],shot:'#b48cff',minion:'bomb'},
  endlessone:{name:'The Endless One',hp:1620,r:44,spd:100,c1:'#0a0614',c2:'#ffffff',acts:['ringshot','shards','blink','tidal','strikes','summon','whirl'],shot:'#e0d0ff',minion:'caster'},
+ ancienttome:{name:'The Ancient Tome',hp:1700,r:40,spd:85,c1:'#4a2a1a',c2:'#ffd36a',acts:['glyphs','ringshot','shards','blink','bolts','summon'],shot:'#ffe8a0',minion:'caster'},
+ godofdestruction:{name:'The God of Destruction',hp:1800,r:46,spd:95,c1:'#1a1214',c2:'#ff3a1a',acts:['smash','quakebreak','slam','meteors','smash','summon','combo'],shot:'#ff6a3a',minion:'brute'},
+ radiantseraph:{name:'The Radiant Seraph',hp:1850,r:42,spd:105,c1:'#f0e8d0',c2:'#fff2b0',acts:['raisewall','structures','ringshot','strikes','fan','raisewall','summon'],shot:'#fff0a0',minion:'melee'},
+ blightmother:{name:'The Blight Mother',hp:1900,r:44,spd:80,c1:'#4a5a2a',c2:'#9aff3a',acts:['squirt','spray','pools','squirt','summon','whirl'],shot:'#b8ff5a',minion:'bomb'},
+ forms1:{name:'The Shapeless One',hp:2400,r:40,spd:90,c1:'#5a6a7a',c2:'#7af0ff',acts:['slam','shards','charge','summon','ringshot'],shot:'#9af8ff',minion:'brute',form:'Form of Stone'},
+ forms2:{name:'The Shapeless One · Form of Flame',hp:2400,r:40,spd:122,c1:'#5a1a0a',c2:'#ffa030',acts:['breath','fan','meteors','whirl','charge'],shot:'#ffb040',minion:'lunge',form:'Form of Flame'},
+ forms3:{name:'The Shapeless One · Form of Stars',hp:2400,r:42,spd:112,c1:'#140e22',c2:'#ffffff',acts:['ringshot','shards','blink','tidal','strikes','summon','glyphs'],shot:'#e0d0ff',minion:'caster',form:'Form of Stars'},
  corruptedsinger:{name:'The Corrupted Singer',hp:1150,r:34,spd:96,c1:'#2a1a3a',c2:'#b47aff',acts:['ringshot','whirl','strikes','tidal','summon','fan'],shot:'#c89aff',minion:'caster'}
 };
 const WEAPONS={sword:{n:'Sword',dmg:11,rate:.42,reach:62,arc:2.0},axe:{n:'Axe',dmg:19,rate:.72,reach:58,arc:2.3},daggers:{n:'Twin Daggers',dmg:6,rate:.22,reach:46,arc:1.7},spear:{n:'Spear',dmg:13,rate:.55,reach:94,arc:.85},hammer:{n:'Maul',dmg:28,rate:1.0,reach:66,arc:2.6,stun:true}};
@@ -832,11 +856,16 @@ const MINIONS={
  riftling:{n:'Rift Spider',feat:'spider',c1:'#101828',c2:'#7af0ff',role:'melee',dmg:19,spd:250,r:11},
  nullsprout:{n:'Pale Sprout',feat:'husk',c1:'#c8c0d8',c2:'#7a3ad0',role:'heal',dmg:14,spd:190,r:11,shot:'#e8e0f0'},
  starspawn:{n:'Starspawn',feat:'shade',c1:'#0a0614',c2:'#ffffff',role:'ranged',dmg:28,spd:230,r:11,shot:'#ffffff'},
+ inkscribe:{n:'Ink Scribe',feat:'hood',c1:'#1a1a2a',c2:'#ffd36a',role:'ranged',dmg:30,spd:200,r:11,shot:'#ffe8a0'},
+ rubbletitan:{n:'Rubble Titan',feat:'basalt',c1:'#3a2a28',c2:'#ff3a1a',role:'melee',dmg:38,spd:140,r:16},
+ lightsentinel:{n:'Light Sentinel',feat:'knight',c1:'#e8e0d0',c2:'#fff2b0',role:'melee',dmg:32,spd:190,r:13},
+ blightspawn:{n:'Blight Spawn',feat:'bloat',c1:'#8ab03a',c2:'#9aff3a',role:'bomb',dmg:80,spd:220,r:12},
+ shapeshifter:{n:'Shapeshifter',feat:'shade',c1:'#3a3058',c2:'#7af0ff',role:'ranged',dmg:36,spd:230,r:11,shot:'#7af0ff'},
  soulwisp:{n:'Soul Wisp',feat:'shade',c1:'#3a2a5a',c2:'#b47aff',role:'ranged',dmg:18,spd:230,r:11,shot:'#d8b0ff'}};
 const ROLE_TXT={melee:['fights up close','fight up close'],ranged:['attacks from range','attack from range'],bomb:['runs at enemies and explodes','run at enemies and explode'],heal:['heals you and shoots enemies','heal you and shoot enemies']};
-const ARMOR_NAMES=['Leather Vest','Desert Wraps','Reed Coat','Fur Hauberk','Ash Plate','Void Mail','Storm Mail','Jade Mail','Coral Mail','Gloom Mail','Vein Mail','Royal Mail','Bloom Mail','Hymn Mail','Slag Mail','Brimstone Mail','Iron Mail','Molten Mail','Starless Mail','Rift Mail','Null Mail','Endless Mail','Endless Mail'];
-const ARMOR_COL=['#8a6a4a','#d8c08a','#6a7a4a','#c9d6dc','#5a4a44','#5a4a7a','#5a6a80','#5a7a3a','#2a6a72','#1e2a30','#0e2a30','#5a3a7a','#6aaa3a','#4a3a6a','#3a2420','#6a5424','#3a3a42','#6a2a1a','#1a1428','#1a2238','#3a3648','#0e0a18','#0e0a18'];
-const REGION_ADJ=['Grove','Dune','Fen','Rime','Cinder','Hollow','Storm','Jade','Tide','Gloom','Vein','Royal','Bloom','Hymn','Slag','Brimstone','Iron','Molten','Starless','Rift','Null','Endless','Endless'];
+const ARMOR_NAMES=['Leather Vest','Desert Wraps','Reed Coat','Fur Hauberk','Ash Plate','Void Mail','Storm Mail','Jade Mail','Coral Mail','Gloom Mail','Vein Mail','Royal Mail','Bloom Mail','Hymn Mail','Slag Mail','Brimstone Mail','Iron Mail','Molten Mail','Starless Mail','Rift Mail','Null Mail','Endless Mail','Endless Mail','Scholar Mail','Ruin Mail','Radiant Mail','Blight Mail','Prism Mail'];
+const ARMOR_COL=['#8a6a4a','#d8c08a','#6a7a4a','#c9d6dc','#5a4a44','#5a4a7a','#5a6a80','#5a7a3a','#2a6a72','#1e2a30','#0e2a30','#5a3a7a','#6aaa3a','#4a3a6a','#3a2420','#6a5424','#3a3a42','#6a2a1a','#1a1428','#1a2238','#3a3648','#0e0a18','#0e0a18','#6a4a2a','#3a2a28','#e0d8c0','#4a5a2a','#3a3058'];
+const REGION_ADJ=['Grove','Dune','Fen','Rime','Cinder','Hollow','Storm','Jade','Tide','Gloom','Vein','Royal','Bloom','Hymn','Slag','Brimstone','Iron','Molten','Starless','Rift','Null','Endless','Endless','Scholar\'s','Ruined','Radiant','Blighted','Prismatic'];
 const UNIQ={sword:['Thornfang','Sunsplitter','Gravelight'],axe:["Widow's Bite",'Emberhew'],daggers:['Twin Whispers','Mothfangs'],spear:['Skypiercer','Reedcaller'],hammer:['Mountainfall','Old Thunder'],
  armor:['Bramblehide','Sultan\'s Mantle','Fenwalker Coat','Rimeguard Plate','Ashen Bulwark','Crownless Aegis']};
 
@@ -865,6 +894,11 @@ const BOSS_LOOT={
  riftweaver:{w:['sword','Riftsilk Blade',['Swift','Critical','Leeching']],a:['Weaver\'s Shroud',['Fleet','Vital','Sturdy'],'#1a1030'],r:['blades','Rift Spindle']},
  nullbloom:{w:['spear','Pale Thorn',['Frostbite','Leeching','Critical']],a:['Nullpetal Armor',['Renewing','Vital','Sturdy'],'#e8e0f0'],r:['frost','Seed of Nothing']},
  endlessone:{w:['sword','Edge of Forever',['Critical','Thundering','Leeching','Swift']],a:['Robe of the Endless',['Sturdy','Vital','Renewing','Fleet'],'#0a0614'],r:['storm','Fragment of Eternity']},
+ ancienttome:{w:['spear','Quill of the First Word',['Critical','Swift','Frostbite']],a:['Robe of Every Page',['Renewing','Vital','Fleet'],'#4a2a1a'],r:['lightning','The Final Chapter']},
+ godofdestruction:{w:['hammer','Worldbreaker',['Thundering','Executioner','Burning','Critical']],a:['Armor of Ruin',['Sturdy','Vital','Renewing'],'#1a1214'],r:['meteor','Fist of Ending']},
+ radiantseraph:{w:['sword','Dawnblade',['Critical','Swift','Leeching','Burning']],a:['Wings of the Seraph',['Fleet','Sturdy','Vital','Renewing'],'#f0e8d0'],r:['ward','Halo of Light']},
+ blightmother:{w:['daggers','Blightfang',['Leeching','Burning','Swift','Critical']],a:['Mother\'s Hide',['Renewing','Vital','Sturdy'],'#4a5a2a'],r:['frost','Vial of Plague']},
+ forms3:{w:['axe','Edge of Every Shape',['Critical','Thundering','Leeching','Executioner']],a:['Shifting Plate',['Sturdy','Vital','Renewing','Fleet'],'#140e22'],r:['storm','The Final Form']},
  corruptedsinger:{w:['daggers','Last Verse',['Leeching','Thundering','Critical','Swift']],a:['Mantle of the Final Song',['Sturdy','Vital','Renewing','Fleet'],'#2a1a3a'],r:['lightning','The Corrupted Hymn']}};
 function bossItem(slot,id,bi){const D=BOSS_LOOT[id]; let it;
   if(slot==='weapon'){it=mkItem('weapon',bi,'unique',D.w[0]); it.name=D.w[1]; it.ench=D.w[2].slice();}
@@ -986,6 +1020,18 @@ const WF=[{n:'Hatchet',k:'axe',dm:.85,rm:.82,re:1},{n:'Battleaxe',k:'axe',dm:1.1
     20:{col:['#7af0ff','#1a1030','#b48cff','#2a3a5a','#9af8ff'],w:[['Shard Hatchet',0],['Fault Battleaxe',1],['Thread Pike',3]],uw:[['Riftcutter',0,['Swift','Critical']]],a:[['Silk Vest','light'],['Rift Coat','medium'],['Crystal Plate','heavy']],ua:[['Webbed Armor','light',['Fleet','Vital']]],r:[['Rift Shard','blades'],['Torn Path','gale'],['Crystal Spool','lightning']],ur:[['Loom of the Rift','blades']]},
     21:{col:['#e8e0f0','#7a3ad0','#b48cff','#3a3648','#d8d0e8'],w:[['Pale Hatchet',0],['Orchard Battleaxe',1],['Null Knives',2]],uw:[['Colourless',3,['Frostbite','Leeching']]],a:[['Petal Vest','light'],['Grey Coat','medium'],['Null Plate','heavy']],ua:[['Fading Armor','medium',['Renewing','Vital']]],r:[['Pale Seed','frost'],['Silent Petal','totem'],['Grey Bloom','ward']],ur:[['Heart of the Null','frost']]},
     22:{col:['#ffffff','#0a0614','#e0d0ff','#1a1428','#b48cff'],w:[['Endless Hatchet',0],['Edge Battleaxe',1],['Last Light Knives',2]],uw:[['The Final Edge',4,['Critical','Thundering']]],a:[['Edge Vest','light'],['Endless Coat','medium'],['Collapse Plate','heavy']],ua:[['Armor of Forever','heavy',['Sturdy','Vital']]],r:[['Last Light','lightning'],['Collapse Stone','meteor'],['Edge Wind','storm']],ur:[['Shard of Forever','storm']]}};
+  const OI4={23:{col:['#ffd36a','#4a2a1a','#7ab0ff','#e8dcc0','#8a3a2a'],w:[['Scholar\'s Hatchet',0],['Archive Battleaxe',1],['Quill Pike',3]],uw:[['Unwritten Edge',2,['Critical','Swift']]],a:[['Page Vest','light'],['Librarian Coat','medium'],['Bound Plate','heavy']],ua:[['Armor of Footnotes','medium',['Renewing','Vital']]],r:[['Ink Bottle','lightning'],['Bookmark Charm','ward'],['Spellbook','storm']],ur:[['Index of Everything','lightning']]},
+    24:{col:['#ff3a1a','#1a1214','#ffb03a','#5a4a40','#ff6a3a'],w:[['Ruin Hatchet',0],['Crater Battleaxe',1],['Rubble Knives',2]],uw:[['World Splitter',4,['Thundering','Executioner']]],a:[['Ash Vest','light'],['Ruin Coat','medium'],['Wreck Plate','heavy']],ua:[['Unbreakable Armor','heavy',['Sturdy','Vital']]],r:[['Crack Stone','meteor'],['Ruin Bell','fury'],['Last Spark','nova']],ur:[['Core of Ruin','meteor']]},
+    25:{col:['#fff2b0','#ffd36a','#ffffff','#c8b880','#e8e0d0'],w:[['Bright Hatchet',0],['Shield Battleaxe',1],['Ray Pike',3]],uw:[['Sunlance',3,['Critical','Burning']]],a:[['Feather Vest','light'],['Ward Coat','medium'],['Radiant Plate','heavy']],ua:[['Armor of the Bright Gate','heavy',['Sturdy','Renewing']]],r:[['Light Wall','ward'],['Halo Charm','totem'],['Sunburst','nova']],ur:[['Feather of the Seraph','ward']]},
+    26:{col:['#9aff3a','#4a5a2a','#c8ff6a','#2a3a1a','#8ab03a'],w:[['Rot Hatchet',0],['Swamp Battleaxe',1],['Blister Knives',2]],uw:[['Plaguefang',2,['Leeching','Burning']]],a:[['Moss Vest','light'],['Rot Coat','medium'],['Blister Plate','heavy']],ua:[['Immune Armor','medium',['Renewing','Vital']]],r:[['Spore Sac','frost'],['Antidote','totem'],['Rot Bomb','meteor']],ur:[['Heart of the Swamp','frost']]},
+    27:{col:['#7af0ff','#ffa030','#ffffff','#3a3058','#b48cff'],w:[['Prism Hatchet',0],['Mirror Battleaxe',1],['Shifting Pike',3]],uw:[['Shapebreaker',4,['Critical','Thundering']]],a:[['Mirror Vest','light'],['Shifting Coat','medium'],['Prism Plate','heavy']],ua:[['Armor of Every Shape','heavy',['Sturdy','Vital']]],r:[['Prism Shard','blades'],['Mirror Charm','ward'],['Changing Star','storm']],ur:[['Seed of Creation','storm']]}};
+  for(const rg of [23,24,25,26,27]){const D=OI4[rg], o=(rg-23)*5, C=D.col;
+    D.w.forEach(([n,f],i)=>CAT.weapon.push({cid:'W'+(300+o+i),name:n,tier:5,col:C[i%5],f,rg}));
+    D.uw.forEach(([n,f,ench],i)=>CAT.uweapon.push({cid:'X'+(200+o+i),name:n,tier:5,col:C[i],f,ench,rg}));
+    D.a.forEach(([n,w],i)=>CAT.armor.push({cid:'A'+(400+o+i),name:n,tier:5,col:C[(i+2)%5],w,rg}));
+    D.ua.forEach(([n,w,ench],i)=>CAT.uarmor.push({cid:'U'+(250+o+i),name:n,tier:5,col:C[i+1],w,ench,rg}));
+    D.r.forEach(([n,fx],i)=>CAT.art.push({cid:'R'+(1400+o+i),name:n,fx,tier:5,col:C[i%5],cdm:.85,pm:1.4,rad:1.12,dur:1.18,rg}));
+    D.ur.forEach(([n,fx],i)=>CAT.uart.push({cid:'Q'+(200+o+i),name:n,fx,tier:5,col:C[i],cdm:.65,pm:1.7,rad:1.4,dur:1.45,rg}));}
   for(const rg of [15,16,17,18,19,20,21,22]){const D=OI3[rg], o=(rg-15)*5, C=D.col;
     D.w.forEach(([n,f],i)=>CAT.weapon.push({cid:'W'+(260+o+i),name:n,tier:5,col:C[i%5],f,rg}));
     D.uw.forEach(([n,f,ench],i)=>CAT.uweapon.push({cid:'X'+(160+o+i),name:n,tier:5,col:C[i],f,ench,rg}));
@@ -1022,7 +1068,8 @@ const WF=[{n:'Hatchet',k:'axe',dm:.85,rm:.82,re:1},{n:'Battleaxe',k:'axe',dm:1.1
   const G=[['stormsentinel','Thunderhead\'s Calling','stormwisp',3,7],['mossback','Behemoth\'s Seedling','mossling',2,8],['lanternmaw','Lure of the Deep','lanterneel',3,9],
    ['sculkmonstrosity','Heart of the Swarm','crawler',4,11],['monarch','Royal Decree','royalknight',2,12],['harmonizer','Seed of Harmony','sproutling',2,13],['corruptedsinger','The Singer\'s Chorus','soulwisp',4,14]];
   G.push(['foundrycolossus','Foundry Bell','slagling',2,15],['brimstonewyrm','Wyrm Egg','wyrmling',3,16],['ironwarlord','Warlord\'s Horn','ironlegion',3,17],['forgeking','Sparks of the Throne','forgeimp',5,18],
-    ['hollowwatcher','Lens of the Watcher','voideye',3,19],['riftweaver','Weaver\'s Silk','riftling',4,20],['nullbloom','Pale Seedpod','nullsprout',2,21],['endlessone','Shard of the Endless','starspawn',4,22]);
+    ['hollowwatcher','Lens of the Watcher','voideye',3,19],['riftweaver','Weaver\'s Silk','riftling',4,20],['nullbloom','Pale Seedpod','nullsprout',2,21],['endlessone','Shard of the Endless','starspawn',4,22],
+    ['ancienttome','Torn Page','inkscribe',3,23],['godofdestruction','Fragment of Ruin','rubbletitan',2,24],['radiantseraph','Feather of Light','lightsentinel',3,25],['blightmother','Blight Egg Sac','blightspawn',5,26],['forms3','Mirror of Forms','shapeshifter',4,27]);
   G.forEach(([boss,name,mn,cnt,rg],i)=>CAT.uart.push({cid:'QG'+(i+1),name,fx:'summon',mn,cnt,tier:5,col:MINIONS[mn].c2,cdm:.75,pm:1.6,rad:1,dur:1.4,rg,bossSummon:boss}));})();
 const CAT_TOTAL=Object.values(CAT).reduce((s,l)=>s+l.length,0);
 const CAT_BY_ID={}; for(const k in CAT) for(const e of CAT[k]) CAT_BY_ID[e.cid]=Object.assign({cat:k},e);
@@ -1054,7 +1101,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='2.9.1', SAVE_VERSION=6;
+const APP_VERSION='3.0.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1150,7 +1197,8 @@ function startLevel(bi,li,forceIntro,seed){
   P={x:L.start.x,y:L.start.y,r:13,hp:ST.maxhp,face:-Math.PI/2,atk:0,swing:0,roll:0,rollCd:0,rdx:0,rdy:0,iframe:0,flash:0,bow:0,pot:0,acd:{a1:0,a2:0,a3:0,a4:0,a5:0,a6:0,a7:0,a8:0},slow:0,ward:0,gale:0,walk:0,dead:false,regenAcc:0,air:AIR_MAX};
   L.water=!!B.water; L.pods=L.water?(L.rooms||[]).map(p=>({x:p.x,y:p.y,pod:true})):[]; $('#airBar').hidden=!L.water;
   ents=[];projs=[];hazards=[];parts=[];texts=[];loot=[];boss=null;amb=[];allies=[];
-  L.chests=L.chests||[]; withSeed(seed+7,()=>buildLevel3D());
+  L.chests=L.chests||[]; withSeed(seed+7,()=>buildLevel3D()); L.blocks=[];
+  if(isBoss&&B.boss==='godofdestruction') for(const [tx,ty] of [[9,13],[10,13],[11,13],[28,13],[29,13],[30,13],[15,17],[16,17],[24,17],[25,17],[18,7],[19,7],[21,7],[22,7],[8,23],[9,23],[31,23],[32,23],[14,10],[26,10],[20,21],[13,21],[27,21]]) addBlock(tx,ty,'rock',0,{},true);
   if(MP.role!=='client'||!MP.inGame){const n=L.mpN||1; L.spawns.forEach(p=>{spawnEnemy(pickType(L.tier),p.x,p.y); for(let k=1;k<n;k++){let ok=false; for(let t=0;t<24&&!ok;t++){const a=Math.random()*TAU,d=rand(16,30+t*4); ok=!!spawnEnemy(pickType(L.tier),p.x+Math.cos(a)*d,p.y+Math.sin(a)*d);} if(!ok) spawnEnemy(pickType(L.tier),p.x,p.y);}});
     if(isBoss){spawnBoss(B.boss); boss.max*=n; boss.hp=boss.max;}}
   run={bi,li,kills:0,items:0,shards:0,time:0,done:false,endT:0};
@@ -1252,7 +1300,39 @@ function spread(b,n,step,spd,dmg,col,o){const a=angTo({x:b.x,y:b.y-b.r*.6},{x:P.
 function haz(x,y,r,delay,dmg,col,o={}){hazards.push({x,y,r,t:0,delay,dmg,col,persist:o.persist||0,slow:o.slow,done:false,life:0,tick:0});}
 function rain(b,n,col){for(let i=0;i<n;i++) haz(P.x+rand(-230,230),P.y+rand(-200,200),42,.8+i*.09,18*b.dm,col); haz(P.x,P.y,46,.9,18*b.dm,col);}
 function tp(b,x,y){if(!blocked(x,y,b.r)){b.x=x;b.y=y;return true;} return false;}
+/* Blocks the Core bosses can break (rocks) or raise (walls of light, obelisks). They are real walls while they stand. */
+function blkFree(tx,ty){if(!L||tx<1||ty<1||tx>=L.w-1||ty>=L.h-1) return false; return !L.g[ty*L.w+tx];}
+function addBlock(tx,ty,kind,life,o={},fromNet){if(!L.blocks) L.blocks=[]; if(!blkFree(tx,ty)) return null; const A=L.arena; if(A&&(tx<=A.x||ty<=A.y||tx>=A.x+A.w-1||ty>=A.y+A.h-1)) return null;
+  const x=(tx+.5)*T, y=(ty+.5)*T; if(!fromNet){if(P&&Math.hypot(P.x-x,P.y-y)<T*.95) return null; for(const pl of livePlayers()) if(Math.hypot(pl.x-x,pl.y-y)<T*.95) return null; if(boss&&!boss.dead&&Math.hypot(boss.x-x,boss.y-y)<boss.r+T*.6) return null;}
+  L.g[ty*L.w+tx]=1; const bk={tx,ty,x,y,kind,life:life||0,max:life||0,t:0,fire:!!o.fire,shots:0}; L.blocks.push(bk);
+  if(!fromNet&&MP.role==='host'&&MP.inGame) bcast({t:'blk',op:'add',tx,ty,kind,life,fire:o.fire?1:0}); return bk;}
+function addBlockAt(x,y,kind,life,o){return addBlock(Math.floor(x/T),Math.floor(y/T),kind,life,o);}
+function breakBlock(bk,fromNet){const i=L.blocks.indexOf(bk); if(i<0) return; L.blocks.splice(i,1); L.g[bk.ty*L.w+bk.tx]=0;
+  if(bk.kind==='rock'){for(let k=0;k<10;k++){const a=Math.random()*TAU,s2=rand(80,260); FXP(bk.x,bk.y,rand(10,40),Math.cos(a)*s2,Math.sin(a)*s2,rand(150,330),k%3?'#5a4a44':'#ff5a2a',1,rand(6,10));} shake(4);}
+  else puff(bk.x,bk.y,bk.kind==='obelisk'?'#ffd36a':'#fff2b0',14,140,.5,6);
+  if(!fromNet&&MP.role==='host'&&MP.inGame) bcast({t:'blk',op:'del',tx:bk.tx,ty:bk.ty});}
+function breakBlocksNear(x,y,r){if(!L.blocks) return 0; let n=0; for(const bk of L.blocks.slice()) if(Math.hypot(bk.x-x,bk.y-y)<r){breakBlock(bk); n++;} return n;}
+function netBlock(m){if(!L) return; if(!L.blocks) L.blocks=[]; if(m.op==='add') addBlock(m.tx,m.ty,m.kind,m.life,{fire:!!m.fire},true); else {const bk=L.blocks.find(b=>b.tx===m.tx&&b.ty===m.ty); if(bk) breakBlock(bk,true);}}
+function updBlocks(dt){if(!L||!L.blocks||!L.blocks.length) return; const host=!(MP.role==='client'&&MP.inGame);
+  for(const bk of L.blocks.slice()){bk.t+=dt;
+    if(bk.fire&&host&&boss&&!boss.dead){const due=[1.2,3.4,5.6][bk.shots]; if(due!=null&&bk.t>=due){bk.shots++; const o={x:bk.x,y:bk.y+20,r:14}; radial(o,10,210,7*boss.dm,'#fff0a0',bk.shots*.3); puff(bk.x,bk.y,'#fff2b0',10,120,.4,6);}}
+    if(bk.max>0&&bk.t>=bk.max&&host) breakBlock(bk);}}
+function lob(b,tx,ty,col){for(let k=0;k<14;k++){const f=k/14; FXP(lerp(b.x,tx,f),lerp(b.y,ty,f),b.r*1.2+Math.sin(f*Math.PI)*120,0,0,-40,col,.5+f*.35,7);}}
 const ACT={
+ glyphs:{dur:1.7,start(b){const c=BOSSES[b.id].shot, n=6, a0=Math.random()*TAU; for(let i=0;i<n;i++){const a=a0+i/n*TAU; haz(P.x+Math.cos(a)*115,P.y+Math.sin(a)*115,44,1.0+i*.06,16*b.dm,c);} haz(P.x,P.y,52,1.45,18*b.dm,c);},tick(b,dt,t,pt){if(cross(pt,t,.2)) CFX.pages(b,['#ffd36a','#fff8e8'],t);}},
+ smash:{dur:2.0,start(b){b.a.ang=angTo(b,P);b.a.hit=false;},tick(b,dt,t,pt){
+   if(t<.6){b.a.ang=angTo(b,P);b.face=b.a.ang;b.a.tele=true;return;} b.a.tele=false;
+   if(t<1.4){const s=560*dt, fx=b.x+Math.cos(b.a.ang)*(b.r+26), fy=b.y+Math.sin(b.a.ang)*(b.r+26); breakBlocksNear(fx,fy,b.r*.8+T*.7); moveCirc(b,Math.cos(b.a.ang)*s,Math.sin(b.a.ang)*s); b.walk+=dt*12;
+     if(!b.a.hit&&dist(b,P)<b.r+P.r+8){b.a.hit=true; hurtP(20*b.dm);} if(Math.random()<.6) puff(b.x,b.y,'#5a4a40',4,120,.4,5);}
+   if(cross(pt,t,1.4)){shake(10); radial(b,12,230,8*b.dm,BOSSES[b.id].shot);}}},
+ quakebreak:{dur:1.9,start(b){haz(b.x,b.y,210,.9,22*b.dm,'#ff5a2a');},tick(b,dt,t,pt){if(cross(pt,t,.9)){breakBlocksNear(b.x,b.y,270); shake(14); radial(b,16,240,8*b.dm,'#a08070'); CFX.debris(b,['#ff3a1a']);
+     const A=L.arena; for(let i=0;i<4;i++) addBlock(A.x+2+((Math.random()*(A.w-4))|0),A.y+2+((Math.random()*(A.h-4))|0),'rock',0);}}},
+ raisewall:{dur:1.5,start(b){const n=13, R=2.7*T, gap=Math.random()*TAU; for(let i=0;i<n;i++){const a=gap+.75+i/(n-1)*(TAU-1.5); addBlockAt(P.x+Math.cos(a)*R,P.y+Math.sin(a)*R,'light',5.5);} flashT=.2; flashCol='#fff8e0'; shake(5);},
+   tick(b,dt,t,pt){if(cross(pt,t,.8)) radial(b,10,220,8*b.dm,BOSSES[b.id].shot);}},
+ structures:{dur:1.6,start(b){const A=L.arena; let made=0; for(let k=0;k<40&&made<3;k++){const tx=A.x+2+((Math.random()*(A.w-4))|0), ty=A.y+2+((Math.random()*(A.h-4))|0), x=(tx+.5)*T, y=(ty+.5)*T;
+     if(Math.hypot(P.x-x,P.y-y)<130||Math.hypot(b.x-x,b.y-y)<b.r+60) continue; if(addBlock(tx,ty,'obelisk',7.5,{fire:true})) made++;} shake(4);},tick(){}},
+ squirt:{dur:1.9,tick(b,dt,t,pt){for(const x of [.3,.75,1.2]) if(cross(pt,t,x)){const tx=P.x+rand(-70,70), ty=P.y+rand(-70,70); lob(b,tx,ty,'#9aff3a'); haz(tx,ty,60,.75,7*b.dm,'#7aff2a',{persist:7,slow:true}); b.squirtT=.3;}}},
+ spray:{dur:1.7,tick(b,dt,t,pt){if(cross(pt,t,.45)){spread(b,7,.2,300,9*b.dm,'#9aff3a'); const a=angTo(b,P); for(let i=1;i<=3;i++) haz(b.x+Math.cos(a)*i*95,b.y+Math.sin(a)*i*95,52,.55+i*.15,6*b.dm,'#7aff2a',{persist:6,slow:true}); b.squirtT=.4;}}},
  charge:{dur:1.7,start(b){b.a.ang=angTo(b,P);b.a.hit=false;},tick(b,dt,t,pt){
    if(t<.65){b.a.ang=angTo(b,P);b.face=b.a.ang;b.a.tele=true;return;} b.a.tele=false;
    if(t<1.15){const s=470*dt; moveCirc(b,Math.cos(b.a.ang)*s,Math.sin(b.a.ang)*s); b.walk+=dt*16; if(Math.random()<.5) puff(b.x,b.y,'#9a8a6a',1,40,.4,4);
@@ -1294,6 +1374,7 @@ const ACT={
 function updBoss(dt){const b=boss; if(!b||b.dead) return;
   b.flash=Math.max(0,b.flash-dt);
   if(b.burn>0){b.burn-=dt; b.btk=(b.btk||0)+dt; if(b.btk>.5){b.btk=0; hurtE(b,Math.max(2,ST.dmg*.25),{});}}
+  if(!(MP.role==='client'&&MP.inGame)&&!b.inv) checkForms(b);
   if(!b.awake){if(dist(b,P)<440&&!P.dead){b.awake=true; b.face=angTo(b,P); b.cd=1.2; startCine(bossCine(b),()=>{$('#bossBar').hidden=false;}); if(MP.role==='host'&&MP.inGame) bcast({t:'cine',k:'boss'});} return;}
   if(b.trans>0){b.trans-=dt; b.walk+=dt*4; if(Math.random()<.6) puff(b.x+rand(-30,30),b.y-rand(0,60),choice(['#b45cff','#c8b8ff','#1a1028']),2,90,.8,5); if(b.trans<=0) finishTransform(); return;}
   if(b.a){const A=ACT[b.a.n],pt=b.a.t; b.a.t+=dt; A.tick(b,dt,b.a.t,pt); if(b.a.t>=A.dur){b.a=null; b.hidden=false; b.inv=false; b.cd=(b.hp<b.max/2?.5:.95)*(b.id==='sov2'?.7:1);}}
@@ -1302,7 +1383,13 @@ function updBoss(dt){const b=boss; if(!b||b.dead) return;
     if(b.cd<=0){let n; do n=choice(b.acts); while(n===b.last&&b.acts.length>1); b.last=n; b.a={n,t:0}; if(ACT[n].start) ACT[n].start(b);}}
   if(!b.hidden&&dist(b,P)<b.r+P.r) hurtP(8*b.dm);
 }
-function bossDown(b,fromNet){if(!fromNet&&MP.role==='host'&&MP.inGame) bcast({t:'bdown',id:b.id,x:Math.round(b.x),y:Math.round(b.y)});
+function shiftForm(b,id,fromNet){const D=BOSSES[id]; if(!D||b.id===id) return; Object.assign(b,{id,name:D.name,acts:D.acts,c1:D.c1,c2:D.c2,r:D.r,spd:D.spd*DF().spd,a:null,cd:1.6,inv:true,last:null});
+  b.hp=Math.max(1,Math.min(b.hp,Math.round(b.max*(id==='forms2'?2/3:1/3)))); projs=projs.filter(p=>p.own==='p'); hazards=[];
+  if(!fromNet&&MP.role==='host'&&MP.inGame) bcast({t:'cine',k:'form',id});
+  startCine(formCine(b),()=>{b.inv=false; radial(b,24,220,8*b.dm,D.shot); shake(8);});}
+function checkForms(b){if(!b||b.dead) return; if(b.id==='forms1'&&b.hp<=b.max*2/3) shiftForm(b,'forms2'); else if(b.id==='forms2'&&b.hp<=b.max/3) shiftForm(b,'forms3');}
+function bossDown(b,fromNet){
+  if((b.id==='forms1'||b.id==='forms2')&&!fromNet){checkForms(b); if(b.id==='forms2'&&b.hp<=0) b.hp=1; if(b.hp<=0) b.hp=1; return;}if(!fromNet&&MP.role==='host'&&MP.inGame) bcast({t:'bdown',id:b.id,x:Math.round(b.x),y:Math.round(b.y)});
   if(b.id==='sov1'){b.hp=1; b.inv=true; b.trans=2.8; b.a=null; b.hidden=false; projs=projs.filter(p=>p.own==='p'); hazards=[]; ents.forEach(e=>{if(e.hp>0){e.hp=0; puff(e.x,e.y-e.r,e.c1,10,120,.5,4);}}); ents=[];
     banner('The mask shatters','Something older wakes'); flashT=.6; flashCol='#e0b0ff'; shake(10); return;}
   b.dead=true; b.hp=0; puff(b.x,b.y-b.r,b.c2,60,260,1.2,7); puff(b.x,b.y-b.r,b.c1,40,200,1,6); shake(12); flashT=.4; flashCol='#fff';
@@ -1378,7 +1465,7 @@ function update(dt){
   if(coopHost) asP(bossTarget(dt),()=>updBoss(dt)); else updBoss(dt);
   }
   updAllies(dt);
-  updProjs(dt); updHaz(dt); updLoot(dt); updChests();
+  updBlocks(dt); updProjs(dt); updHaz(dt); updLoot(dt); updChests();
   for(const p of parts){p.x+=p.vx*dt; p.y+=p.vy*dt; p.vx*=.95; p.vy*=.95; p.z=(p.z||0)+(p.vz||0)*dt; p.vz=(p.vz||0)-260*dt; if(p.z<0){p.z=0;p.vz*=-.3;} p.life-=dt;} parts=parts.filter(p=>p.life>0); if(parts.length>700) parts.splice(0,parts.length-700);
   for(const t of texts){t.life-=dt;} texts=texts.filter(t=>t.life>0);
   cam.x+=(P.x-cam.x)*Math.min(1,dt*8); cam.y+=(P.y-20-cam.y)*Math.min(1,dt*8);
@@ -1569,7 +1656,12 @@ const FEAT={
  expanse:{melee:'shade',ranged:'skeleton',lunge:'wolf',bomb:'mite',caster:'hood',brute:'guard'},
  rift:{melee:'husk',ranged:'hooded',lunge:'spider',bomb:'bloat',caster:'hat',brute:'golem'},
  nullgarden:{melee:'mummy',ranged:'skeleton',lunge:'leech',bomb:'bloat',caster:'hood',brute:'troll'},
- edge:{melee:'shade',ranged:'hooded',lunge:'hound',bomb:'mite',caster:'hat',brute:'guard'}};
+ edge:{melee:'shade',ranged:'hooded',lunge:'hound',bomb:'mite',caster:'hat',brute:'guard'},
+ knowledge:{melee:'mummy',ranged:'hooded',lunge:'scarab',bomb:'bloat',caster:'hat',brute:'golem'},
+ destruction:{melee:'husk',ranged:'skeleton',lunge:'hound',bomb:'mite',caster:'hood',brute:'basalt'},
+ immunity:{melee:'knight',ranged:'hooded',lunge:'wolf',bomb:'mite',caster:'hood',brute:'guard'},
+ infection:{melee:'husk',ranged:'scarab',lunge:'spider',bomb:'bloat',caster:'hat',brute:'troll'},
+ forms:{melee:'shade',ranged:'skeleton',lunge:'leech',bomb:'mite',caster:'hood',brute:'golem'}};
 const ROLE={melee:['Brawler','#e8b06a'],ranged:['Archer · keeps distance','#9fd0ff'],lunge:['Pouncer · leaps at you','#ff9a6a'],bomb:['Explodes up close','#ffd36a'],caster:['Caster · ground blasts','#c9a6ff'],brute:['Heavy · hits hard','#ff6a6a']};
 const HEADH={melee:1.5,ranged:1.5,lunge:1.0,bomb:.95,caster:1.75,brute:2.0};
 
@@ -1802,6 +1894,80 @@ function buildBoss(b){
     const tail=new THREE.Group(); tail.position.set(0,.05,-.85); body.add(tail); u.tail=tail; add(tail,gCone,sk,0,0,.05,.22,.4,.22).rotation.x=-Math.PI/2; add(tail,gCone,fin,0,0,-.35,.05,.5,.45).rotation.x=-Math.PI/2;
     ['#ff7a8a','#ffb05a','#ff7a8a','#ffd84a','#c86aff','#ff9a8a'].forEach((c,i)=>{const cm=M(c,{roughness:.8}); const x=-.26+i*.1, z=-.15-(i%2)*.18; add(body,gCyl,cm,x,.52,z,.03,.24,.03).rotation.z=(i-2.5)*.25; add(body,gSph,cm,x+(i-2.5)*.03,.64,z,.05);});
     break;}
+  case 'ancienttome':{const u=R.userData; u.float=true; u.legs=[]; u.arms=[]; const lea=M('#4a2a1a',{roughness:.7}), lea2=M('#5a341e',{roughness:.65}), gold=M('#d8b050',{metalness:.85,roughness:.22}), page=M('#efe4c8',{roughness:.85}), page2=M('#e4d6b4',{roughness:.85}), rune=glow('#ffd36a',2.4), rune2=glow('#7ab0ff',2.2);
+    const book=new THREE.Group(); book.position.set(0,1.05,0); book.rotation.x=-.55; B.add(book); u.book=book;
+    add(book,gBox,lea,0,0,-.05,.16,1.0,.12); for(let i=0;i<4;i++) add(book,gBox,gold,0,-.36+i*.24,-.1,.18,.04,.04);
+    u.covers=[]; for(const sd of [-1,1]){const cv=new THREE.Group(); book.add(cv); u.covers.push(cv); cv.userData.sd=sd;
+      add(cv,gBox,sd<0?lea:lea2,sd*.4,0,-.06,.8,1.0,.05); for(const [cx2,cy2] of [[.74,.46],[.74,-.46]]) add(cv,gBox,gold,sd*cx2,cy2,-.03,.1,.1,.06);
+      add(cv,gBox,page,sd*.38,0,.02,.72,.92,.1); add(cv,gBox,page2,sd*.38,0,.075,.7,.9,.01);
+      for(let r2=0;r2<7;r2++) for(let c2=0;c2<4;c2++){if((r2*7+c2*3)%5===0) continue; const gm=add(cv,gBox,(r2+c2)%3?rune:rune2,sd*(.14+c2*.15),.34-r2*.11,.085,.08,.025,.005); gm.castShadow=false;}}
+    u.covers[0].rotation.y=.25; u.covers[1].rotation.y=-.25;
+    u.flip=[]; for(let i=0;i<5;i++){const pg=new THREE.Group(); book.add(pg); add(pg,gBox,page,.37,0,.09,.7,.9,.008); pg.userData.ph=i/5; u.flip.push(pg);}
+    const eye=new THREE.Group(); eye.position.set(0,.0,.3); book.add(eye); add(eye,gTor,gold,0,0,0,.22,.22,.4); u.core=add(eye,gSph,rune,0,0,0,.13,.13,.06); add(eye,gSph,M('#1a0a00'),0,0,.05,.05,.07,.02); u.sigil=eye;
+    u.rings=[]; const thinTor=geo('thintor',()=>new THREE.TorusGeometry(1,.035,6,48)); for(let i=0;i<2;i++){const r=add(B,thinTor,i?rune2:rune,0,1.05,0,1.0+i*.18,1.0+i*.18,1.0+i*.18); r.rotation.x=Math.PI/2+i*.4; u.rings.push(r);}
+    u.orbit=[0,1,2,3,4,5].map(i=>{const q=new THREE.Group(); add(q,gCone,i%2?page:gold,0,0,0,.025,.28,.025); add(q,gSph,M('#1a1a2a'),0,-.15,0,.02); q.rotation.z=.5; B.add(q); return q;});
+    u.tentacles=[]; for(const sx of [-.35,.35]){const g=new THREE.Group(); g.position.set(sx,.55,0); B.add(g); const segs=[]; let p=g;
+      for(let k=0;k<6;k++){const sg=new THREE.Group(); sg.position.y=k?-.09:0; p.add(sg); const l=add(sg,gTor,gold,0,-.05,0,.04,.05,.04); l.rotation.y=k%2?Math.PI/2:0; segs.push(sg); p=sg;} u.tentacles.push(segs);}
+    {const pl=new THREE.PointLight(0xffd890,1.6,7); pl.position.y=1.2; B.add(pl);} break;}
+  case 'godofdestruction':{const u=R.userData; const ob=M('#1a1214',{flatShading:true,roughness:.6,metalness:.2}), ob2=M('#2a1c1c',{flatShading:true,roughness:.7}), mag=glow('#ff3a1a',2.4), mag2=glow('#ffb03a',2.2), bone=M('#d8c8b0',{roughness:.5});
+    u.legs=[limb(B,-.24,.55,0,.55,.17,ob,ob2),limb(B,.24,.55,0,.55,.17,ob,ob2)];
+    const torso=new THREE.Group(); torso.position.y=.55; B.add(torso); u.torso=torso; torso.userData.rx0=.18; torso.rotation.x=.18;
+    [[0,.42,0,.5],[-.3,.62,0,.34],[.3,.62,0,.34],[0,.15,.06,.36],[0,.7,-.15,.36]].forEach(([x,y,z,r],i)=>{const m=add(torso,gIco,i%2?ob2:ob,x,y,z,r); m.rotation.set(i,i*1.7,i*.4);});
+    for(const [x,y,z,rz] of [[-.15,.5,.42,.4],[.12,.35,.44,-.3],[0,.62,.4,0],[-.3,.25,.3,.8],[.32,.55,.3,-.6]]) add(torso,gBox,mag,x,y,z,.025,.32,.01).rotation.z=rz;
+    u.heart=add(torso,gOct,mag2,0,.45,.42,.12,.18,.08); u.heart.castShadow=false;
+    for(const sx of [-1,1]) for(let i=0;i<3;i++){const sp=add(torso,gCone,ob,sx*(.42+i*.08),.86+i*.04,(i-1)*.1,.07,.36,.07); sp.rotation.z=-sx*(.5+i*.2);}
+    const head=new THREE.Group(); head.position.y=1.0; torso.add(head); u.head=head; add(head,gIco,ob,0,.05,.05,.24); add(head,gBox,bone,0,-.08,.2,.22,.08,.06);
+    for(let i=0;i<5;i++) add(head,gCone,bone,-.08+i*.04,-.13,.22,.012,.05,.012).rotation.x=Math.PI;
+    u.core=add(head,gBox,mag2,-.08,.06,.22,.06,.03,.01); add(head,gBox,mag2,.08,.06,.22,.06,.03,.01);
+    for(const sx of [-1,1]){const h=add(head,gCone,bone,sx*.2,.32,-.02,.06,.46,.06); h.rotation.set(-.3,0,-sx*.55); const h2=add(head,gCone,ob,sx*.12,.3,.1,.03,.22,.03); h2.rotation.z=-sx*.2;}
+    const aL=limb(torso,-.62,.8,0,.72,.15,ob,ob2), aR=limb(torso,.62,.8,0,.72,.15,ob,ob2); u.arms=[aL,aR]; u.armsFwd=.3;
+    for(const a of [aL,aR]){const f=add(a,gIco,ob,0,-.82,0,.3); f.rotation.set(.4,.8,0); add(a,gIco,ob2,0,-.25,0,.24); for(let i=0;i<3;i++) add(a,gBox,mag,(i-1)*.1,-.82,.27,.04,.04,.02);}
+    u.orbit=[0,1,2,3,4].map(i=>{const r=add(B,gIco,i%2?ob:ob2,0,1,0,.1+i%3*.03); r.rotation.set(i,i*2,0); return r;}); break;}
+  case 'radiantseraph':{const u=R.userData; u.float=true; u.legs=[]; const white=M('#f8f2e4',{roughness:.35}), gold=M('#e0bc5a',{metalness:.85,roughness:.2}), lite=glow('#fff2b0',2.2), wht=glow('#ffffff',2.6);
+    add(B,gCone,white,0,.7,0,.4,1.3,.36); add(B,gCone,M('#ece4d0',{roughness:.4}),0,.5,0,.46,.5,.42).rotation.x=Math.PI;
+    for(let i=0;i<3;i++) add(B,gBand,gold,0,.35+i*.32,0,.36-i*.08,.04,.33-i*.07);
+    const torso=new THREE.Group(); torso.position.y=1.25; B.add(torso); add(torso,gSph,white,0,0,0,.26,.24,.2); add(torso,gBox,gold,0,0,.17,.24,.26,.03); u.core=add(torso,gOct,wht,0,.02,.2,.07,.1,.03);
+    for(const sx of [-1,1]){add(torso,gSph,gold,sx*.28,.1,0,.13,.08,.13); add(torso,gCone,gold,sx*.36,.18,0,.04,.16,.04).rotation.z=-sx*.7;}
+    const head=new THREE.Group(); head.position.y=1.62; B.add(head); u.head=head; add(head,gSph,white,0,0,0,.16,.19,.16); add(head,gSph,wht,0,.01,.1,.11,.13,.07);
+    const halo=add(head,gTor,gold,0,.32,-.05,.2,.2,.3); halo.rotation.x=Math.PI/2-.2; u.halo=halo; for(let i=0;i<8;i++){const a2=i/8*TAU; const sp=add(head,gCone,lite,Math.cos(a2)*.3,.32+Math.sin(a2)*.3,-.08,.015,.12,.015); sp.rotation.z=a2-Math.PI/2; sp.castShadow=false;}
+    u.bigWings=[]; const fe=M('#ffffff',{roughness:.4,side:THREE.DoubleSide}), fe2=M('#fff4d8',{roughness:.4,side:THREE.DoubleSide,emissive:new THREE.Color('#fff2b0'),emissiveIntensity:.35}), edge=glow('#ffd36a',1.6);
+    for(const [wy,ws] of [[1.4,1],[1.1,.8],[.82,.6]]) for(const sx of [-1,1]){const w=new THREE.Group(); w.position.set(sx*.18,wy,-.2); B.add(w); w.userData={sx,ws,y0:wy};
+      for(let i=0;i<6;i++){const len=(1.05-i*.09)*ws; const f=new THREE.Group(); f.rotation.z=sx*(-.15+i*.2); w.add(f); add(f,gBox,i%2?fe:fe2,sx*len/2,0,0,len,.11,.02); add(f,gBox,edge,sx*len,0,0,.05,.12,.025);} u.bigWings.push(w);}
+    const aL=limb(torso,-.32,.12,0,.6,.06,gold), aR=limb(torso,.32,.12,0,.6,.06,gold); u.arms=[aL,aR]; u.armsFwd=.6;
+    const hd=hand(aR,-.6); add(hd,gCyl,lite,0,.4,0,.03,1.6,.03); add(hd,gCone,wht,0,1.28,0,.07,.3,.07); add(hand(aL,-.6),gSph,wht,0,0,.06,.09);
+    u.orbit=[0,1,2,3,4,5].map(i=>{const o=add(B,gOct,i%2?wht:lite,0,1,0,.05,.09,.05); o.castShadow=false; return o;});
+    {const pl=new THREE.PointLight(0xfff2c0,2,9); pl.position.y=1.4; B.add(pl);} break;}
+  case 'blightmother':{const u=R.userData; u.legs=[]; u.arms=[]; const skin=M('#5a6a3a',{roughness:.55}), skin2=M('#6a7a42',{roughness:.6}), dark=M('#2a3418',{roughness:.7}), pus=glow('#9aff3a',2.4), pus2=glow('#d8ff6a',2), teeth=M('#e8e0b0');
+    const body=new THREE.Group(); body.position.y=.15; B.add(body); u.bloat=body;
+    add(body,gSph,skin,0,.72,0,.7,.62,.66); add(body,gSph,skin2,-.38,.55,.25,.36,.32,.32); add(body,gSph,skin2,.4,.6,.2,.38,.34,.34); add(body,gSph,skin,0,1.18,-.15,.42,.36,.4);
+    u.spots=[]; for(let i=0;i<20;i++){const a2=i*2.39, y=.4+(i%5)*.18, rr=.62-Math.abs(y-.75)*.4; const sp=add(body,gSph,i%3?pus:pus2,Math.cos(a2)*rr,y,Math.sin(a2)*rr,.05+(i%4)*.02); sp.castShadow=false; u.spots.push(sp);}
+    add(body,gSph,M('#120a04'),0,.62,.6,.34,.18,.12); for(let i=0;i<10;i++){const x=-.27+i*.06; add(body,gCone,teeth,x,.72,.66,.022,.11,.022).rotation.x=Math.PI; add(body,gCone,teeth,x,.52,.66,.02,.09,.02);}
+    const ey=glow('#ffe84a',2.6); u.core=add(body,gSph,ey,-.16,1.12,.42,.06); [[.14,1.16],[0,1.28],[-.3,1.0],[.3,1.02],[.05,1.05]].forEach(([x,y])=>add(body,gSph,ey,x,y,.4,.035));
+    u.nozzles=[]; for(const [x,z,rx,rz] of [[-.3,-.2,-.4,.4],[.25,-.25,-.4,-.4],[0,-.45,-.7,0]]){const nz=new THREE.Group(); nz.position.set(x,1.35,z); nz.rotation.set(rx,0,rz); body.add(nz); add(nz,gCyl,dark,0,.15,0,.08,.3,.08); add(nz,gCyl,skin2,0,.32,0,.1,.06,.1); const tip=add(nz,gSph,pus,0,.36,0,.06,.03,.06); u.nozzles.push(tip);}
+    u.tentacles=[]; for(let i=0;i<8;i++){const a2=i/8*TAU, g=new THREE.Group(); g.position.set(Math.cos(a2)*.55,.18,Math.sin(a2)*.5); g.rotation.y=-a2; B.add(g); const segs=[]; let p=g;
+      for(let k=0;k<4;k++){const sg=new THREE.Group(); sg.position.x=k?.16:0; p.add(sg); add(sg,gSph,k%2?skin:dark,.08,0,0,.08-k*.014,.06-k*.01,.07-k*.012); if(k===3) add(sg,gSph,pus,.16,0,0,.03); segs.push(sg); p=sg;} u.tentacles.push(segs);}
+    {const pl=new THREE.PointLight(0x9aff3a,1.4,7); pl.position.y=1.2; B.add(pl);} break;}
+  case 'forms1':{const u=R.userData; const h=bruteBase({skin:'#5a6a7a',rocky:true,skinOpt:{flatShading:true,roughness:.8,metalness:.15},eye:'#7af0ff',eyeGlow:true});
+    const cA=M('#7af0ff',{emissive:new THREE.Color('#2a90b0'),emissiveIntensity:1.3,roughness:.15,transparent:true,opacity:.92}), cB=M('#ffa030',{emissive:new THREE.Color('#b05010'),emissiveIntensity:1.2,roughness:.15}), cC=M('#ffffff',{emissive:new THREE.Color('#8a7ab0'),emissiveIntensity:1.1,roughness:.15});
+    for(let i=0;i<9;i++){const a2=i*1.9; const c=add(h.torso,gOct,[cA,cB,cC][i%3],Math.cos(a2)*.3,.3+(i%4)*.14,Math.sin(a2)*.22-.05,.06,.2+(i%3)*.06,.06); c.rotation.set(Math.sin(a2)*.8,a2,Math.cos(a2)*.8);}
+    for(let i=0;i<5;i++){const c=add(h.head,gOct,[cA,cB,cC][i%3],-.12+i*.06,.22+Math.abs(i-2)*-.03,0,.03,.12,.03); c.rotation.z=(i-2)*.3;}
+    u.orbit=[0,1,2,3].map(i=>{const o=add(B,gOct,[cA,cB,cC,cA][i],0,1,0,.06,.14,.06); o.castShadow=false; return o;}); u.core=add(h.torso,gOct,cA,0,.42,.36,.09,.14,.05); break;}
+  case 'forms2':{const u=R.userData; u.float=true; u.legs=[]; const core=glow('#ffa030',2.4), fl=glow('#ff5a1a',2.2), fl2=glow('#ffd84a',2.4), dark=M('#2a0a04',{roughness:.6});
+    add(B,gSph,dark,0,1.0,0,.32,.4,.3); u.core=add(B,gSph,core,0,1.0,.12,.22,.28,.2);
+    u.flames=[]; for(let i=0;i<16;i++){const a2=i/16*TAU, y=.55+(i%4)*.25; const f=add(B,gCone,i%3?fl:fl2,Math.cos(a2)*.3,y,Math.sin(a2)*.28,.07,.4,.07); f.rotation.set(Math.sin(a2)*.4,0,-Math.cos(a2)*.4); f.castShadow=false; u.flames.push(f);}
+    const head=new THREE.Group(); head.position.y=1.5; B.add(head); u.head=head; add(head,gSph,dark,0,0,0,.17,.2,.17); add(head,gBox,fl2,-.07,.02,.15,.06,.025,.01); add(head,gBox,fl2,.07,.02,.15,.06,.025,.01);
+    for(let i=0;i<5;i++){const f=add(head,gCone,i%2?fl:fl2,-.12+i*.06,.22+(i===2?.08:0),-.02,.04,.26,.04); u.flames.push(f);}
+    u.bigWings=[]; for(const sx of [-1,1]){const w=new THREE.Group(); w.position.set(sx*.2,1.2,-.15); B.add(w); w.userData={sx,ws:1,y0:1.2}; for(let i=0;i<5;i++){const f=new THREE.Group(); f.rotation.z=sx*(-.1+i*.25); w.add(f); const c=add(f,gCone,i%2?fl:fl2,sx*.45,0,0,.08,.9-i*.1,.03); c.rotation.z=-sx*Math.PI/2; u.flames.push(c);} u.bigWings.push(w);}
+    const aL=limb(B,-.34,1.25,0,.55,.06,fl), aR=limb(B,.34,1.25,0,.55,.06,fl); u.arms=[aL,aR]; u.armsFwd=.5;
+    {const pl=new THREE.PointLight(0xffa040,2.2,8); pl.position.y=1.1; B.add(pl);} break;}
+  case 'forms3':{const u=R.userData; u.float=true; u.legs=[]; const star=glow('#ffffff',2.8), vio=glow('#b48cff',2.4), cy=glow('#7af0ff',2.4), body=M('#140e22',{roughness:.4,metalness:.3});
+    add(B,gOct,body,0,1.0,0,.4,.75,.35); u.core=add(B,gOct,star,0,1.05,.22,.14,.22,.08);
+    for(let i=0;i<26;i++){const a2=Math.random()*TAU, y=.5+Math.random()*1.0; const s2=add(B,gSph,i%3?star:i%2?vio:cy,Math.cos(a2)*.33*(1-Math.abs(y-1)*.8),y,Math.sin(a2)*.3*(1-Math.abs(y-1)*.8),.014+Math.random()*.012); s2.castShadow=false;}
+    const head=new THREE.Group(); head.position.y=1.85; B.add(head); u.head=head; add(head,gOct,body,0,0,0,.18,.24,.18); add(head,gBox,star,-.06,.02,.16,.05,.02,.01); add(head,gBox,star,.06,.02,.16,.05,.02,.01);
+    u.rings=[]; const thinTor=geo('thintor',()=>new THREE.TorusGeometry(1,.035,6,48)); for(let i=0;i<3;i++){const r=add(B,thinTor,[star,vio,cy][i],0,1.05,0,.75+i*.2,.75+i*.2,.75+i*.2); u.rings.push(r);}
+    const aL=limb(B,-.4,1.45,0,.65,.05,vio), aR=limb(B,.4,1.45,0,.65,.05,cy); u.arms=[aL,aR]; u.armsFwd=.4; add(aL,gSph,star,0,-.7,0,.07); add(aR,gSph,star,0,-.7,0,.07);
+    u.orbit=[0,1,2,3,4,5,6,7].map(i=>{const o=add(B,gOct,[star,vio,cy][i%3],0,1,0,.05,.11,.05); o.castShadow=false; return o;});
+    {const pl=new THREE.PointLight(0xe0d0ff,2,9); pl.position.y=1.2; B.add(pl);} break;}
   case 'foundrycolossus':{const u=R.userData; const iron=M('#3a3a42',{metalness:.7,roughness:.35}), dark=M('#1e1e24',{metalness:.6,roughness:.4}), rust=M('#5a3a2a',{roughness:.7}), hot=glow('#ff7a1a',2.6), hot2=glow('#ffd84a',2.2);
     u.legs=[limb(B,-.22,.5,0,.5,.15,dark,iron),limb(B,.22,.5,0,.5,.15,dark,iron)];
     const torso=new THREE.Group(); torso.position.y=.5; B.add(torso); u.torso=torso; torso.userData.rx0=.08; torso.rotation.x=.08;
@@ -2001,7 +2167,7 @@ function addBossAura(R,col){const u=R.userData, c=new THREE.Color(col), add2=(g,
   const light=new THREE.PointLight(c,1.3,7); light.position.y=1.2; R.add(light);
   u.auraFx={disc,ring,ring2,glow:gs,glow2:gs2,light,col:'#'+c.getHexString()};}
 // Moving parts and the aura, every frame
-function animBoss(m,b){const u=m.userData;
+function animBoss(m,b){const u=m.userData; if(b.squirtT>0) b.squirtT-=1/60;
   if(u.plates) u.plates.forEach((g,i)=>{g.rotation.y=i*TAU/4+time*.7; g.position.y=1.0+Math.sin(time*2+i)*.05;});
   if(u.arcs&&u.orbit&&u.core){u.arcT=(u.arcT||0)-1/60; if(u.arcT<=0){u.arcT=.08; const c=u.core.position; u.arcs.forEach(l=>{const a=u.orbit[(Math.random()*u.orbit.length)|0].position, p=l.geometry.attributes.position;
       for(let k=0;k<7;k++){const t=k/6, j=k&&k<6?.09:0; p.setXYZ(k,a.x+(c.x-a.x)*t+rand(-j,j),a.y+(c.y-a.y)*t+rand(-j,j),a.z+(c.z-a.z)*t+rand(-j,j));} p.needsUpdate=true; l.visible=!b.hidden&&Math.random()<.75;});}}
@@ -2014,6 +2180,15 @@ function animBoss(m,b){const u=m.userData;
   if(u.tentacles) u.tentacles.forEach((segs,i)=>segs.forEach((sg,k)=>{sg.rotation.z=Math.sin(time*2.4+i+k*.8)*.35; sg.rotation.y=Math.cos(time*1.9+i*2+k)*.3;}));
   if(u.ribbons) u.ribbons.forEach((segs,i)=>segs.forEach((sg,k)=>{sg.rotation.x=Math.sin(time*2.2+i+k*.7)*.25; sg.rotation.z=Math.cos(time*1.6+i+k*.5)*.2;}));
   if(u.petals) u.petals.rotation.z=time*.8;
+  if(u.flip) u.flip.forEach(pg=>{const k=((time*.55+pg.userData.ph)%1); pg.rotation.y=-k*Math.PI*.95+.25; pg.visible=k<.98;});
+  if(u.covers){const o=.25+Math.sin(time*1.3)*.12; u.covers[0].rotation.y=o; u.covers[1].rotation.y=-o;}
+  if(u.book){u.book.position.y=1.05+Math.sin(time*1.6)*.06; u.book.rotation.z=Math.sin(time*.9)*.08;}
+  if(u.sigil) u.sigil.rotation.z=time*1.5;
+  if(u.bigWings) u.bigWings.forEach(w=>{const f=Math.sin(time*2.2)*.28; w.rotation.y=w.userData.sx*(.35+f); w.rotation.z=w.userData.sx*Math.sin(time*2.2+.6)*.1;});
+  if(u.halo) u.halo.rotation.z=time*.8;
+  if(u.bloat){const k=1+Math.sin(time*2.4)*.05; u.bloat.scale.set(k,1/k*1.02,k); if(m.userData.squirt>0) m.userData.squirt-=1/60;}
+  if(u.nozzles) u.nozzles.forEach((n,i)=>{n.material.emissiveIntensity=(b.squirtT>0?4:1.4)+Math.sin(time*6+i)*.6;});
+  if(u.flames) u.flames.forEach((f,i)=>{const k=.8+.35*Math.abs(Math.sin(time*9+i*1.7)); f.scale.y=f.userData.sy0||(f.userData.sy0=f.scale.y); f.scale.y=f.userData.sy0*k;});
   if(u.wyrm) u.wyrm.forEach((sg,i)=>{sg.rotation.y=Math.sin(time*2.2-i*.6)*.35; sg.rotation.x=Math.sin(time*1.6-i*.5)*.12;});
   if(u.rings) u.rings.forEach((r,i)=>{r.rotation.z=time*(.6+i*.35)*(i%2?-1:1); r.rotation.x=Math.PI/2+i*.5+Math.sin(time+i)*.2;});
   if(u.petalMats) u.petalMats.forEach((pm,i)=>{pm.color.setHSL((time*.12+i*.25)%1,.75,.72); pm.emissive.setHSL((time*.12+i*.25)%1,.8,.45);});
@@ -2078,6 +2253,11 @@ const B3={
  expanse:{void:0x000000,sky:0x8a6ac8,gnd:0x05030a,sun:0xd8c8ff,hi:.7,si:.6,rock:0x1a1428,top:0x2a2040,tree:'voidspire',floorDeco:['starD','pebble','starD'],fl:[0x14101e,0x181424,0x100c18],pool:0x000000,fogN:10,fogF:32},
  rift:{void:0x00020a,sky:0x6ac8e8,gnd:0x04060e,sun:0xc8f0ff,hi:.75,si:.65,rock:0x1a2238,top:0x2a3a5a,tree:'riftcrystal',floorDeco:['starD','pebble'],fl:[0x141a2a,0x182030,0x101624],pool:0x000000,fogN:10,fogF:32},
  nullgarden:{void:0x060510,sky:0xd8d0e8,gnd:0x100e16,sun:0xf0e8ff,hi:.8,si:.75,rock:0x3a3448,top:0x5a5470,tree:'nullflower',floorDeco:['flower','starD','tuft'],fl:[0x2a2834,0x302e3a,0x26242e],pool:0x1a0a2a,fogN:12,fogF:34},
+ knowledge:{void:0x0e0804,sky:0xffe0a8,gnd:0x2a1e12,sun:0xffd890,hi:.85,si:.95,rock:0x4a3424,top:0x7a5a36,tree:'bookshelf',floorDeco:['scrollD','candleD','scrollD'],fl:[0x5a4630,0x624c34,0x54422c]},
+ destruction:{void:0x0a0202,sky:0xff8a6a,gnd:0x1a0806,sun:0xffa080,hi:.8,si:.9,rock:0x2a1a1a,top:0x4a2a24,tree:'brokenpillar',floorDeco:['rubbleD','emberD','rubbleD'],fl:[0x2a1c1c,0x302020,0x261818],pool:0xff3a10,fogN:12,fogF:34},
+ immunity:{void:0x2a2620,sky:0xd8d0c0,gnd:0x6a6050,sun:0xffe8c0,hi:.55,si:.7,rock:0xc8c0b0,top:0xf0e8d8,tree:'lightspire',floorDeco:['featherD','flower','featherD'],fl:[0x9a9284,0xa29a8c,0x928a7c]},
+ infection:{void:0x060a02,sky:0xc8ff8a,gnd:0x121a0a,sun:0xd8ffa0,hi:.8,si:.85,rock:0x2a3a1a,top:0x4a5a2a,tree:'blightstalk',floorDeco:['blisterD','tuft','blisterD'],fl:[0x2e3a1e,0x344222,0x2a361a],pool:0x6aff2a,fogN:11,fogF:32},
+ forms:{void:0x04020a,sky:0xa8c8ff,gnd:0x0a0814,sun:0xe0e8ff,hi:.85,si:.8,rock:0x2a2440,top:0x3a3058,tree:'prism',floorDeco:['starD','prismD','starD'],fl:[0x1e1a2e,0x241e36,0x1a1628],pool:0x2a1a4a,fogN:11,fogF:34},
  edge:{void:0x000000,sky:0x7a6aaa,gnd:0x000000,sun:0xe0d0ff,hi:.8,si:.7,rock:0x140e22,top:0x1a1428,tree:'voidspire',floorDeco:['starD','starD','pebble'],fl:[0x0a0812,0x0e0a18,0x08060e],pool:0x000000,fogN:9,fogF:28}};
 const DECOR={
  oak:[{g:gCyl,col:0x6b4a2e,y:.4,sx:.12,sy:.8},{g:gIco,col:0x4f8a2e,flat:1,y:1.05,sx:.62,sy:.55},{g:gIco,col:0x62a03a,flat:1,x:.22,y:1.35,z:.1,sx:.4}],
@@ -2117,6 +2297,17 @@ const DECOR={
  voidspire:[{g:gOct,col:0x2a1a4a,em:0x4a1aa0,flat:1,y:.95,sx:.17,sy:.5},{g:gOct,col:0x1a0a2a,flat:1,x:.28,y:.55,sx:.1,sy:.25},{g:gOct,col:0x1a0a2a,flat:1,x:-.22,y:1.35,sx:.07,sy:.18},{g:gSph,col:0xffffff,em:0xb48cff,y:1.6,sx:.05}],
  riftcrystal:[{g:gOct,col:0x2a5a8a,em:0x2a8ad0,flat:1,y:.6,sx:.14,sy:.6,rz:.2},{g:gOct,col:0x5a3a9a,em:0x6a3ad0,flat:1,x:.2,y:.4,sx:.09,sy:.4,rz:-.4},{g:gOct,col:0x9af8ff,em:0x4ad0ff,flat:1,x:-.15,y:.3,sx:.07,sy:.3,rz:.5}],
  nullflower:[{g:gCyl,col:0x8a8498,y:.6,sx:.04,sy:1.2},{g:gSph,col:0x0a0614,em:0x3a1a6a,y:1.25,sx:.1},{g:gSph,col:0xe8e0f0,x:.16,y:1.24,sx:.13,sy:.04},{g:gSph,col:0xe8e0f0,x:-.16,y:1.24,sx:.13,sy:.04},{g:gSph,col:0xd8d0e8,z:.16,y:1.24,sx:.13,sy:.04},{g:gSph,col:0xd8d0e8,z:-.16,y:1.24,sx:.13,sy:.04}],
+ bookshelf:[{g:gBox,col:0x4a2e1a,y:.65,sx:.5,sy:1.3,sz:.22},{g:gBox,col:0x8a3a2a,x:-.12,y:.35,z:.1,sx:.18,sy:.22,sz:.04},{g:gBox,col:0x2a5a8a,x:.1,y:.35,z:.1,sx:.18,sy:.22,sz:.04},{g:gBox,col:0x3a6a3a,x:-.08,y:.75,z:.1,sx:.24,sy:.22,sz:.04},{g:gBox,col:0x8a6a2a,x:.13,y:.75,z:.1,sx:.14,sy:.22,sz:.04},{g:gBox,col:0x6a2a5a,y:1.12,z:.1,sx:.3,sy:.2,sz:.04},{g:gSph,col:0xffd36a,em:0xffa020,x:.18,y:1.38,sx:.04}],
+ brokenpillar:[{g:gCyl,col:0x3a2a28,y:.45,sx:.17,sy:.9},{g:gIco,col:0x3a2a28,flat:1,x:.25,y:.08,sx:.14},{g:gIco,col:0x2a1e1c,flat:1,x:-.2,y:.06,sx:.1},{g:gBox,col:0xff3a1a,em:0xff2000,flat:1,y:.5,z:.172,sx:.03,sy:.6,sz:.01}],
+ lightspire:[{g:gOct,col:0xfff8e8,em:0xd8c890,flat:1,y:.8,sx:.14,sy:.8},{g:gCyl,col:0xd8b860,y:.06,sx:.2,sy:.12},{g:gSph,col:0xffffff,em:0xfff2b0,y:1.65,sx:.07}],
+ blightstalk:[{g:gCyl,col:0x3a4a22,y:.5,sx:.06,sy:1.0},{g:gSph,col:0x8ab03a,y:1.05,sx:.16,sy:.2},{g:gSph,col:0x9aff3a,em:0x5ad010,x:.1,y:1.1,z:.08,sx:.05},{g:gSph,col:0x9aff3a,em:0x5ad010,x:-.08,y:.95,z:.1,sx:.04},{g:gSph,col:0x6a8a2a,x:.12,y:.5,sx:.08}],
+ prism:[{g:gOct,col:0x7af0ff,em:0x2a90b0,flat:1,y:.6,sx:.12,sy:.6,rz:.15},{g:gOct,col:0xffa030,em:0xb05010,flat:1,x:.2,y:.4,sx:.08,sy:.4,rz:-.3},{g:gOct,col:0xffffff,em:0x8a7ab0,flat:1,x:-.18,y:.35,sx:.07,sy:.35,rz:.4}],
+ scrollD:[{g:gCyl,col:0xe8dcc0,y:.03,sx:.03,sy:.18,rz:Math.PI/2},{g:gBox,col:0xe8dcc0,x:.05,y:.01,z:.05,sx:.12,sy:.01,sz:.08}],
+ candleD:[{g:gCyl,col:0xf0e8d8,y:.06,sx:.025,sy:.12},{g:gSph,col:0xffd36a,em:0xffa020,y:.14,sx:.02}],
+ rubbleD:[{g:gIco,col:0x3a2a28,flat:1,y:.04,sx:.07},{g:gIco,col:0x2a1e1c,flat:1,x:.08,y:.03,z:.05,sx:.05}],
+ featherD:[{g:gSph,col:0xffffff,y:.02,sx:.09,sy:.01,sz:.03},{g:gSph,col:0xfff2b0,em:0xc8b060,x:.05,y:.02,z:.04,sx:.02}],
+ blisterD:[{g:gSph,col:0x9aff3a,em:0x4ab010,y:.02,sx:.06,sy:.03},{g:gSph,col:0x6a8a2a,x:.08,y:.02,sx:.04,sy:.02}],
+ prismD:[{g:gOct,col:0x7af0ff,em:0x2a90b0,flat:1,y:.05,sx:.03,sy:.06},{g:gOct,col:0xffa030,em:0xb05010,flat:1,x:.08,y:.04,sx:.025,sy:.05}],
  emberD:[{g:gIco,col:0x2a1a14,flat:1,y:.04,sx:.08,sy:.05},{g:gIco,col:0xff6a1a,em:0xff4a00,flat:1,x:.06,y:.04,sx:.04}],
  starD:[{g:gOct,col:0xffffff,em:0xb48cff,flat:1,y:.06,sx:.025},{g:gOct,col:0xd8c8ff,em:0x8a5ad0,flat:1,x:.12,y:.04,z:.08,sx:.018}]};
 const _m4=new THREE.Matrix4(),_q=new THREE.Quaternion(),_eu=new THREE.Euler(),_sv=new THREE.Vector3(),_pv=new THREE.Vector3(),_cc=new THREE.Color();
@@ -2247,6 +2438,20 @@ function syncChest(c){const m=ensure(c,buildChest,'c'); m.position.set(c.x*S,0,c
   u.lid.rotation.x+=((c.open?-1.9:0)-u.lid.rotation.x)*.2; u.glow.material.opacity=c.open?0:.12+.08*Math.sin(time*3);}
 function syncLoot(o){const m=ensure(o,()=>buildLoot(o),'l'+o.kind); m.position.set(o.x*S,o.z*S,o.y*S); const u=m.userData;
   if(u.sprite) u.sprite.position.y=.55+Math.sin(time*3+o.x)*.06; if(u.spin){u.spin.rotation.y=time*3; u.spin.position.y=.2+Math.sin(time*4+o.x)*.04;}}
+function buildBlockModel(bk){const g=new THREE.Group(); g.userData={mats:[],key:'blk'+bk.kind}; CUR=g;
+  if(bk.kind==='rock'){const rk=M('#4a3a36',{flatShading:true,roughness:.95}), rk2=M('#3a2c28',{flatShading:true,roughness:.95}), cr=glow('#ff4a1a',1.6);
+    [[0,.45,0,.48],[.18,.85,.08,.32],[-.2,.8,-.1,.3],[.05,1.1,0,.24],[-.25,.25,.2,.25]].forEach(([x,y,z,r],i)=>{const m=add(g,gIco,i%2?rk2:rk,x,y,z,r); m.rotation.set(i,i*2,i*.5); m.castShadow=true;});
+    add(g,gBox,cr,.0,.6,.42,.03,.5,.01).rotation.z=.3; add(g,gBox,cr,.25,.4,.33,.02,.3,.01).rotation.z=-.5;}
+  else if(bk.kind==='light'){const m=new THREE.MeshStandardMaterial({color:0xfff0c8,emissive:new THREE.Color(0xffd870),emissiveIntensity:.55,transparent:true,opacity:.55,roughness:.2});
+    add(g,gBox,m,0,.7,0,.9,1.4,.9); add(g,gBox,glow('#ffffff',1.8),0,1.41,0,.92,.04,.92); add(g,gBox,glow('#ffd36a',1.4),0,.02,0,.96,.04,.96); g.userData.mat=m;}
+  else {const st=M('#f0e8d8',{roughness:.35,metalness:.2}), gold=M('#d8b860',{metalness:.8,roughness:.25});
+    add(g,gBox,gold,0,.1,0,.8,.2,.8); add(g,gPrism,st,0,.9,0,.28,1.5,.28); const top=add(g,gOct,glow('#fff2b0',2.4),0,1.85,0,.22,.36,.22); g.userData.top=top;
+    const pl=new THREE.PointLight(0xfff2b0,1.2,5); pl.position.y=1.8; g.add(pl);}
+  return g;}
+function syncBlock(bk){const m=ensure(bk,()=>buildBlockModel(bk),'blk'+bk.kind); m.position.set(bk.x*S,0,bk.y*S);
+  const rise=Math.min(1,bk.t/.35), fall=bk.max>0?Math.min(1,(bk.max-bk.t)/.4):1, k=Math.max(.01,Math.min(rise,fall)); m.scale.set(1,k,1);
+  if(m.userData.mat) m.userData.mat.opacity=.45+.2*Math.sin(time*6+bk.tx);
+  if(m.userData.top){m.userData.top.rotation.y=time*2; m.userData.top.position.y=1.85+Math.sin(time*3+bk.tx)*.08;}}
 function syncPortal(){if(!L.exit) return; const m=ensure(L.exit,buildPortal,'portal'); m.position.set(L.exit.x*S,0,L.exit.y*S); m.scale.setScalar(L.exit.big?(L.exit.grow!=null?.2+2.6*L.exit.grow:2.8):1); m.children[1].rotation.y=time*1.5; m.children[2].rotation.y=time*1.5; m.children[1].rotation.z=Math.sin(time)*.1;}
 /* pools */
 const matCache=new Map(); const basicMat=c=>{let m=matCache.get(c); if(!m){m=new THREE.MeshBasicMaterial({color:C3(c)}); matCache.set(c,m);} return m;};
@@ -2287,7 +2492,7 @@ function render(){
   for(const o of loot) syncLoot(o);
   for(const e of ents) syncEnemy(e);
   for(const a of allies) syncEnemy(a);
-  syncBoss(); syncPortal(); if(L.pods) for(const p of L.pods) syncPod(p);
+  syncBoss(); syncPortal(); if(L.blocks) for(const bk of L.blocks) syncBlock(bk); if(L.pods) for(const p of L.pods) syncPod(p);
   if(P&&mode!=='menu') syncPlayer(); else swingMesh.material.opacity=0;
   if(MP.inGame&&mode!=='menu') for(const o of MP.others.values()) syncRemote(o);
   for(const [o,m] of REG) if(!seenSet.has(o)){scene.remove(m); disposeModel(m); REG.delete(o);}
@@ -2497,12 +2702,18 @@ $('#howClose').onclick=()=>{$('#how').hidden=true;};
 
 /* island map */
 const isleCv=$('#isle'); let isleDrawn=false; let selNode=null;
+const CORE_ANG={23:-150,24:-62,25:12,26:100};
+function CORE_POS(bi){const cx=690,cy=330; if(bi===27){const n=[[605,300],[640,250],[740,250],[775,300],[690,330]]; return {nodes:n,lab:[690,402]};}
+  const a0=CORE_ANG[bi]*Math.PI/180, P2=(r,da)=>{const a=a0+da*Math.PI/180; return [Math.round(cx+Math.cos(a)*r*1.05),Math.round(cy+Math.sin(a)*r*.82)];};
+  const lb=P2(300,0); lb[0]=clamp(lb[0],470,920); lb[1]=clamp(lb[1],40,610); return {nodes:[P2(255,-20),P2(232,-6),P2(212,8),P2(192,20),P2(148,0)],lab:lb};}
+[23,24,25,26,27].forEach(bi=>{if(BIOMES[bi]) BIOMES[bi].lab=CORE_POS(bi).lab;});
 const NODES=[];
 (function buildNodes(){const cx0=500,cy0=322;
   BIOMES.forEach((B,bi)=>{ const n=B.levels.length+1;
     for(let li=0;li<n;li++){let x,y;
       if(bi<5){const a=(B.ang+(li===1?9:li===0?-7:0))*Math.PI/180, rr=[.6,.48,.35][li]; x=cx0+Math.cos(a)*rr*400; y=cy0+Math.sin(a)*rr*260;}
       else if(bi===6){[x,y]=[[832,62],[872,40],[920,42],[962,66],[968,112],[930,138],[880,136],[910,92]][li];}
+      else if(bi>=23){const C7=CORE_POS(bi); [x,y]=C7.nodes[li];}
       else if(bi>=7){[x,y]=({10:[[400,240],[480,150],[600,110],[740,140],[870,230],[850,420],[640,400]],11:[[420,230],[465,170],[525,130],[595,175],[545,85]],12:[[740,230],[785,170],[845,130],[915,175],[865,85]],13:[[740,545],[785,485],[845,445],[915,490],[865,395]],14:[[420,555],[465,495],[525,455],[595,500],[545,405]],15:[[420,230],[465,170],[525,130],[595,175],[545,85]],16:[[740,230],[785,170],[845,130],[915,175],[865,85]],17:[[740,545],[785,485],[845,445],[915,490],[865,395]],18:[[420,555],[465,495],[525,455],[595,500],[545,405]],19:[[420,230],[465,170],[525,130],[595,175],[545,85]],20:[[740,230],[785,170],[845,130],[915,175],[865,85]],21:[[740,545],[785,485],[845,445],[915,490],[865,395]],22:[[420,555],[465,495],[525,455],[595,500],[545,405]],7:[[300,250],[340,170],[412,132],[486,176],[424,70]],8:[[680,330],[740,262],[812,232],[886,282],[800,150]],9:[[400,530],[490,578],[600,575],[700,530],[560,480]]})[bi][li];}
       else {const pos=[[200,.17],[20,.17],[0,0]][li]; const a=pos[0]*Math.PI/180; x=cx0+Math.cos(a)*pos[1]*400; y=cy0+Math.sin(a)*pos[1]*260;}
       NODES.push({bi,li,x,y,boss:li===n-1});}});})();
@@ -2529,9 +2740,9 @@ function drawIsle(){const g=isleCv.getContext('2d'),S=5,cx0=500,cy0=322;
 let mapWorld=1, drawnWorld=0;
 const worldOf=bi=>BIOMES[bi].world||1;
 const outerOpen=()=>SAVE&&(SAVE.won||Object.keys(SAVE.cleared).some(k=>+k.split('-')[0]>=7));
-const WORLD_NAME={1:'Isle of Six Crowns',2:'Outer Isles',3:'The Deep Dark',4:'Shift Dimension',5:'The Forge',6:'The Void'};
+const WORLD_NAME={1:'Isle of Six Crowns',2:'Outer Isles',3:'The Deep Dark',4:'Shift Dimension',5:'The Forge',6:'The Void',7:'Core of Creations'};
 const anyIn=min=>Object.keys(SAVE.cleared).some(k=>+k.split('-')[0]>=min);
-function worldOpen(w){if(!SAVE) return w===1; if(w===1) return true; if(w===2) return outerOpen(); if(w===3) return !!SAVE.cleared['9-4']||anyIn(10); if(w>=4&&w<=6) return !!SAVE.portalOpen||!!SAVE.cleared['10-6']||anyIn(11); return false;}
+function worldOpen(w){if(!SAVE) return w===1; if(w===1) return true; if(w===2) return outerOpen(); if(w===3) return !!SAVE.cleared['9-4']||anyIn(10); if(w>=4&&w<=6) return !!SAVE.portalOpen||!!SAVE.cleared['10-6']||anyIn(11); if(w===7) return !!(SAVE.cleared['14-4']&&SAVE.cleared['18-4']&&SAVE.cleared['22-4'])||anyIn(23); return false;}
 function islandNoise(x,y,cx,cy,rx,ry,seed){const dx=(x-cx)/rx,dy=(y-cy)/ry,a=Math.atan2(dy,dx),r=Math.hypot(dx,dy),e=.86+.07*Math.sin(a*3+seed)+.04*Math.sin(a*7+seed*2)+.02*Math.sin(a*13+seed); return {r,e};}
 function drawWorld3(){const g=isleCv.getContext('2d'),S=5;
   for(let y=0;y<640;y+=S) for(let x=0;x<1000;x+=S){const h=hash(x,y); let col=h<.03?'#0a1418':'#05090c'; const I=islandNoise(x,y,640,330,330,285,3);
@@ -2552,6 +2763,18 @@ function drawDim(w){const g=isleCv.getContext('2d'),S=5,D=DIMS[w];
     g.fillStyle=col; g.fillRect(x,y,S,S);}
   const cx=670,cy=322; for(let r=46;r>0;r-=6){g.fillStyle=r%12?D.ring[0]:D.ring[1]; g.beginPath(); g.arc(cx,cy,r,0,TAU); g.fill(); g.fillStyle=D.core; g.beginPath(); g.arc(cx,cy,r-3,0,TAU); g.fill();}
   drawnWorld=w;}
+function drawWorld7(){const g=isleCv.getContext('2d'),S=5, cx=690, cy=330;
+  for(let y=0;y<640;y+=S) for(let x=0;x<1000;x+=S){const h=hash(x,y); let col=h>.993?'#fff2b0':h>.987?'#7a6ab8':(y<320?'#0a0a1e':'#080816'); if(Math.sin(x*.01+y*.017)>.95) col='#1a1438';
+    const I=islandNoise(x,y,cx,cy,320,268,11);
+    if(I.r<I.e){ if(I.r>I.e-.05) col=h<.5?'#d8b050':'#a88a3a';
+      else {const dx=(x-cx)/1.05, dy=(y-cy)/.82, rr=Math.hypot(dx,dy); let bi;
+        if(rr<92) bi=27; else {const ang=Math.atan2(dy,dx)*180/Math.PI; let best=23,bd=1e9; for(const k of [23,24,25,26]){let d=Math.abs(((ang-CORE_ANG[k])+540)%360-180); if(d<bd){bd=d;best=k;}} bi=best;}
+        col=BIOMES[bi].map[(h*3)|0]; if(h>.95) col=BIOMES[bi].accent; if(bi===27&&h>.9) col=['#7af0ff','#ffa030','#ffffff','#b48cff'][((h*997)|0)%4];
+        if(rr>=88&&rr<96) col='#d8b050';}}
+    else if(I.r<I.e+.06) col='#2a2050';
+    g.fillStyle=col; g.fillRect(x,y,S,S);}
+  for(let r=26;r>0;r-=4){g.fillStyle=r%8?'#fff2b0':'#7af0ff'; g.beginPath(); g.arc(cx,cy,r,0,TAU); g.fill();}
+  drawnWorld=7;}
 function drawWorld4(){const g=isleCv.getContext('2d'),S=5;
   const L4=[{bi:11,cx:510,cy:168,rx:140,ry:115},{bi:12,cx:830,cy:168,rx:140,ry:115},{bi:13,cx:830,cy:478,rx:140,ry:115},{bi:14,cx:510,cy:488,rx:140,ry:115}];
   for(let y=0;y<640;y+=S) for(let x=0;x<1000;x+=S){const h=hash(x,y); let col=h>.992?'#d8c8ff':h>.985?'#7a6ab8':(y<320?'#120a24':'#0c0a1e'); if(Math.sin(x*.012+y*.02)>.96) col='#1e1440';
@@ -2578,16 +2801,16 @@ function drawWorld2(){const g=isleCv.getContext('2d'),S=5;
   drawnWorld=2;}
 const levelKey=(bi,li)=>bi+'-'+li;
 function unlocked(bi,li){if(bi===6&&!EVENT_ACTIVE()) return false; if(SAVE.cleared[levelKey(bi,li)]) return true; if(li>0) return !!SAVE.cleared[levelKey(bi,li-1)];
-  if(bi===7) return !!SAVE.won; if(bi===11||bi===15||bi===19) return worldOpen(4); if(bi>7) return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];
+  if(bi===7) return !!SAVE.won; if(bi===11||bi===15||bi===19) return worldOpen(4); if(bi===23) return worldOpen(7); if(bi>7) return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];
   if(bi===6) return true;
   if(bi===0) return true; if(bi===5){for(let b=0;b<5;b++) if(!SAVE.cleared[levelKey(b,2)]) return false; return true;} return !!SAVE.cleared[levelKey(bi-1,2)];}
 function openMap(){if(!MP.peer) setTimeout(initMP,100); renderPartyHud(); mode='map'; showOnly('mapScr'); while(mapWorld>1&&!worldOpen(mapWorld)) mapWorld--; renderDiff();
-  if(drawnWorld!==mapWorld){if(mapWorld===2) drawWorld2(); else if(mapWorld===3) drawWorld3(); else if(mapWorld===4) drawWorld4(); else if(mapWorld===5||mapWorld===6) drawDim(mapWorld); else {drawIsle(); drawnWorld=1;}} calcStats();
-  {const wb=$('#mapWorldBtn'), bk=$('#mapWorldBack'); const nextW=mapWorld<3&&worldOpen(mapWorld+1)?mapWorld+1:0, backW=mapWorld===2||mapWorld===3?mapWorld-1:0;
-    wb.hidden=!nextW; if(nextW) wb.textContent=(nextW===2?'Outer Isles':'The Deep Dark')+' →'; wb.classList.toggle('next',!!nextW&&!anyIn(nextW===2?7:10));
-    bk.hidden=!backW; if(backW) bk.textContent='← '+(backW===1?'Isle of Six Crowns':'Outer Isles');
-    $('#mapScr').classList.toggle('w2',mapWorld===2); $('#mapScr').classList.toggle('w3',mapWorld===3); $('#mapScr').classList.toggle('w4',mapWorld===4); $('#mapScr').classList.toggle('w5',mapWorld===5); $('#mapScr').classList.toggle('w6',mapWorld===6); $('#mapScr').classList.toggle('hasworld',!wb.hidden||!bk.hidden);
-    $('#mapScr h2').textContent={1:'The Isle',2:'The Outer Isles',3:'The Deep Dark',4:'The Shift Dimension',5:'The Forge',6:'The Void'}[mapWorld];}
+  if(drawnWorld!==mapWorld){if(mapWorld===2) drawWorld2(); else if(mapWorld===3) drawWorld3(); else if(mapWorld===4) drawWorld4(); else if(mapWorld===5||mapWorld===6) drawDim(mapWorld); else if(mapWorld===7) drawWorld7(); else {drawIsle(); drawnWorld=1;}} calcStats();
+  {const wb=$('#mapWorldBtn'), bk=$('#mapWorldBack'); const nextW=mapWorld<3&&worldOpen(mapWorld+1)?mapWorld+1:mapWorld===3&&worldOpen(7)?7:0, backW=mapWorld===2||mapWorld===3?mapWorld-1:mapWorld===7?3:0;
+    wb.hidden=!nextW; if(nextW) wb.textContent=(nextW===2?'Outer Isles':nextW===7?'Core of Creations':'The Deep Dark')+' →'; wb.classList.toggle('next',!!nextW&&!anyIn(nextW===2?7:nextW===7?23:10));
+    bk.hidden=!backW; if(backW) bk.textContent='← '+(backW===1?'Isle of Six Crowns':backW===3?'The Deep Dark':'Outer Isles');
+    $('#mapScr').classList.toggle('w2',mapWorld===2); $('#mapScr').classList.toggle('w3',mapWorld===3); $('#mapScr').classList.toggle('w4',mapWorld===4); $('#mapScr').classList.toggle('w5',mapWorld===5); $('#mapScr').classList.toggle('w6',mapWorld===6); $('#mapScr').classList.toggle('w7',mapWorld===7); $('#mapScr').classList.toggle('hasworld',!wb.hidden||!bk.hidden);
+    $('#mapScr h2').textContent={1:'The Isle',2:'The Outer Isles',3:'The Deep Dark',4:'The Shift Dimension',5:'The Forge',6:'The Void',7:'The Core of Creations'}[mapWorld];}
   $('#mapPower').textContent=ST.power; $('#mapShards').textContent=SAVE.shards; $('#mapShardIco').src=iconURL('shard','#7fe0c8','#e8fff8');
   const box=$('#nodes'); box.innerHTML='';
   BIOMES.forEach((B,bi)=>{if(bi===6&&!EVENT_ACTIVE()) return; if(worldOf(bi)!==mapWorld) return; if(B.lab){const d=document.createElement('div'); d.className='biome-label'; d.style.left=B.lab[0]/10+'%'; d.style.top=B.lab[1]/6.4+'%'; d.textContent=B.name; box.appendChild(d); return;} const a=B.ang*Math.PI/180, rr=bi<5?.74:0; let lx=500+Math.cos(a)*rr*400, ly=322+Math.sin(a)*rr*260+(bi===5?-95:0); if(bi===6){lx=905; ly=166;}
@@ -2600,7 +2823,7 @@ function openMap(){if(!MP.peer) setTimeout(initMP,100); renderPartyHud(); mode='
   {const mk=(x,y,cls,label,title,go)=>{const pb=document.createElement('button'); pb.className='mapportal '+cls; pb.style.left=x/10+'%'; pb.style.top=y/6.4+'%'; pb.title=title; pb.setAttribute('aria-label',title);
       pb.innerHTML='<i></i><span>'+label+'</span>'; pb.onclick=()=>{mapWorld=go; selNode=null; openMap();}; box.appendChild(pb);};
     if(mapWorld===3&&worldOpen(4)){mk(520,290,'shift','The Shift','Enter the portal to the Shift Dimension',4); mk(640,250,'forge','The Forge','Enter the portal to the Forge',5); mk(760,290,'void','The Void','Enter the portal to the Void',6);}
-    else if(mapWorld>=4) mk(670,322,mapWorld===5?'forge':mapWorld===6?'void':'shift','Back to the Deep Dark','Return through the portal to the Deep Dark',3);}
+    else if(mapWorld>=4&&mapWorld<=6) mk(670,322,mapWorld===5?'forge':mapWorld===6?'void':'shift','Back to the Deep Dark','Return through the portal to the Deep Dark',3);}
   let svg=''; for(let i=1;i<NODES.length;i++){const a=NODES[i-1],b=NODES[i]; if(b.bi===5&&b.li===0&&a.bi!==4) continue; if(b.bi===6&&(b.li===0||!EVENT_ACTIVE())) continue; if(worldOf(a.bi)!==mapWorld||worldOf(b.bi)!==mapWorld) continue; const done=SAVE.cleared[levelKey(a.bi,a.li)];
     svg+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${done?'#f0b84a':'rgba(255,255,255,.35)'}" stroke-width="4" stroke-dasharray="8 8"/>`;}
   $('#paths').innerHTML=svg;
@@ -2621,8 +2844,8 @@ function selectNode(n,el,silent){selNode=n; document.querySelectorAll('.node.sel
   if(un&&n.li===0&&SAVE.intros&&SAVE.intros[n.bi]){const ib=document.createElement('button'); ib.className='btn small'; ib.textContent='Enter with region intro'; ib.onclick=()=>startLevel(n.bi,0,true); p.appendChild(ib);}
   if(un){const g=$('#goBtn'); if(MP.party&&MP.party.members.length>1&&MP.role!=='host'){g.disabled=true; g.textContent='Party leader picks the level';} else if(MP.party&&MP.party.members.length>1) g.textContent=`Enter with party (${MP.party.members.length})`; g.onclick=()=>playLevel(n.bi,n.li); if(!silent) g.focus();}}
 $('#mapMenu').onclick=toMenu;
-$('#mapWorldBtn').onclick=()=>{mapWorld=Math.min(3,mapWorld+1); selNode=null; openMap();};
-$('#mapWorldBack').onclick=()=>{mapWorld=Math.max(1,mapWorld-1); selNode=null; openMap();};
+$('#mapWorldBtn').onclick=()=>{mapWorld=mapWorld===3?7:Math.min(3,mapWorld+1); selNode=null; openMap();};
+$('#mapWorldBack').onclick=()=>{mapWorld=mapWorld===7?3:Math.max(1,mapWorld-1); selNode=null; openMap();};
 $('#mapInv').onclick=()=>openInv();
 $('#mapDiff').onclick=()=>{const o=['easy','normal','hard']; SAVE.diff=o[(o.indexOf(SAVE.diff||'normal')+1)%3]; renderDiff(); persist(); toast('Difficulty: '+DF().name+(SAVE.diff==='easy'?' · monsters hit softer and move slower':SAVE.diff==='hard'?' · monsters hit harder and move faster':' · normal'));};
 $('#mapShop').onclick=()=>openShop(); $('#mapFriends').onclick=()=>openFriends(); $('#btnFriends').onclick=()=>openFriends(); $('#friendsClose').onclick=()=>closeFriends(); $('#shopClose').onclick=()=>closeShop();
@@ -2716,7 +2939,7 @@ $('#pInv').onclick=()=>{$('#pause').hidden=true; mode='play'; openInv();};
 $('#pQuit').onclick=()=>{$('#pause').hidden=true; persist(); openMap();};
 function showResult(kind){persist(); mode='result'; $('#result').hidden=false; const B=BIOMES[run.bi];
   const t=Math.round(run.time), mm=Math.floor(t/60), ss=String(t%60).padStart(2,'0');
-  if(kind==='clear'){$('#resTitle').textContent=L.boss?'Crown claimed':'Level cleared'; $('#resSub').textContent=L.boss?`${B.name} is free. ${run.bi===18?'The Forge falls quiet. Every fire is out and every hammer is still.':run.bi===22?'The Void is sealed. Even the Endless has an ending.':run.bi===14?'The Shift Dimension is saved. Every land, every sea and every song is free.':run.bi===10?'The great portal is open. Choose the Shift, the Forge or the Void on the map.':run.bi===9?'The Outer Isles are safe. Press → on the map to descend into the Deep Dark.':run.bi>=7?BIOMES[run.bi+1].name+' is now open.':run.bi===6?'Hollowshade Isle is yours. Happy Halloween!':run.bi<4?BIOMES[run.bi+1].name+' is now open.':'The Hollow Spire is now open.'}`:`${L.name} · ${B.name}`;}
+  if(kind==='clear'){$('#resTitle').textContent=L.boss?'Crown claimed':'Level cleared'; $('#resSub').textContent=L.boss?`${B.name} is free. ${run.bi===27?'The Shapeless One is still at last. The Core of Creations is whole again, and every world is safe.':run.bi===18?'The Forge falls quiet. Every fire is out and every hammer is still.':run.bi===22?'The Void is sealed. Even the Endless has an ending.':run.bi===14?'The Shift Dimension is saved. Every land, every sea and every song is free.':run.bi===10?'The great portal is open. Choose the Shift, the Forge or the Void on the map.':run.bi===9?'The Outer Isles are safe. Press → on the map to descend into the Deep Dark.':run.bi>=7?BIOMES[run.bi+1].name+' is now open.':run.bi===6?'Hollowshade Isle is yours. Happy Halloween!':run.bi<4?BIOMES[run.bi+1].name+' is now open.':'The Hollow Spire is now open.'}`:`${L.name} · ${B.name}`;}
   else if(kind==='victory'){$('#resTitle').textContent='The isle is saved'; $('#resSub').textContent='All six crowns are free. A new map has opened: press the → button at the bottom right of the map to sail to the Outer Isles.';}
   else {$('#resTitle').textContent='You fell'; $('#resSub').textContent='Loot you picked up is kept. Try equipping stronger gear or roll through telegraphed rings.';}
   $('#resStats').innerHTML=`<dt>Time</dt><dd>${mm}:${ss}</dd><dt>Enemies defeated</dt><dd>${run.kills}</dd><dt>Items found</dt><dd>${run.items}</dd><dt>Shards collected</dt><dd>${run.shards}</dd>`;
@@ -2748,6 +2971,11 @@ const STORY={
  20:{lines:['The Shattered Rift. Here the Void broke into a thousand glowing pieces.','The Rift Weaver stitches the pieces into traps.'],hero:'Watch your step. Every step.'},
  21:{lines:['The Null Gardens. Pale flowers bloom where colour goes to die.','At the centre, the Null Bloom drinks the light.'],hero:'Flowers again. Why is it always flowers.'},
  22:{lines:['The Endless Edge. The last place before nothing at all.','The Endless One waits where the paths stop.'],hero:'One more step. Then it is over.'},
+ 23:{lines:['The Core of Creations. At the centre of every world lies the place where worlds are made.','First, the Core of Knowledge: a library with no end, guarded by a book that has read everything.'],hero:'Quiet in the library. Got it.'},
+ 24:{lines:['The Core of Destruction. Everything that is made can be unmade, and here it is.','Its god breaks walls, rocks and anything that stands still too long.'],hero:'Keep moving. Do not hide behind rocks.'},
+ 25:{lines:['The Core of Immunity. White stone and bright light that protects the Core.','Its Seraph raises walls of light from nothing.'],hero:'So bright. Look for the gaps.'},
+ 26:{lines:['The Core of Infection. A swamp of rot that spreads into everything.','Do not step in the green pools. The Blight Mother leaves them everywhere.'],hero:'Gross. Watch your feet.'},
+ 27:{lines:['The Core of Forms. The heart of creation, where nothing keeps its shape.','The Shapeless One waits here. It will change three times before the end.'],hero:'Three forms. One of me. Let\'s go.'},
  14:{lines:["Singer's Meadows. The last land of the Shift Dimension, where a song once held the world together.",'Now the song is corrupted. Sculk-infected and soul-corrupted creatures march to the Corrupted Singer.'],hero:'One last verse. Let\'s end it.'}};
 const BOSS_STORY={
  bramble:{ep:'Lord of Thorns',stir:'The brambles part. Something huge is walking on roots.',taunt:'Another sapling for my garden. Kneel, and grow.'},
@@ -2772,6 +3000,13 @@ const BOSS_STORY={
  riftweaver:{ep:'Spinner of Broken Paths',stir:'Threads of light snap tight across the rift. Something is pulling them.',taunt:'Every path you walk, I wove. Every path ends in my web.'},
  nullbloom:{ep:'Flower of Nothing',stir:'Every pale flower turns toward you. In the middle, one enormous bud begins to open.',taunt:'Shh. Let the colour fade. Let everything fade.'},
  endlessone:{ep:'At the End of Everything',stir:'The stars go out, one by one, until only two remain. They are eyes.',taunt:'Before the first world, I was. After the last one, I will be.'},
+ ancienttome:{ep:'Keeper of All Knowledge',stir:'Dust lifts from the shelves. Somewhere, ten thousand pages begin to turn at once.',taunt:'I have read every ending. Yours is on page one.'},
+ godofdestruction:{ep:'Breaker of Worlds',stir:'The ground splits. Rocks lift into the air and shatter before they fall.',taunt:'Walls. Mountains. Worlds. Everything breaks. You will too.'},
+ radiantseraph:{ep:'Light That Guards the Core',stir:'Warm light pours from above. Two enormous wings unfold, then four, then six.',taunt:'Nothing passes my light. Not stone, not fire, not you.'},
+ blightmother:{ep:'Mother of the Infection',stir:'The marsh bubbles. Something huge and swollen is breathing beneath it.',taunt:'Come closer, little one. Mother has so much to share.'},
+ forms1:{ep:'Form of Stone',stir:'The floor ripples like water. It rises, folding into a shape that cannot decide what it is.',taunt:'This is only my first shape. You will not see my last.'},
+ forms2:{ep:'Form of Flame',stir:'',taunt:'Stone was patient. Fire is not.'},
+ forms3:{ep:'Form of Stars',stir:'',taunt:'I was every shape before the first world. Now I am all of them.'},
  corruptedsinger:{ep:'Voice of the Broken Song',stir:'A beautiful note rings out... then cracks into a scream.',taunt:'Listen closely. This is the last song you will ever hear.'}};
 let cine=null;
 const easeIO=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2, lerp=(a,b,t)=>a+(b-a)*t;
@@ -2799,7 +3034,7 @@ cEl.addEventListener('click',e=>{if(e.target.closest('#cSkip')) return; cineAdva
 $('#cSkip').addEventListener('click',e=>{e.stopPropagation(); endCine();});
 function heroShot(text,dur=3.4){const px=P.x*S,pz=P.y*S; return {dur,speaker:profileName()||'You',text,enter(){P.face=Math.PI/2;},cam:dolly([px+.6,1.9,pz+2.6,px,1.0,pz],[px+.2,7.5,pz+6,px,.5,pz])};}
 function biomeCine(bi){const st=STORY[bi],B=BIOMES[bi],px=P.x*S,pz=P.y*S;
-  const shots=[{dur:4.6,title:B.name,sub:bi<5?`Region ${bi+1} of 6`:bi===6?'Halloween event · until October 31':bi>=11?`${WORLD_NAME[BIOMES[bi].world]} · Region ${bi-(bi>=19?18:bi>=15?14:10)} of 4`:bi===10?'Beneath the world':bi>=7?`The Outer Isles · Region ${bi-6} of 3`:'The final region',text:st.lines[0],cam:orbit(px,pz,12,13,-.4,.8,0)}];
+  const shots=[{dur:4.6,title:B.name,sub:bi<5?`Region ${bi+1} of 6`:bi===6?'Halloween event · until October 31':bi>=23?`The Core of Creations · Core ${bi-22} of 5`:bi>=11?`${WORLD_NAME[BIOMES[bi].world]} · Region ${bi-(bi>=19?18:bi>=15?14:10)} of 4`:bi===10?'Beneath the world':bi>=7?`The Outer Isles · Region ${bi-6} of 3`:'The final region',text:st.lines[0],cam:orbit(px,pz,12,13,-.4,.8,0)}];
   let tgt=null,bd=1e9; for(const e of ents){const d=dist(e,P); if(d>150&&d<bd){bd=d;tgt=e;}}
   if(tgt){const ex=tgt.x*S,ez=tgt.y*S; shots.push({dur:4.4,text:st.lines[1],label:`${tgt.name} · ${ROLE[tgt.type][0]}`,enter(){tgt.face=Math.PI/2;},cam:dolly([ex+3,3.4,ez+4.6,ex,.7,ez],[ex+1,1.7,ez+2.6,ex,.8,ez])});}
   else shots.push({dur:4.4,text:st.lines[1],cam:orbit(px,pz,8,6,1,2,0)});
@@ -2826,6 +3061,11 @@ const CFX={
   rain(b,c){for(let i=0;i<3;i++){const x=b.x+rand(-280,280),y=b.y+rand(-220,220); FXP(x,y,320,0,0,-520,c[i%c.length],.7,8); if(Math.random()<.35) puff(x,y,c[0],6,120,.4,5);}},
   bolts(b){bolt({x:b.x+rand(-260,260),y:b.y+rand(-200,200)}); flashT=.12; flashCol='#e8f8ff'; shake(4);},
   souls(b,c){for(let i=0;i<6;i++){const a=rand(-.8,.8)+(b.face||0); FXP(b.x+Math.cos(b.face||0)*b.r*.5,b.y+Math.sin(b.face||0)*b.r*.5,b.r*1.1,Math.cos(a)*rand(60,200),Math.sin(a)*rand(60,200),rand(80,220),c[i%c.length],1.3,rand(5,8));}},
+  pages(b,c,t){for(let k=0;k<4;k++){const a=Math.random()*TAU, r=rand(30,90); FXP(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r,rand(30,90),Math.cos(a+1.4)*220,Math.sin(a+1.4)*220,rand(40,140),k%2?'#fff8e8':c[k%c.length],1.2,rand(5,8));}},
+  debris(b,c){for(let i=0;i<8;i++){const a=Math.random()*TAU,s2=rand(120,320); FXP(b.x,b.y,20,Math.cos(a)*s2,Math.sin(a)*s2,rand(200,420),i%3?'#6a5a50':c[0],1.1,rand(7,11));} shake(5);},
+  lightwalls(b,c){for(let i=0;i<3;i++){const a=Math.random()*TAU, r=rand(90,220), x=b.x+Math.cos(a)*r, y=b.y+Math.sin(a)*r; for(let k=0;k<10;k++) FXP(x+rand(-8,8),y+rand(-8,8),k*14,0,0,rand(150,260),k%2?'#ffffff':c[0],.9,7);}},
+  poison(b,c){for(let i=0;i<6;i++){const a=Math.random()*TAU,s2=rand(80,240); FXP(b.x,b.y,b.r*1.4,Math.cos(a)*s2,Math.sin(a)*s2,rand(160,320),c[i%c.length],1.2,rand(6,10));} if(Math.random()<.5) puff(b.x+rand(-160,160),b.y+rand(-120,120),c[0],10,90,.8,6);},
+  shift(b,c,t){const cols=['#7af0ff','#ffa030','#ffffff','#b48cff']; for(let k=0;k<5;k++){const a=t*5+k*TAU/5, r=60+Math.sin(t*3+k)*30; FXP(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r,20+k*12,Math.cos(a)*90,Math.sin(a)*90,80,cols[(k+((t*4)|0))%4],.7,8);}},
   quake(b,c){puff(b.x+rand(-200,200),b.y+rand(-160,160),c[0],10,160,.6,6); shake(5);}};
 const BOSS_FX={bramble:{c:['#7fb04f','#c9ff6a','#4a6b2a'],a:['ring','burst']},sultan:{c:['#f0d08a','#e2c387','#ffd98a'],a:['spiral','quake']},
   witch:{c:['#b7f06a','#8e7aa8','#d8ff6a'],a:['burst','spiral']},warden:{c:['#cfefff','#ffffff','#9fd3e8'],a:['rain','ring']},
@@ -2835,11 +3075,14 @@ const BOSS_FX={bramble:{c:['#7fb04f','#c9ff6a','#4a6b2a'],a:['ring','burst']},su
   lanternmaw:{c:['#9fffd0','#d8ff6a','#bff8ff'],a:['spiral','burst']},echotyrant:{c:['#7af0ff','#b48cff','#e8fff8'],a:['souls','spiral']},
   sculkmonstrosity:{c:['#2affe0','#5affff','#0c2a30'],a:['burst','quake']},monarch:{c:['#7affb0','#2affe0','#c04aff'],a:['spiral','rain']},
   harmonizer:{c:['#ffd8f0','#ffe86a','#8ad05a'],a:['spiral','burst']},corruptedsinger:{c:['#b47aff','#2affe0','#ffd8f0'],a:['ring','spiral']},
+  ancienttome:{c:['#ffd36a','#fff2d0','#7ab0ff'],a:['pages','spiral']},godofdestruction:{c:['#ff3a1a','#8a7060','#ffb03a'],a:['debris','quake']},
+  radiantseraph:{c:['#fff2b0','#ffffff','#ffd36a'],a:['lightwalls','ring']},blightmother:{c:['#9aff3a','#c8ff6a','#4a6a1a'],a:['poison','burst']},
+  forms1:{c:['#7af0ff','#ffa030','#ffffff'],a:['shift','quake']},forms2:{c:['#ffa030','#ff4a1a','#ffd84a'],a:['burst','spiral']},forms3:{c:['#ffffff','#b48cff','#7af0ff'],a:['spiral','shift']},
   foundrycolossus:{c:['#ff7a1a','#ffb03a','#ffd84a'],a:['quake','rain']},brimstonewyrm:{c:['#ffcc3a','#ff8a2a','#ff4a1a'],a:['burst','spiral']},ironwarlord:{c:['#ff4a2a','#c8c8d0','#ff8a3a'],a:['ring','quake']},
   forgeking:{c:['#ffd040','#ff6a1a','#ffffff'],a:['rain','ring']},hollowwatcher:{c:['#d8b0ff','#ffffff','#7a4ad0'],a:['spiral','ring']},riftweaver:{c:['#7af0ff','#b48cff','#ffffff'],a:['spiral','burst']},
   nullbloom:{c:['#e8e0f0','#7a3ad0','#b48cff'],a:['burst','spiral']},endlessone:{c:['#ffffff','#b48cff','#e0d0ff'],a:['spiral','ring']}};
 function fxTick(b,heavy){const F=BOSS_FX[b.id]||BOSS_FX.bramble; let acc=0;
-  return (t,dt)=>{acc-=dt; if(acc>0) return; acc=heavy?.22:.4; for(const a of F.a){if(a==='spiral'||a==='rain'||a==='souls') CFX[a](b,F.c,t); else if(Math.random()<(heavy?.6:.35)) CFX[a](b,F.c,t);}};}
+  return (t,dt)=>{acc-=dt; if(acc>0) return; acc=heavy?.22:.4; for(const a of F.a){if(a==='spiral'||a==='rain'||a==='souls'||a==='shift'||a==='pages') CFX[a](b,F.c,t); else if(Math.random()<(heavy?.6:.35)) CFX[a](b,F.c,t);}};}
 // Entrance: summoning circle → the boss rises out of it → roar → it leaps and slams down → shows its power → taunt.
 function bossCine(b){const s=BOSS_STORY[b.id]||{ep:'',stir:'Something stirs.',taunt:'...'},bx=b.x*S,bz=b.y*S,px=P.x*S,pz=P.y*S,dx=px-bx,dz=pz-bz,dl=Math.hypot(dx,dz)||1,ux=dx/dl,uz=dz/dl,sc=b.r/13*.85,fa=Math.atan2(uz,ux);
   const F=BOSS_FX[b.id]||BOSS_FX.bramble; let circ=null, leap=null;
@@ -2859,6 +3102,7 @@ function bossCine(b){const s=BOSS_STORY[b.id]||{ep:'',stir:'Something stirs.',ta
    {dur:2.0,fast:true,speaker:b.name,text:s.taunt,enter(){b.spin=0; b.roar=0; shake(6);},tick(t,dt){if(Math.random()<.25) CFX.ring(b,F.c);},
     cam:k=>{const qx=b.x*S,qz=b.y*S,vx=P.x*S-qx,vz=P.y*S-qz,vl=Math.hypot(vx,vz)||1,wx=vx/vl,wz=vz/vl, r=lerp(5*sc,3.2*sc,k); return [qx+wx*r,lerp(2.2*sc,1.8*sc,k),qz+wz*r,qx,1.55*sc,qz];}}];
   shots.cleanup=()=>{if(circ){circ.remove(); circ=null;} b.cineHide=false; b.rise=1; b.jy=0; b.spin=0;};
+  if(b.id==='forms1') shots[1].sub='Form of Stone · Keeper of the Core of Forms';
   return shots;}
 function portalCine(){const ex=L.exit, gx=ex.x*S, gz=ex.y*S; ex.grow=0; const cols=['#3affe0','#b48cff','#ffffff'];
   return [{dur:3.0,title:'The Great Portal',sub:'The Deep Dark',text:'Deep below the city, the ancient portal shudders awake.',enter(){shake(6);},
@@ -2869,6 +3113,14 @@ function portalCine(){const ex=L.exit, gx=ex.x*S, gz=ex.y*S; ex.grow=0; const co
      cam:k=>[P.x*S+.8,2.2,P.y*S+3.2,gx,1.5,gz]},
    {dur:1.8,enter(){flashT=1.2; flashCol='#e8fff8'; shake(14); for(let i=0;i<60;i++){const a=Math.random()*TAU; FXP(ex.x,ex.y,60,Math.cos(a)*rand(100,400),Math.sin(a)*rand(100,400),rand(100,300),cols[i%3],1.2,7);} P.hideT=1;},
      tick(t){flashT=Math.max(flashT,.4*(1-t/1.8));}, cam:k=>[gx,lerp(2,1.4,k),gz+lerp(3,.6,k),gx,1.4,gz-1]}];}
+function formCine(b){const D=BOSSES[b.id], S2=BOSS_STORY[b.id]||{}, F=BOSS_FX[b.id]||BOSS_FX.bramble, sc=b.r/13*.85, fa=Math.atan2(P.y-b.y,P.x-b.x); let shell=null;
+  return [{dur:2.2,fast:true,text:'The Shapeless One shudders. Its shape cracks apart...',enter(){b.cineHide=false; b.spin=0; shake(10); flashT=.3; flashCol='#ffffff';},
+     tick(t,dt){b.spin=Math.sin(t*22)*.35*(t/2.2); b.jy=Math.abs(Math.sin(t*14))*.25*sc; CFX.shift(b,F.c,t); if(Math.random()<.4) shake(4); if(t>1.8&&!shell){shell=1; flashT=.8; flashCol=F.c[0]; b.rise=0; CFX.ring(b,F.c); CFX.burst(b,F.c);}},
+     cam:k=>{const a=fa+.6+k*.8, r=lerp(6*sc,4.5*sc,k); return [b.x*S+Math.cos(a)*r,lerp(2.4*sc,1.8*sc,k),b.y*S+Math.sin(a)*r,b.x*S,1.2*sc,b.y*S];}},
+   {dur:2.4,title:'The Shapeless One',sub:D.form,enter(){b.spin=0; b.jy=0; b.roar=1.8; shake(12);},tick(t,dt){b.rise=Math.min(1,(b.rise||0)+dt*1.6); fxTick(b,true)(t,dt); if(Math.random()<.3) CFX.ring(b,F.c);},
+     cam:orbit(b.x*S,b.y*S,4.2*sc,1.1*sc,fa-1.4,fa+.5,1.4*sc)},
+   {dur:1.8,fast:true,speaker:'The Shapeless One',text:S2.taunt||'...',enter(){b.rise=1; b.roar=0;},tick(){},
+     cam:k=>{const r=lerp(5*sc,3.4*sc,k); return [b.x*S+Math.cos(fa)*r,2*sc,b.y*S+Math.sin(fa)*r,b.x*S,1.5*sc,b.y*S];}}];}
 function transformCine(b){const bx=b.x*S,bz=b.y*S,sc=b.r/13; const dx=P.x-b.x,dz=P.y-b.y,dl=Math.hypot(dx,dz)||1,ux=dx/dl,uz=dz/dl,fa=Math.atan2(uz,ux); const F=BOSS_FX.sov2;
   return [{dur:2.2,title:'Form II',sub:'The Sovereign Unbound',enter(){flashT=.7; flashCol='#e0b0ff'; shake(12); puff(b.x,b.y,'#b45cff',70,280,1.2,7); CFX.ring(b,F.c);},tick:fxTick(b,true),cam:orbit(bx,bz,5*sc,2*sc,0,TAU*.7,1.6*sc)},
    {dur:2.0,fast:true,speaker:'The Sovereign Unbound',text:'You thought the mask was me?',enter(){b.roar=1.6; CFX.burst(b,F.c);},tick:fxTick(b,false),cam:dolly([bx+ux*5*sc,2.2*sc,bz+uz*5*sc,bx,1.6*sc,bz],[bx+ux*3.2*sc,1.8*sc,bz+uz*3.2*sc,bx,1.7*sc,bz])},
@@ -3358,7 +3610,8 @@ function onMsg(code,m){if(!m||typeof m!=='object') return; const H=MP.role==='ho
   case 'hurt': if(C&&MP.inGame&&mode!=='cutscene') hurtP(m.d,{slow:m.slow}); break;
   case 'kill': if(C&&MP.inGame) netKill(m); break;
   case 'bdown': if(C&&MP.inGame) netBossDown(m); break;
-  case 'cine': if(C&&MP.inGame&&boss){if(m.k==='boss') startCine(bossCine(boss),()=>{$('#bossBar').hidden=false;}); else if(m.k==='trans'){L.form2=true; startCine(transformCine(boss),()=>{});}} break;
+  case 'blk': if(C&&MP.inGame) netBlock(m); break;
+  case 'cine': if(C&&MP.inGame&&boss){if(m.k==='boss') startCine(bossCine(boss),()=>{$('#bossBar').hidden=false;}); else if(m.k==='trans'){L.form2=true; startCine(transformCine(boss),()=>{});} else if(m.k==='form') shiftForm(boss,m.id,true);} break;
   case 'complete': if(H){bcast({t:'complete'});} if((H||C)&&MP.inGame&&run&&!run.done) completeLevel(true); break;
   case 'wipe': if(C&&MP.inGame&&run&&!run.done) run.endT=1.2; break;
   case 'banner': if(C&&MP.inGame) banner(m.a,m.b); break;
