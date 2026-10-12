@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0b1a22">
 <title>Isle of Six Crowns</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,11 @@
 }
 [hidden]{display:none!important}
 html,body{height:100%;overflow:hidden;background:var(--sea);color:var(--ink);font-family:var(--body);font-size:15px}
-body{touch-action:none;user-select:none;-webkit-user-select:none}
+html,body{touch-action:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+/* never zoom: menus can still scroll, but double-tap and pinch zoom are off; the game HUD takes every touch */
+.screen *,.overlay *{touch-action:pan-x pan-y}
+#hud,#hud *,#game,#gl,#joy,.tbtns,.tbtns *{touch-action:none!important}
 #gl{position:fixed;inset:0;width:100%;height:100%;display:block}
 #game{position:fixed;inset:0;display:block}
 .mobs{margin:0;padding:0;list-style:none;display:grid;gap:3px;font-size:13px}
@@ -628,6 +632,14 @@ const cross=(pt,t,x)=>pt<x&&t>=x;
 let UIDN=1; const uid=()=>Date.now().toString(36)+'-'+(UIDN++);
 const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const TOUCH=matchMedia('(pointer: coarse)').matches;
+// Stop phones and tablets from zooming in when the screen is tapped quickly or pinched.
+(()=>{const vp=document.querySelector('meta[name=viewport]')||document.head.appendChild(Object.assign(document.createElement('meta'),{name:'viewport'}));
+  vp.content='width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover';
+  const typing=t=>t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable);
+  for(const ev of ['gesturestart','gesturechange','gestureend']) document.addEventListener(ev,e=>e.preventDefault(),{passive:false});
+  document.addEventListener('touchmove',e=>{if(e.touches.length>1||(e.scale&&e.scale!==1)) e.preventDefault();},{passive:false});
+  document.addEventListener('dblclick',e=>{if(!typing(e.target)) e.preventDefault();},{passive:false});
+  let lastEnd=0; document.addEventListener('touchend',e=>{const now=performance.now(); if(now-lastEnd<350&&!typing(e.target)&&e.cancelable){e.preventDefault(); const t=e.target.closest&&e.target.closest('button,a,[role=button],.cell,.node,.slot'); if(t&&!t.disabled&&!e.target.closest('#hud')) t.click();} lastEnd=now;},{passive:false});})();
 if(TOUCH) document.body.classList.add('touch');
 const KEY='isle6crowns.v1';
 const T=40, WALLH=18;
@@ -1094,7 +1106,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='3.2.0', SAVE_VERSION=6;
+const APP_VERSION='3.2.1', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
