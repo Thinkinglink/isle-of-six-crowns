@@ -27,6 +27,7 @@ Open **Friends & Party** from the main menu or the map (key **F**).
 - **Invite:** press **Invite** next to an online friend. Up to 4 players, on any mix of Windows, Mac, Android, iPhone and iPad.
 - **Harder together:** mobs in every level and boss health are multiplied by the number of players (2 players = ×2, 4 players = ×4).
 - The party leader picks the level. Everyone gets their own loot, and a fallen player gets back up next to a teammate.
+- If a friend takes you to an island you haven't reached yet, you keep the loot, but it doesn't count as cleared for you. You still unlock islands in order on your own save.
 
 ## 🌊 The Outer Isles
 
