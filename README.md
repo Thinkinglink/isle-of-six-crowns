@@ -80,7 +80,7 @@ Select any weapon, armor or artifact in your Pack and press **✦ Enchant** (abo
 
 ## 🐺 Summoning artifacts
 
-50 new artifacts summon allies that fight beside you: wolves, golems, knights, skeleton archers, exploding mites, healing sprites and more. Every boss of the Outer Isles and the Shift Dimension now drops its own guardian summoning artifact as well as its normal one. Every summoned pet has its own health bar and stays with you until it is defeated (up to 10 at a time).
+50 new artifacts summon allies that fight beside you: wolves, golems, knights, skeleton archers, exploding mites, healing sprites and more. Every boss of the Outer Isles and the Shift Dimension now drops its own guardian summoning artifact as well as its normal one. Every summoned pet has its own health bar and stays with you until it is defeated (up to 10 at a time). Pets tear through regular monsters but only chip away at bosses.
 
 ## ✨ The Core of Creations
 
@@ -106,3 +106,7 @@ Open it from the map with **Shop** (key **B**): weekly limited weapons, armor an
 ## Updates
 
 The game updates itself when you open it, on every device. Your progress is always kept.
+
+## 🎬 Boss defeat cutscenes
+
+Every boss now gets its own defeat cutscene: its last words, its collapse, souls rising out of the arena, and a final word from you.

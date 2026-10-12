@@ -1115,7 +1115,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='3.3.0', SAVE_VERSION=6;
+const APP_VERSION='3.4.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1282,7 +1282,7 @@ function hurtP(d,o={}){if(P.ally){const a=P; if(a.hp<=0||a.iframe>0) return; d=M
   if(P.ward>0) d*=.25; d=Math.max(1,Math.round(d*(1-ST.red)));
   P.hp-=d; P.iframe=.35; P.flash=.15; P.hurtT=.25; shake(5); sparks(P.x,P.y,Math.random()*TAU,'#ff7a6a',6,20); ftext(P.x,P.y-36,'-'+d,'#ff7a6a'); if(o.slow) P.slow=1.6;
   if(P.hp<=0){P.hp=0; P.dead=true; P.deadAt=time; puff(P.x,P.y-10,'#e2504a',30,180,1,5); if(inCoop()) P.respawnT=6; else run.endT=1.6;}}
-function hurtE(e,d,o={}){if(e.inv||e.hp<=0) return; let crit=false; if(o.melee&&Math.random()<ST.crit){d*=2;crit=true;}
+function hurtE(e,d,o={}){if(e.inv||e.hp<=0) return; if(o.pet) d*=(e===boss||e.isBoss)?PET_BOSS:PET_MOB; let crit=false; if(o.melee&&Math.random()<ST.crit){d*=2;crit=true;}
   if(o.melee&&ST.exec&&e.hp<e.max*.3) d*=1.5; d=Math.round(d);
   if(MP.role==='client'&&MP.inGame&&(e.mirror)){const kb=e.isBoss?0:(o.melee?(ST.stun?260:160):80);
     toHost({t:'hit',id:e.isBoss?'boss':e.id,d,kb,burn:(o.melee&&ST.burn)||o.burn?1:0,slowT:o.melee&&ST.frost?1.6:(o.slowT||0),stun:o.stun||(o.melee&&ST.stun?.7:0)});
@@ -1416,9 +1416,10 @@ function bossDown(b,fromNet){
   dropLoot(b.x,b.y,{kind:'arrows',amt:12});
   for(const sl of ['weapon','armor','artifact']) dropLoot(b.x,b.y,{kind:'item',item:bossItem(sl,b.id,L.tier)});
   {const gs=CAT.uart.find(e=>e.bossSummon===b.id&&!e.ev); if(gs){const it=mkCatItem(gs,'uart',L.tier,'unique'); it.pot=+(it.pot*1.12).toFixed(2); it.pow=Math.round(it.pow*1.12); it.boss=b.id; dropLoot(b.x,b.y,{kind:'item',item:it});}}
-  if(b.id==='sov2'){banner('The Sovereign falls','All six crowns are yours'); if(!run.guest){SAVE.cleared[L.bi+'-'+L.li]=true; SAVE.won=true;} persist(); run.victory=true; startCine(victoryCine(b),()=>{L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T,final:true}; banner('Collect your loot','Then step into the portal');});}
-  else if(b.id==='echotyrant'){L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T,big:true,cine:true}; banner('The Echo Tyrant falls','Collect your loot, then enter the great portal');}
-  else {banner('Guardian defeated','Collect your loot, then enter the portal'); L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T};}
+  b.fallCine=true; b.deadAt=null;
+  if(b.id==='sov2'){banner('The Sovereign falls','All six crowns are yours'); if(!run.guest){SAVE.cleared[L.bi+'-'+L.li]=true; SAVE.won=true;} persist(); run.victory=true; const vs=victoryCine(b), ds=defeatCine(b,true); const all=ds.concat(vs); all.cleanup=ds.cleanup; startCine(all,()=>{L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T,final:true}; banner('Collect your loot','Then step into the portal');});}
+  else if(b.id==='echotyrant') startCine(defeatCine(b),()=>{L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T,big:true,cine:true}; banner('The Echo Tyrant falls','Collect your loot, then enter the great portal');});
+  else startCine(defeatCine(b),()=>{banner('Guardian defeated','Collect your loot, then enter the portal'); L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T};});
 }
 function finishTransform(){const D=BOSSES.sov2,b=boss; Object.assign(b,{id:'sov2',name:D.name,r:D.r,spd:D.spd,c1:D.c1,c2:D.c2,acts:D.acts,max:Math.round(D.hp*(1+.6*5))*(L.mpN||1),inv:false,cd:1.2,form:2,last:null});
   b.hp=b.max; L.form2=true; b.face=angTo(b,P); startCine(transformCine(b),()=>{radial(b,24,200,8*b.dm,'#d48cff'); shake(8);}); if(MP.role==='host'&&MP.inGame) bcast({t:'cine',k:'trans'});}
@@ -1516,6 +1517,7 @@ function summonAllies(it){const D=MINIONS[it.minion]||MINIONS.wolf, n=it.count||
     puff(P.x+Math.cos(a)*44,P.y+Math.sin(a)*44,D.c2,14,140,.6,5);}
   for(let i=0;i<30;i++){const a=i/30*TAU; parts.push({x:P.x+Math.cos(a)*24,y:P.y+Math.sin(a)*24,z:6,vx:Math.cos(a)*240,vy:Math.sin(a)*240,vz:40,life:.5,max:.5,col:i%2?D.c2:'#c8b0ff',sz:6});}
   toast(`Summoned ${n>1?n+' × ':''}${D.n}`,D.c2);}
+const PET_MOB=3.5, PET_BOSS=.2; // pets shred monsters but only scratch bosses
 function updAllies(dt){if(!allies.length) return; const tg=targets();
   for(const a of allies){a.cd-=dt; a.flash=Math.max(0,a.flash-dt); a.iframe=Math.max(0,(a.iframe||0)-dt); if(a.hp<=0) a.life=0;
     let t=null,bd=520; for(const e of tg){const d=Math.hypot(e.x-a.x,e.y-a.y); if(d<bd&&Math.hypot(e.x-P.x,e.y-P.y)<560){bd=d;t=e;}}
@@ -1523,11 +1525,11 @@ function updAllies(dt){if(!allies.length) return; const tg=targets();
     if(Math.hypot(P.x-a.x,P.y-a.y)>700){a.x=P.x+a.ox*40; a.y=P.y+a.oy*40;}
     if(!t||P.dead){a.state=go(P.x+a.ox*60,P.y+a.oy*60,a.spd*1.1)?'chase':'idle'; continue;}
     const d=bd, reach=a.r+t.r+10;
-    if(a.role==='melee'){ if(d>reach){go(t.x,t.y,a.spd); a.state='chase';} else {a.face=Math.atan2(t.y-a.y,t.x-a.x); a.state=a.cd>.55?'wind':'idle'; if(a.cd<=0){a.cd=.85; hurtE(t,a.dmg,{}); puff(t.x,t.y-t.r,a.c2,5,90,.3,3);}}}
-    else if(a.role==='bomb'){ if(d>reach){go(t.x,t.y,a.spd); a.state='chase';} else {a.life=0; for(const e of tg) if(Math.hypot(e.x-a.x,e.y-a.y)<95+e.r) hurtE(e,a.dmg,{}); puff(a.x,a.y-8,'#ffb24a',26,220,.6,6); puff(a.x,a.y-8,a.c2,14,160,.5,5); shake(4);}}
+    if(a.role==='melee'){ if(d>reach){go(t.x,t.y,a.spd); a.state='chase';} else {a.face=Math.atan2(t.y-a.y,t.x-a.x); a.state=a.cd>.55?'wind':'idle'; if(a.cd<=0){a.cd=.85; hurtE(t,a.dmg,{pet:true}); puff(t.x,t.y-t.r,a.c2,5,90,.3,3);}}}
+    else if(a.role==='bomb'){ if(d>reach){go(t.x,t.y,a.spd); a.state='chase';} else {a.life=0; for(const e of tg) if(Math.hypot(e.x-a.x,e.y-a.y)<95+e.r) hurtE(e,a.dmg,{pet:true}); puff(a.x,a.y-8,'#ffb24a',26,220,.6,6); puff(a.x,a.y-8,a.c2,14,160,.5,5); shake(4);}}
     else { const want=a.role==='heal'?Math.min(d,140):190; if(d>want+30){go(t.x,t.y,a.spd); a.state='chase';} else if(d<want-60){go(a.x-(t.x-a.x),a.y-(t.y-a.y),a.spd*.7); a.state='chase';} else a.state='idle';
       a.face=Math.atan2(t.y-a.y,t.x-a.x);
-      if(a.cd<=0){a.cd=a.role==='heal'?1.6:1.2; a.state='wind'; const an=Math.atan2((t.y-t.r)-(a.y-12),t.x-a.x); projs.push({x:a.x,y:a.y-12,vx:Math.cos(an)*520,vy:Math.sin(an)*520,dmg:Math.round(a.dmg),r:5,col:a.shot,own:'p',life:1.4,arrow:a.feat==='skeleton'||a.feat==='hooded'});}
+      if(a.cd<=0){a.cd=a.role==='heal'?1.6:1.2; a.state='wind'; const an=Math.atan2((t.y-t.r)-(a.y-12),t.x-a.x); projs.push({x:a.x,y:a.y-12,vx:Math.cos(an)*520,vy:Math.sin(an)*520,dmg:Math.round(a.dmg),pet:true,r:5,col:a.shot,own:'p',life:1.4,arrow:a.feat==='skeleton'||a.feat==='hooded'});}
       if(a.role==='heal'&&!P.dead){a.ht=(a.ht||0)-dt; if(a.ht<=0){a.ht=2.5; const h=Math.max(3,Math.round(ST.maxhp*.04)); if(P.hp<ST.maxhp){P.hp=Math.min(ST.maxhp,P.hp+h); ftext(P.x,P.y-40,'+'+h,'#8fd06a');} puff(P.x,P.y-10,a.c1,6,60,.5,3);}}}
   }
   for(const a of allies) if(a.life<=0&&a.role!=='bomb'){puff(a.x,a.y-10,a.c2,16,140,.6,5); sparks(a.x,a.y,Math.random()*Math.PI*2,'#ffffff',8,a.r); toast(a.name+' was defeated',a.c2);}
@@ -1550,7 +1552,7 @@ function updProjs(dt){
       if(solid(p.x,p.y+10)){p.life=0; puff(p.x,p.y,p.col,4,60,.25,3); break;}
       if(p.mirror) continue;
       if(p.arrow&&p.own==='p'&&s===0&&Math.random()<.7) parts.push({x:p.x,y:p.y+12,z:12,vx:-p.vx*.05,vy:-p.vy*.05,vz:0,life:.16,max:.16,col:'#fff3d0',sz:3});
-      if(p.own==='p'){ for(const e of targets()){ if(Math.hypot(e.x-p.x,(e.y-e.r)-p.y)<e.r+p.r+4){hurtE(e,p.dmg,{}); sparks(p.x,p.y+e.r,Math.atan2(p.vy,p.vx)+Math.PI,'#fff3d0',6,e.r); p.life=0; break;} } }
+      if(p.own==='p'){ for(const e of targets()){ if(Math.hypot(e.x-p.x,(e.y-e.r)-p.y)<e.r+p.r+4){hurtE(e,p.dmg,{pet:!!p.pet}); sparks(p.x,p.y+e.r,Math.atan2(p.vy,p.vx)+Math.PI,'#fff3d0',6,e.r); p.life=0; break;} } }
       else { for(const pl of foes()) if(Math.hypot(pl.x-p.x,(pl.y-12)-p.y)<pl.r+p.r-2){ if(!(pl.roll>0)){asP(pl,()=>hurtP(p.dmg,{slow:p.slow})); p.life=0;} break; } }
     }
     p.life-=dt; }
@@ -2486,7 +2488,7 @@ function syncPlayer(){const sk=curSkin(); const m=ensure(P,()=>buildPlayer(sk),'
 const moundMesh=new THREE.Mesh(gCap,new THREE.MeshStandardMaterial({color:0xc9a060,roughness:1})); moundMesh.visible=false; moundMesh.receiveShadow=true; scene.add(moundMesh);
 const teleLine=new THREE.Group(); const teleMesh=new THREE.Mesh(gPlane,new THREE.MeshBasicMaterial({color:0xe2504a,transparent:true,opacity:.4,depthWrite:false})); teleMesh.rotation.x=-Math.PI/2; teleLine.add(teleMesh); teleLine.visible=false; scene.add(teleLine);
 function syncBoss(){const b=boss; moundMesh.visible=false; teleLine.visible=false; if(!b) return;
-  if(b.dead){const el=time-(b.deadAt||0); if(!b.deadAt||el>2.2) return; const m=ensure(b,()=>buildBoss(b),b.id), u=m.userData; if(!u.base) u.base=m.scale.x; const k=Math.min(1,el/1.6), f=el>1.6?Math.max(.01,1-(el-1.6)/.6):1;
+  if(b.dead&&!(b.fallCine&&!b.deadAt)){const el=time-(b.deadAt||0); if(!b.deadAt||el>2.2) return; const m=ensure(b,()=>buildBoss(b),b.id), u=m.userData; if(!u.base) u.base=m.scale.x; const k=Math.min(1,el/1.6), f=el>1.6?Math.max(.01,1-(el-1.6)/.6):1;
     m.position.set(b.x*S+Math.sin(el*40)*.04*(1-k),-k*.9,b.y*S); m.rotation.z=easeInOut(k)*.9; m.rotation.x=-k*.3; m.scale.setScalar(u.base*f*(1-.15*k)); setFlash(m,Math.sin(el*24)>0&&el<1.4?1:0);
     if(Math.random()<.5) puff(b.x+rand(-b.r,b.r),b.y+rand(-b.r,b.r),b.c2,4,160,.6,6); if(el>1.5&&!b.boomed){b.boomed=true; shock(b.x,b.y,b.r*6,b.c2,.8); flashT=.4; flashCol='#ffffff'; shake(10);} return;}
   const m=ensure(b,()=>buildBoss(b),b.id); const u=m.userData;
@@ -3216,6 +3218,23 @@ function transformCine(b){const bx=b.x*S,bz=b.y*S,sc=b.r/13; const dx=P.x-b.x,dz
   return [{dur:2.2,title:'Form II',sub:'The Sovereign Unbound',enter(){flashT=.7; flashCol='#e0b0ff'; shake(12); puff(b.x,b.y,'#b45cff',70,280,1.2,7); CFX.ring(b,F.c);},tick:fxTick(b,true),cam:orbit(bx,bz,5*sc,2*sc,0,TAU*.7,1.6*sc)},
    {dur:2.0,fast:true,speaker:'The Sovereign Unbound',text:'You thought the mask was me?',enter(){b.roar=1.6; CFX.burst(b,F.c);},tick:fxTick(b,false),cam:dolly([bx+ux*5*sc,2.2*sc,bz+uz*5*sc,bx,1.6*sc,bz],[bx+ux*3.2*sc,1.8*sc,bz+uz*3.2*sc,bx,1.7*sc,bz])},
    {dur:2.4,fast:true,speaker:'The Sovereign Unbound',text:'I am what remains when an island loses all of its kings.',enter(){shake(10); CFX.ring(b,F.c);},tick:fxTick(b,true),cam:k=>{const a=fa-.4+k*.9,r=lerp(3.4*sc,7*sc,k); return [bx+Math.cos(a)*r,lerp(1*sc,4.5*sc,k),bz+Math.sin(a)*r,bx,1.6*sc,bz];}}];}
+const BOSS_FALL={bramble:['No... my roots... my beautiful garden...','The thorns are falling away. The meadow can breathe again.'],sultan:['The sand... slips through my fingers...','Every grain is free now. Even the ones he swallowed.'],witch:['My pot... my lovely bubbling pot... gone cold...','The fen is going quiet. No more humming in the dark.'],warden:['Passed... someone finally... passed...','The ice is cracking. The pass is open.'],golem:['THE FORGE... GROWS... COLD...','Its heart is just a cinder now.'],sov2:['Six crowns... and still... not enough...',''],pumpking:['The candles... are going out... one... by... one...','Happy Halloween, your majesty.'],stormsentinel:['The sky... no longer answers...','The clouds are parting. Sunlight.'],mossback:['Mmmm... sleep... long... sleep...','Rest well, old giant. The shrine is quiet again.'],lanternmaw:['My light... my pretty little light...','No more following strange lights into the water.'],echotyrant:['The echoes... fall... silent...','The portal is still humming. Something is waiting on the other side.'],sculkmonstrosity:['More... I needed... more...','The veins stopped pulsing. It finally has enough.'],monarch:['My throne... my claws... my kingdom...','The Clawed King bows at last.'],harmonizer:['The song... ends... out of... tune...','The meadow is silent. It almost sounds peaceful.'],foundrycolossus:['The fire... inside me... is out...','The furnace doors are closing for good.'],brimstonewyrm:['Ssso... cold... ssso very... cold...','The wastes are cooling. The coils are still.'],ironwarlord:['My armour... was supposed to... hold...','The drums have stopped. The citadel is free.'],forgeking:['Every blade I made... and none... could stop you...','The anvil is quiet. The Molten Throne is empty.'],hollowwatcher:['I watched... everything... except this...','The eye is closing. The dark is just dark again.'],riftweaver:['My threads... unravel... all of them...','The paths are straight again.'],nullbloom:['Shh... let me... wilt... quietly...','The pale flowers are turning away. One by one.'],endlessone:['Even the end... has an end...','The stars are coming back.'],ancienttome:['So many pages... and none told me... how this ends...','The last page is turning. Its story is over.'],godofdestruction:['Broken... I am the one... broken...','Nothing left to break. The ground is still.'],radiantseraph:['My light... grows dim... guard... the core...','Six wings fold, one by one. The light softens.'],blightmother:['My children... my beautiful infection...','The poison is drying up. The marsh is clearing.'],forms3:['Every shape... and none of them... was enough...','No more forms. No more changing. It is over.'],corruptedsinger:['The last note... finally... breaks...','Silence. Real silence.']};
+function defeatCine(b,final){const D=BOSSES[b.id]||{}, s=BOSS_STORY[b.id]||{}, F=BOSS_FX[b.id]||BOSS_FX.bramble, fl=BOSS_FALL[b.id]||['No... this cannot be...','It is over.'], sc=Math.max(.8,b.r/13*.85);
+  const bx=b.x*S,bz=b.y*S, fa=Math.atan2(P.y-b.y,P.x-b.x), nm=(b.name||D.name||'The guardian').replace(/ · .*/,'');
+  const souls=(n,sp)=>{for(let i=0;i<n;i++){const a=Math.random()*TAU, r=rand(0,b.r*1.6); FXP(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r,rand(10,b.r*2),Math.cos(a)*rand(10,40),Math.sin(a)*rand(10,40),rand(sp*.6,sp),F.c[i%F.c.length],rand(1,1.8),rand(4,8));}};
+  const shots=[
+   {dur:2.6,fast:true,speaker:nm,text:fl[0],enter(){b.fallCine=true; b.deadAt=null; b.boomed=false; b.roar=1.4; b.a=null; b.flash=0; b.hidden=false; flashT=.3; flashCol='#ffffff'; shake(8); CFX.ring(b,F.c);},
+    tick(t,dt){b.flash=Math.max(0,(b.flash||0)-dt); b.burn=0; b.spin=Math.sin(t*13)*.12*(1-t/2.6); b.walk+=dt*2; if(Math.random()<.05){b.flash=.05; sparks(b.x+rand(-b.r,b.r),b.y,Math.random()*TAU,F.c[0],6,b.r*1.4);} if(Math.random()<.35) souls(1,90); if(Math.random()<.08) shake(3);},
+    cam:k=>{const a=fa+.5-k*.35, r=lerp(6*sc,4.8*sc,k); return [bx+Math.cos(a)*r,lerp(1.8*sc,2.3*sc,k),bz+Math.sin(a)*r,bx,1.3*sc,bz];}},
+   {dur:2.4,enter(){b.deadAt=time; b.spin=0; b.roar=0; shake(10); CFX.burst(b,F.c);},
+    tick(t,dt){if(Math.random()<.5) souls(2,160);},
+    cam:k=>{const a=fa+.15+k*1.1, r=lerp(5.5*sc,8.5*sc,k); return [bx+Math.cos(a)*r,lerp(2*sc,4.6*sc,k),bz+Math.sin(a)*r,bx,lerp(1*sc,.4,k),bz];}},
+   {dur:2.6,title:nm+' defeated',sub:s.ep||'Guardian defeated',enter(){souls(40,260); CFX.ring(b,F.c); flashT=.35; flashCol=F.c[0];},
+    tick(t,dt){if(Math.random()<.7) souls(2,200);},
+    cam:k=>{const a=fa+1.25+k*.8, r=9*sc; return [bx+Math.cos(a)*r,lerp(5*sc,8*sc,k),bz+Math.sin(a)*r,bx,lerp(.6,1.6*sc,k),bz];}}];
+  if(!final&&fl[1]) shots.push(heroShot(fl[1],2.6));
+  shots.cleanup=()=>{b.spin=0; b.roar=0; if(!b.deadAt) b.deadAt=time-3;};
+  return shots;}
 function victoryCine(b){const bx=b.x*S,bz=b.y*S,px=P.x*S,pz=P.y*S, cols=['#c9e27a','#ffd98a','#b7f06a','#cfefff','#ff8a3a','#c8b8ff'];
   const burst=n=>()=>{for(let i=0;i<6;i++) puff(b.x+Math.cos(i/6*TAU)*120,b.y+Math.sin(i/6*TAU)*120,cols[i],n,200,1.4,6); flashT=.35; flashCol='#fff';};
   return [{dur:3.6,title:'The Sovereign falls',sub:'All six crowns are free',enter:burst(30),cam:orbit(bx,bz,7,5,0,1.2,.4)},
