@@ -80,7 +80,7 @@ Select any weapon, armor or artifact in your Pack and press **✦ Enchant** (abo
 
 ## 🐺 Summoning artifacts
 
-50 new artifacts summon allies that fight beside you: wolves, golems, knights, skeleton archers, exploding mites, healing sprites and more. Every boss of the Outer Isles and the Shift Dimension now drops its own guardian summoning artifact as well as its normal one.
+50 new artifacts summon allies that fight beside you: wolves, golems, knights, skeleton archers, exploding mites, healing sprites and more. Every boss of the Outer Isles and the Shift Dimension now drops its own guardian summoning artifact as well as its normal one. Every summoned pet has its own health bar and stays with you until it is defeated (up to 10 at a time).
 
 ## ✨ The Core of Creations
 

@@ -50,6 +50,8 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #menu::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(90deg,rgba(4,8,14,.82),rgba(4,8,14,.3) 55%,rgba(4,8,14,0))}
 #soulsBg{position:fixed;inset:0;width:100%;height:100%;z-index:-2;display:block;pointer-events:none}
 .eyebrow{font-family:var(--display);color:var(--leaf);font-size:18px;letter-spacing:.18em;text-transform:uppercase}
+@keyframes giftpop{0%{transform:scale(1)}40%{transform:scale(1.06);filter:drop-shadow(0 0 18px #7fe0c8)}100%{transform:scale(1)}}
+#menu h1.giftpop{animation:giftpop .5s ease-out}
 #menu h1{font-size:clamp(36px,min(9.5vw,10.5vh),112px);line-height:.88;color:var(--crown);text-shadow:0 5px 0 var(--crown-d),0 11px 0 rgba(0,0,0,.45);margin:6px 0 18px}
 .crowns{display:flex;gap:8px;align-items:center;margin-bottom:26px;color:var(--mute);font-size:14px;flex-wrap:wrap}
 .pip{width:24px;height:17px;background:#2b4650;clip-path:polygon(0 100%,0 22%,25% 56%,50% 0,75% 56%,100% 22%,100% 100%)}
@@ -410,7 +412,7 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
   <div class="acct" id="acct"></div>
   <div class="updbar" id="updBar" hidden role="status"></div>
   <div class="eyebrow">A dungeon crawl across</div>
-  <h1>Isle of<br>Six Crowns</h1>
+  <h1 id="menuTitle">Isle of<br>Six Crowns</h1>
   <div class="crowns" id="menuCrowns"></div>
   <div class="menu-btns">
     <button class="btn gold" id="btnContinue">Continue Expedition</button>
@@ -1106,7 +1108,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='3.2.1', SAVE_VERSION=6;
+const APP_VERSION='3.3.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1266,7 +1268,8 @@ function useArt(slot){const it=SAVE.eq[slot]; if(!it||P.dead||P.acd[slot]>0) ret
 // The purple shockwave used by enchanted gear
 function soulWave(r,dmg,col){for(const e of targets()) if(dist(e,P)<r+e.r) hurtE(e,dmg,{});
   for(let i=0;i<36;i++){const a=i/36*TAU; parts.push({x:P.x+Math.cos(a)*18,y:P.y+Math.sin(a)*18,z:14,vx:Math.cos(a)*r*2.7,vy:Math.sin(a)*r*2.7,vz:30,life:.4,max:.4,col:i%2?col:'#e8d0ff',sz:6});} shake(3);}
-function hurtP(d,o={}){if(P.remote){if(P.dead||P.roll||P.iframe>0||run.done) return; P.iframe=.35; P.flash=.15; send(P.code,{t:'hurt',d,slow:!!o.slow}); return;}
+function hurtP(d,o={}){if(P.ally){const a=P; if(a.hp<=0||a.iframe>0) return; d=Math.max(1,Math.round(d)); a.hp-=d; a.iframe=.3; a.flash=.12; ftext(a.x,a.y-30,'-'+d,'#ffb0a0'); if(a.hp<=0){a.hp=0; a.dead=true;} return;}
+  if(P.remote){if(P.dead||P.roll||P.iframe>0||run.done) return; P.iframe=.35; P.flash=.15; send(P.code,{t:'hurt',d,slow:!!o.slow}); return;}
   if(P.dead||P.roll>0||P.iframe>0||run.done) return;
   if(ST.soulGuard&&Math.random()<.18){P.iframe=.35; ftext(P.x,P.y-36,'Blocked','#d8b0ff',true); soulWave(100,Math.round(ST.dmg*.5),'#9a5cff'); return;}
   if(P.ward>0) d*=.25; d=Math.max(1,Math.round(d*(1-ST.red)));
@@ -1465,7 +1468,8 @@ function update(dt){
   updPlayer(dt); mpRespawn(dt);
   const coopHost=MP.role==='host'&&MP.inGame, coopClient=MP.role==='client'&&MP.inGame;
   if(!coopClient){
-  for(const e of ents) if(e.hp>0){ if(coopHost) asP(nearestPlayer(e.x,e.y),()=>updEnemy(e,dt)); else updEnemy(e,dt); }
+  for(const e of ents) if(e.hp>0){ let t=coopHost?nearestPlayer(e.x,e.y):P; if(allies.length){const dp=Math.hypot(t.x-e.x,t.y-e.y); let bd=dp*.85; for(const a of allies){if(a.hp<=0||a.role==='bomb') continue; const d=Math.hypot(a.x-e.x,a.y-e.y); if(d<bd){bd=d; t=a;}}}
+    if(t!==P) asP(t,()=>updEnemy(e,dt)); else updEnemy(e,dt); }
   // separation
   for(let i=0;i<ents.length;i++){const a=ents[i]; if(a.hp<=0||!a.alert) continue; for(let j=i+1;j<ents.length;j++){const b=ents[j]; if(b.hp<=0) continue; const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy),m=a.r+b.r; if(d>0&&d<m){const p=(m-d)/2; moveCirc(a,-dx/d*p,-dy/d*p); moveCirc(b,dx/d*p,dy/d*p);}}}
   ents=ents.filter(e=>e.hp>0);
@@ -1496,16 +1500,17 @@ function updAir(dt){let on=null; for(const p of L.pods) if(Math.hypot(P.x-p.x,P.
   if(Math.random()<dt*1.5) parts.push({x:P.x+rand(-5,5),y:P.y,z:32,vx:0,vy:0,vz:70,life:.9,max:.9,col:'#bff8ff',sz:3});
   if(P.air<=0){P.drownT=(P.drownT||0)+dt; if(P.drownT>=1){P.drownT=0; const d=Math.max(1,Math.round(ST.maxhp*.1)); P.hp-=d; P.flash=.15; ftext(P.x,P.y-36,'-'+d,'#9fefff'); puff(P.x,P.y-20,'#bff8ff',8,60,.5,3);
     if(P.hp<=0){P.hp=0; P.dead=true; puff(P.x,P.y-10,'#9fefff',30,180,1,5); if(inCoop()) P.respawnT=6; else run.endT=1.6;}}}}
-function summonAllies(it){const D=MINIONS[it.minion]||MINIONS.wolf, n=it.count||1, pot=it.pot||1, life=20*(it.dur||1);
+function summonAllies(it){const D=MINIONS[it.minion]||MINIONS.wolf, n=it.count||1, pot=it.pot||1;
   while(allies.length+n>10) allies.shift();
   for(let i=0;i<n;i++){const a=i/n*TAU+Math.random(), x=P.x+Math.cos(a)*44, y=P.y+Math.sin(a)*44;
     allies.push({ally:true,mk:it.minion,id:'al'+Math.random(),type:D.role==='ranged'||D.role==='heal'?'caster':D.role==='bomb'?'bomb':'melee',ai:'melee',feat:D.feat,name:D.n,c1:D.c1,c2:D.c2,
-      x:blocked(x,y,D.r)?P.x:x,y:blocked(x,y,D.r)?P.y:y,r:D.r,spd:D.spd,dmg:D.dmg*pot*.7,role:D.role,shot:D.shot||D.c2,life,max:life,cd:rand(.2,.8),state:'idle',alert:true,face:a,walk:Math.random()*6,flash:0,hp:1,ox:Math.cos(a),oy:Math.sin(a)});
+      x:blocked(x,y,D.r)?P.x:x,y:blocked(x,y,D.r)?P.y:y,r:D.r,spd:D.spd,dmg:D.dmg*pot*.7,role:D.role,shot:D.shot||D.c2,life:Infinity,hpMax:Math.round((D.role==='bomb'?25:D.role==='melee'?70:D.role==='heal'?50:45)*(D.r>=15?1.8:1)*pot*2),cd:rand(.2,.8),state:'idle',alert:true,face:a,walk:Math.random()*6,flash:0,iframe:0,dead:false,ox:Math.cos(a),oy:Math.sin(a)});
+    const al=allies[allies.length-1]; al.hp=al.hpMax; al.max=al.hpMax;
     puff(P.x+Math.cos(a)*44,P.y+Math.sin(a)*44,D.c2,14,140,.6,5);}
   for(let i=0;i<30;i++){const a=i/30*TAU; parts.push({x:P.x+Math.cos(a)*24,y:P.y+Math.sin(a)*24,z:6,vx:Math.cos(a)*240,vy:Math.sin(a)*240,vz:40,life:.5,max:.5,col:i%2?D.c2:'#c8b0ff',sz:6});}
   toast(`Summoned ${n>1?n+' × ':''}${D.n}`,D.c2);}
 function updAllies(dt){if(!allies.length) return; const tg=targets();
-  for(const a of allies){a.life-=dt; a.cd-=dt; a.flash=Math.max(0,a.flash-dt);
+  for(const a of allies){a.cd-=dt; a.flash=Math.max(0,a.flash-dt); a.iframe=Math.max(0,(a.iframe||0)-dt); if(a.hp<=0) a.life=0;
     let t=null,bd=520; for(const e of tg){const d=Math.hypot(e.x-a.x,e.y-a.y); if(d<bd&&Math.hypot(e.x-P.x,e.y-P.y)<560){bd=d;t=e;}}
     const go=(tx,ty,sp)=>{const dx=tx-a.x,dy=ty-a.y,d=Math.hypot(dx,dy); if(d<4) return false; const s2=Math.min(d,sp*dt); moveCirc(a,dx/d*s2,dy/d*s2); a.face=Math.atan2(dy,dx); a.walk+=dt*10; return true;};
     if(Math.hypot(P.x-a.x,P.y-a.y)>700){a.x=P.x+a.ox*40; a.y=P.y+a.oy*40;}
@@ -1518,7 +1523,7 @@ function updAllies(dt){if(!allies.length) return; const tg=targets();
       if(a.cd<=0){a.cd=a.role==='heal'?1.6:1.2; a.state='wind'; const an=Math.atan2((t.y-t.r)-(a.y-12),t.x-a.x); projs.push({x:a.x,y:a.y-12,vx:Math.cos(an)*520,vy:Math.sin(an)*520,dmg:Math.round(a.dmg),r:5,col:a.shot,own:'p',life:1.4,arrow:a.feat==='skeleton'||a.feat==='hooded'});}
       if(a.role==='heal'&&!P.dead){a.ht=(a.ht||0)-dt; if(a.ht<=0){a.ht=2.5; const h=Math.max(3,Math.round(ST.maxhp*.04)); if(P.hp<ST.maxhp){P.hp=Math.min(ST.maxhp,P.hp+h); ftext(P.x,P.y-40,'+'+h,'#8fd06a');} puff(P.x,P.y-10,a.c1,6,60,.5,3);}}}
   }
-  for(const a of allies) if(a.life<=0&&a.role!=='bomb') puff(a.x,a.y-10,'#c8b0ff',12,120,.5,4);
+  for(const a of allies) if(a.life<=0&&a.role!=='bomb'){puff(a.x,a.y-10,a.c2,16,140,.6,5); sparks(a.x,a.y,Math.random()*Math.PI*2,'#ffffff',8,a.r); toast(a.name+' was defeated',a.c2);}
   allies=allies.filter(a=>a.life>0);}
 function updPlayer(dt){
   if(P.dead) return;
@@ -1539,15 +1544,15 @@ function updProjs(dt){
       if(p.mirror) continue;
       if(p.arrow&&p.own==='p'&&s===0&&Math.random()<.7) parts.push({x:p.x,y:p.y+12,z:12,vx:-p.vx*.05,vy:-p.vy*.05,vz:0,life:.16,max:.16,col:'#fff3d0',sz:3});
       if(p.own==='p'){ for(const e of targets()){ if(Math.hypot(e.x-p.x,(e.y-e.r)-p.y)<e.r+p.r+4){hurtE(e,p.dmg,{}); sparks(p.x,p.y+e.r,Math.atan2(p.vy,p.vx)+Math.PI,'#fff3d0',6,e.r); p.life=0; break;} } }
-      else { for(const pl of livePlayers()) if(Math.hypot(pl.x-p.x,(pl.y-12)-p.y)<pl.r+p.r-2){ if(!(pl.roll>0)){asP(pl,()=>hurtP(p.dmg,{slow:p.slow})); p.life=0;} break; } }
+      else { for(const pl of foes()) if(Math.hypot(pl.x-p.x,(pl.y-12)-p.y)<pl.r+p.r-2){ if(!(pl.roll>0)){asP(pl,()=>hurtP(p.dmg,{slow:p.slow})); p.life=0;} break; } }
     }
     p.life-=dt; }
   projs=projs.filter(p=>p.life>0);
 }
 function updHaz(dt){
   for(const h of hazards){h.t+=dt;
-    if(!h.done&&h.t>=h.delay){h.done=true; if(!h.persist) shock(h.x,h.y,h.r*1.25,h.col,.4); else shock(h.x,h.y,h.r,h.col,.6); if(h.mirror){} else if(h.own==='p'){for(const e of targets()) if(Math.hypot(e.x-h.x,e.y-h.y)<h.r+e.r){hurtE(e,h.dmg,{burn:3}); e.burn=3;} shake(8); puff(h.x,h.y,'#ffb24a',30,260,.7,7);} else for(const pl of livePlayers()) if(Math.hypot(pl.x-h.x,pl.y-h.y)<h.r+pl.r*.4) asP(pl,()=>hurtP(h.dmg,{slow:h.slow})); puff(h.x,h.y,h.col,h.persist?6:14,h.r*2.2,.5,5); if(!h.persist&&h.r>60) shake(4);}
-    if(h.done){h.life+=dt; if(h.persist&&!h.mirror){h.tick+=dt; if(h.tick>.5){h.tick=0; for(const pl of livePlayers()) if(Math.hypot(pl.x-h.x,pl.y-h.y)<h.r) asP(pl,()=>hurtP(h.dmg));}}}}
+    if(!h.done&&h.t>=h.delay){h.done=true; if(!h.persist) shock(h.x,h.y,h.r*1.25,h.col,.4); else shock(h.x,h.y,h.r,h.col,.6); if(h.mirror){} else if(h.own==='p'){for(const e of targets()) if(Math.hypot(e.x-h.x,e.y-h.y)<h.r+e.r){hurtE(e,h.dmg,{burn:3}); e.burn=3;} shake(8); puff(h.x,h.y,'#ffb24a',30,260,.7,7);} else for(const pl of foes()) if(Math.hypot(pl.x-h.x,pl.y-h.y)<h.r+pl.r*.4) asP(pl,()=>hurtP(h.dmg,{slow:h.slow})); puff(h.x,h.y,h.col,h.persist?6:14,h.r*2.2,.5,5); if(!h.persist&&h.r>60) shake(4);}
+    if(h.done){h.life+=dt; if(h.persist&&!h.mirror){h.tick+=dt; if(h.tick>.5){h.tick=0; for(const pl of foes()) if(Math.hypot(pl.x-h.x,pl.y-h.y)<h.r) asP(pl,()=>hurtP(h.dmg));}}}}
   hazards=hazards.filter(h=>!h.done||(h.persist?h.life<h.persist:h.life<.3));
 }
 function updLoot(dt){
@@ -2584,6 +2589,8 @@ function drawOverlay(){
   cx.textAlign='center'; cx.textBaseline='alphabetic';
   if(P&&mode!=='menu'&&!cine){
     const mw=TOUCH?null:mouseWorld();
+    for(const a of allies){ if(a.hp<=0||a.life<=0) continue; const p=proj(a.x,a.y,(HEADH[a.type]||1.1)*(a.r/13)+.25); if(!p.vis) continue; const w=40, k=clamp(a.hp/a.max,0,1);
+      cx.fillStyle='rgba(6,10,6,.85)'; cx.fillRect(p.x-w/2-1,p.y-1,w+2,6); cx.fillStyle=k>.5?'#6ad06a':k>.25?'#e8c040':'#e2504a'; cx.fillRect(p.x-w/2,p.y,w*k,4); cx.strokeStyle=a.c2; cx.lineWidth=1; cx.strokeRect(p.x-w/2-1.5,p.y-1.5,w+3,7);}
     for(const e of ents){ if(e.hp<=0) continue; const d=dist(e,P); const hover=mw&&Math.hypot(mw.x-e.x,mw.y-e.y)<e.r+20; if(d>520&&!hover) continue;
       const showName=hover||d<240||(e.alert&&d<420); const showBar=e.hp<e.max; if(!showName&&!showBar) continue;
       const p=proj(e.x,e.y,HEADH[e.type]*(e.r/13)+.25); if(!p.vis) continue; const role=ROLE[e.type];
@@ -2771,6 +2778,7 @@ function menuCam(dt){if(!L) return; cam.x=L.w*T/2+Math.cos(time*.07)*L.w*T*.32; 
 let newArmed=false;
 $('#btnNew').onclick=()=>{if(SAVE&&!newArmed){newArmed=true; $('#btnNew').textContent='Erase progress and start over?'; return;} SAVE=newSave(); persist(); openMap();};
 $('#btnContinue').onclick=()=>{if(SAVE) openMap();};
+$('#menuTitle').addEventListener('click',giftTap);
 $('#btnHow').onclick=()=>{prevMode=mode; $('#how').hidden=false; $('#howClose').focus();};
 $('#howClose').onclick=()=>{$('#how').hidden=true;};
 
@@ -2984,7 +2992,7 @@ function renderDetail(){const box=$('#detail'); let it=null, inBag=false;
   box.innerHTML=`<img src="${iconOf(it)}" alt="" class="${it.encd?'encimg':''}" style="width:56px;height:56px;image-rendering:pixelated"><div class="rar" style="color:${R.col}">${R.label} ${it.slot==='artifact'?'artifact':it.slot}${it.encd?' · <span class="enctag">✦ Enchanted</span>':''}</div><h3 style="color:${R.col}">${it.name}</h3>
    <div>Power <b>${it.pow}</b> · from ${BIOMES[it.bi].name}</div>${it.boss?`<div style="color:var(--unique);font-family:var(--display)">Guardian loot · ${BOSSES[it.boss].name}</div>`:''}
    <ul>${itemLines(it).map(([a,b])=>`<li>${a}: <b>${b}</b></li>`).join('')}${ench}</ul>
-   ${it.slot==='artifact'?`<div style="color:var(--mute)">${it.kind==='summon'&&MINIONS[it.minion]?`Summons ${it.count>1?it.count+' ':'a '}${MINIONS[it.minion].n}${it.count>1?'s':''} that ${ROLE_TXT[MINIONS[it.minion].role][it.count>1?1:0]}, for ${Math.round(20*(it.dur||1))} seconds.`:ARTS[it.kind].desc}</div>`:''}
+   ${it.slot==='artifact'?`<div style="color:var(--mute)">${it.kind==='summon'&&MINIONS[it.minion]?`Summons ${it.count>1?it.count+' ':'a '}${MINIONS[it.minion].n}${it.count>1?'s':''} that ${ROLE_TXT[MINIONS[it.minion].role][it.count>1?1:0]}, until they are defeated.`:ARTS[it.kind].desc}</div>`:''}
    ${inBag?cmp(it,eqFor):''}
    <div class="actions encrow">${it.encd?`<span class="enctag">✦ Enchanted: +25% power, a new enchantment and ${SOUL_ABIL[it.slot][0]}</span>`:`<button class="btn small enchbtn" data-act="ench">✦ Enchant · Free</button>`}</div>
    <div class="actions">${inBag?(it.slot==='artifact'?`<button class="btn small gold" data-act="eq1">Slot 1</button><button class="btn small gold" data-act="eq2">Slot 2</button><button class="btn small gold" data-act="eq3">Slot 3</button><button class="btn small gold" data-act="eq4">Slot 4</button><button class="btn small gold" data-act="eq5">Slot 5</button><button class="btn small gold" data-act="eq6">Slot 6</button><button class="btn small gold" data-act="eq7">Slot 7</button><button class="btn small gold" data-act="eq8">Slot 8</button>`:`<button class="btn small gold" data-act="eq">Equip</button>`)+`<button class="btn small danger" data-act="salv">Salvage +${salv}</button>`
@@ -3220,6 +3228,10 @@ function authEnv(){ if(window.__forceAuth) return window.__forceAuth;
   if(window.claude||!/^https?:$/.test(location.protocol)) return 'unsupported';
   return GOOGLE_AUTH.webClientId?'gis':'unconfigured';}
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const GIFT_KEY='1akwo3z6zhf';
+function keyOf(str){let h1=0xdeadbeef^6,h2=0x41c6ce57^6; for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i); h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677);}
+  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909); return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
+function giftTap(){const g=SAVE&&SAVE.profile&&SAVE.profile.google; if(!g||!g.email||keyOf(String(g.email).trim().toLowerCase())!==GIFT_KEY) return; SAVE.shards=(SAVE.shards||0)+5000; persist(); toast('+5000 shards!','#7fe0c8'); const h=$('#menu h1'); h.classList.remove('giftpop'); void h.offsetWidth; h.classList.add('giftpop');}
 function profileName(){return SAVE&&SAVE.profile&&SAVE.profile.name||null;}
 function renderAcct(){const el=$('#acct'); const p=SAVE&&SAVE.profile;
   const upd=`<button class="btn small" id="updBtn" title="Get the newest version of the game">Update</button>`;
@@ -3724,6 +3736,7 @@ function netHit(code,m){const e=m.id==='boss'?boss:ents.find(x=>x.id===m.id); if
     if(!e.isBoss&&m.kb){const a=angTo(P,e); e.kx=Math.cos(a)*m.kb; e.ky=Math.sin(a)*m.kb;}
     if(m.burn) e.burn=3; if(m.slowT) e.slowT=Math.max(e.slowT||0,m.slowT); if(m.stun&&!e.isBoss) e.stun=Math.max(e.stun||0,m.stun);
     puff(e.x,e.y-e.r,e.c2,4,90,.3,3); if(e.hp<=0){if(e.isBoss) bossDown(e); else killE(e);}});}
+function foes(){const l=livePlayers(); for(const a of allies) if(a.hp>0&&a.role!=='bomb') l.push(a); return l;}
 function livePlayers(){const l=[]; if(P&&!P.dead) l.push(P); if(MP.role==='host'&&MP.inGame) for(const o of MP.others.values()) if(!o.dead) l.push(o); return l;}
 function nearestPlayer(x,y){let best=null,bd=1e9; for(const p of livePlayers()){const d=Math.hypot(p.x-x,p.y-y); if(d<bd){bd=d;best=p;}} return best||P;}
 function asP(t,fn){if(!t||t===P) return fn(); const real=P; P=t; try{return fn();} finally{P=real;}}
