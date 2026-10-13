@@ -116,3 +116,11 @@ Every boss now gets its own defeat cutscene: its last words, its collapse, souls
 Every boss is now built from far finer, smoother geometry, with dark corruption veins that pulse in its own colour. Each one carries an immense aura: a roaring flame shell, a spinning rune circle, glowing ground cracks, shock rings, a vortex of motes, crackling arcs and floating rubble. The aura flares when the boss attacks and is toned to the arena so the boss always stays visible. Bosses also breathe, turn smoothly, track you with their heads and kick up dust as they walk.
 
 The Sculk Monstrosity and the Corrupted Singer have their own story cutscenes: the Singer gathers lost souls into a soul block, the sculk spins a cocoon around it and the Monstrosity hatches; later the soul block is forced into the Singer itself, and defeating it heals it.
+
+## ⚔️ Signature moves, unique cutscenes, themed levels
+
+- **Every boss has its own signature move**, called out on screen when it's used: Thornwood Prison, Living Sandstorm, Avalanche, Thunder Chase, Earthshaker Leap, Deadly Lure, Royal Execution, Hammerfall, Watcher's Gaze, Storm of Pages, World Splitter, Judgment of Light, Requiem and many more.
+- **Every boss arrives its own way** (bursting from the ground, crashing down from the sky, charging in, flickering in, assembling from light, waking from stone…) and shows off its signature move in its intro.
+- **Every boss dies its own way**: shattering, melting, burning to ash, sinking, exploding, dissolving into light or toppling.
+- **Every level is dressed after its title**: halls get tiled floors and pillars, libraries get bookshelves, forges get lava cracks and anvils, gardens get flowers, royal levels get carpets and banners, caverns are darker and twistier, plains are wide open, and more. Layouts change too: halls, caves, long roads or open plains.
+- Monsters, terrain and scenery are built from much finer geometry.
