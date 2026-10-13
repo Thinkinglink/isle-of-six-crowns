@@ -1119,7 +1119,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='3.9.0', SAVE_VERSION=6;
+const APP_VERSION='3.9.1', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -2319,20 +2319,20 @@ function buildBoss(b){
     const aL=limb(torso,-.52,.72,0,.62,.12,hide,plate), aR=limb(torso,.52,.72,0,.62,.12,hide,plate); u.arms=[aL,aR]; u.armsFwd=.2;
     for(const a of [aL,aR]) for(let i=0;i<3;i++) add(a,gCone,M('#d8d8e0'),(i-1)*.05,-.72,.06,.025,.12,.025).rotation.x=Math.PI;
     u.smallArms=[limb(torso,-.36,.36,.12,.36,.06,hide),limb(torso,.36,.36,.12,.36,.06,hide)]; break;}
-  case 'sculkmonstrosity':{const u=R.userData; u.legs=[]; u.arms=[]; u.armsFwd=.25; const stone=M('#6a6670',{roughness:.95,flatShading:true}), stone2=M('#55525c',{roughness:.95,flatShading:true});
+  case 'sculkmonstrosity':{const u=R.userData; u.legs=[]; u.arms=[]; u.armsFwd=.25; const stone=M('#9a96a0',{roughness:.95,flatShading:true,emissive:new THREE.Color('#040404'),emissiveIntensity:.1}), stone2=M('#7a7682',{roughness:.95,flatShading:true,emissive:new THREE.Color('#040404'),emissiveIntensity:.1});
     const shell=M('#0a1e24',{roughness:.45,metalness:.25}), shell2=M('#10303a',{roughness:.5,metalness:.2}), flesh=M('#0c2a30',{roughness:.6}), flesh2=M('#123a40',{roughness:.6}), bone=M('#cfd8d0',{roughness:.45}), pus=glow('#2affe0',2), seam=glow('#2affe0',1.6), spine=M('#5affff',{emissive:new THREE.Color('#14b0a0'),emissiveIntensity:1.4,roughness:.15,metalness:.3,transparent:true,opacity:.92});
     // a huge hunched torso leaning forward on its fists
     const tor=new THREE.Group(); tor.position.set(0,1.0,.05); tor.rotation.x=.38; B.add(tor);
     add(tor,gSph,flesh,0,.15,0,.72,.62,.6); add(tor,gSph,flesh2,0,.5,-.08,.6,.42,.5); add(tor,gSph,flesh,0,-.25,.1,.5,.4,.45);
     // armour plates over the hump with glowing seams, and crystal spines
-    for(let i=0;i<4;i++){const y=.72-i*.22, z=-.25-i*.12; const pl=add(tor,gCap,i%2?shell2:shell,0,y,z,.62-i*.06,.34,.42); pl.rotation.x=-.9-i*.25;}
+    for(let i=0;i<4;i++){const y=.72-i*.22, z=-.25-i*.12; const pl=add(tor,gCap,i%2?stone2:stone,0,y,z,.62-i*.06,.34,.42); pl.rotation.x=-.9-i*.25;}
     for(let i=0;i<7;i++){const t=i/6, hh=.2+Math.sin(t*Math.PI)*.34; const sp=add(tor,gOct,spine,(i%2?.1:-.1),1.0-t*.75,-.42-t*.35,.08,hh*1.2,.08); sp.rotation.x=-.9-t*.6; sp.rotation.z=i%2?-.3:.3; sp.castShadow=false;}
     for(const [x,y,z,r] of [[.5,.1,.25,.2],[-.55,.0,.2,.18],[.35,-.3,.3,.16],[-.3,.45,.35,.15],[.6,.4,-.1,.17],[-.62,.3,-.15,.19],[0,-.4,.38,.14]]){const c=add(tor,gIco,(x>0)?stone:stone2,x,y,z,r,r*.8,r); c.rotation.set(x*3,y*4,z*2);}
     // an open ribcage on the chest with the pulsing heart inside
     for(let i=0;i<4;i++){const rb=add(tor,gHalfTor,bone,0,.2-i*.15,.42,.32-i*.03,.3,.32); rb.rotation.set(Math.PI/2,0,Math.PI);}
     u.heart=add(tor,gSph,glow('#2affe0',2.6),0,.05,.36,.16,.24,.16); u.heart.castShadow=false;
     // a small armoured head sunk between the shoulders, six eyes and snapping side jaws
-    const hd=new THREE.Group(); hd.position.set(0,1.18,.62); B.add(hd); u.head=hd; add(hd,gSph,shell,0,0,0,.3,.24,.27); add(hd,gCap,shell2,0,.06,-.02,.32,.18,.29);
+    const hd=new THREE.Group(); hd.position.set(0,1.18,.62); B.add(hd); u.head=hd; add(hd,gSph,shell,0,0,0,.3,.24,.27); add(hd,gIco,stone,0,.12,.02,.33,.13,.28); add(hd,gIco,stone2,0,-.16,.1,.22,.08,.18);
     const ey=glow('#5affff',2.6); u.core=add(hd,gSph,ey,0,.12,.25,.045); add(hd,gSph,ey,-.12,.05,.23,.04); add(hd,gSph,ey,.12,.05,.23,.04);
     // heavy horns that curve down past the jaw
     {const hn=M('#3a3a3e',{roughness:.7}), hn2=M('#5a5a60',{roughness:.65}); for(const sd of [-1,1]){let p=new THREE.Group(); p.position.set(sd*.24,.14,0); p.rotation.set(.15,0,-sd*1.0); hd.add(p);
@@ -2342,7 +2342,7 @@ function buildBoss(b){
     // massive knuckle-walking arms with bone claws
     for(const sd of [-1,1]){const ar=new THREE.Group(); ar.position.set(sd*.78,1.35,.3); B.add(ar); u.arms.push(ar);
       add(ar,gIco,stone,0,0,0,.32,.28,.32); add(ar,gIco,stone2,sd*.06,.12,-.04,.2,.14,.2);
-      add(ar,gSph,flesh,0,-.36,.04,.2,.36,.2); add(ar,gSph,flesh2,0,-.82,.1,.25,.34,.24); add(ar,gSph,seam,sd*.1,-.7,.2,.05).castShadow=false;
+      add(ar,gSph,flesh,0,-.36,.04,.2,.36,.2); add(ar,gSph,flesh2,0,-.82,.1,.25,.34,.24); add(ar,gIco,stone2,sd*.12,-.78,.06,.18,.26,.16); add(ar,gIco,stone,-sd*.06,-.4,-.08,.14,.2,.12); add(ar,gSph,seam,sd*.1,-.7,.2,.05).castShadow=false;
       add(ar,gIco,stone,0,-1.18,.14,.3,.22,.32);
       for(let k=0;k<4;k++){const c=add(ar,gCone,bone,(k-1.5)*.1,-1.3,.34,.05,.2,.05); c.rotation.x=Math.PI/2+.5;}}
     // short, thick hind legs
