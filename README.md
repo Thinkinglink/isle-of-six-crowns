@@ -124,3 +124,7 @@ The Sculk Monstrosity and the Corrupted Singer have their own story cutscenes: t
 - **Every boss dies its own way**: shattering, melting, burning to ash, sinking, exploding, dissolving into light or toppling.
 - **Every level is dressed after its title**: halls get tiled floors and pillars, libraries get bookshelves, forges get lava cracks and anvils, gardens get flowers, royal levels get carpets and banners, caverns are darker and twistier, plains are wide open, and more. Layouts change too: halls, caves, long roads or open plains.
 - Monsters, terrain and scenery are built from much finer geometry.
+
+## 👾 168 unique monsters
+
+Every monster in every region now has its own design: 17 different body types (walkers, hulking brutes, golems, four-legged beasts, insects, serpents, crabs, mantises, birds, walking plants, totems, slimes, jellies, floating mages, flame wisps, tripods and walking bombs) combined with their own heads, backs, weapons and tails. No two of the 168 monsters share a design, and each one is shaped to fit its name.

@@ -1126,7 +1126,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='3.8.2', SAVE_VERSION=6;
+const APP_VERSION='3.9.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1805,9 +1805,159 @@ function bruteBase(o){const R=CUR,B=R.userData.body; const so=o.skinOpt||{}; con
   torso.userData.rx0=torso.rotation.x; Object.assign(R.userData,{arms:[aL,aR],torso,head});
   return {torso,head,aL,aR,skin,dark};}
 
+
+/* ---------------- every one of the 168 monsters gets its own design ---------------- */
+const MROLES=['melee','ranged','lunge','bomb','caster','brute'];
+const MPLAN_POOL={melee:['biped','hunch','mantis','crab','plant','wisp','bird','golem','quad'],ranged:['biped','tripod','crab','insect','totem','floater','bird','serpent'],lunge:['quad','insect','serpent','mantis','bird','crab'],
+ bomb:['blob','sac','jelly','totem','insect','floater'],caster:['floater','wisp','jelly','totem','plant','bird','biped'],brute:['golem','hunch','crab','quad','plant','tripod']};
+const MPLAN_RULES=[[/golem|titan|colossus|juggernaut|guardian|monolith|sentinel$/i,'golem'],[/ogre|troll|yeti|brute|thrall/i,'hunch'],[/treant|sprout$|seedling$|gardener|root shaman/i,'plant'],[/hound|wolf|cat\b|stalker|lurker/i,'quad'],
+ [/spider|crawler|scarab|swarm/i,'insect'],[/leech|eel/i,'serpent'],[/slime|changeling|unstable form/i,'blob'],[/bloat|puff|bloom|pus/i,'jelly'],[/mote|core|null mite|collapse/i,'floater'],[/beetle|mite|bomb|mine/i,'sac'],
+ [/darter|pollinator|nester/i,'bird'],[/shade|drifter|whisperer/i,'wisp'],[/seer|oracle|priest|acolyte|mage|witch|hag|caller|scholar|keeper|weaver/i,'floater'],[/spitter|slinger/i,'tripod'],[/knight|legionnaire|husk|dead|sailor|walker|imp|scarecrow/i,'biped']];
+const MHEADS=['plain','skull','beak','cyclops','multi','mask','horned','antlers','crest','hood','crown','tusks','mandibles','helm','flame','mushroom','crystal'];
+const MBACKS=['spikes','crystals','wings','shell','sail','vents','mushrooms','candles','cape','pack','orbs','fins','banner','roots','none'];
+const MWEAP={melee:['sword','axe','club','claws','spear','hammer','sickle','fists'],ranged:['bow','crossbow','sling','tube','quill','launcher'],caster:['staff','orb','book','lantern','wand','bell'],brute:['fists','hammer','club','boulder','chains','shieldfist'],lunge:['none'],bomb:['none']};
+const MTAILS=['none','whip','club','stinger','flame','fan'];
+const MHINTS=[[/bone|grave|dead|skull|husk/i,{head:'skull'}],[/fire|ember|magma|flame|cinder|blaze|molten|furnace|forge|pyre|lava|slag|ash|brimstone/i,{head:'flame',back:'vents',tail:'flame'}],
+ [/crystal|shard|prism|mirror|rift|ice|frost|rime|snow/i,{head:'crystal',back:'crystals'}],[/mushroom|spore|bloom|rot|plague|blight/i,{head:'mushroom',back:'mushrooms'}],[/iron|knight|legion|guard|sentinel|shield/i,{head:'helm',back:'cape'}],
+ [/monarch|royal|throne|crown/i,{head:'crown',back:'banner'}],[/storm|thunder|spark|gale|tempest/i,{head:'crest',back:'fins'}],[/sculk|soul|echo|gloom|abyss|shrieker|void|null|hollow/i,{head:'multi',back:'orbs'}],
+ [/ink|quill|paper|scroll|scholar|library|rune/i,{head:'mask',back:'candles'}],[/light|ray|halo|sun|ward/i,{head:'crown',back:'wings'}],[/sand|dune|mirage|scarab|wrapped/i,{head:'hood'}],[/reef|coral|drowned|tide|eel|puffer/i,{back:'fins',head:'cyclops'}],
+ [/moss|vine|root|thicket|hedge|stump|jungle|sprout|seed|pollinator|nester|treant|gardener/i,{head:'antlers',back:'roots'}],[/ogre|troll|yeti|brute|titan/i,{head:'tusks'}],[/spider|crawler|darter|stalker/i,{head:'mandibles'}],[/archer|slinger|crossbow/i,{back:'pack'}]];
+let MSPEC=null;
+function buildMSpecs(){MSPEC={}; const used=new Set(), ph=new Map(), pc={}, pw=new Map();
+  BIOMES.forEach((B,bi)=>MROLES.forEach((t,ti)=>{const nm=((B.skins||{})[t]||[''])[0], r=srand(bi*131+ti*17+7), hint={}; for(const [re,h] of MHINTS) if(re.test(nm)) for(const k in h) if(!hint[k]) hint[k]=h[k];
+    const order=(arr,first)=>{const a=arr.slice().sort(()=>r()-.5); if(first){const i=a.indexOf(first); if(i>0){a.splice(i,1); a.unshift(first);}} return a;};
+    const pool=MPLAN_POOL[t]; let plan=null; for(const [re,p] of MPLAN_RULES) if(re.test(nm)){plan=p; break;}
+    if(!plan||(pc[t+plan]||0)>=13){plan=pool.slice().sort((a,b)=>((pc[t+a]||0)-(pc[t+b]||0))||(r()-.5))[0];}
+    pc[t+plan]=(pc[t+plan]||0)+1;
+    let head='plain',back='none'; outer: for(const hd of order(MHEADS,hint.head)) for(const bk of order(MBACKS,hint.back)){const sig=plan+'|'+hd+'|'+bk; if(used.has(sig)||(ph.get(plan+hd)||0)>=2) continue; head=hd; back=bk; used.add(sig); ph.set(plan+hd,(ph.get(plan+hd)||0)+1); break outer;}
+    let weap='none'; for(const w of order(MWEAP[t],null)){if(!pw.has(plan+w+t)){weap=w; break;}} if(weap==='none'&&MWEAP[t][0]!=='none') weap=order(MWEAP[t])[0]; pw.set(plan+weap+t,1);
+    const tail=order(MTAILS,hint.tail)[0];
+    MSPEC[bi+':'+t]={plan,head,back,weap,tail,k1:.85+r()*.35,k2:.85+r()*.35,name:nm};}));}
+function monSpec(bi,t){if(!MSPEC) buildMSpecs(); return MSPEC[bi+':'+t]||MSPEC['0:'+t];}
+const hs=(c,a)=>'#'+hexShade(c,a).getHexString();
+function addHeadPart(h,type,mt){const {gl,bone,dark,lite,metal,sec}=mt, eyes=(y=.03,z=.14,sp=.06,r=.03)=>{add(h,gSphL,gl,-sp,y,z,r); add(h,gSphL,gl,sp,y,z,r);};
+  switch(type){
+   case 'plain': eyes(); break;
+   case 'skull': add(h,gSph,bone,0,.02,.02,.15,.16,.15); add(h,gSphL,M('#0a0808'),-.06,.03,.13,.04); add(h,gSphL,M('#0a0808'),.06,.03,.13,.04); add(h,gSphL,gl,-.06,.03,.15,.018); add(h,gSphL,gl,.06,.03,.15,.018); add(h,gBox,bone,0,-.11,.08,.1,.04,.08); break;
+   case 'beak': eyes(.05,.12,.07); add(h,gCone,M('#e8a23a'),0,-.02,.2,.05,.16,.05).rotation.x=Math.PI/2; break;
+   case 'cyclops': add(h,gSph,M('#f2f0e8'),0,.02,.12,.09); add(h,gSph,gl,0,.02,.19,.045); add(h,gSphL,M('#050505'),0,.02,.215,.02); break;
+   case 'multi': for(const [x,y] of [[-.07,.07],[.07,.07],[0,.0],[-.1,-.03],[.1,-.03],[0,.11]]) add(h,gSphL,gl,x,y,.14,.022); break;
+   case 'mask': add(h,gCap,lite,0,0,.04,.16,.18,.14).rotation.x=Math.PI/2; add(h,gBox,gl,-.05,.04,.18,.04,.012,.01); add(h,gBox,gl,.05,.04,.18,.04,.012,.01); add(h,gBox,dark,0,-.06,.18,.06,.01,.01); break;
+   case 'horned': eyes(); for(const sd of [-1,1]){const c=add(h,gCone,bone,sd*.12,.14,0,.035,.2,.035); c.rotation.z=-sd*.6;} break;
+   case 'antlers': eyes(); for(const sd of [-1,1]){seg(h,[sd*.08,.12,0],[sd*.2,.34,-.02],.016,M('#8a6a4a')); seg(h,[sd*.15,.25,0],[sd*.26,.28,.06],.012,M('#8a6a4a')); seg(h,[sd*.19,.32,0],[sd*.14,.44,-.04],.012,M('#8a6a4a'));} break;
+   case 'crest': eyes(); for(let i=0;i<4;i++) add(h,gCone,sec,0,.15+i*.005,.06-i*.07,.025,.12+i*.02,.025).rotation.x=-.4; break;
+   case 'hood': add(h,gCone,dark,0,.06,-.02,.2,.34,.2); add(h,gSph,M('#050505'),0,0,.06,.13,.12,.1); eyes(.0,.15,.045,.022); break;
+   case 'crown': eyes(); crown(h,.14,.75,'#e8c040'); break;
+   case 'tusks': eyes(.05); for(const sd of [-1,1]){const c=add(h,gCone,bone,sd*.07,-.07,.13,.025,.14,.025); c.rotation.x=-.5;} break;
+   case 'mandibles': eyes(.05,.13,.05,.025); for(const sd of [-1,1]){const c=add(h,gCone,dark,sd*.06,-.06,.16,.022,.14,.022); c.rotation.set(Math.PI/2,0,sd*.6);} break;
+   case 'helm': add(h,gCyl,metal,0,.03,0,.17,.24,.17); add(h,gBox,gl,0,.03,.165,.13,.018,.01); add(h,gCone,metal,0,.2,0,.06,.12,.06); break;
+   case 'flame': eyes(); for(let i=0;i<5;i++) add(h,gCone,glow(i%2?'#ffb03a':'#ff6a1a',2),(i-2)*.05,.18+(i%2)*.04,-.02,.04,.16+(i%3)*.05,.04); break;
+   case 'mushroom': eyes(); add(h,gCap,sec,0,.1,0,.24,.14,.24); for(let i=0;i<5;i++) add(h,gSphL,lite,Math.cos(i*1.3)*.13,.17,Math.sin(i*1.3)*.13,.02); break;
+   case 'crystal': eyes(); for(let i=0;i<4;i++){const c=add(h,gOct,gl,(i-1.5)*.06,.17+(i%2)*.04,-.02,.035,.12+(i%2)*.05,.035); c.rotation.z=(i-1.5)*.25;} break;}}
+function addBackPart(p,x,y,z,type,mt,sc=1){const {gl,bone,dark,lite,metal,sec,wood}=mt, g=new THREE.Group(); g.position.set(x,y,z); g.scale.setScalar(sc); p.add(g);
+  switch(type){
+   case 'spikes': for(let i=0;i<5;i++){const c=add(g,gCone,bone,0,.08,-.02+(i-2)*.07,.03,.16+(2-Math.abs(i-2))*.05,.03); c.rotation.x=-.5;} break;
+   case 'crystals': for(let i=0;i<4;i++){const c=add(g,gOct,gl,(i-1.5)*.08,.1,-.03,.04,.16+(i%2)*.08,.04); c.rotation.z=(i-1.5)*.3; c.castShadow=false;} break;
+   case 'wings': for(const sd of [-1,1]){const w=add(g,gSph,M(lite.color.getStyle(),{side:THREE.DoubleSide,transparent:true,opacity:.85}),sd*.28,.12,-.04,.3,.03,.14); w.rotation.z=sd*.4;} break;
+   case 'shell': add(g,gCap,dark,0,0,-.04,.24,.18,.2).rotation.x=-Math.PI/2; break;
+   case 'sail': for(let i=0;i<5;i++) add(g,gBox,sec,0,.06+(2-Math.abs(i-2))*.04,-.04+(i-2)*.06,.01,.12+(2-Math.abs(i-2))*.08,.05); break;
+   case 'vents': for(let i=0;i<3;i++){add(g,gCyl,metal,(i-1)*.08,.08,-.04,.03,.16,.03); add(g,gSphL,glow('#ffb03a',2),(i-1)*.08,.17,-.04,.03);} break;
+   case 'mushrooms': for(let i=0;i<3;i++){add(g,gCyl,lite,(i-1)*.09,.05,-.03,.02,.1,.02); add(g,gCap,sec,(i-1)*.09,.1,-.03,.06,.04,.06);} break;
+   case 'candles': for(let i=0;i<3;i++){add(g,gCyl,M('#f0e8d8'),(i-1)*.07,.06+(i%2)*.03,-.03,.02,.12+(i%2)*.05,.02); add(g,gSphL,glow('#ffd36a',2),(i-1)*.07,.14+(i%2)*.06,-.03,.018);} break;
+   case 'cape': {const c=add(g,gBox,M(sec.color.getStyle(),{side:THREE.DoubleSide,roughness:.8}),0,-.15,-.06,.3,.42,.02); c.rotation.x=.15;} break;
+   case 'pack': add(g,gBox,wood,0,0,-.06,.16,.22,.08); for(let i=0;i<3;i++){add(g,gCyl,M('#c9a066'),(i-1)*.04,.16,-.06,.01,.22,.01); add(g,gCone,sec,(i-1)*.04,.28,-.06,.02,.05,.02);} break;
+   case 'orbs': for(let i=0;i<3;i++){const o=add(g,gSphL,gl,(i-1)*.14,.18+(i%2)*.06,-.12,.04); o.castShadow=false;} break;
+   case 'fins': for(let i=0;i<3;i++){const f=add(g,gBox,sec,0,.08,-.02+(i-1)*.08,.01,.14+(i===1?.06:0),.07); f.rotation.x=-.3;} break;
+   case 'banner': add(g,gCyl,wood,.08,.18,-.04,.012,.5,.012); add(g,gBox,sec,.15,.3,-.04,.13,.18,.01); add(g,gSphL,M('#e8c040'),.08,.44,-.04,.022); break;
+   case 'roots': for(let i=0;i<4;i++) seg(g,[0,0,-.03],[(i-1.5)*.1,.22+(i%2)*.06,-.12],.018,wood); break;}}
+function addWeapon(arm,type,mt,u){if(!arm||type==='none') return; const {gl,bone,metal,wood,sec}=mt, hd=hand(arm);
+  switch(type){
+   case 'sword': add(hd,gBox,metal,0,-.18,.04,.03,.4,.012); add(hd,gBox,M('#c8a040'),0,.02,.04,.12,.02,.03); break;
+   case 'axe': add(hd,gCyl,wood,0,-.1,.04,.016,.42,.016); add(hd,gCap,metal,.07,-.28,.04,.1,.06,.02).rotation.z=-Math.PI/2; break;
+   case 'club': add(hd,gTaper,wood,0,-.16,.04,.05,.36,.05).rotation.x=Math.PI; for(let i=0;i<4;i++) add(hd,gCone,bone,Math.cos(i*1.6)*.05,-.28,.04+Math.sin(i*1.6)*.05,.012,.05,.012).rotation.z=Math.cos(i*1.6)*1.5; break;
+   case 'claws': for(let i=0;i<3;i++) add(hd,gCone,bone,(i-1)*.03,-.08,.05,.012,.12,.012).rotation.x=Math.PI-.3; break;
+   case 'spear': add(hd,gCyl,wood,0,-.05,.04,.012,.7,.012); add(hd,gCone,metal,0,-.45,.04,.025,.1,.025).rotation.x=Math.PI; break;
+   case 'hammer': add(hd,gCyl,wood,0,-.12,.04,.016,.4,.016); add(hd,gBox,metal,0,-.32,.04,.16,.08,.09); break;
+   case 'sickle': add(hd,gCyl,wood,0,-.08,.04,.014,.26,.014); add(hd,gHalfTor,metal,.05,-.22,.04,.1,.1,.1); break;
+   case 'fists': add(hd,gSph,mt.lite,0,0,.02,.07); break;
+   case 'boulder': add(hd,gIco,M('#6a645c',{flatShading:true}),0,-.06,.08,.12); break;
+   case 'chains': for(let i=0;i<4;i++) add(hd,gTor,metal,0,-.05-i*.06,.04,.025,.025,.3).rotation.y=i*Math.PI/2; break;
+   case 'shieldfist': add(hd,gSph,mt.lite,0,0,.02,.07); add(hand(u.arms[0]),gCyl,metal,0,0,.08,.14,.03,.14).rotation.x=Math.PI/2; break;
+   case 'bow': {const bh=hand(u.arms[0]); add(bh,gHalfTor,wood,0,0,.05,.26,.26,.26).rotation.set(0,Math.PI/2,Math.PI/2); add(bh,gCyl,M('#e8e0c8'),0,0,.0,.004,.5,.004);} break;
+   case 'crossbow': add(hd,gBox,wood,0,-.05,.12,.04,.04,.26); add(hd,gHalfTor,metal,0,-.05,.22,.14,.14,.14).rotation.set(Math.PI/2,0,0); break;
+   case 'sling': add(hd,gCyl,M('#8a6a4a'),0,-.12,.03,.006,.24,.006); add(hd,gSphL,M('#6a645c'),0,-.25,.03,.035); break;
+   case 'tube': add(hd,gCyl,metal,0,-.04,.12,.04,.3,.04).rotation.x=Math.PI/2; add(hd,gSphL,gl,0,-.04,.28,.035); break;
+   case 'quill': {const q=add(hd,gSph,M('#f4f0e6',{side:THREE.DoubleSide}),0,-.15,.04,.04,.22,.012); q.rotation.z=.2; add(hd,gCone,M('#1a1a2a'),0,-.38,.04,.012,.06,.012).rotation.x=Math.PI;} break;
+   case 'launcher': add(hd,gCyl,metal,0,-.04,.1,.035,.24,.035).rotation.x=Math.PI/2; add(hd,gOct,gl,0,-.04,.25,.04,.07,.04).rotation.x=Math.PI/2; break;
+   case 'staff': add(hd,gCyl,wood,0,0,.04,.016,.9,.016); u.orb=add(hd,gSph,gl,0,.48,.04,.06); break;
+   case 'orb': u.orb=add(hd,gSph,gl,0,-.08,.1,.07); break;
+   case 'book': add(hd,gBox,sec,0,-.06,.08,.14,.18,.04); add(hd,gBox,M('#f2ead8'),0,-.06,.1,.12,.16,.02); u.orb=add(hd,gSphL,gl,0,.08,.1,.03); break;
+   case 'lantern': add(hd,gCyl,metal,0,-.08,.04,.006,.14,.006); u.orb=add(hd,gBox,gl,0,-.2,.04,.07,.1,.07); break;
+   case 'wand': add(hd,gCyl,wood,0,-.06,.08,.01,.26,.01).rotation.x=-.6; u.orb=add(hd,gOct,gl,0,-.17,.2,.04); break;
+   case 'bell': add(hd,gCone,M('#d8b040',{metalness:.7,roughness:.3}),0,-.12,.06,.08,.12,.08); u.orb=add(hd,gSphL,gl,0,-.19,.06,.025); break;}}
+function addTail(p,x,y,z,type,mt){if(type==='none') return; const {gl,bone,dark,sec}=mt, g=new THREE.Group(); g.position.set(x,y,z); p.add(g); (mt.u.sway=mt.u.sway||[]).push(g);
+  switch(type){
+   case 'whip': for(let i=0;i<4;i++) add(g,gCone,dark,0,.02-i*.01,-.06-i*.09,.04-i*.008,.12,.04-i*.008).rotation.x=-Math.PI/2; break;
+   case 'club': add(g,gCyl,dark,0,0,-.14,.03,.26,.03).rotation.x=Math.PI/2; add(g,gSph,bone,0,0,-.3,.07); for(let i=0;i<4;i++) add(g,gCone,bone,Math.cos(i*1.6)*.07,Math.sin(i*1.6)*.07,-.3,.015,.06,.015).rotation.z=i*1.6; break;
+   case 'stinger': seg(g,[0,0,0],[0,.18,-.18],.03,dark); seg(g,[0,.18,-.18],[0,.32,-.06],.025,dark); add(g,gCone,gl,0,.34,.02,.025,.1,.025).rotation.x=1.2; break;
+   case 'flame': for(let i=0;i<3;i++) add(g,gCone,glow(i%2?'#ffb03a':'#ff6a1a',2),(i-1)*.04,.04,-.08-i*.04,.04,.18,.04).rotation.x=-1.2; break;
+   case 'fan': for(let i=0;i<3;i++){const f=add(g,gSph,sec,(i-1)*.08,.06,-.12,.05,.02,.16); f.rotation.y=(i-1)*.4;} break;}}
+function buildCreature(R,B,sp,c1,c2,role){const u=R.userData; u.legs=[]; u.arms=[]; u.armsFwd=0; const k1=sp.k1,k2=sp.k2;
+  const mt={main:M(c1,{roughness:.6}),dark:M(hs(c1,-.35)),lite:M(hs(c1,.25)),sec:M(c2,{roughness:.5}),gl:glow(c2,1.8),metal:M('#9098a4',{metalness:.7,roughness:.3}),bone:M('#e2dac6',{roughness:.5}),wood:M('#6a4a2a'),u};
+  const {main,dark,lite,sec,gl}=mt; let head=null,back=null,tail=null; const crawlLeg=(p,x,y,z,sd,len,ph)=>{const g=new THREE.Group(); g.position.set(x,y,z); g.userData.ph=ph; p.add(g); seg(g,[0,0,0],[sd*len*.6,len*.35,0],.035,dark); seg(g,[sd*len*.6,len*.35,0],[sd*len,-y,0],.028,main); u.legs.push(g); return g;};
+  switch(sp.plan){
+   case 'biped':{const h=humanoid({body:c1,skin:hs(c1,.2),sleeve:hs(c1,-.15),legC:hs(c1,-.4),hunch:(k1-.85)*.6,armsFwd:role==='melee'?.4:0}); head=h.head; back=[h.torso,0,.32,-.15]; tail=[h.torso,0,0,-.12]; break;}
+   case 'hunch':{const h=bruteBase({skin:c1,rocky:k1>1.05,belly:hs(c1,.2)}); head=h.head; back=[h.torso,0,.62,-.22]; tail=[h.torso,0,.1,-.25]; break;}
+   case 'golem':{u.legs=[limb(B,-.2,.5,0,.5,.13,dark),limb(B,.2,.5,0,.5,.13,dark)]; const t=new THREE.Group(); t.position.y=.5; B.add(t); u.torso=t; t.userData.rx0=0;
+     add(t,gBox,main,0,.32,0,.62*k2,.55,.42); add(t,gBox,lite,0,.36,.2,.36,.3,.04); add(t,gBox,dark,0,.64,0,.7*k2,.12,.46);
+     const hg=new THREE.Group(); hg.position.set(0,.82,.06); t.add(hg); add(hg,gBox,main,0,0,0,.26,.24,.24); head=hg; u.head=hg;
+     u.arms=[limb(t,-.42*k2,.56,0,.55,.12,main,dark),limb(t,.42*k2,.56,0,.55,.12,main,dark)]; for(const a of u.arms) add(a,gBox,dark,0,-.58,0,.2,.18,.2); back=[t,0,.66,-.22]; tail=[t,0,.1,-.22]; break;}
+   case 'quad':{u.legType='quad'; const t=new THREE.Group(); t.position.y=.42; B.add(t); add(t,gSph,main,0,.08,0,.3*k2,.24,.5*k1); add(t,gSph,lite,0,.02,.1,.22,.16,.3);
+     for(const [x,z] of [[-.17,.3],[.17,.3],[-.17,-.3],[.17,-.3]]) u.legs.push(limb(B,x,.42,z*k1,.38,.065,dark));
+     const hg=new THREE.Group(); hg.position.set(0,.6,.52*k1); B.add(hg); add(hg,gSph,main,0,0,0,.17,.15,.18); add(hg,gCone,lite,0,-.03,.16,.07,.14,.07).rotation.x=Math.PI/2; head=hg; u.head=hg; back=[t,0,.28,-.05]; tail=[t,0,.12,-.48*k1]; break;}
+   case 'insect':{u.legType='crawl'; add(B,gSph,main,0,.32,.12,.22,.17,.24); add(B,gSph,dark,0,.38,-.28*k1,.3*k2,.24,.38*k1); for(let i=0;i<3;i++) add(B,gTor,sec,0,.38,-.12-i*.13*k1,.27*k2,.27*k2,.15).rotation.x=Math.PI/2;
+     for(let i=0;i<6;i++){const sd=i<3?-1:1; crawlLeg(B,sd*.14,.3,.22-(i%3)*.16,sd,.5,i);} const hg=new THREE.Group(); hg.position.set(0,.36,.42); B.add(hg); add(hg,gSph,dark,0,0,0,.13); head=hg; u.head=hg; back=[B,0,.58,-.3*k1]; tail=[B,0,.38,-.68*k1]; break;}
+   case 'serpent':{u.legType='worm'; u.segs=[]; for(let i=0;i<7;i++){const g=new THREE.Group(); g.position.set(0,.18,-i*.16*k1); B.add(g); add(g,gSph,i%2?main:dark,0,0,0,.17-i*.016,.15-i*.014,.17-i*.016); if(i%2===0) add(g,gCone,sec,0,.13-i*.01,0,.025,.08,.025); u.segs.push(g);}
+     const hg=new THREE.Group(); hg.position.set(0,.34,.22); B.add(hg); add(hg,gSph,main,0,0,0,.17,.14,.2); head=hg; u.head=hg; back=[u.segs[2],0,.12,0]; tail=[u.segs[6],0,0,-.08]; break;}
+   case 'floater':{u.float=true; add(B,gCone,main,0,.5,0,.34*k2,.8,.34*k2); add(B,gTor,sec,0,.18,0,.3*k2,.3*k2,.4).rotation.x=Math.PI/2; add(B,gSph,dark,0,.88,0,.16,.1,.14);
+     const hg=new THREE.Group(); hg.position.y=1.04; B.add(hg); add(hg,gSph,lite,0,0,0,.15,.16,.15); head=hg; u.head=hg; u.arms=[limb(B,-.2,.82,0,.3,.04,main,lite),limb(B,.2,.82,0,.3,.04,main,lite)]; back=[B,0,.82,-.16]; tail=null; break;}
+   case 'jelly':{u.float=true; add(B,gCap,M(c1,{roughness:.25,transparent:true,opacity:.85}),0,.62,0,.38*k2,.34,.38*k2); add(B,gSph,gl,0,.68,0,.14);
+     u.sway=[]; for(let i=0;i<6;i++){const a=i/6*TAU, g=new THREE.Group(); g.position.set(Math.cos(a)*.24,.62,Math.sin(a)*.24); B.add(g); for(let k=0;k<4;k++) add(g,gSphL,k%2?sec:main,0,-.08-k*.1,0,.035-k*.005,.06,.035-k*.005); u.sway.push(g);}
+     const hg=new THREE.Group(); hg.position.set(0,.74,.28); B.add(hg); head=hg; back=[B,0,.94,0]; break;}
+   case 'blob':{const b=add(B,gSph,M(c1,{roughness:.2,transparent:true,opacity:.86}),0,.32,0,.38*k2,.32,.38*k2); b.userData.s=b.scale.clone(); u.blob=b; add(B,gSph,gl,0,.3,0,.12); add(B,gIco,dark,.08,.22,-.05,.07);
+     const hg=new THREE.Group(); hg.position.set(0,.44,.26); B.add(hg); head=hg; back=[B,0,.62,0]; break;}
+   case 'sac':{u.legType='quad'; const b=add(B,gSph,main,0,.45,0,.36*k2,.34,.38); for(let i=0;i<6;i++) add(B,gSphL,gl,Math.cos(i)*.3,.45+Math.sin(i*2)*.15,Math.sin(i)*.3,.04).castShadow=false;
+     for(const [x,z] of [[-.2,.18],[.2,.18],[-.2,-.18],[.2,-.18]]) u.legs.push(limb(B,x,.22,z,.2,.05,dark));
+     const hg=new THREE.Group(); hg.position.set(0,.52,.34); B.add(hg); add(hg,gSph,dark,0,0,0,.12); head=hg; u.head=hg; back=[B,0,.8,0]; tail=[B,0,.4,-.36]; break;}
+   case 'tripod':{u.legType='crawl'; for(let i=0;i<3;i++){const a=i/3*TAU+Math.PI/2, g=new THREE.Group(); g.position.y=.9*k1; g.userData.ph=i; B.add(g); seg(g,[0,0,0],[Math.cos(a)*.42,-.35*k1,Math.sin(a)*.42],.035,dark); seg(g,[Math.cos(a)*.42,-.35*k1,Math.sin(a)*.42],[Math.cos(a)*.58,-.9*k1,Math.sin(a)*.58],.03,main); u.legs.push(g);}
+     add(B,gSph,main,0,.98*k1,0,.26,.2,.26); add(B,gCap,lite,0,1.06*k1,0,.24,.12,.24); const hg=new THREE.Group(); hg.position.set(0,1.0*k1,.2); B.add(hg); head=hg; u.head=hg;
+     if(role==='ranged'){add(hg,gCyl,mt.metal,0,-.04,.12,.05,.26,.05).rotation.x=Math.PI/2; add(hg,gSphL,gl,0,-.04,.26,.04);} back=[B,0,1.12*k1,-.1]; break;}
+   case 'crab':{u.legType='crawl'; add(B,gCap,main,0,.28,0,.46*k2,.26,.36); add(B,gSph,dark,0,.26,0,.42*k2,.1,.32); for(let i=0;i<6;i++){const sd=i<3?-1:1; crawlLeg(B,sd*.3,.24,.12-(i%3)*.14,sd,.42,i);}
+     for(const sd of [-1,1]){const a=new THREE.Group(); a.position.set(sd*.34,.32,.28); B.add(a); seg(a,[0,0,0],[sd*.08,0,.18],.04,main); add(a,gCone,lite,sd*.1,.02,.32,.06,.18,.05).rotation.x=Math.PI/2; add(a,gCone,lite,sd*.13,-.03,.3,.04,.14,.035).rotation.set(Math.PI/2,0,sd*.4); u.arms.push(a);}
+     const hg=new THREE.Group(); hg.position.set(0,.42,.3); B.add(hg); for(const sd of [-1,1]){seg(hg,[sd*.06,-.06,0],[sd*.08,.06,0],.012,dark); add(hg,gSphL,gl,sd*.08,.08,0,.03);} head=hg; back=[B,0,.5,-.05]; tail=[B,0,.28,-.36]; break;}
+   case 'mantis':{u.legType='crawl'; add(B,gSph,dark,0,.38,-.3,.18,.16,.34); seg(B,[0,.38,-.05],[0,.85*k1,.12],.09,main); for(let i=0;i<4;i++){const sd=i<2?-1:1; crawlLeg(B,sd*.1,.36,-.05-(i%2)*.2,sd,.48,i);}
+     for(const sd of [-1,1]){const a=new THREE.Group(); a.position.set(sd*.13,.78*k1,.14); B.add(a); seg(a,[0,0,0],[0,-.22,.12],.03,main); add(a,gCone,lite,0,-.18,.3,.03,.34,.012).rotation.x=Math.PI/2+.4; u.arms.push(a);}
+     const hg=new THREE.Group(); hg.position.set(0,.98*k1,.16); B.add(hg); add(hg,gCone,main,0,-.02,0,.13,.18,.1).rotation.x=Math.PI; head=hg; u.head=hg; back=[B,0,.7*k1,-.05]; tail=[B,0,.4,-.6]; break;}
+   case 'totem':{const t=new THREE.Group(); B.add(t); for(let i=0;i<3;i++){const y=.18+i*.3, w=.3-i*.04; add(t,i%2?gCyl:gBox,i%2?dark:main,0,y,0,w,.28,w); add(t,gBox,gl,-.07,y+.04,w*.52+.002,.05,.03,.01); add(t,gBox,gl,.07,y+.04,w*.52+.002,.05,.03,.01); add(t,gBox,M('#100c0c'),0,y-.06,w*.52+.002,.12,.03,.01);}
+     t.userData.s=t.scale.clone(); u.blob=t; const hg=new THREE.Group(); hg.position.set(0,.95,0); B.add(hg); head=hg; back=[B,0,.55,-.2]; break;}
+   case 'bird':{u.legs=[limb(B,-.08,.4,0,.36,.025,M('#d8a040')),limb(B,.08,.4,0,.36,.025,M('#d8a040'))]; add(B,gSph,main,0,.58,0,.24,.24,.3*k1); add(B,gSph,lite,0,.52,.1,.16,.16,.18);
+     u.wings=[0,1].map(i=>{const sd=i?1:-1, g=new THREE.Group(); g.position.set(sd*.2,.64,0); B.add(g); add(g,gSph,sec,sd*.22,0,-.02,.26,.03,.13); return g;});
+     const hg=new THREE.Group(); hg.position.set(0,.86,.2); B.add(hg); add(hg,gSph,main,0,0,0,.13); head=hg; u.head=hg; if(sp.head==='plain') sp={...sp,head:'beak'}; back=[B,0,.74,-.12]; tail=[B,0,.56,-.3]; break;}
+   case 'plant':{u.legType='crawl'; for(let i=0;i<4;i++){const a=i/4*TAU+.4, g=new THREE.Group(); g.position.y=.25; g.userData.ph=i; B.add(g); seg(g,[0,0,0],[Math.cos(a)*.3,-.25,Math.sin(a)*.3],.04,mt.wood); u.legs.push(g);}
+     add(B,gCyl,mt.wood,0,.62,0,.13*k2,.8,.13*k2); u.sway=[]; for(let i=0;i<3;i++){const g=new THREE.Group(); g.position.set((i-1)*.12,1.0,0); B.add(g); add(g,gIco,lite,0,.12+(i%2)*.06,0,.2+(i%2)*.06); u.sway.push(g);}
+     u.arms=[limb(B,-.14,.8,0,.32,.03,mt.wood),limb(B,.14,.8,0,.32,.03,mt.wood)]; const hg=new THREE.Group(); hg.position.set(0,.72,.12); B.add(hg); head=hg; back=[B,0,.7,-.13]; break;}
+   case 'wisp':{u.float=true; const bd=add(B,gCone,M(c1,{roughness:.3,transparent:true,opacity:.88}),0,.55,0,.28*k2,.7,.28*k2); bd.rotation.x=Math.PI; add(B,gSph,gl,0,.62,.06,.1);
+     u.sway=[]; for(let i=0;i<3;i++){const g=new THREE.Group(); g.position.set((i-1)*.1,.22,0); B.add(g); add(g,gCone,sec,0,-.1,0,.05,.2,.05).rotation.x=Math.PI; u.sway.push(g);}
+     u.arms=[limb(B,-.24,.82,0,.28,.03,main),limb(B,.24,.82,0,.28,.03,main)]; const hg=new THREE.Group(); hg.position.y=.98; B.add(hg); add(hg,gSph,main,0,0,0,.15); head=hg; u.head=hg; back=[B,0,.8,-.14]; break;}}
+  if(head) addHeadPart(head,sp.plan==='bird'&&sp.head==='plain'?'beak':sp.head,mt);
+  if(back&&sp.back!=='none') addBackPart(back[0],back[1],back[2],back[3],sp.back,mt);
+  if(tail&&sp.tail!=='none') addTail(tail[0],tail[1],tail[2],tail[3],sp.tail,mt);
+  if(u.arms.length===2&&sp.plan!=='crab'&&sp.plan!=='mantis'){addWeapon(sp.weap==='bow'?u.arms[0]:u.arms[1],sp.weap,mt,u); if(role==='ranged') u.ranged=true; if(role==='caster') u.caster=true;}
+  else if(role==='ranged'&&head&&sp.plan!=='tripod'){add(head,gCyl,mt.metal,0,-.02,.16,.03,.16,.03).rotation.x=Math.PI/2; add(head,gSphL,gl,0,-.02,.25,.03);}
+  if(role==='bomb'){const f=add(B,gSphL,glow('#ffb03a',2.2),0,sp.plan==='sac'?.82:.7,0,.05); u.orb=f;}}
 function buildEnemy(e){
   const R=model(),B=R.userData.body,bio=BIOMES[L.bi],f=e.feat||FEAT[bio.id][e.type],c1=e.c1,c2=e.c2,acc=bio.accent; R.userData.kind=f;
-  switch(f){
+  if(!e.feat&&!e.ally&&!L.menu){buildCreature(R,B,monSpec(L.bi,e.type),c1,c2,e.type);} else switch(f){
   case 'husk': case 'frosthusk': case 'mummy': {
     const h=humanoid({body:c1,skin:c2,hunch:.32,armsFwd:1.35,eye:f==='mummy'?'#ffd36a':f==='frosthusk'?'#7fd0ff':'#d8ff6a',eyeGlow:true,legC:hexShade(c1,-.45)});
     if(f==='husk'){const moss=M('#3f6a2a',{roughness:1}); add(h.torso,gSphL,moss,-.2,.47,.02,.09); add(h.torso,gSphL,moss,.16,.48,-.05,.075); add(h.head,gSphL,moss,.08,.13,-.03,.08); add(h.head,gSphL,moss,-.07,.15,0,.06);
@@ -2873,6 +3023,7 @@ function syncEnemy(e){const m=ensure(e,()=>buildEnemy(e),e.ally?'al'+e.mk:'e'+L.
   if(e.ally){if(!u.allyRing){u.allyRing=new THREE.Mesh(gRing,new THREE.MeshBasicMaterial({color:new THREE.Color(e.c2),transparent:true,opacity:.75,depthWrite:false,side:THREE.DoubleSide})); u.allyRing.rotation.x=-Math.PI/2; u.allyRing.position.y=.03; u.allyRing.scale.setScalar(e.r*S*1.5); m.add(u.allyRing);} u.allyRing.material.opacity=e.life<3?.3+.4*Math.abs(Math.sin(time*8)):.75;}
   m.position.set(e.x*S,0,e.y*S); m.rotation.y=yawOf(e.face); if(u.ph==null) u.ph=Math.random()*6; if(!u.base0) u.base0=m.scale.x;
   const moving=e.alert&&e.state==='chase'; animLimbs(m,e.walk,moving||e.state==='dash');
+  if(u.float&&u.body) u.body.position.y=.12+Math.sin(time*2.2+u.ph)*.06; if(u.sway) u.sway.forEach((g,i)=>{g.rotation.z=Math.sin(time*2.4+i+u.ph)*.3; g.rotation.x=Math.cos(time*1.9+i)*.25;});
   {const b0=u.base0, fl=clamp((e.flash||0)/.1,0,1); let sx=1,sy=1, lean=0;
    if(e.state==='wind'){const p=.5+.5*Math.sin(time*18); sx=1.07; sy=.9; lean=-.18; if(u.body) u.body.position.y+=.0;}
    else if(e.state==='dash'){sx=.92; sy=1.06; lean=.25;}
