@@ -62,6 +62,14 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #sigCall{position:fixed;left:50%;top:13%;transform:translateX(-50%);font:700 clamp(18px,3.2vw,30px)/1.1 'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase;text-shadow:0 0 14px currentColor,0 2px 0 #000;pointer-events:none;opacity:0;z-index:30;white-space:nowrap}
 #sigCall.show{animation:sigIn 1.7s ease-out forwards}
 @keyframes sigIn{0%{opacity:0;transform:translateX(-50%) scale(1.5)}12%{opacity:1;transform:translateX(-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-10px)}}
+#adminBtn{position:fixed;right:12px;bottom:12px;z-index:60;width:46px;height:46px;border-radius:50%;border:2px solid #ffd36a;background:rgba(20,16,10,.85);color:#ffd36a;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 0 14px rgba(255,211,106,.4)}
+#adminBtn[hidden],#adminPanel[hidden]{display:none}
+#adminPanel{position:fixed;inset:0;z-index:61;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+#adminPanel .admBox{background:#15120e;border:2px solid #ffd36a;border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px;width:min(420px,100%);max-height:92vh;overflow:auto}
+#adminPanel h3{margin:0 0 4px;color:#ffd36a;font-family:'Space Mono',monospace;letter-spacing:.05em}
+#adminPanel .admRow{display:flex;flex-direction:column;gap:6px;color:#e8dcc0;font-size:14px}
+#adminPanel select{padding:8px;background:#221c14;color:#f0e6d0;border:1px solid #6a5a3a;border-radius:6px;font-size:14px}
+#adminPanel .admRow3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 #menu h1{font-size:clamp(36px,min(9.5vw,10.5vh),112px);line-height:.88;color:var(--crown);text-shadow:0 5px 0 var(--crown-d),0 11px 0 rgba(0,0,0,.45);margin:6px 0 18px}
 .crowns{display:flex;gap:8px;align-items:center;margin-bottom:26px;color:var(--mute);font-size:14px;flex-wrap:wrap}
 .pip{width:24px;height:17px;background:#2b4650;clip-path:polygon(0 100%,0 22%,25% 56%,50% 0,75% 56%,100% 22%,100% 100%)}
@@ -1118,7 +1126,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='3.6.0', SAVE_VERSION=6;
+const APP_VERSION='3.7.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -3188,6 +3196,42 @@ let newArmed=false;
 $('#btnNew').onclick=()=>{if(SAVE&&!newArmed){newArmed=true; $('#btnNew').textContent='Erase progress and start over?'; return;} SAVE=newSave(); persist(); openMap();};
 $('#btnContinue').onclick=()=>{if(SAVE) openMap();};
 $('#menuTitle').addEventListener('click',giftTap);
+/* ---------------- admin panel: only for one account (checked by a scrambled code, the email is not stored here) ---------------- */
+let _admK=null,_admE=null;
+function isAdmin(){const g=SAVE&&SAVE.profile&&SAVE.profile.google; if(!g||!g.email) return false; const e=String(g.email).trim().toLowerCase(); if(e!==_admE){_admE=e; _admK=keyOf(e)===GIFT_KEY;} return _admK;}
+function adminLoot(){const types=['usword','uweapon','uarmor','uarmor','uart','uart','uart']; let n=0;
+  for(const t of types){const it=mkCatItem(pickCat(CAT[t],27),t,27,'unique'); enchantItem(it); delete it.newEnch; it.name='Admin '+it.name; it.pow=Math.round(it.pow*2);
+    if(it.dmg) it.dmg=Math.round(it.dmg*2); if(it.hp) it.hp=Math.round(it.hp*2); if(it.pot) it.pot=+(it.pot*1.6).toFixed(2); SAVE.inv.push(it); n++;}
+  persist(); toast(n+' admin items added to your pack','#ffd36a');}
+function adminPlay(bi,kind){$('#adminPanel').hidden=true; hideOverlays(); MP.inGame=false; const B=BIOMES[bi];
+  if(kind==='region'){startLevel(bi,0,true); run.guest=true; return;}
+  startLevel(bi,B.levels.length,false); run.guest=true; const b=boss; if(!b) return; P.x=b.x; P.y=b.y+260; cam.x=P.x; cam.y=P.y; b.awake=true; b.face=angTo(b,P); b.cd=1.2;
+  if(kind==='intro') startCine(bossCine(b),()=>{$('#bossBar').hidden=false;});
+  else {if(b.id==='sov1'){const D=BOSSES.sov2; Object.assign(b,{id:'sov2',name:D.name,c1:D.c1,c2:D.c2,r:D.r});} if(b.id==='forms1'){const D=BOSSES.forms3; Object.assign(b,{id:'forms3',name:D.name,c1:D.c1,c2:D.c2});} b.hp=0; bossDown(b);}}
+function renderAdmin(){const p=$('#adminPanel'); p.querySelector('[data-a="gems"]').textContent='Infinite gems: '+(SAVE.adminGems?'ON':'OFF'); p.querySelector('[data-a="all"]').textContent='Unlock all levels & maps: '+(SAVE.adminAll?'ON':'OFF');}
+function buildAdmin(){if($('#adminBtn')) return;
+  const b=document.createElement('button'); b.id='adminBtn'; b.title='Admin settings'; b.textContent='⚙'; b.hidden=true; document.body.appendChild(b);
+  const p=document.createElement('div'); p.id='adminPanel'; p.hidden=true;
+  p.innerHTML=`<div class="admBox"><h3>Admin settings</h3>
+    <button class="btn" data-a="gems"></button>
+    <button class="btn" data-a="loot">Give admin loot</button>
+    <button class="btn" data-a="all"></button>
+    <div class="admRow"><label>Cutscenes</label><select id="admReg">${BIOMES.map((B,i)=>`<option value="${i}">${B.name} · ${(BOSSES[B.boss]||{}).name||''}</option>`).join('')}</select></div>
+    <div class="admRow3"><button class="btn small" data-a="region">Region intro</button><button class="btn small" data-a="intro">Boss intro</button><button class="btn small" data-a="defeat">Boss defeat</button></div>
+    <button class="btn danger small" data-a="close">Close</button></div>`;
+  document.body.appendChild(p);
+  b.onclick=e=>{e.stopPropagation(); if(!isAdmin()) return; renderAdmin(); p.hidden=!p.hidden;};
+  p.addEventListener('click',e=>{const a=e.target.closest('[data-a]'); if(!a){if(e.target===p) p.hidden=true; return;} const k=a.dataset.a;
+    if(k==='close') p.hidden=true;
+    else if(k==='gems'){SAVE.adminGems=!SAVE.adminGems; if(SAVE.adminGems) SAVE.shards=Math.max(SAVE.shards||0,999999); persist(); renderAdmin(); toast(SAVE.adminGems?'Infinite gems on':'Infinite gems off','#7fe0c8'); if(mode==='map'){openMap(); p.hidden=false;}}
+    else if(k==='loot') adminLoot();
+    else if(k==='all'){SAVE.adminAll=!SAVE.adminAll; persist(); renderAdmin(); toast(SAVE.adminAll?'Every level and map unlocked':'Unlock-all turned off','#8fd06a'); if(mode==='map') openMap();}
+    else adminPlay(+$('#admReg').value,k);});
+  ['keydown','keyup'].forEach(t=>p.addEventListener(t,e=>e.stopPropagation()));
+  setInterval(()=>{const ok=isAdmin(); b.hidden=!ok||mode==='cutscene'; if(!ok) p.hidden=true;
+    if(ok&&SAVE.adminGems&&SAVE.shards<999999){SAVE.shards=999999; persist();}},700);}
+setTimeout(buildAdmin,0);
+
 $('#btnHow').onclick=()=>{prevMode=mode; $('#how').hidden=false; $('#howClose').focus();};
 $('#howClose').onclick=()=>{$('#how').hidden=true;};
 
@@ -3233,7 +3277,7 @@ const worldOf=bi=>BIOMES[bi].world||1;
 const outerOpen=()=>SAVE&&(SAVE.won||Object.keys(SAVE.cleared).some(k=>+k.split('-')[0]>=7));
 const WORLD_NAME={1:'Isle of Six Crowns',2:'Outer Isles',3:'The Deep Dark',4:'Shift Dimension',5:'The Forge',6:'The Void',7:'Core of Creations'};
 const anyIn=min=>Object.keys(SAVE.cleared).some(k=>+k.split('-')[0]>=min);
-function worldOpen(w){if(!SAVE) return w===1; if(w===1) return true; if(w===2) return outerOpen(); if(w===3) return !!SAVE.cleared['9-4']||anyIn(10); if(w>=4&&w<=6) return !!SAVE.portalOpen||!!SAVE.cleared['10-6']||anyIn(11); if(w===7) return !!(SAVE.cleared['14-4']&&SAVE.cleared['18-4']&&SAVE.cleared['22-4'])||anyIn(23); return false;}
+function worldOpen(w){if(SAVE&&SAVE.adminAll) return true; if(!SAVE) return w===1; if(w===1) return true; if(w===2) return outerOpen(); if(w===3) return !!SAVE.cleared['9-4']||anyIn(10); if(w>=4&&w<=6) return !!SAVE.portalOpen||!!SAVE.cleared['10-6']||anyIn(11); if(w===7) return !!(SAVE.cleared['14-4']&&SAVE.cleared['18-4']&&SAVE.cleared['22-4'])||anyIn(23); return false;}
 function islandNoise(x,y,cx,cy,rx,ry,seed){const dx=(x-cx)/rx,dy=(y-cy)/ry,a=Math.atan2(dy,dx),r=Math.hypot(dx,dy),e=.86+.07*Math.sin(a*3+seed)+.04*Math.sin(a*7+seed*2)+.02*Math.sin(a*13+seed); return {r,e};}
 function drawWorld3(){const g=isleCv.getContext('2d'),S=5;
   for(let y=0;y<640;y+=S) for(let x=0;x<1000;x+=S){const h=hash(x,y); let col=h<.03?'#0a1418':'#05090c'; const I=islandNoise(x,y,640,330,330,285,3);
@@ -3291,7 +3335,7 @@ function drawWorld2(){const g=isleCv.getContext('2d'),S=5;
   g.fillStyle='#a89a78'; for(let i=0;i<5;i++) g.fillRect(760+i*8,168-i*12,80-i*16,12); g.fillStyle='#e8c860'; g.fillRect(796,106,8,8); g.fillStyle='#3f7a28'; g.fillRect(752,164,10,16); g.fillRect(838,160,10,14);
   drawnWorld=2;}
 const levelKey=(bi,li)=>bi+'-'+li;
-function unlocked(bi,li){if(bi===6&&!EVENT_ACTIVE()) return false; if(SAVE.cleared[levelKey(bi,li)]) return true; if(li>0) return !!SAVE.cleared[levelKey(bi,li-1)];
+function unlocked(bi,li){if(bi===6&&!EVENT_ACTIVE()) return false; if(SAVE&&SAVE.adminAll) return true; if(SAVE.cleared[levelKey(bi,li)]) return true; if(li>0) return !!SAVE.cleared[levelKey(bi,li-1)];
   if(bi===7) return !!SAVE.won; if(bi===11||bi===15||bi===19) return worldOpen(4); if(bi===23) return worldOpen(7); if(bi>7) return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];
   if(bi===6) return true;
   if(bi===0) return true; if(bi===5){for(let b=0;b<5;b++) if(!SAVE.cleared[levelKey(b,2)]) return false; return true;} return !!SAVE.cleared[levelKey(bi-1,2)];}
