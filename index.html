@@ -1126,7 +1126,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='3.8.0', SAVE_VERSION=6;
+const APP_VERSION='3.8.1', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -2176,30 +2176,36 @@ function buildBoss(b){
     const aL=limb(torso,-.52,.72,0,.62,.12,hide,plate), aR=limb(torso,.52,.72,0,.62,.12,hide,plate); u.arms=[aL,aR]; u.armsFwd=.2;
     for(const a of [aL,aR]) for(let i=0;i<3;i++) add(a,gCone,M('#d8d8e0'),(i-1)*.05,-.72,.06,.025,.12,.025).rotation.x=Math.PI;
     u.smallArms=[limb(torso,-.36,.36,.12,.36,.06,hide),limb(torso,.36,.36,.12,.36,.06,hide)]; break;}
-  case 'sculkmonstrosity':{const u=R.userData; u.legType='crawl'; u.legs=[]; u.arms=[];
-    const shell=M('#0a1e24',{roughness:.45,metalness:.25}), shell2=M('#10303a',{roughness:.5,metalness:.2}), flesh=M('#0c2a30',{roughness:.6}), bone=M('#cfd8d0',{roughness:.45}), pus=glow('#2affe0',2), seam=glow('#2affe0',1.6), spine=M('#5affff',{emissive:new THREE.Color('#14b0a0'),emissiveIntensity:1.4,roughness:.15,metalness:.3,transparent:true,opacity:.92});
-    // arched, armoured body with glowing seams between the plates
-    add(B,gSph,flesh,0,.85,0,.62,.46,.86);
-    for(let i=0;i<5;i++){const z=.62-i*.31, r=.58-Math.abs(i-1.5)*.05; const pl=add(B,gCap,i%2?shell2:shell,0,.95+Math.sin(i/4*Math.PI)*.12,z,r,.42,.3); pl.rotation.x=-.15+i*.08; const sm=add(B,gTor,seam,0,.98+Math.sin(i/4*Math.PI)*.12,z-.15,r*.9,r*.9,.4); sm.rotation.x=Math.PI/2-.1; sm.scale.z=.25; sm.castShadow=false;}
-    // a ribcage under the belly with a pulsing heart inside
-    for(let i=0;i<5;i++){const z=.35-i*.17; const rb=add(B,gHalfTor,bone,0,.62,z,.4,.34,.4); rb.rotation.z=Math.PI; rb.rotation.y=0;}
-    u.heart=add(B,gSph,glow('#2affe0',2.6),0,.6,.0,.16,.24,.16); u.heart.castShadow=false;
-    // crystal spines along the back
-    for(let i=0;i<8;i++){const z=.55-i*.16, hh=.22+Math.sin(i/7*Math.PI)*.32; const sp=add(B,gOct,spine,(i%2?.07:-.07),1.3+Math.sin(i/7*Math.PI)*.1,z,.06,hh,.06); sp.rotation.z=(i%2?-.25:.25); sp.castShadow=false;}
-    // a low wedge head with six eyes and side-opening mandibles
-    const hd=new THREE.Group(); hd.position.set(0,.78,.86); B.add(hd); u.head=hd; add(hd,gSph,shell,0,0,0,.34,.26,.3); add(hd,gCap,shell2,0,.06,-.02,.36,.2,.32);
-    const ey=glow('#5affff',2.6); u.core=add(hd,gSph,ey,-.1,.1,.26,.04); [[.1,.1],[-.17,.04],[.17,.04],[-.05,.16],[.05,.16]].forEach(([x,y])=>add(hd,gSph,ey,x,y,.25,.03));
-    add(hd,gSph,M('#020608'),0,-.1,.22,.2,.08,.1); u.mand=[];
-    for(const sd of [-1,1]){const mg=new THREE.Group(); mg.position.set(sd*.2,-.08,.18); hd.add(mg); u.mand.push(mg); const m1=add(mg,gCone,bone,sd*.05,0,.2,.05,.42,.06); m1.rotation.set(Math.PI/2,0,-sd*.5);
-      for(let k=0;k<3;k++) add(mg,gCone,bone,sd*(.02+k*.03),-.02,.08+k*.08,.012,.07,.012).rotation.x=Math.PI;}
-    // six long spider legs
-    for(let i=0;i<6;i++){const sd=i<3?-1:1, k=i%3, z=.45-k*.42; const lg=new THREE.Group(); lg.position.set(sd*.5,.8,z); B.add(lg); lg.userData.ph=i; u.legs.push(lg);
-      seg(lg,[0,0,0],[sd*.55,.42,0],.07,shell); seg(lg,[sd*.55,.42,0],[sd*.95,-.8,0],.05,shell2); add(lg,gCone,bone,sd*.97,-.84,0,.045,.14,.045).rotation.x=Math.PI; add(lg,gSph,seam,sd*.55,.42,0,.07).castShadow=false;}
-    // glowing pustules across the plates
-    u.spots=[]; for(let i=0;i<18;i++){const a2=i/18*TAU, z=Math.cos(a2)*.7, x=Math.sin(a2)*.5; const sp=add(B,gSph,pus,x,1.0+Math.abs(Math.cos(a2))*.12,z,.04+(i%3)*.015); sp.castShadow=false; u.spots.push(sp);}
-    // sculk tendrils trailing from the tail
-    u.tentacles=[]; for(let i=0;i<4;i++){const g=new THREE.Group(); g.position.set((i-1.5)*.16,.8,-.8); g.rotation.y=Math.PI/2+(i-1.5)*.3; B.add(g); const segs=[]; let p=g;
-      for(let k=0;k<5;k++){const sg=new THREE.Group(); sg.position.x=k?.17:0; p.add(sg); add(sg,gSph,k%2?flesh:shell2,.09,0,0,.08-k*.012,.06-k*.008,.06-k*.008); if(k===4) add(sg,gSph,pus,.18,0,0,.035); segs.push(sg); p=sg;} u.tentacles.push(segs);}
+  case 'sculkmonstrosity':{const u=R.userData; u.legs=[]; u.arms=[]; u.armsFwd=.25;
+    const shell=M('#0a1e24',{roughness:.45,metalness:.25}), shell2=M('#10303a',{roughness:.5,metalness:.2}), flesh=M('#0c2a30',{roughness:.6}), flesh2=M('#123a40',{roughness:.6}), bone=M('#cfd8d0',{roughness:.45}), pus=glow('#2affe0',2), seam=glow('#2affe0',1.6), spine=M('#5affff',{emissive:new THREE.Color('#14b0a0'),emissiveIntensity:1.4,roughness:.15,metalness:.3,transparent:true,opacity:.92});
+    // a huge hunched torso leaning forward on its fists
+    const tor=new THREE.Group(); tor.position.set(0,1.0,.05); tor.rotation.x=.38; B.add(tor);
+    add(tor,gSph,flesh,0,.15,0,.72,.62,.6); add(tor,gSph,flesh2,0,.5,-.08,.6,.42,.5); add(tor,gSph,flesh,0,-.25,.1,.5,.4,.45);
+    // armour plates over the hump with glowing seams, and crystal spines
+    for(let i=0;i<4;i++){const y=.72-i*.22, z=-.25-i*.12; const pl=add(tor,gCap,i%2?shell2:shell,0,y,z,.62-i*.06,.34,.42); pl.rotation.x=-.9-i*.25;}
+    for(let i=0;i<7;i++){const t=i/6, hh=.2+Math.sin(t*Math.PI)*.34; const sp=add(tor,gOct,spine,(i%2?.1:-.1),1.0-t*.75,-.42-t*.35,.08,hh*1.2,.08); sp.rotation.x=-.9-t*.6; sp.rotation.z=i%2?-.3:.3; sp.castShadow=false;}
+    // an open ribcage on the chest with the pulsing heart inside
+    for(let i=0;i<4;i++){const rb=add(tor,gHalfTor,bone,0,.2-i*.15,.42,.32-i*.03,.3,.32); rb.rotation.set(Math.PI/2,0,Math.PI);}
+    u.heart=add(tor,gSph,glow('#2affe0',2.6),0,.05,.36,.16,.24,.16); u.heart.castShadow=false;
+    // a small armoured head sunk between the shoulders, six eyes and snapping side jaws
+    const hd=new THREE.Group(); hd.position.set(0,1.18,.62); B.add(hd); u.head=hd; add(hd,gSph,shell,0,0,0,.3,.24,.27); add(hd,gCap,shell2,0,.06,-.02,.32,.18,.29);
+    const ey=glow('#5affff',2.6); u.core=add(hd,gSph,ey,-.09,.08,.24,.04); [[.09,.08],[-.16,.02],[.16,.02],[-.05,.14],[.05,.14]].forEach(([x,y])=>add(hd,gSph,ey,x,y,.23,.03));
+    add(hd,gSph,M('#020608'),0,-.1,.2,.18,.08,.1); u.mand=[];
+    for(const sd of [-1,1]){const mg=new THREE.Group(); mg.position.set(sd*.18,-.1,.16); hd.add(mg); u.mand.push(mg); const m1=add(mg,gCone,bone,sd*.04,0,.17,.045,.36,.055); m1.rotation.set(Math.PI/2,0,-sd*.5);}
+    // massive knuckle-walking arms with bone claws
+    for(const sd of [-1,1]){const ar=new THREE.Group(); ar.position.set(sd*.78,1.35,.3); B.add(ar); u.arms.push(ar);
+      add(ar,gSph,shell,0,0,0,.3,.26,.3); add(ar,gCap,shell2,sd*.04,.08,0,.32,.2,.32);
+      add(ar,gSph,flesh,0,-.36,.04,.2,.36,.2); add(ar,gSph,flesh2,0,-.82,.1,.25,.34,.24); add(ar,gSph,seam,sd*.1,-.7,.2,.05).castShadow=false;
+      add(ar,gSph,shell,0,-1.18,.14,.28,.2,.3);
+      for(let k=0;k<4;k++){const c=add(ar,gCone,bone,(k-1.5)*.1,-1.3,.34,.05,.2,.05); c.rotation.x=Math.PI/2+.5;}}
+    // short, thick hind legs
+    for(const sd of [-1,1]){const lg=new THREE.Group(); lg.position.set(sd*.42,.72,-.35); B.add(lg); u.legs.push(lg);
+      add(lg,gSph,flesh2,0,-.1,0,.24,.3,.26); add(lg,gCyl,shell,0,-.45,.04,.15,.4,.15); add(lg,gSph,shell2,0,-.68,.1,.2,.08,.26); for(let k=0;k<3;k++) add(lg,gCone,bone,(k-1)*.08,-.7,.32,.035,.12,.035).rotation.x=Math.PI/2;}
+    // glowing pustules all over
+    u.spots=[]; for(let i=0;i<18;i++){const a2=i/18*TAU, sp=add(tor,gSph,pus,Math.cos(a2)*.62,.1+Math.sin(i*1.7)*.3,Math.sin(a2)*.5,.04+(i%3)*.015); sp.castShadow=false; u.spots.push(sp);}
+    // sculk tendrils writhing off the back
+    u.tentacles=[]; for(let i=0;i<4;i++){const g=new THREE.Group(); g.position.set((i-1.5)*.22,.55,-.55); g.rotation.set(0,Math.PI/2,.9); tor.add(g); const segs=[]; let p=g;
+      for(let k=0;k<5;k++){const sg=new THREE.Group(); sg.position.x=k?.16:0; p.add(sg); add(sg,gSph,k%2?flesh:shell2,.08,0,0,.07-k*.01,.055-k*.007,.055-k*.007); if(k===4) add(sg,gSph,pus,.16,0,0,.032); segs.push(sg); p=sg;} u.tentacles.push(segs);}
     break;}
   case 'monarch':{const u=R.userData; const st={metalness:.5,roughness:.32}; const h=humanoid({body:'#1e1428',bodyOpt:st,skin:'#2a2236',sleeve:'#160e1e',legC:'#100a16',eye:'#7affb0',eyeGlow:true,armsFwd:.25});
     h.head.children.forEach(c=>c.visible=false);
