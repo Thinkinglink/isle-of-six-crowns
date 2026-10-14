@@ -340,7 +340,7 @@ function playStep(S,i,t,bus){const st=i%16, bar=Math.floor(i/16), ch=S.prog[bar]
   // lead
   const m=S.mel[i]; if(m&&!(sec===0&&!S.menu&&bar<2)) {minst(S.lead,bus,t,m.n,m.d,v.lead*(sec===3?1.1:1)); if(S.menu&&sec>=1) minst('strings',bus,t,m.n-12,m.d,.35);}}
 
-const VER='4.6.2';
+const VER='4.7.0';
 // ---- the album ----
 const T=[]; const scaleName=a=>Object.keys(SCALES).find(k=>SCALES[k]===a)||'';
 const NICE={major:'major',minor:'minor',dorian:'dorian',phrygian:'phrygian',harm:'harmonic minor',lydian:'lydian',mixo:'mixolydian',whole:'whole-tone',dim:'diminished',hijaz:'hijaz'};
@@ -414,7 +414,7 @@ function draw(){requestAnimationFrame(draw); const W=cv.width, H=cv.height, cx=W
   // loop position arc
   g.strokeStyle='rgba(98,198,182,.85)'; g.lineWidth=W*.006; g.beginPath(); g.arc(cx,cy,r0*.86,-Math.PI/2,-Math.PI/2+pos*TAU); g.stroke();}
 show(); render(); draw();
-window.__jb={makeSong,playStep,AU,T,inst,drum};
+window.__jb={makeSong,playStep,AU,T};
 })();
 </script>
 

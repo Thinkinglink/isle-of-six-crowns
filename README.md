@@ -19,6 +19,17 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 👑 Version 4.7
+
+- **Game modes button** in the top right of the main menu: pick Adventure, **Infinite Bosses**, or see what's coming next (Dungeons in the next update, then Legends).
+- **Infinite Bosses:** fight every boss you have beaten in Adventure, one after another. You start with 6 minutes and win 45 more seconds for each boss. The more bosses you beat, the bigger the reward for Adventure: diamonds, boss gear, a cursed artifact at 5 bosses and a boosted item at 8. Your best run also gives you a **Boss Hunter crest**: +1% damage and health in every level for each boss in your best run (up to +20%). Beat them all and they come back stronger.
+- **Key golems finish the job:** when you get close to a locked gate, the golem walks to it by itself, unlocks it, then stops following you and stays to guard the gate.
+- **Sign in with your account name and email:** type the name and email of an account saved on this device and the game switches to it. If there is no account yet, you can make one from your current progress. Google sign-in is still there.
+- **One free enchantment a week:** enchanting now uses a weekly token. You get a new one every week (up to 4 saved). The enchant button shows how many you have, or how long until the next.
+- **Smarter enemies:** monsters call nearby friends when they spot you, some circle around to attack from the side, badly hurt ones run away to heal, and sometimes reinforcements arrive.
+- **Armor set bonuses:** wear a weapon and armor from the same island to get a set bonus with its own glowing aura (Regrowth, Sandstrider, Venomous, Frostbound, Inferno, Aegis, Stormcaller or Soulbound).
+- **Cursed artifacts:** rare, very strong gear with a catch (Blood Pact, Glass Heart, Frenzy, Hunger, Void Lamp). Your pack shows the bonus and the curse.
+
 ## 🎬 Version 4.6
 
 - **Smoother animation everywhere:** characters ease into and out of walking, with a bobbing stride, weight shifts and a gentle idle sway. Monsters climb out of the ground when they appear, raise their weapons before they strike and swing through the hit. Bosses wind up every attack: slams raise both arms and smash down, charges lean in, casts lift the arms high, ranged attacks thrust forward, breath attacks rear back first, and roars build up instead of snapping.

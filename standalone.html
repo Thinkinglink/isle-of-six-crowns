@@ -66,6 +66,26 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 .strow small{display:block;color:#9fb0ac;font-size:12.5px;margin-top:2px}
 .strow .btn{flex:none}
 #muteAll{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));z-index:4;display:flex;align-items:center;gap:8px;padding:8px 12px;font:inherit;font-size:14px;color:#f3e6c4;background:rgba(7,17,22,.82);border:3px solid var(--rim);box-shadow:inset 0 0 0 2px var(--edge);cursor:pointer}
+#menuTop{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));z-index:4;display:flex;gap:8px}
+#menuTop #muteAll{position:static}
+#btnModes{display:flex;align-items:center;gap:8px;padding:8px 12px;font:inherit;font-size:14px;color:#ffd36a;background:rgba(7,17,22,.82);border:3px solid var(--rim);box-shadow:inset 0 0 0 2px var(--edge);cursor:pointer}
+#btnModes svg{width:20px;height:20px;fill:currentColor}
+#btnModes:focus-visible{outline:3px solid #ffd36a;outline-offset:2px}
+@media (max-width:560px){#btnModes span{display:none}}
+#modesPanel{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:16px}
+#modesPanel[hidden]{display:none}
+.modesbox{width:min(720px,100%)}
+.modesbox h2{margin:0;font-family:var(--display);color:#f0c050;font-size:24px}
+.modegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.modecard{display:flex;flex-direction:column;gap:6px;text-align:left;padding:14px;font:inherit;color:#f3e6c4;background:rgba(255,255,255,.04);border:2px solid rgba(255,255,255,.12);border-radius:8px;cursor:pointer}
+.modecard:hover,.modecard:focus-visible{border-color:#d8a840;background:rgba(216,168,64,.1);outline:none}
+.modecard .mico{font-size:26px}.modecard b{font-size:17px;color:#ffd36a}.modecard .md{font-size:13px;line-height:1.4;color:#c8d8d4}
+.modecard .msub{font-size:12.5px;color:#9fe0a0}.modecard .mtag{font-size:12px;color:#ffb070}
+.modecard.soon{opacity:.62}
+#gauntHud{position:absolute;left:50%;top:max(64px,calc(env(safe-area-inset-top) + 56px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;padding:6px 14px;background:rgba(7,17,22,.8);border:2px solid #d8a840;color:#f3e6c4;pointer-events:none;z-index:3}
+#gauntHud b{font-size:22px;color:#ffd36a;font-variant-numeric:tabular-nums}#gauntHud span{font-size:12px}
+#gauntHud.low b{color:#ff8a6a}
+#gauntHud[hidden]{display:none}
 #muteAll svg{width:22px;height:22px;fill:currentColor}
 #muteAll.off{color:#ff8a6a}
 #muteAll:focus-visible{outline:3px solid #ffd36a;outline-offset:2px}
@@ -250,6 +270,8 @@ body.cinemode #gl{filter:contrast(1.07) saturate(1.14)}
 .enctag{color:#d8b0ff;font-family:var(--display)}
 .ench.soul b{color:#d8b0ff}
 .encrow{margin-bottom:6px}
+.cursed{margin:6px 0;padding:8px 10px;border:2px solid #6a1a8a;background:rgba(80,10,100,.25);color:#e0b0ff;font-size:13px;line-height:1.4}
+.cursed b{color:#fff}
 .uprow{margin-bottom:6px;align-items:center;flex-wrap:wrap}
 .upbtn{background:linear-gradient(#2fa88a,#1a7058);border-color:#0e4a3a;color:#fff}
 .upbtn:disabled{opacity:.5;cursor:not-allowed}
@@ -1218,11 +1240,11 @@ const ANDROID=typeof window.IsleAndroid!=='undefined';
 function loadSave(){if(ANDROID){try{const t=IsleAndroid.loadGame(); if(t){const s=JSON.parse(t); if(s&&s.eq&&s.eq.weapon) return s;}}catch(e){}}
   try{const s=JSON.parse(localStorage.getItem(KEY)); if(s&&s.eq&&s.eq.weapon) return s;}catch(e){} return null;}
 let andT=0; function androidSave(){if(!ANDROID||!SAVE) return; clearTimeout(andT); andT=setTimeout(()=>{try{IsleAndroid.saveGame(JSON.stringify(SAVE));}catch(e){}},40);}
-function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify(SAVE));}catch(e){} androidSave(); if(DESK.on){clearTimeout(DESK.t); DESK.t=setTimeout(writeSaveFile,40);}}
+function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify(SAVE));}catch(e){} if(typeof acctStore==='function') acctStore(); androidSave(); if(DESK.on){clearTimeout(DESK.t); DESK.t=setTimeout(writeSaveFile,40);}}
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='4.6.2', SAVE_VERSION=7;
+const APP_VERSION='4.7.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1261,8 +1283,27 @@ function calcStats(){const e=SAVE.eq,w=e.weapon,b=WEAPONS[w.kind],a=e.armor; con
   ST={dmg:w.dmg,rate:(w.rate||b.rate)*(has(w,'Swift')?.85:1),reach:w.reach||b.reach,arc:w.arc||b.arc,stun:!!b.stun,leech:has(w,'Leeching'),burn:has(w,'Burning'),crit:has(w,'Critical')?.22:.05,frost:has(w,'Frostbite'),thunder:has(w,'Thundering'),exec:has(w,'Executioner'),
    maxhp:Math.round(100+(a?a.hp:0)+(has(a,'Vital')?30:0)),red:Math.min(.6,(a?a.red:0)+(has(a,'Sturdy')?.08:0)),spd:175*(has(a,'Fleet')?1.12:1),regen:has(a,'Renewing')?1.5:0,
    power:Math.round(all.reduce((s,i)=>s+i.pow,0)/all.length),soul:!!w.encd,soulGuard:!!(a&&a.encd)};
+  // matching weapon + armor from the same island give a set bonus; cursed artifacts trade a big buff for a penalty
+  ST.set=null; if(w&&a&&w.bi===a.bi){const sb=SETS[SET_OF_MOOD[moodOf(w.bi)]||'soul']; if(sb){ST.set=sb; sb.f(ST);}}
+  ST.curses=[]; for(const it of all) if(it.curse&&CURSES[it.curse]){CURSES[it.curse].f(ST); ST.curses.push(CURSES[it.curse]);}
   ST.dmg=Math.round(ST.dmg*(1+.06*upLv('mig'))); ST.maxhp=Math.round(ST.maxhp*(1+.1*upLv('vit'))); ST.red=Math.min(.7,ST.red+.02*upLv('arm')); ST.spd*=1+.04*upLv('swf'); ST.crit+=.03*upLv('cri');
+  {const c=crestLv(); if(c){ST.dmg=Math.round(ST.dmg*(1+c/100)); ST.maxhp=Math.round(ST.maxhp*(1+c/100));}}
   return ST;}
+const SETS={regrowth:{n:'Regrowth',col:'#7aff8a',d:'Heal 3 health every second',f:S=>{S.regen+=3;}},
+ sand:{n:'Sandstrider',col:'#f0c878',d:'Move 15% faster and swing 8% faster',f:S=>{S.spd*=1.15; S.rate*=.92;}},
+ venom:{n:'Venomous',col:'#9aff3a',d:'Hits poison enemies (they keep taking damage) and +5% damage',f:S=>{S.burn=true; S.dmg=Math.round(S.dmg*1.05);}},
+ frost:{n:'Frostbound',col:'#9fe0ff',d:'Hits slow enemies and +5% damage reduction',f:S=>{S.frost=true; S.red+=.05;}},
+ inferno:{n:'Inferno',col:'#ff7a2a',d:'Hits set enemies on fire and +10% damage',f:S=>{S.burn=true; S.dmg=Math.round(S.dmg*1.1);}},
+ aegis:{n:'Aegis',col:'#ffd36a',d:'+12% damage reduction and +10% health',f:S=>{S.red+=.12; S.maxhp=Math.round(S.maxhp*1.1);}},
+ storm:{n:'Stormcaller',col:'#7fd8ff',d:'Hits can chain lightning and you move 5% faster',f:S=>{S.thunder=true; S.spd*=1.05;}},
+ soul:{n:'Soulbound',col:'#c890ff',d:'Heal from your hits and +8% critical chance',f:S=>{S.leech=true; S.crit+=.08;}}};
+const SET_OF_MOOD={nature:'regrowth',enchanted:'regrowth',desert:'sand',swamp:'venom',infect:'venom',frost:'frost',fire:'inferno',cataclysm:'inferno',royal:'aegis',holy:'aegis',storm:'storm',water:'storm'};
+const CURSES={bloodpact:{n:'Blood Pact',buff:'+60% damage',pen:'-40% max health',f:S=>{S.dmg=Math.round(S.dmg*1.6); S.maxhp=Math.round(S.maxhp*.6);}},
+ glassheart:{n:'Glass Heart',buff:'+30% damage and +25% critical chance',pen:'Your armor stops no damage',f:S=>{S.dmg=Math.round(S.dmg*1.3); S.crit+=.25; S.red=0;}},
+ frenzy:{n:'Frenzy Chain',buff:'Swing 35% faster and move 20% faster',pen:'Lose 2 health every second',f:S=>{S.rate*=.65; S.spd*=1.2; S.drain=(S.drain||0)+2;}},
+ hunger:{n:'Hungering Idol',buff:'Heal from every hit and +40% damage',pen:'Your health never regenerates',f:S=>{S.leech=true; S.dmg=Math.round(S.dmg*1.4); S.noRegen=true;}},
+ voidlamp:{n:'Void Lantern',buff:'+80% damage',pen:'Half max health, and enemies hit you 25% harder',f:S=>{S.dmg=Math.round(S.dmg*1.8); S.maxhp=Math.round(S.maxhp*.5); S.red-=.25;}}};
+function makeCursed(bi){const it=mkCatItem(pickCat(CAT.uart,bi),'uart',bi,'unique'), k=choice(Object.keys(CURSES)); it.curse=k; it.name=CURSES[k].n+': '+it.name; it.pow=Math.round(it.pow*1.5); it.col='#6a1a8a'; return it;}
 const recPower=bi=>Math.round(20*(1+0.5*bi)*1.12);
 
 /* ---------------- canvas setup ---------------- */
@@ -1426,7 +1467,7 @@ function killE(e,fromNet){run.kills++; if(!e.ally){e.dieAt=time; e.dieDir=Math.r
   const n=rint(1,3); for(let i=0;i<n;i++) dropLoot(e.x,e.y,{kind:'shard',amt:1});
   if(Math.random()<.22) dropLoot(e.x,e.y,{kind:'arrows',amt:rint(3,6)});
   if(Math.random()<(e.type==='brute'?.18:.07)) dropLoot(e.x,e.y,{kind:'item',item:randomItem(L.tier)});}
-function randomItem(bi,boost=0){const rar=rollRarity(bi,boost), r=Math.random();
+function randomItem(bi,boost=0){const rar=rollRarity(bi,boost), r=Math.random(); if(Math.random()<(boost?.08:.025)) return makeCursed(bi);
   if(r<.4){const sw=Math.random()<.5; return rar==='unique'?(sw?mkCatItem(pickCat(CAT.usword,bi),'usword',bi,'unique'):mkCatItem(pickCat(CAT.uweapon,bi),'uweapon',bi,'unique')):(sw?mkCatItem(pickCat(CAT.sword,bi),'sword',bi,rar):mkCatItem(pickCat(CAT.weapon,bi),'weapon',bi,rar));}
   if(r<.8) return rar==='unique'?mkCatItem(pickCat(CAT.uarmor,bi),'uarmor',bi,'unique'):mkCatItem(pickCat(CAT.armor,bi),'armor',bi,rar);
   return rar==='unique'?mkCatItem(pickCat(CAT.uart,bi),'uart',bi,'unique'):mkCatItem(pickCat(CAT.art,bi),'art',bi,rar);}
@@ -1608,6 +1649,7 @@ function bossDown(b,fromNet){
   for(const sl of ['weapon','armor','artifact']) dropLoot(b.x,b.y,{kind:'item',item:bossItem(sl,b.id,L.tier)});
   {const gs=CAT.uart.find(e=>e.bossSummon===b.id&&!e.ev); if(gs){const it=mkCatItem(gs,'uart',L.tier,'unique'); it.pot=+(it.pot*1.12).toFixed(2); it.pow=Math.round(it.pow*1.12); it.boss=b.id; dropLoot(b.x,b.y,{kind:'item',item:it});}}
   b.fallCine=true; b.deadAt=null;
+  if(GAUNT&&!GAUNT.over&&!fromNet){gauntBeat(b); return;}
   if(b.id==='sov2'){banner('The Sovereign falls','All six crowns are yours'); if(!run.guest){SAVE.cleared[L.bi+'-'+L.li]=true; SAVE.won=true;} persist(); run.victory=true; const vs=victoryCine(b), ds=defeatCine(b,true); const all=ds.concat(vs); all.cleanup=ds.cleanup; startCine(all,()=>{L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T,final:true}; banner('Collect your loot','Then step into the portal');});}
   else if(b.id==='forms3'){const ds=defeatCine(b), ls=legendsOriginCine(b), all=ds.concat(ls); all.cleanup=()=>{if(ds.cleanup) ds.cleanup(); ls.cleanup();}; startCine(all,()=>legendsCard());}
   else if(LEGENDS[b.id]) startCine(defeatCine(b),()=>legendDoneCard(b));
@@ -1618,15 +1660,28 @@ function finishTransform(){const D=BOSSES.sov2,b=boss; Object.assign(b,{id:'sov2
   b.hp=b.max; L.form2=true; b.face=angTo(b,P); startCine(transformCine(b),()=>{radial(b,24,200,8*b.dm,'#d48cff'); shake(8);}); if(MP.role==='host'&&MP.inGame) bcast({t:'cine',k:'trans'});}
 
 /* ---------------- enemy AI ---------------- */
+// when a monster spots you it shouts for help: everyone nearby joins in, and sometimes reinforcements arrive
+function enemyAlerted(e){let n=0; ents.forEach(o=>{if(o!==e&&!o.alert&&dist(o,e)<420){o.alert=true; n++;}});
+  if((e.ai==='melee'||e.ai==='lunge')&&Math.random()<.45) e.flank=Math.random()<.5?-1:1; for(const o of ents) if(o!==e&&o.alert&&!o.flank&&(o.ai==='melee'||o.ai==='lunge')&&Math.random()<.4) o.flank=Math.random()<.5?-1:1;
+  puff(e.x,e.y-e.r*2.2,'#ffd36a',6,60,.5,5); if(typeof sfx==='function') sfx('ewind',e);
+  if(L&&!L.boss&&!L.menu&&!e.summoned&&(L.reinf||0)<6&&(MP.role!=='client'||!MP.inGame)&&Math.random()<.3){const k=1+(Math.random()<.4?1:0); L.reinf=(L.reinf||0)+k;
+    for(let i=0;i<k;i++){const ang=Math.random()*TAU; const x=e.x+Math.cos(ang)*70, y=e.y+Math.sin(ang)*70; const r2=spawnEnemy(pickType(L.tier),x,y,true); if(r2) puff(x,y,'#8a7a64',10,100,.5,5);}
+    toast(e.name+' called for reinforcements!','#ff9a6a');}}
 function updEnemy(e,dt){
   e.flash=Math.max(0,e.flash-dt); if(e.slowT>0){e.slowT-=dt; if(Math.random()<.08) parts.push({x:e.x+rand(-8,8),y:e.y,z:e.r*2,vx:0,vy:0,vz:20,life:.5,max:.5,col:'#9fe0ff',sz:3});}
   if(e.burn>0){e.burn-=dt; e.btk=(e.btk||0)+dt; if(e.btk>.5){e.btk=0; hurtE(e,Math.max(2,ST.dmg*.25),{}); if(e.hp<=0) return;} if(Math.random()<.3) parts.push({x:e.x+rand(-6,6),y:e.y,z:e.r*2.4,vx:0,vy:0,vz:110,life:.45,max:.45,col:'#ff8a3a',sz:3});}
   if(e.kx||e.ky){moveCirc(e,e.kx*dt,e.ky*dt); e.kx*=Math.pow(.002,dt); e.ky*=Math.pow(.002,dt); if(Math.abs(e.kx)+Math.abs(e.ky)<5){e.kx=e.ky=0;}}
   if(e.stun>0){e.stun-=dt; return;}
   const d=dist(e,P), a=angTo(e,P);
-  if(!e.alert){ if(d<330) {e.alert=true; ents.forEach(o=>{if(o!==e&&dist(o,e)<180) o.alert=true;});} else return; }
+  if(!e.alert){ if(d<330) {e.alert=true; enemyAlerted(e);} else return; }
   if(P.dead){return;}
-  const go=(dir,sm=1)=>{if(e.slowT>0) sm*=.5; moveCirc(e,Math.cos(a)*e.spd*sm*dt*dir,Math.sin(a)*e.spd*sm*dt*dir); e.walk+=dt*9; e.face=a;};
+  // smarter enemies: some circle round to your side or back instead of walking straight at you
+  const fl=(e.flank&&d>95&&e.state==='chase')?e.flank*.95*Math.min(1,(d-95)/180):0, am=a+fl;
+  const go=(dir,sm=1)=>{if(e.slowT>0) sm*=.5; const mv=dir>0?am:a; moveCirc(e,Math.cos(mv)*e.spd*sm*dt*dir,Math.sin(mv)*e.spd*sm*dt*dir); e.walk+=dt*9; e.face=a;};
+  // badly hurt enemies fall back, patch themselves up, then return to the fight
+  if(!e.healed&&!e.ally&&!e.summoned&&e.ai!=='bomb'&&e.hp>0&&e.hp<e.max*.35){e.healed=true; e.flee=2.2; e.state='chase'; puff(e.x,e.y-e.r,'#ffffff',6,80,.4,4);}
+  if(e.flee>0){e.flee-=dt; go(-1,1.3); e.face=a+Math.PI; if(e.flee<=0) e.heal=1.8; return;}
+  if(e.heal>0){e.heal-=dt; e.hp=Math.min(e.max,e.hp+e.max*.2*dt); e.face=a; if(Math.random()<.4) parts.push({x:e.x+rand(-10,10),y:e.y+rand(-6,6),z:rand(6,30),vx:0,vy:0,vz:60,life:.6,max:.6,col:'#7aff8a',sz:4}); if(d>70) return;}
   e.cd-=dt;
   switch(e.ai){
    case 'melee':
@@ -1664,7 +1719,7 @@ function update(dt){
   if(MP.inGame) mpTick(dt);
   if(mode==='cutscene'){updCine(dt); return;}
   if(mode!=='play'&&!(MP.inGame&&(mode==='pause'||mode==='inv'))) return;
-  run.time+=dt;
+  run.time+=dt; if(GAUNT) gauntTick(dt);
   shakeT=Math.max(0,shakeT-dt); if(shakeT<=0) shakeA=0; flashT=Math.max(0,flashT-dt);
   updPlayer(dt); mpRespawn(dt);
   const coopHost=MP.role==='host'&&MP.inGame, coopClient=MP.role==='client'&&MP.inGame;
@@ -1732,7 +1787,7 @@ function updPlayer(dt){
   if(L.water) updAir(dt);
   for(const k of ['atk','swing','rollCd','iframe','flash','bow','pot','slow','ward','gale','fury']) P[k]=Math.max(0,P[k]-dt);
   for(const k in P.acd) P.acd[k]=Math.max(0,P.acd[k]-dt);
-  if(ST.regen){P.hp=Math.min(ST.maxhp,P.hp+ST.regen*dt);}
+  if(ST.regen&&!ST.noRegen){P.hp=Math.min(ST.maxhp,P.hp+ST.regen*dt);} if(ST.drain&&!P.dead&&mode==='play') P.hp=Math.max(1,P.hp-ST.drain*dt);
   if(P.blades>0){P.blades-=dt; P.bladeT=(P.bladeT||0)+dt; if(P.bladeT>.25){P.bladeT=0; for(const e of targets()) if(dist(e,P)<82+e.r) hurtE(e,Math.max(1,Math.round(6*P.bladePow)),{});}}
   if(P.roll>0){P.roll-=dt; moveCirc(P,P.rdx*480*dt,P.rdy*480*dt); P.walk+=dt*20; if(Math.random()<.5) puff(P.x,P.y,'#cbbf9f',1,40,.3,3); return;}
   const m=moveVec(); const l=Math.hypot(m.x,m.y); MP.lastMove=l>0;
@@ -1771,6 +1826,63 @@ function updChests(){for(const c of L.chests){if(c.open||P.dead) continue; if(Ma
   dropLoot(c.x,c.y,{kind:'item',item:randomItem(L.tier,.25)}); if(Math.random()<.4) dropLoot(c.x,c.y,{kind:'item',item:randomItem(L.tier,.1)});
   for(let i=0;i<rint(4,8);i++) dropLoot(c.x,c.y,{kind:'shard',amt:1}); dropLoot(c.x,c.y,{kind:'arrows',amt:rint(5,9)}); toast('Chest opened','#f0b84a');}}}
 function completeLevel(fromNet){if(run.done) return; if(!fromNet&&MP.inGame&&MP.party){if(MP.role==='host') bcast({t:'complete'}); else toHost({t:'complete'});} run.done=true; if(!run.guest) SAVE.cleared[L.bi+'-'+L.li]=true; persist(); puff(P.x,P.y-10,BIOMES[L.bi].accent,30,160,.8,5); setTimeout(()=>showResult('clear'),500);}
+/*GAUNT-START*/
+/* ---------------- Infinite Bosses: fight every boss you have beaten, back to back, against the clock ---------------- */
+let GAUNT=null; const G_START=360, G_BONUS=45;
+function gauntList(){const seen={}, out=[]; if(!SAVE) return out; BIOMES.forEach((B,bi)=>{if(!B||!B.boss||!B.levels) return; if(!SAVE.cleared[bi+'-'+B.levels.length]) return; if(seen[B.boss]) return; seen[B.boss]=1; out.push(bi);}); return out;}
+function crestLv(){return Math.min(20,(SAVE&&SAVE.gBest)||0);}
+function startGauntlet(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;}
+  if(MP.party&&MP.party.members.length>1){toast('Infinite Bosses is played solo. Leave the party to start it.','#ffd36a'); return;}
+  const list=gauntList(); if(!list.length){toast('Beat at least one island boss in Adventure first. Every boss you beat joins Infinite Bosses.','#ffd36a'); return;}
+  GAUNT={list,i:0,left:G_START,beaten:0,names:[],over:false,granted:false,wait:0,t:0};
+  $('#modesPanel')&&($('#modesPanel').hidden=true); gauntLoad(0);
+  setTimeout(()=>banner('Infinite Bosses',`${list.length} boss${list.length>1?'es':''} · ${Math.round(G_START/60)} minutes · +${G_BONUS}s for every boss`),300);}
+function gauntLoad(i){if(!GAUNT) return; const prev=P&&P.hp>0&&i>0?P.hp/ST.maxhp:1; GAUNT.i=i; GAUNT.wait=0; const bi=GAUNT.list[i], B=BIOMES[bi];
+  startLevel(bi,B.levels.length); run.gaunt=true; L.exit=null; if(GAUNT.lap&&boss){boss.max=Math.round(boss.max*(1+.3*GAUNT.lap)); boss.hp=boss.max; boss.dm*=1+.15*GAUNT.lap;}
+  if(i>0) P.hp=Math.round(ST.maxhp*Math.min(1,prev+.35));
+  $('#lvlName').innerHTML=`<small>Infinite Bosses · boss ${i+1} of ${GAUNT.list.length}</small>${L.name}`; gauntHud();}
+function gauntHud(){let el=$('#gauntHud'); if(!el){el=document.createElement('div'); el.id='gauntHud'; el.setAttribute('role','timer'); $('#hud').appendChild(el);}
+  if(!GAUNT){el.hidden=true; return;} el.hidden=false; const s=Math.max(0,Math.ceil(GAUNT.left)), mm=Math.floor(s/60), ss=String(s%60).padStart(2,'0');
+  el.className=s<=30?'low':''; el.innerHTML=`<b>${mm}:${ss}</b><span>Bosses beaten: ${GAUNT.beaten} · best ${(SAVE.gBest||0)}</span>`;}
+function gauntTick(dt){if(!GAUNT||GAUNT.over) return; if(GAUNT.wait>0){GAUNT.wait-=dt; if(GAUNT.wait<=0){const n=GAUNT.i+1; setTimeout(()=>{if(!GAUNT||GAUNT.over) return; if(n>=GAUNT.list.length){GAUNT.lap=(GAUNT.lap||0)+1; banner('Every boss beaten!','They come back stronger. Keep going.'); GAUNT.list=GAUNT.list.slice(); for(let k=GAUNT.list.length-1;k>0;k--){const j=(Math.random()*(k+1))|0; [GAUNT.list[k],GAUNT.list[j]]=[GAUNT.list[j],GAUNT.list[k]];} gauntLoad(0);} else gauntLoad(n);},0);} return;}
+  GAUNT.left-=dt; GAUNT.t+=dt; GAUNT.hudT=(GAUNT.hudT||0)-dt; if(GAUNT.hudT<=0){GAUNT.hudT=.25; gauntHud();}
+  if(GAUNT.left<=0&&!run.done&&!P.dead){GAUNT.left=0; gauntHud(); run.done=true; flashT=.4; flashCol='#ff8a6a'; banner('Time is up!',`You beat ${GAUNT.beaten} boss${GAUNT.beaten===1?'':'es'}`); setTimeout(()=>gauntEnd('time'),1400);}}
+function gauntBeat(b){if(!GAUNT) return; GAUNT.beaten++; GAUNT.names.push(b.name); GAUNT.left+=G_BONUS; gauntHud();
+  startCine(defeatCine(b),()=>{collectAllLoot(); if(!GAUNT||GAUNT.over) return; const left=GAUNT.list.length-GAUNT.i-1;
+    banner(`${b.name} is down!`,`+${G_BONUS} seconds · ${left>0?left+' to go':'one more lap'}`); GAUNT.wait=2.2;});}
+function gauntReward(n){const tierBi=Math.max(...GAUNT.list.slice(0,Math.max(1,Math.min(GAUNT.list.length,n))));
+  const r={shards:n?30*n+12*n*n:0,items:[]}; const nItems=Math.floor(n/2)+(n>=10?1:0);
+  for(let k=0;k<nItems;k++){const bi=GAUNT.list[k%GAUNT.list.length]; const it=bossItem(choice(['weapon','armor','artifact']),BIOMES[bi].boss,tierBi); if(it) r.items.push(it);}
+  if(n>=5) r.items.push(makeCursed(tierBi)); if(n>=8) r.items.push(randomItem(tierBi,2)); return r;}
+function gauntGrant(){if(!GAUNT||GAUNT.granted) return null; GAUNT.granted=true; const n=GAUNT.beaten, r=gauntReward(n), oldBest=SAVE.gBest||0;
+  SAVE.shards+=r.shards; for(const it of r.items) SAVE.inv.push(it); if(n>oldBest) SAVE.gBest=n; SAVE.gRuns=(SAVE.gRuns||0)+1; persist(); r.newBest=n>oldBest; r.oldBest=oldBest; return r;}
+function gauntEnd(reason){if(!GAUNT||GAUNT.over) return; GAUNT.over=true; const r=gauntGrant()||{shards:0,items:[]}; const n=GAUNT.beaten;
+  persist(); mode='result'; $('#result').hidden=false; gauntHud();
+  $('#resTitle').textContent=reason==='dead'?'You fell in Infinite Bosses':'Infinite Bosses complete';
+  $('#resSub').textContent=(n?`You beat ${n} boss${n===1?'':'es'}${r.newBest?' — a new best!':'.'} `:'No bosses beaten this time. ')+`Your rewards are in your pack for Adventure. Your Boss Hunter crest gives +${crestLv()}% damage and health in every level (one point for each boss in your best run, up to 20).`;
+  const t=Math.round(GAUNT.t), mm=Math.floor(t/60), ss=String(t%60).padStart(2,'0');
+  $('#resStats').innerHTML=`<dt>Bosses beaten</dt><dd>${n}</dd><dt>Best run</dt><dd>${SAVE.gBest||0}</dd><dt>Fight time</dt><dd>${mm}:${ss}</dd><dt>Diamonds won</dt><dd>${r.shards}</dd><dt>Gear won</dt><dd>${r.items.length?r.items.map(i=>esc(i.name)).join(', '):'none'}</dd>`;
+  $('#resRetry').hidden=false; $('#resRetry').textContent='Try again'; $('#resMap').focus(); if(typeof sfx==='function') sfx(n?'win':'ui');}
+function gauntQuit(){if(!GAUNT) return; if(!GAUNT.over) gauntGrant(); GAUNT=null; gauntHud(); const rr=$('#resRetry'); if(rr) rr.textContent='Retry';}
+
+/* ---------------- Game Modes panel (top right of the main menu) ---------------- */
+const MODES=[
+ {id:'adv',n:'Adventure',d:'The main story: sail the islands, beat the bosses, free the crowns.',ico:'⚔️'},
+ {id:'gaunt',n:'Infinite Bosses',d:'Every boss you have beaten, one after another. Beat as many as you can before the clock runs out to win diamonds, gear and a Boss Hunter crest for Adventure.',ico:'👑'},
+ {id:'dun',n:'Dungeons',d:'One huge puzzle dungeon. Reach the prisoner in 5 minutes or become the prisoner and break out.',ico:'🗝️',soon:true},
+ {id:'leg',n:'Legends',d:'Lead armies against the tribes of the six lands and face the one who took the three crystals.',ico:'🛡️',soon:true}];
+function openModes(){let p=$('#modesPanel'); if(!p){p=document.createElement('div'); p.id='modesPanel'; p.className='stpanel'; p.setAttribute('role','dialog'); p.setAttribute('aria-modal','true'); p.setAttribute('aria-labelledby','modesTitle'); document.body.appendChild(p);
+    p.addEventListener('click',e=>{if(e.target===p) p.hidden=true;}); ['keydown','keyup'].forEach(t=>p.addEventListener(t,e=>{e.stopPropagation(); if(e.key==='Escape') p.hidden=true;}));}
+  const nb=gauntList().length;
+  p.innerHTML=`<div class="stBox modesbox"><h2 id="modesTitle">Game modes</h2><div class="modegrid">${MODES.map(m=>{const sub=m.id==='gaunt'?(SAVE?(nb?`${nb} boss${nb>1?'es':''} ready · best run ${SAVE.gBest||0} · crest +${crestLv()}%`:'Beat an island boss to unlock'):'Start an expedition first'):m.id==='adv'?(SAVE?'Continue your expedition':'Start a new expedition'):'';
+    return `<button class="modecard${m.soon?' soon':''}" data-mode="${m.id}" ${m.soon?'aria-disabled="true"':''}><span class="mico" aria-hidden="true">${m.ico}</span><b>${m.n}</b><span class="md">${m.d}</span>${m.soon?`<span class="mtag">${m.id==='dun'?'Coming in the next update':'Coming soon'}</span>`:sub?`<span class="msub">${sub}</span>`:''}</button>`;}).join('')}</div><button class="btn small" id="modesClose">Close</button></div>`;
+  p.querySelector('#modesClose').onclick=()=>{p.hidden=true;};
+  p.querySelectorAll('.modecard').forEach(b=>b.onclick=()=>{const id=b.dataset.mode;
+    if(id==='adv'){p.hidden=true; if(SAVE) openMap(); else $('#btnNew').click(); return;}
+    if(id==='gaunt'){if(!SAVE||!gauntList().length){startGauntlet(); return;} p.hidden=true; startGauntlet(); return;}
+    toast(id==='dun'?'Dungeons mode is coming in the next update!':'Legends mode is coming soon!','#ffd36a');});
+  p.hidden=false; const f=p.querySelector('.modecard'); if(f) f.focus();}
+/*GAUNT-END*/
 
 /* ---------------- ambient ---------------- */
 function updAmb(dt){if(!L) return; const kind=L.amb||BIOMES[L.bi].amb; if(REDUCED) return;
@@ -4189,6 +4301,11 @@ function syncPlayer(){const sk=curSkin(); const m=ensure(P,()=>buildPlayer(sk),'
      const om=new THREE.MeshBasicMaterial({color:0xd8b0ff}); const orbs=[0,1,2,3].map(i=>{const o=new THREE.Mesh(gOct,om); o.scale.setScalar(.045); g.add(o); return o;}); g.userData={r1,sp,orbs}; m.add(g); u.encAura=g;}
    if(u.encAura){const A=u.encAura.userData; u.encAura.visible=ne>0; if(ne){const k=Math.min(1,.45+ne*.14); A.sp.material.opacity=(.22+.1*Math.sin(time*4))*k*1.4; A.r1.material.opacity=.35+.25*Math.sin(time*5); A.r1.rotation.z=time;
      A.orbs.forEach((o,i)=>{o.visible=i<Math.min(4,ne+1); const a=time*2.2+i*TAU/4; o.position.set(Math.cos(a)*.55,.5+.35*Math.sin(time*3+i),Math.sin(a)*.55);});}}} animSkin(m,mv,mode==='play');
+  // set bonus: a ring of the set's colour under your feet and motes rising around you
+  {const sb=ST&&ST.set; if(sb&&(!u.setFx||u.setFx.userData.n!==sb.n)){if(u.setFx){m.remove(u.setFx); u.setFx=null;} const g=new THREE.Group(), c=new THREE.Color(sb.col), mat=new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:.6,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide});
+     const r1=new THREE.Mesh(gRing,mat); r1.rotation.x=-Math.PI/2; r1.position.y=.035; r1.scale.setScalar(.62); g.add(r1); const r2=new THREE.Mesh(gRing,mat.clone()); r2.rotation.x=-Math.PI/2; r2.position.y=.036; r2.scale.setScalar(.42); g.add(r2);
+     g.userData={n:sb.n,r1,r2,col:sb.col}; m.add(g); u.setFx=g;}
+   if(u.setFx){u.setFx.visible=!!sb; if(sb){const A=u.setFx.userData; A.r1.rotation.z=time*1.2; A.r2.rotation.z=-time*1.8; A.r1.material.opacity=.45+.2*Math.sin(time*4); if(Math.random()<.25&&mode==='play') parts.push({x:P.x+rand(-14,14),y:P.y+rand(-10,10),z:rand(2,10),vx:0,vy:0,vz:rand(40,80),life:.7,max:.7,col:A.col,sz:rand(2,4)});}}}
   m.traverse||0; setFlash(m,P.flash>0?1:0);
   if(P.iframe>0&&P.roll<=0) m.visible=!P.dead&&((time*20|0)%2===0);
   swingRoot.position.set(P.x*S,.55,P.y*S); swingRoot.rotation.y=-P.face;
@@ -4223,18 +4340,18 @@ function syncBoss(){const b=boss; moundMesh.visible=false; teleLine.visible=fals
 /* ---------------- locked gates and the key golems that open them ---------------- */
 function openGate(i,fromNet){const G=L&&L.gates&&L.gates[i]; if(!G||G.open) return; G.open=true; G.t0=time; for(const t of G.tiles) L.g[t.y*L.w+t.x]=0;
   for(const t of G.tiles) puff((t.x+.5)*T,(t.y+.5)*T,'#9a9488',8,120,.6,6); shake(6); if(typeof sfx==='function') sfx('gate'); banner('The gate opens','The way forward is clear');
-  for(const k of L.keys) if(k.gate===i&&k.state!=='used'){k.state='used'; puff(k.x,k.y,'#ffd36a',24,160,.6,6);}
+  for(const k of L.keys) if(k.gate===i&&k.state!=='used'&&k.state!=='done'){const was=k.state; k.state='done'; k.face=Math.atan2(P.y-k.y,P.x-k.x); puff(k.x,k.y,'#ffd36a',24,160,.6,6); if(was!=='idle') setTimeout(()=>toast('The key golem stops following you and stays to guard the gate.','#ffd36a'),900);}
   if(!fromNet&&MP.inGame){if(MP.role==='host') bcast({t:'gate',i}); else toHost({t:'gate',i});}}
-function updKeys(dt){if(!L||!L.keys||!P) return; for(const k of L.keys){if(k.state==='used') continue; const G=L.gates[k.gate]; if(!G||G.open){k.state='used'; continue;}
+function updKeys(dt){if(!L||!L.keys||!P) return; for(const k of L.keys){if(k.state==='used') continue; if(k.state==='done'){k.face=Math.atan2(P.y-k.y,P.x-k.x); continue;} const G=L.gates[k.gate]; if(!G||G.open){k.state=k.state==='idle'?'used':'done'; if(k.state==='done') toast('The gate is open! The key golem stays behind to guard it.','#ffd36a'); continue;}
     const d=Math.hypot(P.x-k.x,P.y-k.y);
     if(k.state==='idle'){k.walk+=dt*2; if(d<48&&!P.dead){k.state='follow'; if(typeof sfx==='function') sfx('key'); toast('A key golem follows you! Lead it to the locked gate.','#ffd36a'); puff(k.x,k.y,'#ffd36a',14,120,.5,5);}}
     else if(k.state==='follow'){if(d>56){const sp=Math.min(d-48,(d>300?420:240)*dt); moveCirc(k,(P.x-k.x)/d*sp,(P.y-k.y)/d*sp); k.walk+=dt*12; k.face=Math.atan2(P.y-k.y,P.x-k.x);} if(d>700){k.x=P.x; k.y=P.y+30;}
       // close to its gate (the golem or the player): it takes over and walks to the lock by itself
-      if(Math.hypot(k.x-G.x,k.y-G.y)<330||Math.hypot(P.x-G.x,P.y-G.y)<260){k.path=keyPath(k,G); k.state='toGate'; k.stuck=0; toast('The key golem heads for the gate!','#ffd36a');}}
+      if(Math.hypot(k.x-G.x,k.y-G.y)<400||Math.hypot(P.x-G.x,P.y-G.y)<380){k.path=keyPath(k,G); k.state='toGate'; k.stuck=0; toast('The key golem heads for the gate!','#ffd36a');}}
     else if(k.state==='toGate'){const gd=Math.hypot(k.x-G.x,k.y-G.y); k.stuck+=dt;
       if(gd<70||!k.path||!k.path.length||k.stuck>7){if(gd>=90){const g=k.path&&k.path.length?k.path[k.path.length-1]:(k.goal!=null?{x:k.goal%L.w,y:(k.goal/L.w)|0}:null); puff(k.x,k.y,'#ffd36a',12,120,.5,5); if(g){k.x=(g.x+.5)*T; k.y=(g.y+.5)*T;} else {k.x=G.x+(P.x-G.x)*.2; k.y=G.y+(P.y-G.y)*.2;} puff(k.x,k.y,'#ffd36a',12,120,.5,5);} k.state='unlock'; k.ut=0; k.face=Math.atan2(G.y-k.y,G.x-k.x); continue;}
       const n=k.path[0], tx=(n.x+.5)*T, ty=(n.y+.5)*T, dd=Math.hypot(tx-k.x,ty-k.y); if(dd<8){k.path.shift(); continue;}
-      const sp=Math.min(dd,320*dt); moveCirc(k,(tx-k.x)/dd*sp,(ty-k.y)/dd*sp); k.walk+=dt*13; k.face=Math.atan2(ty-k.y,tx-k.x);}
+      const sp=Math.min(dd,380*dt); moveCirc(k,(tx-k.x)/dd*sp,(ty-k.y)/dd*sp); k.walk+=dt*13; k.face=Math.atan2(ty-k.y,tx-k.x);}
     else if(k.state==='unlock'){k.ut+=dt; k.face=Math.atan2(G.y-k.y,G.x-k.x); if(k.ut>.25&&!k.clk){k.clk=1; if(typeof sfx==='function') sfx('key'); puff(k.x+Math.cos(k.face)*20,k.y+Math.sin(k.face)*20,'#ffd36a',10,90,.4,4);} if(k.ut>1.0) openGate(k.gate);}}}
 // shortest walk over open floor from the golem to a tile beside its gate
 function keyPath(k,G){const W=L.w,H=L.h, sx=Math.floor(k.x/T), sy=Math.floor(k.y/T), goal=new Set(), gt=new Set(G.tiles.map(t=>t.y*W+t.x));
@@ -4250,7 +4367,7 @@ function buildKeyGolem(){const R=model(),B=R.userData.body; bossTex(); const st=
   const k=new THREE.Group(); k.position.set(0,.66,-.2); B.add(k); add(k,gTor,gold,0,.28,0,.12,.12,.45); add(k,gCyl,gold,0,-.02,0,.028,.5,.028); add(k,gBox,gold,.05,-.18,0,.08,.045,.035); add(k,gBox,gold,.05,-.26,0,.06,.045,.035); R.userData.keyM=k;
   const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0xffd36a,transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending})); gl.position.y=.7; gl.scale.set(1.5,1.5,1); R.add(gl); R.userData.glow=gl;
   applyHi(R); detailize(R); R.scale.setScalar(1.05); CUR=null; return R;}
-function syncKey(k){if(k.state==='used') return; const m=ensure(k,buildKeyGolem,'kg'), u=m.userData; m.position.set(k.x*S,k.state==='idle'?Math.abs(Math.sin(time*3))*.08:0,k.y*S); m.rotation.y=yawOf(k.face);
+function syncKey(k){if(k.state==='used') return; const m=ensure(k,buildKeyGolem,'kg'), u=m.userData; m.position.set(k.x*S,k.state==='idle'||k.state==='done'?Math.abs(Math.sin(time*(k.state==='done'?2:3)))*.05:0,k.y*S); if(k.state==='done'){m.rotation.y=yawOf(k.face); animLimbs(m,0,false); u.keyM.visible=false; u.arms[1].rotation.x=-2.4+Math.sin(time*6)*.35; u.glow.material.opacity=.15; return;} m.rotation.y=yawOf(k.face);
   animLimbs(m,k.walk,k.state==='follow'||k.state==='toGate'); if(k.state==='unlock'){u.arms.forEach(a=>a.rotation.x=-1.5); u.keyM.rotation.z=Math.min(1,k.ut*1.4)*Math.PI*.5;} else u.keyM.rotation.z=Math.sin(time*2.4)*.12; u.glow.material.opacity=.35+.25*Math.sin(time*4);}
 function buildGateTile(t){const R=model(); bossTex(); const iron=M('#3a3a42',{metalness:.7,roughness:.35}), stone=M('#7a7468',{roughness:.9,flatShading:true}), stone2=M('#5a564e',{roughness:.9,flatShading:true});
   const bars=new THREE.Group(); R.add(bars); R.userData.bars=bars;
@@ -4386,7 +4503,7 @@ function drawMini(){if(!L) return; const S=mini.width, sc=S/Math.max(L.w,L.h); m
   const dot=(o,c,s)=>{const tx=o.x/T|0,ty=o.y/T|0; if(tx<0||ty<0||tx>=L.w||ty>=L.h||!L.seen[ty*L.w+tx]) return; mg.fillStyle=c; mg.fillRect(ox+o.x/T*sc-s/2,oy+o.y/T*sc-s/2,s,s);};
   for(const c of L.chests) if(!c.open) dot(c,'#f0b84a',8);
   if(L.gates) for(const G of L.gates) if(!G.open) for(const t of G.tiles) dot({x:(t.x+.5)*T,y:(t.y+.5)*T},'#ffd36a',sc*1.1);
-  if(L.keys) for(const k of L.keys) if(k.state!=='used') dot(k,'#ffe58a',9);
+  if(L.keys) for(const k of L.keys) if(k.state!=='used'&&k.state!=='done') dot(k,'#ffe58a',9);
   for(const o of loot) if(o.kind==='item') dot(o,RAR[o.item.rar].col,6);
   for(const e of ents) if(e.alert) dot(e,'#e2504a',5);
   if(boss&&!boss.dead) dot(boss,'#ff3a3a',12);
@@ -4691,7 +4808,7 @@ function unlocked(bi,li){if(bi===6&&!EVENT_ACTIVE()) return false; if(SAVE&&SAVE
   if(bi===7) return !!SAVE.won; if(bi===11||bi===15||bi===19) return worldOpen(4); if(bi===23) return worldOpen(7); if(bi===28) return worldOpen(8); if(bi===32) return worldOpen(9); if(bi===36) return worldOpen(10); if(bi>7) return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];
   if(bi===6) return true;
   if(bi===0) return true; if(bi===5){for(let b=0;b<5;b++) if(!SAVE.cleared[levelKey(b,BIOMES[b].levels.length)]) return false; return true;} return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];}
-function openMap(){if(!MP.peer) setTimeout(initMP,100); renderPartyHud(); mode='map'; showOnly('mapScr'); while(mapWorld>1&&!worldOpen(mapWorld)) mapWorld--; renderDiff();
+function openMap(){if(GAUNT) gauntQuit();if(!MP.peer) setTimeout(initMP,100); renderPartyHud(); mode='map'; showOnly('mapScr'); while(mapWorld>1&&!worldOpen(mapWorld)) mapWorld--; renderDiff();
   if(drawnWorld!==mapWorld){if(mapWorld===2) drawWorld2(); else if(mapWorld===3) drawWorld3(); else if(mapWorld===4) drawWorld4(); else if(mapWorld===5||mapWorld===6||mapWorld>=8) drawDim(mapWorld); else if(mapWorld===7) drawWorld7(); else {drawIsle(); drawnWorld=1;}} calcStats();
   {const wb=$('#mapWorldBtn'), bk=$('#mapWorldBack'); const nextW=mapWorld<3&&worldOpen(mapWorld+1)?mapWorld+1:mapWorld===3&&worldOpen(7)?7:mapWorld===7&&worldOpen(8)?8:(mapWorld===8||mapWorld===9)&&worldOpen(mapWorld+1)?mapWorld+1:0, backW=mapWorld===2||mapWorld===3?mapWorld-1:mapWorld===7?3:mapWorld>=8?mapWorld-1:0;
     wb.hidden=!nextW; if(nextW) wb.textContent=(nextW===2?'Outer Isles':nextW===7?'Core of Creations':nextW>=8?WORLD_NAME[nextW]:'The Deep Dark')+' →'; wb.classList.toggle('next',!!nextW&&!anyIn({2:7,7:23,3:10,8:28,9:32,10:36}[nextW]||10));
@@ -4778,7 +4895,7 @@ function renderInv(){calcStats(); const e=SAVE.eq;
   $('#invShards').textContent=SAVE.shards; $('#invShardIco').src=iconURL('shard','#7fe0c8','#e8fff8');
   const eqBox=$('#eqSlots'); eqBox.innerHTML='';
   [['weapon','Melee'],['armor','Armor'],['a1','Artifact 1'],['a2','Artifact 2'],['a3','Artifact 3'],['a4','Artifact 4'],['a5','Artifact 5'],['a6','Artifact 6'],['a7','Artifact 7'],['a8','Artifact 8']].forEach(([s,lab])=>{const it=e[s]; const b=document.createElement('button'); b.className='cell'+(it?' r-'+it.rar:'')+(it&&it.encd?' enc':'')+(invSel&&invSel.where==='eq'&&invSel.slot===s?' sel':''); b.innerHTML=cellHTML(it,lab); b.onclick=()=>{invSel={where:'eq',slot:s}; renderInv();}; eqBox.appendChild(b);});
-  $('#stats').innerHTML=`<dt>Power</dt><dd class="big">${ST.power}</dd><dt>Health</dt><dd>${ST.maxhp}</dd><dt>Melee damage</dt><dd>${ST.dmg}</dd><dt>Swings per second</dt><dd>${(1/ST.rate).toFixed(1)}</dd><dt>Damage reduction</dt><dd>${Math.round(ST.red*100)}%</dd><dt>Move speed</dt><dd>${Math.round(ST.spd/175*100)}%</dd><dt>Arrows</dt><dd>${SAVE.arrows}</dd>`;
+  $('#stats').innerHTML=`<dt>Power</dt><dd class="big">${ST.power}</dd><dt>Health</dt><dd>${ST.maxhp}</dd><dt>Melee damage</dt><dd>${ST.dmg}</dd><dt>Swings per second</dt><dd>${(1/ST.rate).toFixed(1)}</dd><dt>Damage reduction</dt><dd>${Math.round(ST.red*100)}%</dd><dt>Move speed</dt><dd>${Math.round(ST.spd/175*100)}%</dd><dt>Arrows</dt><dd>${SAVE.arrows}</dd>${ST.set?`<dt style="color:${ST.set.col}">Set bonus</dt><dd style="color:${ST.set.col}">${ST.set.n}</dd><dd class="setd" style="grid-column:1/-1;color:var(--mute);font-size:12px">${ST.set.d}</dd>`:`<dd class="setd" style="grid-column:1/-1;color:var(--mute);font-size:12px">Tip: wear a weapon and armor from the same island for a set bonus</dd>`}${ST.curses.map(c=>`<dd style="grid-column:1/-1;color:#d08aff;font-size:12px">☠ ${c.n}: ${c.buff}, but ${c.pen.toLowerCase()}</dd>`).join('')}`;
   $('#bagCap').innerHTML=`<span class="inf">∞ Unlimited pack</span><span>${SAVE.inv.length} item${SAVE.inv.length===1?'':'s'} · there's always room for more</span>`; $('#invCodex').textContent=`Codex ${Object.keys(CAT).reduce((s,k)=>s+foundCount(k),0)}/${CAT_TOTAL}`;
   const bag=$('#bagGrid'); bag.innerHTML='';
   let list=SAVE.inv.filter(it=>invFilter==='all'||it.slot===invFilter); if(invSort==='power') list=list.slice().sort((a,b)=>b.pow-a.pow); else if(invSort==='rarity') list=list.slice().sort((a,b)=>RANK[b.rar]-RANK[a.rar]||b.pow-a.pow); else list=list.slice().reverse();
@@ -4805,19 +4922,25 @@ function renderDetail(){const box=$('#detail'); let it=null, inBag=false;
    <div>Power <b>${it.pow}</b> · from ${BIOMES[it.bi].name}</div>${it.boss?`<div style="color:var(--unique);font-family:var(--display)">Guardian loot · ${BOSSES[it.boss].name}</div>`:''}
    <ul>${itemLines(it).map(([a,b])=>`<li>${a}: <b>${b}</b></li>`).join('')}${ench}</ul>
    ${it.slot==='artifact'?`<div style="color:var(--mute)">${it.kind==='summon'&&MINIONS[it.minion]?`Summons ${it.count>1?it.count+' ':'a '}${MINIONS[it.minion].n}${it.count>1?'s':''} that ${ROLE_TXT[MINIONS[it.minion].role][it.count>1?1:0]}, until they are defeated.`:ARTS[it.kind].desc}</div>`:''}
+   ${it.curse&&CURSES[it.curse]?`<div class="cursed">☠ Cursed · <b>${CURSES[it.curse].buff}</b><br>Penalty: ${CURSES[it.curse].pen}</div>`:''}
    ${inBag?cmp(it,eqFor):''}
    <div class="actions uprow">${(it.up||0)>=UP_MAX?`<span class="uptag">⬆ Fully upgraded · level ${UP_MAX}</span>`:`<button class="btn small upbtn" data-act="up" ${SAVE.shards<gearCost(it)?'disabled':''} aria-label="Upgrade this gear for ${gearCost(it)} diamonds">⬆ Upgrade gear · level ${(it.up||0)} → ${(it.up||0)+1} · 💎 ${gearCost(it)}</button>${SAVE.shards<gearCost(it)?`<span class="upneed">Need ${gearCost(it)-SAVE.shards} more diamonds</span>`:''}`}</div>
-   <div class="actions encrow">${it.encd?`<span class="enctag">✦ Enchanted: +25% power, a new enchantment and ${SOUL_ABIL[it.slot][0]}</span>`:`<button class="btn small enchbtn" data-act="ench">✦ Enchant · Free</button>`}</div>
+   <div class="actions encrow">${it.encd?`<span class="enctag">✦ Enchanted: +25% power, a new enchantment and ${SOUL_ABIL[it.slot][0]}</span>`:(enchTokens()>0?`<button class="btn small enchbtn" data-act="ench">✦ Enchant · Free (${enchTokens()>=99?'unlimited':enchTokens()+' left'})</button>`:`<button class="btn small enchbtn" disabled>✦ Enchant</button><span class="upneed">Next free enchantment in ${enchWait()}</span>`)}</div>
    <div class="actions">${inBag?(it.slot==='artifact'?`<button class="btn small gold" data-act="eq1">Slot 1</button><button class="btn small gold" data-act="eq2">Slot 2</button><button class="btn small gold" data-act="eq3">Slot 3</button><button class="btn small gold" data-act="eq4">Slot 4</button><button class="btn small gold" data-act="eq5">Slot 5</button><button class="btn small gold" data-act="eq6">Slot 6</button><button class="btn small gold" data-act="eq7">Slot 7</button><button class="btn small gold" data-act="eq8">Slot 8</button>`:`<button class="btn small gold" data-act="eq">Equip</button>`)+`<button class="btn small danger" data-act="salv">Salvage +${salv}</button>`
      :(it.slot==='artifact'?`<button class="btn small" data-act="uneq">Unequip</button>`:`<span class="empty">Equipped</span>`)}</div>`;
   box.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>invAction(b.dataset.act,it));}
 const enchCost=it=>0;
+// one free enchantment a week (they stack up to 4 if you're away)
+const WEEK=7*864e5;
+function enchTokens(){if(!SAVE) return 0; if(SAVE.adminAll||SAVE.adminGems) return 99; const now=Date.now(); if(SAVE.enchTok==null){SAVE.enchTok=1; SAVE.enchLast=now;}
+  const w=Math.floor((now-(SAVE.enchLast||now))/WEEK); if(w>0){SAVE.enchTok=Math.min(4,SAVE.enchTok+w); SAVE.enchLast+=w*WEEK;} return SAVE.enchTok;}
+function enchWait(){const ms=(SAVE.enchLast||Date.now())+WEEK-Date.now(), d=Math.floor(ms/864e5), h=Math.ceil((ms%864e5)/36e5); return d>0?`${d} day${d>1?'s':''} ${h} h`:`${h} hour${h>1?'s':''}`;}
 // gear upgrades: spend diamonds to raise an item a level at a time (each level adds a little power)
 const UP_MAX=10, gearCost=it=>Math.max(25,Math.round((it.pow||10)*(.45+.2*(it.up||0))/5)*5);
 function upgradeItem(it){const c=gearCost(it); if((it.up||0)>=UP_MAX||SAVE.shards<c) return false; SAVE.shards-=c; it.up=(it.up||0)+1;
   it.pow=Math.round(it.pow*1.06)+1; if(it.dmg) it.dmg=Math.max(it.dmg+1,Math.round(it.dmg*1.05)); if(it.hp) it.hp=Math.max(it.hp+2,Math.round(it.hp*1.05)); if(it.red) it.red=+Math.min(.6,it.red+.005).toFixed(3); if(it.pot) it.pot=+(it.pot*1.04).toFixed(2);
   toast(`${it.name} upgraded to level ${it.up}!`,'#7fe0c8'); if(typeof sfx==='function') sfx('enchant'); return true;}
-function enchantItem(it){if(it.encd) return false; it.encd=true; it.pow=Math.round(it.pow*1.25);
+function enchantItem(it){if(it.encd) return false; if(enchTokens()<=0){toast('No free enchantment left this week. Next one in '+enchWait(),'#b45cff'); return false;} if(enchTokens()<99) SAVE.enchTok--; it.encd=true; it.pow=Math.round(it.pow*1.25);
   if(it.dmg) it.dmg=Math.round(it.dmg*1.2); if(it.hp) it.hp=Math.round(it.hp*1.2); if(it.red) it.red=+Math.min(.5,it.red+.03).toFixed(2); if(it.pot) it.pot=+(it.pot*1.2).toFixed(2);
   const pool=Object.keys(it.slot==='weapon'?W_ENCH:it.slot==='armor'?A_ENCH:R_ENCH).filter(n=>!it.ench.includes(n));
   if(pool.length){const n=choice(pool); it.ench.push(n); it.newEnch=n;
@@ -4840,15 +4963,15 @@ $('#pGfx').onclick=()=>{const o=['auto','high','medium','low']; GFX_PREF=o[(o.in
 setTimeout(renderGfxBtn,0);
 $('#pInv').onclick=()=>{$('#pause').hidden=true; mode='play'; openInv();};
 $('#pQuit').onclick=()=>{$('#pause').hidden=true; persist(); openMap();};
-function showResult(kind){persist(); mode='result'; $('#result').hidden=false; const B=BIOMES[run.bi]; if(run.guest&&kind!=='dead') setTimeout(()=>toast('You played this as a guest. Your loot is kept, but finish the earlier islands to unlock it for yourself.','#5fb3ff'),400);
+function showResult(kind){if(GAUNT&&!GAUNT.over){gauntEnd(kind==='dead'?'dead':'time'); return;} persist(); mode='result'; $('#result').hidden=false; const B=BIOMES[run.bi]; if(run.guest&&kind!=='dead') setTimeout(()=>toast('You played this as a guest. Your loot is kept, but finish the earlier islands to unlock it for yourself.','#5fb3ff'),400);
   const t=Math.round(run.time), mm=Math.floor(t/60), ss=String(t%60).padStart(2,'0');
   if(kind==='clear'){$('#resTitle').textContent=L.boss?'Crown claimed':'Level cleared'; $('#resSub').textContent=L.boss?`${B.name} is free. ${run.bi===39?'The three legends are stopped. Every crystal is silent and every world is safe. You are the true legend.':run.bi===35?'The Grand Magician is stopped. Press → on the map to reach Creators Cataclysm and face the Supreme Creator.':run.bi===31?'The Omega Enchanter is stopped. Press → on the map to reach the Illusion Fortress.':run.bi>=28?BIOMES[run.bi+1].name+' is now open.':run.bi===27?'The Shapeless One is still at last. The Core of Creations is whole again, and every world is safe.':run.bi===18?'The Forge falls quiet. Every fire is out and every hammer is still.':run.bi===22?'The Void is sealed. Even the Endless has an ending.':run.bi===14?'The Shift Dimension is saved. Every land, every sea and every song is free.':run.bi===10?'The great portal is open. Choose the Shift, the Forge or the Void on the map.':run.bi===9?'The Outer Isles are safe. Press → on the map to descend into the Deep Dark.':run.bi>=7?BIOMES[run.bi+1].name+' is now open.':run.bi===6?'Hollowshade Isle is yours. Happy Halloween!':run.bi<4?BIOMES[run.bi+1].name+' is now open.':'The Hollow Spire is now open.'}`:`${L.name} · ${B.name}`;}
   else if(kind==='victory'){$('#resTitle').textContent='The isle is saved'; $('#resSub').textContent='All six crowns are free. A new map has opened: press the → button at the bottom right of the map to sail to the Outer Isles.';}
   else {$('#resTitle').textContent='You fell'; $('#resSub').textContent='Loot you picked up is kept. Try equipping stronger gear or roll through telegraphed rings.';}
   $('#resStats').innerHTML=`<dt>Time</dt><dd>${mm}:${ss}</dd><dt>Enemies defeated</dt><dd>${run.kills}</dd><dt>Items found</dt><dd>${run.items}</dd><dt>Shards collected</dt><dd>${run.shards}</dd>`;
   $('#resRetry').hidden=kind==='victory'||(MP.party&&MP.party.members.length>1&&MP.role!=='host'); if(MP.inGame&&MP.role==='client') MP.inGame=false; else if(MP.inGame) MP.inGame=false; $('#resMap').focus();}
-$('#resMap').onclick=()=>{$('#result').hidden=true; if(run&&run.bi===10&&SAVE.portalOpen) mapWorld=3; openMap();};
-$('#resRetry').onclick=()=>{$('#result').hidden=true; playLevel(run.bi,run.li);};
+$('#resMap').onclick=()=>{$('#result').hidden=true; if(GAUNT) gauntQuit(); if(run&&run.bi===10&&SAVE.portalOpen) mapWorld=3; openMap();};
+$('#resRetry').onclick=()=>{$('#result').hidden=true; if(GAUNT||(run&&run.gaunt)){gauntQuit(); startGauntlet(); return;} playLevel(run.bi,run.li);};
 
 /* ---------------- cutscenes ---------------- */
 const STORY={
@@ -5172,14 +5295,44 @@ function profileName(){return SAVE&&SAVE.profile&&SAVE.profile.name||null;}
 function renderAcct(){const el=$('#acct'); const p=SAVE&&SAVE.profile;
   const upd=`<button class="btn small" id="updBtn" title="Get the newest version of the game">Update</button>`;
   if(p) el.innerHTML=upd+`<button class="acct-me" id="acctMe" title="Change account name"><span class="avatar">${esc(p.name[0].toUpperCase())}</span><span class="acct-txt"><b>${esc(p.name)}</b><small>${p.google?esc(p.google.email):'Signed in'}</small></span></button><button class="btn small" id="acctOut">Sign out</button>`;
-  else el.innerHTML=upd+`<button class="btn small" id="acctIn">Sign in with Google</button>`;
+  else el.innerHTML=upd+`<button class="btn small" id="acctIn">Sign in</button>`;
   $('#updBtn').onclick=manualUpdate;
   const i=$('#acctIn'),o=$('#acctOut'),me=$('#acctMe');
   if(i) i.onclick=openSignin; if(o) o.onclick=signOut; if(me) me.onclick=()=>{pendingGoogle=SAVE.profile.google||null; openSigninShell(); showNameStep(true);};}
 function openSigninShell(){$('#signin').hidden=false;}
 function closeSignin(){$('#signin').hidden=true; if(authBusy){authBusy.cancel=true; authBusy=null;} renderAcct();}
 function sbox(html){const b=$('#signinBox'); b.innerHTML=html; const c=b.querySelector('[data-close]'); if(c) c.onclick=closeSignin; const f=b.querySelector('input,button'); if(f) f.focus();}
+// ---- accounts on this device: sign in with an account name and email ----
+const ACCT_KEY='isle6c-accounts', EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const acctKeyOf=(n,e)=>String(n).trim().toLowerCase().replace(/\s+/g,' ')+'|'+String(e).trim().toLowerCase();
+const acctEmailOf=p=>p&&(p.email||(p.google&&p.google.email))||'';
+function acctReg(){try{return JSON.parse(localStorage.getItem(ACCT_KEY)||'{}')||{};}catch(e){return {};}}
+function acctStoreNow(){if(!SAVE||!SAVE.profile) return; const em=acctEmailOf(SAVE.profile); if(!em) return; const r=acctReg(); r[acctKeyOf(SAVE.profile.name,em)]={name:SAVE.profile.name,email:em,t:Date.now(),save:JSON.stringify(SAVE)}; try{localStorage.setItem(ACCT_KEY,JSON.stringify(r));}catch(e){}}
+var acctT=0; function acctStore(){clearTimeout(acctT); acctT=setTimeout(acctStoreNow,1500);}
 function openSignin(){openSigninShell(); const env=authEnv();
+  sbox(`<h2>Sign in</h2><p class="sp">Choose how you want to sign in.</p><div class="row" style="flex-direction:column;align-items:stretch;gap:10px"><button class="btn gold" id="sgName">Sign in with account name and email</button>${env==='unsupported'||env==='unconfigured'?'':'<button class="btn" id="sgGoogle">Sign in with Google</button>'}</div><div class="row"><button class="btn small" data-close>Cancel</button></div>`);
+  $('#sgName').onclick=openNameSignin; const g=$('#sgGoogle'); if(g) g.onclick=openGoogleSignin;}
+function openNameSignin(){const p=SAVE&&SAVE.profile;
+  sbox(`<h2>Sign in with your account</h2><p class="sp">Type your account name and email. If that account is saved on this device, you'll go straight back into it.</p>
+    <label class="sp" for="siName">Account name</label><input id="siName" class="nm" maxlength="16" autocomplete="username" spellcheck="false" value="${esc(p?p.name:'')}">
+    <label class="sp" for="siMail">Email</label><input id="siMail" class="nm" type="email" maxlength="80" autocomplete="email" spellcheck="false" value="${esc(acctEmailOf(p))}" style="font-size:17px">
+    <p class="sp warn" id="siErr" hidden></p><div class="row"><button class="btn gold" id="siGo">Sign in</button><button class="btn" data-close>Cancel</button></div>`);
+  const err=t=>{const e=$('#siErr'); e.hidden=false; e.textContent=t;};
+  const go=()=>{const n=$('#siName').value.trim().replace(/\s+/g,' '), em=$('#siMail').value.trim();
+    if(!NAME_RE.test(n)) return err('Account names use 3 to 16 letters, numbers, spaces, - or _.'); if(!EMAIL_RE.test(em)) return err('That email doesn\'t look right. Check it and try again.');
+    const key=acctKeyOf(n,em); if(SAVE&&SAVE.profile&&acctKeyOf(SAVE.profile.name,acctEmailOf(SAVE.profile))===key){closeSignin(); toast('You are already signed in as '+n,'#7fe0c8'); return;}
+    const hit=acctReg()[key];
+    if(hit){let s2=null; try{s2=migrateSave(JSON.parse(hit.save)); delete s2._oldV;}catch(e){} if(!s2) return err('That account was found, but its save could not be read.');
+      acctStoreNow(); SAVE=s2; persist(); sbox(`<h2>Welcome back, ${esc(hit.name)}!</h2><p class="sp">Loading your account…</p>`); setTimeout(()=>location.reload(),500); return;}
+    // not found: offer to make it
+    const guest=SAVE&&!(SAVE.profile&&acctEmailOf(SAVE.profile));
+    sbox(`<h2>Account not found</h2><p class="sp">There's no account called <b>${esc(n)}</b> with the email <b>${esc(em)}</b> on this device.</p>
+      <p class="sp">Accounts live on the device where they were made. To play the same account on another device, sign in with Google there, or bring the save file over.</p>
+      <div class="row" style="flex-direction:column;align-items:stretch;gap:10px">${guest?'<button class="btn gold" id="siKeep">Make this account with my current progress</button>':''}<button class="btn${guest?'':' gold'}" id="siNew">Make a new account</button><button class="btn" id="siBack">Try again</button></div>`);
+    const make=keep=>{if(!keep){acctStoreNow(); SAVE=migrateSave(newSave()); delete SAVE._oldV;} SAVE.profile={name:n,email:em,google:null,since:Date.now()}; persist(); acctStoreNow(); sbox(`<h2>Welcome, ${esc(n)}!</h2><p class="sp">Your account is ready. Next time, sign in with this name and email.</p>`); setTimeout(()=>location.reload(),900);};
+    if($('#siKeep')) $('#siKeep').onclick=()=>make(true); $('#siNew').onclick=()=>make(false); $('#siBack').onclick=openNameSignin;};
+  $('#siGo').onclick=go; ['siName','siMail'].forEach(id=>$('#'+id).onkeydown=e=>{if(e.key==='Enter'){e.preventDefault(); go();}});}
+function openGoogleSignin(){openSigninShell(); const env=authEnv();
   if(env==='unsupported') return sbox(`<h2>Sign in</h2><p class="sp">Google sign-in works in the Windows, Mac and Android apps (including on Chromebooks) and in the web version of the game at thinkinglink.github.io/isle-of-six-crowns. It can't run in this copy, which is the preview page or an offline file.</p><div class="row"><button class="btn" data-close>Close</button></div>`);
   if(env==='unconfigured') return sbox(`<h2>Sign in</h2><p class="sp">Google sign-in hasn't been switched on in this copy of the game yet. It needs the game's Google Client ID, which the game's creator adds.</p><div class="row"><button class="btn" data-close>Close</button></div>`);
   if(env==='gis') return startGIS();
@@ -5218,7 +5371,7 @@ async function startDevice(){const job={cancel:false}; authBusy=job;
     if(t&&t.id_token){authBusy=null; try{return onGoogle(parseJwt(t.id_token));}catch(e){return authError('Google sent back a sign-in we could not read. Please try again.');}}
     if(t&&t.error==='slow_down') wait+=5000; else if(t&&(t.error==='access_denied')) return authError('Sign-in was cancelled in the browser.'); else if(t&&t.error==='expired_token') break;}
   if(!job.cancel) authError('The sign-in code expired. Please start again.');}
-function authError(msg){authBusy=null; sbox(`<h2>Sign in</h2><p class="sp warn">${msg}</p><div class="row"><button class="btn gold" id="retryG">Try again</button><button class="btn" data-close>Close</button></div>`); $('#retryG').onclick=openSignin;}
+function authError(msg){authBusy=null; sbox(`<h2>Sign in</h2><p class="sp warn">${msg}</p><div class="row"><button class="btn gold" id="retryG">Try again</button><button class="btn" data-close>Close</button></div>`); $('#retryG').onclick=openGoogleSignin;}
 function onGoogle(info){pendingGoogle={sub:info.sub,email:info.email||'',name:info.name||''}; showNameStep(false,info);}
 function showNameStep(renaming,info){const guess=(profileName()||(info&&(info.given_name||(info.name||'').split(' ')[0]))||'').replace(/[^A-Za-z0-9 _\-]/g,'').slice(0,16);
   sbox(`<h2>${renaming?'Change account name':'Choose your account name'}</h2>${pendingGoogle&&pendingGoogle.email?`<p class="sp">Signed in as <b>${esc(pendingGoogle.email)}</b></p>`:''}
@@ -6103,7 +6256,7 @@ const SFX={
   const menu=$('#menu'); if(menu){const m=document.createElement('button'); m.id='muteAll'; m.type='button';
     const ico=on=>on?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
     const paint=()=>{const on=!AU.vol.muted; m.innerHTML=ico(on)+'<span>'+(on?'Sound on':'Sound off')+'</span>'; m.setAttribute('aria-pressed',String(!on)); m.setAttribute('aria-label',on?'Turn off all music and sound effects':'Turn music and sound effects back on'); m.classList.toggle('off',!on);};
-    m.onclick=e=>{e.stopPropagation(); AU.vol.muted=!AU.vol.muted; auSave(); auInit(); auApplyVol(); paint(); if(!AU.vol.muted) sfx('ui');}; paint(); menu.appendChild(m); window.paintMute=paint;}})();
+    m.onclick=e=>{e.stopPropagation(); AU.vol.muted=!AU.vol.muted; auSave(); auInit(); auApplyVol(); paint(); if(!AU.vol.muted) sfx('ui');}; paint(); const top=document.createElement('div'); top.id='menuTop'; const gm=document.createElement('button'); gm.id='btnModes'; gm.type='button'; gm.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h8v8H3zM13 3h8v8h-8zM3 13h8v8H3zM13 13h8v8h-8z"/></svg><span>Game modes</span>'; gm.setAttribute('aria-label','Choose a game mode'); gm.onclick=e=>{e.stopPropagation(); openModes();}; top.appendChild(gm); top.appendChild(m); menu.appendChild(top); window.paintMute=paint;}})();
 document.addEventListener('click',e=>{if(e.target.closest('.btn')) sfx('ui');},true);
 /* ---- hooks: every move, hit and boss action makes a sound ---- */
 (function(){const wrapF=(o,pre,post)=>function(...args){let st; try{st=pre&&pre(...args);}catch(e){} const r=o.apply(this,args); try{post&&post(st,...args);}catch(e){} return r;};
