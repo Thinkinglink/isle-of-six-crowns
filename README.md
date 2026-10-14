@@ -136,3 +136,7 @@ Every level and every boss has its own looping music, composed live by the game,
 ## ⚔️ Equip best
 
 The Equip best button in your pack puts on your strongest weapon, armor and artifacts in one tap. Bosses now have five times as much health.
+
+## 🗝️ Bigger levels, locked gates and key golems
+
+Levels are now about twice as large, with more rooms and more monsters. Each level's exit is sealed behind an iron gate. Find the glowing key golem, lead it to the gate and the gate opens; bigger levels have two gates and two key golems. Every region of the first island now has five levels before its guardian, and your old progress carries over.

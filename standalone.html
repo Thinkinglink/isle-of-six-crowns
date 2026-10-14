@@ -88,6 +88,8 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #isle{width:100%;height:100%;display:block;image-rendering:pixelated;border:3px solid var(--rim);box-shadow:0 0 0 2px var(--edge),0 12px 0 rgba(0,0,0,.4)}
 #paths{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .node{position:absolute;width:30px;height:30px;transform:translate(-50%,-50%);border:3px solid var(--rim);background:#e9efe6;box-shadow:inset 0 -5px 0 rgba(0,0,0,.3),0 4px 0 rgba(0,0,0,.4);cursor:pointer;padding:0}
+#mapScr.w1 .node{width:19px;height:19px;border-width:2px}
+#mapScr.w1 .node.boss{width:30px;height:26px}
 .node.boss{width:40px;height:34px;background:var(--crown);clip-path:polygon(0 100%,0 18%,25% 52%,50% 0,75% 52%,100% 18%,100% 100%);border:none;box-shadow:none}
 .node.locked{background:#3c5560;cursor:not-allowed}
 .node.cleared{background:var(--leaf)}
@@ -699,22 +701,22 @@ function iconURL(name,a,d){const k=name+a+d; if(!iconURLs.has(k)) iconURLs.set(k
 
 /* ---------------- data ---------------- */
 const BIOMES=[
- {id:'meadow',name:'Thistle Meadows',ang:180,levels:['Hollow Grove','Old Mill Cellar'],boss:'bramble',
+ {id:'meadow',name:'Thistle Meadows',ang:180,levels:['Hollow Grove','Old Mill Cellar','Bramble Steps','Sunken Orchard','Thornwall Gate'],boss:'bramble',
   floor:['#4f7a35','#567f3a'],wallF:'#4a3a2b',wallT:'#6a9644',deco:['#7fb04f','#e8d36a','#d97a8a'],accent:'#c9e27a',amb:'petal',map:['#5c973c','#66a345','#4c8631'],
   skins:{melee:['Moss Husk','#6f8f52','#a7b98a'],ranged:['Bone Archer','#cfc8b4','#e6e0cf'],lunge:['Thicket Spider','#3a2f2a','#c23a2a'],bomb:['Fuse Beetle','#4fa04a','#203a1e'],caster:['Hedge Witch','#5a4a7a','#c9e27a'],brute:['Stump Ogre','#6b4a2e','#8a6a4a']}},
- {id:'desert',name:'Sunscour Dunes',ang:108,levels:['Glass Canyon','Buried Bazaar'],boss:'sultan',
+ {id:'desert',name:'Sunscour Dunes',ang:108,levels:['Glass Canyon','Buried Bazaar','Sandstone Stairs','Dune Sea Ruins','Tomb of the Scorpion Kings'],boss:'sultan',
   floor:['#d2b071','#c9a566'],wallF:'#9a6f3c',wallT:'#e2c387',deco:['#b88a4a','#5f8a3a','#f0dfa8'],accent:'#ffd98a',amb:'sand',map:['#dcbc7a','#e6c886','#cfae6a'],
   skins:{melee:['Wrapped Dead','#d8ccaa','#b8a880'],ranged:['Dune Slinger','#a8743c','#d9b080'],lunge:['Scarab Swarm','#2f4a5a','#4fd0c0'],bomb:['Sun Beetle','#e0a030','#6a3a10'],caster:['Mirage Seer','#7a3a5a','#ffd98a'],brute:['Sand Golem','#b8925a','#8a6a3a']}},
- {id:'swamp',name:'Murkfen',ang:36,levels:['Sunken Chapel','Rotroot Hollow'],boss:'witch',
+ {id:'swamp',name:'Murkfen',ang:36,levels:['Sunken Chapel','Rotroot Hollow','Lantern Bog','Drowned Steps','Witchroot Gate'],boss:'witch',
   floor:['#3f4a2f','#465236'],wallF:'#2c2a22',wallT:'#56603f',deco:['#6a7a3a','#8fd06a','#3a5a4a'],accent:'#b7f06a',amb:'firefly',map:['#4a5a34','#53653a','#3e4c2c'],
   skins:{melee:['Bog Slime','#6aa04a','#9fd07a'],ranged:['Reed Archer','#5a6a4a','#c9b890'],lunge:['Fen Leech','#3a2a3a','#a04a6a'],bomb:['Gasbloat','#8a9a3a','#4a5a1a'],caster:['Murk Acolyte','#3a4a5a','#b7f06a'],brute:['Mire Troll','#4a5a3a','#7a8a5a']}},
- {id:'frost',name:'Rimewall Peaks',ang:324,levels:['Frozen Pass','Glacier Vault'],boss:'warden',
+ {id:'frost',name:'Rimewall Peaks',ang:324,levels:['Frozen Pass','Glacier Vault','Icefall Stairs','Snowbound Ruins','Rimewall Gate'],boss:'warden',
   floor:['#c6dbe4','#bcd2dd'],wallF:'#5f7f96',wallT:'#eaf6fb',deco:['#9fc3d6','#ffffff','#7a9aae'],accent:'#cfefff',amb:'snow',map:['#d8e8ef','#e6f1f6','#c3d7e1'],
   skins:{melee:['Frost Husk','#8aa8ba','#cfe2ec'],ranged:['Rime Archer','#e6eef2','#9fb8c6'],lunge:['Snow Wolf','#e8eef0','#9ab0bc'],bomb:['Ice Mite','#7fd0ff','#2a5a7a'],caster:['Cold Oracle','#3a5a8a','#cfefff'],brute:['Yeti','#f0f4f6','#a8bcc8']}},
- {id:'volcano',name:'Cinder Caldera',ang:252,levels:['Ashen Steps','Forge of Embers'],boss:'golem',
+ {id:'volcano',name:'Cinder Caldera',ang:252,levels:['Ashen Steps','Forge of Embers','Magma Bridge','Obsidian Halls','Caldera Gate'],boss:'golem',
   floor:['#3a2c29','#42322e'],wallF:'#1f1716',wallT:'#5a4038',deco:['#ff6a2a','#ffb24a','#2a1e1c'],accent:'#ff8a3a',amb:'ember',map:['#4a3430','#3e2c28','#5a3c34'],
   skins:{melee:['Cinder Imp','#a03a2a','#ff8a3a'],ranged:['Ash Archer','#5a4a44','#c9a090'],lunge:['Magma Hound','#3a2420','#ff6a2a'],bomb:['Ember Mite','#ff8a3a','#5a1a0a'],caster:['Pyre Mage','#6a2a3a','#ffb24a'],brute:['Basalt Brute','#2a2220','#ff6a2a']}},
- {id:'spire',name:'The Hollow Spire',ang:0,levels:['Gate of Echoes','Throne Ascent'],boss:'sov1',
+ {id:'spire',name:'The Hollow Spire',ang:0,levels:['Gate of Echoes','Throne Ascent','Hall of Banners','Crown Vault','Stair of Kings'],boss:'sov1',
   floor:['#221d30','#282238'],wallF:'#120e1b',wallT:'#3d3357',deco:['#b45cff','#5a4a7a','#e0b0ff'],accent:'#c8b8ff',amb:'void',map:['#2a2340','#332a4c','#221c34'],
   skins:{melee:['Hollow Knight','#3b3550','#8a80a8'],ranged:['Void Archer','#2a2440','#c8b8ff'],lunge:['Shade Hound','#1a1428','#b45cff'],bomb:['Rift Mite','#b45cff','#2a0d3a'],caster:['Echo Priest','#4a3a6a','#e0b0ff'],brute:['Throne Guard','#2a2438','#c8b8ff']}},
  {id:'hallow',name:'Hollowshade Isle',ang:0,levels:['Pumpkin Patch','Crooked Orchard','Witchlight Bog','Bone Chapel','Lantern Crypt','Haunted Manor','Moonlit Graveyard'],boss:'pumpking',event:true,
@@ -1126,7 +1128,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='4.0.0', SAVE_VERSION=6;
+const APP_VERSION='4.1.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1137,6 +1139,7 @@ function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
     if(it.slot==='weapon'&&!WEAPONS[it.kind]) it.kind='sword'; if(it.slot==='artifact'&&!ARTS[it.kind]) it.kind='nova'; if(it.cid&&CAT_BY_ID[it.cid]) s.found[it.cid]=1;}
   if(!s.shop||typeof s.shop!=='object') s.shop={week:-1,stock:[],sold:{}}; if(!s.upg||typeof s.upg!=='object') s.upg={};
   if(!s.skins||typeof s.skins!=='object') s.skins={own:{default:1},eq:'default'}; if(!s.skins.own) s.skins.own={}; s.skins.own.default=1; if(!s.skins.eq) s.skins.eq='default';
+  if(old<7) for(let b=0;b<6;b++) if(s.cleared[b+'-2']) for(let li=2;li<=5;li++) s.cleared[b+'-'+li]=true;
   s.v=SAVE_VERSION; s.appVersion=APP_VERSION; s._oldV=old; return s;}
 async function writeSaveFile(){if(!DESK.on||!DESK.dir||!SAVE) return; const fs=Neutralino.filesystem, f=DESK.dir+'/save.json';
   if(DESK.writing){DESK.again=true; return DESK.writing;}
@@ -1183,9 +1186,9 @@ function genLevel(bi,boss,lay){
     carve(g,w,5,4,30,22); carve(g,w,18,25,4,5); carve(g,w,15,29,10,5);
     [[11,9],[27,9],[11,19],[27,19]].forEach(([x,y])=>{g[y*w+x]=g[y*w+x+1]=g[(y+1)*w+x]=g[(y+1)*w+x+1]=1;});
     return {w,h,g,start:{x:20*T,y:31.5*T},bossAt:{x:20*T,y:11*T},chests:[],spawns:[],exit:null,arena:{x:5,y:4,w:30,h:22},rooms:[{x:9.5*T,y:7.5*T},{x:30.5*T,y:7.5*T},{x:9.5*T,y:22.5*T},{x:30.5*T,y:22.5*T},{x:20.5*T,y:29.5*T}]};}
-  const w=60,h=60,g=new Uint8Array(w*h).fill(1),rooms=[];
+  const w=84,h=84,g=new Uint8Array(w*h).fill(1),rooms=[];
   const LY={open:{n:7,w:[11,16],h:[9,13],cw:4},halls:{n:9,w:[10,16],h:[5,7],cw:3},caves:{n:13,w:[5,9],h:[5,8],cw:2},long:{n:9,w:[7,11],h:[6,9],cw:3,line:1}}[lay]||{n:10,w:[7,13],h:[6,10],cw:3};
-  for(let k=0;k<600&&rooms.length<LY.n;k++){const rw=rint(LY.w[0],LY.w[1]),rh=rint(LY.h[0],LY.h[1]),rx=rint(2,w-rw-2),ry=rint(2,h-rh-2);
+  for(let k=0;k<1600&&rooms.length<Math.round(LY.n*1.6);k++){const rw=rint(LY.w[0],LY.w[1]),rh=rint(LY.h[0],LY.h[1]),rx=rint(2,w-rw-2),ry=rint(2,h-rh-2);
     if(rooms.some(r=>rx<r.x+r.w+3&&rx+rw+3>r.x&&ry<r.y+r.h+3&&ry+rh+3>r.y)) continue;
     rooms.push({x:rx,y:ry,w:rw,h:rh,cx:rx+(rw>>1),cy:ry+(rh>>1)});}
   if(LY.line) rooms.sort((a,b)=>(a.cx+a.cy*.35)-(b.cx+b.cy*.35));
@@ -1203,7 +1206,17 @@ function genLevel(bi,boss,lay){
   mids.forEach(r=>{const p={x:(r.x+1.5)*T,y:(r.y+1.5)*T}; chests.push({x:p.x,y:p.y,open:false});});
   const spawns=[];
   order.forEach((r,i)=>{if(i===0) return; const n=rint(2,4)+(i>order.length/2?1:0)+(i===order.length-1?2:0); for(let k=0;k<n;k++) spawns.push(inRoom(r));});
-  return {w,h,g,start:{x:(s.cx+.5)*T,y:(s.cy+.5)*T},exit:{x:(e.cx+.5)*T,y:(e.cy+.5)*T},chests,spawns,bossAt:null,rooms:order.map(r=>({x:(r.cx+.5)*T,y:(r.y+1.5)*T}))};}
+  // locked gates: the exit room (and in big levels a middle room too) is sealed until a key golem is led to it
+  const gates=[], keys=[], ringOf=r=>{const t=[]; for(let x=r.x-1;x<=r.x+r.w;x++) for(let y=r.y-1;y<=r.y+r.h;y++){if(x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h) continue; if(x<1||y<1||x>=w-1||y>=h-1) continue; if(!g[y*w+x]) t.push({x,y});} return t;};
+  const reach=closed=>{const blk=new Set(); closed.forEach(t=>t.forEach(c=>blk.add(c.y*w+c.x))); const seen=new Uint8Array(w*h), q=[s.cy*w+s.cx]; seen[q[0]]=1; while(q.length){const i=q.pop(), x=i%w, y=(i/w)|0; for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const j=(y+dy)*w+x+dx; if(!seen[j]&&!g[j]&&!blk.has(j)){seen[j]=1; q.push(j);}}} return seen;};
+  const inR=(seen,r)=>!!seen[r.cy*w+r.cx], pickRoom=(seen,ex,minI)=>{let c=order.filter((r,i)=>i>0&&!ex.includes(r)&&inR(seen,r)&&i>=minI); if(!c.length) c=order.filter((r,i)=>i>0&&!ex.includes(r)&&inR(seen,r)); return c.length?c[Math.floor(Math.random()*c.length)]:null;};
+  const mkG=(tiles,kr)=>{let sx2=0,sy2=0; tiles.forEach(c=>{sx2+=c.x; sy2+=c.y;}); const G={tiles:tiles.map(c=>({x:c.x,y:c.y,h:tiles.some(d=>d.y===c.y&&Math.abs(d.x-c.x)===1)})),open:false,x:(sx2/tiles.length+.5)*T,y:(sy2/tiles.length+.5)*T};
+    let bi2=0,bd=1e9; G.tiles.forEach((c,i)=>{const d=Math.hypot((c.x+.5)*T-G.x,(c.y+.5)*T-G.y); if(d<bd){bd=d;bi2=i;}}); G.tiles[bi2].lock=true; gates.push(G); keys.push({x:(kr.cx+.5)*T,y:(kr.cy+.5)*T,gate:gates.length-1,state:'idle',walk:0,face:Math.PI/2,r:12});};
+  {const tE=ringOf(e); if(tE.length&&tE.length<14&&!inR(reach([tE]),e)){const midI=Math.floor(order.length*.5), mid=order[midI]; let tM=null;
+     if(order.length>=11&&mid!==e){const t=ringOf(mid); if(t.length&&t.length<14&&!inR(reach([tE,t]),mid)) tM=t;}
+     if(tM){const kM=pickRoom(reach([tE,tM]),[e,mid],1), kE=pickRoom(reach([tE]),[e,mid,kM],midI+1); if(kM&&kE){mkG(tM,kM); mkG(tE,kE);} else tM=null;}
+     if(!tM&&!gates.length){const kE=pickRoom(reach([tE]),[e],Math.floor(order.length*.4)); if(kE) mkG(tE,kE);}}}
+  return {w,h,g,start:{x:(s.cx+.5)*T,y:(s.cy+.5)*T},exit:{x:(e.cx+.5)*T,y:(e.cy+.5)*T},chests,spawns,bossAt:null,gates,keys,rooms:order.map(r=>({x:(r.cx+.5)*T,y:(r.y+1.5)*T}))};}
 
 /* ---------------- world state ---------------- */
 let mode='menu', prevMode='play';
@@ -1225,7 +1238,7 @@ function startLevel(bi,li,forceIntro,seed){
   P={x:L.start.x,y:L.start.y,r:13,hp:ST.maxhp,face:-Math.PI/2,atk:0,swing:0,roll:0,rollCd:0,rdx:0,rdy:0,iframe:0,flash:0,bow:0,pot:0,acd:{a1:0,a2:0,a3:0,a4:0,a5:0,a6:0,a7:0,a8:0},slow:0,ward:0,gale:0,walk:0,dead:false,regenAcc:0,air:AIR_MAX};
   L.water=!!B.water; L.pods=L.water?(L.rooms||[]).map(p=>({x:p.x,y:p.y,pod:true})):[]; $('#airBar').hidden=!L.water;
   ents=[];projs=[];hazards=[];parts=[];texts=[];loot=[];boss=null;amb=[];allies=[];dying=[];shocks.length=0;
-  L.chests=L.chests||[]; withSeed(seed+7,()=>buildLevel3D()); L.blocks=[];
+  L.chests=L.chests||[]; L.gates=L.gates||[]; L.keys=L.keys||[]; withSeed(seed+7,()=>buildLevel3D()); L.blocks=[]; for(const G of L.gates) if(!G.open) for(const t of G.tiles) L.g[t.y*L.w+t.x]=1;
   if(isBoss&&B.boss==='godofdestruction') for(const [tx,ty] of [[9,13],[10,13],[11,13],[28,13],[29,13],[30,13],[15,17],[16,17],[24,17],[25,17],[18,7],[19,7],[21,7],[22,7],[8,23],[9,23],[31,23],[32,23],[14,10],[26,10],[20,21],[13,21],[27,21]]) addBlock(tx,ty,'rock',0,{},true);
   if(MP.role!=='client'||!MP.inGame){const n=L.mpN||1; L.spawns.forEach(p=>{spawnEnemy(pickType(L.tier),p.x,p.y); for(let k=1;k<n;k++){let ok=false; for(let t=0;t<24&&!ok;t++){const a=Math.random()*TAU,d=rand(16,30+t*4); ok=!!spawnEnemy(pickType(L.tier),p.x+Math.cos(a)*d,p.y+Math.sin(a)*d);} if(!ok) spawnEnemy(pickType(L.tier),p.x,p.y);}});
     if(isBoss){spawnBoss(B.boss); boss.max*=n; boss.hp=boss.max;}}
@@ -1567,7 +1580,7 @@ function update(dt){
   if(coopHost) asP(bossTarget(dt),()=>updBoss(dt)); else updBoss(dt);
   }
   updAllies(dt);
-  updBlocks(dt); updProjs(dt); updHaz(dt); updLoot(dt); updChests();
+  updBlocks(dt); updProjs(dt); updHaz(dt); updLoot(dt); updChests(); updKeys(dt);
   for(const p of parts){p.x+=p.vx*dt; p.y+=p.vy*dt; p.vx*=.95; p.vy*=.95; p.z=(p.z||0)+(p.vz||0)*dt; p.vz=(p.vz||0)-260*dt; if(p.z<0){p.z=0;p.vz*=-.3;} p.life-=dt;} parts=parts.filter(p=>p.life>0); if(parts.length>700) parts.splice(0,parts.length-700);
   for(const t of texts){t.life-=dt;} texts=texts.filter(t=>t.life>0);
   cam.x+=(P.x-cam.x)*Math.min(1,dt*8); cam.y+=(P.y-20-cam.y)*Math.min(1,dt*8);
@@ -2875,7 +2888,7 @@ const THEME_RULES=[
  [/blister|pustule|nest|seeping/i,{scatter:[['blisterD',.1]]}],
  [/light|white|bright|shield/i,{wall:[['lightspire',.1]],sun:1.15}],
  [/glass|dune|bazaar/i,{floor:'sand'}]];
-function themeFor(name,bi,isBoss){const T2={wall:[],scatter:[],plat:[],name:name||''};
+function themeFor(name,bi,isBoss){const T2={wall:[['stairs',/step|stair|ascent|tomb|ruin/i.test(name||'')?.1:.025]],scatter:[],plat:[],name:name||''};
   if(isBoss){T2.wall.push(['brazier',.14],['pillar',.08]); return T2;}
   for(const [re,m] of THEME_RULES) if(re.test(name||'')) for(const k in m){if(Array.isArray(m[k])) T2[k]=(T2[k]||[]).concat(m[k]); else T2[k]=m[k];}
   return T2;}
@@ -2929,7 +2942,8 @@ Object.assign(DECOR,{
  goldpile:[{g:gIco,col:0xf0c040,em:0x8a6a10,y:.06,sx:.2,sy:.08},{g:gCyl,col:0xf0c040,x:.18,y:.03,sx:.06,sy:.02}],
  inkpool:[{g:gCircle,col:0x0a0a14,y:.01,sx:.45,rx:-Math.PI/2}],
  puddle:[{g:gCircle,col:0x3a5a6a,y:.01,sx:.4,rx:-Math.PI/2}],
- snowpile:[{g:gSph,col:0xf4f8ff,y:.02,sx:.4,sy:.1,sz:.3}]});
+ snowpile:[{g:gSph,col:0xf4f8ff,y:.02,sx:.4,sy:.1,sz:.3}],
+ stairs:[{g:gBox,col:0x8a8478,y:.09,z:.3,sx:.7,sy:.18,sz:.24},{g:gBox,col:0x7e786c,y:.27,z:.08,sx:.7,sy:.54,sz:.24},{g:gBox,col:0x8a8478,y:.45,z:-.14,sx:.7,sy:.9,sz:.24},{g:gBox,col:0x7e786c,y:.63,z:-.36,sx:.7,sy:1.26,sz:.24}]});
 const _m4=new THREE.Matrix4(),_q=new THREE.Quaternion(),_eu=new THREE.Euler(),_sv=new THREE.Vector3(),_pv=new THREE.Vector3(),_cc=new THREE.Color();
 function inst(g,mat,list,cast=true){if(!list.length) return null; const im=new THREE.InstancedMesh(g,mat,list.length);
   list.forEach((o,i)=>{_eu.set(o.rx||0,o.ry||0,o.rz||0); _q.setFromEuler(_eu); _m4.compose(_pv.set(o.x,o.y,o.z),_q,_sv.set(o.sx,o.sy??o.sx,o.sz??o.sx)); im.setMatrixAt(i,_m4); if(o.c!==undefined) im.setColorAt(i,_cc.set(o.c));});
@@ -3112,6 +3126,34 @@ function syncBoss(){const b=boss; moundMesh.visible=false; teleLine.visible=fals
   if(b.trans>0){m.rotation.y+=time*6; u.body.position.y=Math.sin(time*20)*.05;}
   bossExtra(m,b);
   setFlash(m,b.flash>0?1:b.burn>0?2:0);}
+
+/* ---------------- locked gates and the key golems that open them ---------------- */
+function openGate(i,fromNet){const G=L&&L.gates&&L.gates[i]; if(!G||G.open) return; G.open=true; G.t0=time; for(const t of G.tiles) L.g[t.y*L.w+t.x]=0;
+  for(const t of G.tiles) puff((t.x+.5)*T,(t.y+.5)*T,'#9a9488',8,120,.6,6); shake(6); if(typeof sfx==='function') sfx('gate'); banner('The gate opens','The way forward is clear');
+  for(const k of L.keys) if(k.gate===i&&k.state!=='used'){k.state='used'; puff(k.x,k.y,'#ffd36a',24,160,.6,6);}
+  if(!fromNet&&MP.inGame){if(MP.role==='host') bcast({t:'gate',i}); else toHost({t:'gate',i});}}
+function updKeys(dt){if(!L||!L.keys||!P) return; for(const k of L.keys){if(k.state==='used') continue; const G=L.gates[k.gate]; if(!G||G.open){k.state='used'; continue;}
+    const d=Math.hypot(P.x-k.x,P.y-k.y);
+    if(k.state==='idle'){k.walk+=dt*2; if(d<48&&!P.dead){k.state='follow'; if(typeof sfx==='function') sfx('key'); toast('A key golem follows you! Lead it to the locked gate.','#ffd36a'); puff(k.x,k.y,'#ffd36a',14,120,.5,5);}}
+    else {if(d>56){const sp=Math.min(d-48,(d>300?420:240)*dt); moveCirc(k,(P.x-k.x)/d*sp,(P.y-k.y)/d*sp); k.walk+=dt*12; k.face=Math.atan2(P.y-k.y,P.x-k.x);} if(d>700){k.x=P.x; k.y=P.y+30;}
+      if(Math.hypot(k.x-G.x,k.y-G.y)<120) openGate(k.gate);}}}
+function buildKeyGolem(){const R=model(),B=R.userData.body; bossTex(); const st=M('#8a8478',{roughness:.9,flatShading:true}), st2=M('#6a645c',{roughness:.9,flatShading:true}), gold=M('#f0c040',{metalness:.85,roughness:.25,emissive:new THREE.Color('#8a6a10'),emissiveIntensity:.5}), eye=glow('#7fe0ff',2);
+  R.userData.legs=[limb(B,-.1,.32,0,.3,.07,st2),limb(B,.1,.32,0,.3,.07,st2)]; add(B,gBox,st,0,.5,0,.36,.34,.28); add(B,gBox,st2,0,.5,.13,.2,.18,.03);
+  const hd=new THREE.Group(); hd.position.y=.8; B.add(hd); add(hd,gBox,st,0,0,0,.26,.22,.24); add(hd,gSphL,eye,-.06,.02,.125,.03); add(hd,gSphL,eye,.06,.02,.125,.03); add(hd,gCone,st2,0,.15,0,.05,.1,.05); R.userData.head=hd;
+  R.userData.arms=[limb(B,-.24,.62,0,.26,.05,st2),limb(B,.24,.62,0,.26,.05,st2)]; R.userData.armsFwd=0;
+  const k=new THREE.Group(); k.position.set(0,.66,-.2); B.add(k); add(k,gTor,gold,0,.28,0,.12,.12,.45); add(k,gCyl,gold,0,-.02,0,.028,.5,.028); add(k,gBox,gold,.05,-.18,0,.08,.045,.035); add(k,gBox,gold,.05,-.26,0,.06,.045,.035); R.userData.keyM=k;
+  const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0xffd36a,transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending})); gl.position.y=.7; gl.scale.set(1.5,1.5,1); R.add(gl); R.userData.glow=gl;
+  applyHi(R); detailize(R); R.scale.setScalar(1.05); CUR=null; return R;}
+function syncKey(k){if(k.state==='used') return; const m=ensure(k,buildKeyGolem,'kg'), u=m.userData; m.position.set(k.x*S,k.state==='idle'?Math.abs(Math.sin(time*3))*.08:0,k.y*S); m.rotation.y=yawOf(k.face);
+  animLimbs(m,k.walk,k.state==='follow'); u.keyM.rotation.z=Math.sin(time*2.4)*.12; u.glow.material.opacity=.35+.25*Math.sin(time*4);}
+function buildGateTile(t){const R=model(); bossTex(); const iron=M('#3a3a42',{metalness:.7,roughness:.35}), stone=M('#7a7468',{roughness:.9,flatShading:true}), stone2=M('#5a564e',{roughness:.9,flatShading:true});
+  const bars=new THREE.Group(); R.add(bars); R.userData.bars=bars;
+  for(let i=0;i<5;i++){add(bars,gCyl,iron,-.4+i*.2,.65,0,.035,1.3,.035); add(bars,gCone,iron,-.4+i*.2,1.35,0,.045,.12,.045);} for(const y of [.25,.75,1.12]) add(bars,gBox,iron,0,y,0,.96,.06,.06);
+  if(t.lock){add(bars,gBox,glow('#ffd36a',1.4),0,.72,.05,.2,.24,.06); add(bars,gSphL,M('#1a1208'),0,.75,.09,.035); add(bars,gBox,M('#1a1208'),0,.68,.09,.02,.06,.01);}
+  add(R,gBox,stone,-.5,.78,0,.16,1.56,.32); add(R,gBox,stone,.5,.78,0,.16,1.56,.32); add(R,gBox,stone2,0,1.5,0,1.14,.16,.34);
+  applyHi(R); detailize(R); CUR=null; return R;}
+function syncGate(t,G){const m=ensure(t,()=>buildGateTile(t),'gt'+(t.lock?1:0)); m.position.set(t.x+.5,0,t.y+.5); m.rotation.y=t.h?0:Math.PI/2;
+  m.userData.bars.position.y=G.open?-1.45*easeInOut(Math.min(1,(time-(G.t0||0))/1.1)):0;}
 function syncChest(c){const m=ensure(c,buildChest,'c'); m.position.set(c.x*S,0,c.y*S); m.rotation.y=0; const u=m.userData;
   u.lid.rotation.x+=((c.open?-1.9:0)-u.lid.rotation.x)*.2; u.glow.material.opacity=c.open?0:.12+.08*Math.sin(time*3);}
 function syncLoot(o){const m=ensure(o,()=>buildLoot(o),'l'+o.kind); m.position.set(o.x*S,o.z*S,o.y*S); const u=m.userData;
@@ -3183,6 +3225,8 @@ function render(){
   if(L.form2!==lastForm2){lastForm2=L.form2; applyLights(L.env||B3[BIOMES[L.bi].id],L.form2);}
   seenSet=new Set();
   for(const c of L.chests) syncChest(c);
+  if(L.gates) for(const G of L.gates) for(const t of G.tiles) syncGate(t,G);
+  if(L.keys) for(const k of L.keys) syncKey(k);
   for(const o of loot) syncLoot(o);
   for(const e of ents) syncEnemy(e);
   for(const a of allies) syncEnemy(a);
@@ -3235,6 +3279,8 @@ function drawMini(){if(!L) return; const S=mini.width, sc=S/Math.max(L.w,L.h); m
   for(let y=0;y<L.h;y++) for(let x=0;x<L.w;x++){ if(!L.seen[y*L.w+x]) continue; mg.fillStyle=L.g[y*L.w+x]?shade(B.wallT,-.4):B.floor[0]; mg.fillRect(ox+x*sc,oy+y*sc,Math.ceil(sc),Math.ceil(sc));}
   const dot=(o,c,s)=>{const tx=o.x/T|0,ty=o.y/T|0; if(tx<0||ty<0||tx>=L.w||ty>=L.h||!L.seen[ty*L.w+tx]) return; mg.fillStyle=c; mg.fillRect(ox+o.x/T*sc-s/2,oy+o.y/T*sc-s/2,s,s);};
   for(const c of L.chests) if(!c.open) dot(c,'#f0b84a',8);
+  if(L.gates) for(const G of L.gates) if(!G.open) for(const t of G.tiles) dot({x:(t.x+.5)*T,y:(t.y+.5)*T},'#ffd36a',sc*1.1);
+  if(L.keys) for(const k of L.keys) if(k.state!=='used') dot(k,'#ffe58a',9);
   for(const o of loot) if(o.kind==='item') dot(o,RAR[o.item.rar].col,6);
   for(const e of ents) if(e.alert) dot(e,'#e2504a',5);
   if(boss&&!boss.dead) dot(boss,'#ff3a3a',12);
@@ -3266,7 +3312,7 @@ function toast(s,col){const el=document.createElement('div'); el.className='toas
 /* ---------------- screens ---------------- */
 const SCREENS=['menu','mapScr','hud','inv','pause','result','how','codex','cine','signin','shop','friends'];
 function showOnly(...ids){SCREENS.forEach(s=>$('#'+s).hidden=!ids.includes(s));}
-function crownsHTML(){let n=0; for(let b=0;b<6;b++) if(SAVE&&SAVE.cleared[b+'-2']) n++; let h=''; for(let i=0;i<6;i++) h+=`<span class="pip${i<n?' on':''}" title="${BIOMES[i].name}"></span>`; return h+`<span>${n} of 6 crowns claimed</span>`;}
+function crownsHTML(){let n=0; for(let b=0;b<6;b++) if(SAVE&&SAVE.cleared[levelKey(b,BIOMES[b].levels.length)]) n++; let h=''; for(let i=0;i<6;i++) h+=`<span class="pip${i<n?' on':''}" title="${BIOMES[i].name}"></span>`; return h+`<span>${n} of 6 crowns claimed</span>`;}
 const soulsUnlocked=()=>!!(SAVE&&worldOpen(3)&&worldOpen(4));
 const menuBg=()=>soulsUnlocked()?'souls':SAVE&&outerOpen()?'heart':null;
 function toMenu(){mode='menu'; showOnly('menu'); const mb=menuBg(); SOULS.mode=mb; $('#menu').classList.toggle('souls',!!mb); if(mb) startSouls(); else SOULS.on=false; renderAcct(); $('#menuCrowns').innerHTML=crownsHTML(); $('#btnContinue').disabled=!SAVE; $('#btnNew').textContent='New Expedition'; newArmed=false;
@@ -3445,11 +3491,11 @@ const NODES=[];
 (function buildNodes(){const cx0=500,cy0=322;
   BIOMES.forEach((B,bi)=>{ const n=B.levels.length+1;
     for(let li=0;li<n;li++){let x,y;
-      if(bi<5){const a=(B.ang+(li===1?9:li===0?-7:0))*Math.PI/180, rr=[.6,.48,.35][li]; x=cx0+Math.cos(a)*rr*400; y=cy0+Math.sin(a)*rr*260;}
+      if(bi<5){const a=(B.ang+[-9,7,-7,8,-4,0][li])*Math.PI/180, rr=[.78,.69,.6,.51,.43,.34][li]; x=cx0+Math.cos(a)*rr*400; y=cy0+Math.sin(a)*rr*260;}
       else if(bi===6){[x,y]=[[832,62],[872,40],[920,42],[962,66],[968,112],[930,138],[880,136],[910,92]][li];}
       else if(bi>=23){const C7=CORE_POS(bi); [x,y]=C7.nodes[li];}
       else if(bi>=7){[x,y]=({10:[[400,240],[480,150],[600,110],[740,140],[870,230],[850,420],[640,400]],11:[[420,230],[465,170],[525,130],[595,175],[545,85]],12:[[740,230],[785,170],[845,130],[915,175],[865,85]],13:[[740,545],[785,485],[845,445],[915,490],[865,395]],14:[[420,555],[465,495],[525,455],[595,500],[545,405]],15:[[420,230],[465,170],[525,130],[595,175],[545,85]],16:[[740,230],[785,170],[845,130],[915,175],[865,85]],17:[[740,545],[785,485],[845,445],[915,490],[865,395]],18:[[420,555],[465,495],[525,455],[595,500],[545,405]],19:[[420,230],[465,170],[525,130],[595,175],[545,85]],20:[[740,230],[785,170],[845,130],[915,175],[865,85]],21:[[740,545],[785,485],[845,445],[915,490],[865,395]],22:[[420,555],[465,495],[525,455],[595,500],[545,405]],7:[[300,250],[340,170],[412,132],[486,176],[424,70]],8:[[680,330],[740,262],[812,232],[886,282],[800,150]],9:[[400,530],[490,578],[600,575],[700,530],[560,480]]})[bi][li];}
-      else {const pos=[[200,.17],[20,.17],[0,0]][li]; const a=pos[0]*Math.PI/180; x=cx0+Math.cos(a)*pos[1]*400; y=cy0+Math.sin(a)*pos[1]*260;}
+      else {const pos=[[150,.2],[210,.2],[270,.2],[330,.2],[30,.2],[0,0]][li]; const a=pos[0]*Math.PI/180; x=cx0+Math.cos(a)*pos[1]*400; y=cy0+Math.sin(a)*pos[1]*260;}
       NODES.push({bi,li,x,y,boss:li===n-1});}});})();
 function sectorOf(a){let best=0,bd=9; for(let i=0;i<5;i++){const d=Math.abs(angDiff(a,BIOMES[i].ang*Math.PI/180)); if(d<bd){bd=d;best=i;}} return best;}
 function drawIsle(){const g=isleCv.getContext('2d'),S=5,cx0=500,cy0=322;
@@ -3537,13 +3583,13 @@ const levelKey=(bi,li)=>bi+'-'+li;
 function unlocked(bi,li){if(bi===6&&!EVENT_ACTIVE()) return false; if(SAVE&&SAVE.adminAll) return true; if(SAVE.cleared[levelKey(bi,li)]) return true; if(li>0) return !!SAVE.cleared[levelKey(bi,li-1)];
   if(bi===7) return !!SAVE.won; if(bi===11||bi===15||bi===19) return worldOpen(4); if(bi===23) return worldOpen(7); if(bi>7) return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];
   if(bi===6) return true;
-  if(bi===0) return true; if(bi===5){for(let b=0;b<5;b++) if(!SAVE.cleared[levelKey(b,2)]) return false; return true;} return !!SAVE.cleared[levelKey(bi-1,2)];}
+  if(bi===0) return true; if(bi===5){for(let b=0;b<5;b++) if(!SAVE.cleared[levelKey(b,BIOMES[b].levels.length)]) return false; return true;} return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];}
 function openMap(){if(!MP.peer) setTimeout(initMP,100); renderPartyHud(); mode='map'; showOnly('mapScr'); while(mapWorld>1&&!worldOpen(mapWorld)) mapWorld--; renderDiff();
   if(drawnWorld!==mapWorld){if(mapWorld===2) drawWorld2(); else if(mapWorld===3) drawWorld3(); else if(mapWorld===4) drawWorld4(); else if(mapWorld===5||mapWorld===6) drawDim(mapWorld); else if(mapWorld===7) drawWorld7(); else {drawIsle(); drawnWorld=1;}} calcStats();
   {const wb=$('#mapWorldBtn'), bk=$('#mapWorldBack'); const nextW=mapWorld<3&&worldOpen(mapWorld+1)?mapWorld+1:mapWorld===3&&worldOpen(7)?7:0, backW=mapWorld===2||mapWorld===3?mapWorld-1:mapWorld===7?3:0;
     wb.hidden=!nextW; if(nextW) wb.textContent=(nextW===2?'Outer Isles':nextW===7?'Core of Creations':'The Deep Dark')+' →'; wb.classList.toggle('next',!!nextW&&!anyIn(nextW===2?7:nextW===7?23:10));
     bk.hidden=!backW; if(backW) bk.textContent='← '+(backW===1?'Isle of Six Crowns':backW===3?'The Deep Dark':'Outer Isles');
-    $('#mapScr').classList.toggle('w2',mapWorld===2); $('#mapScr').classList.toggle('w3',mapWorld===3); $('#mapScr').classList.toggle('w4',mapWorld===4); $('#mapScr').classList.toggle('w5',mapWorld===5); $('#mapScr').classList.toggle('w6',mapWorld===6); $('#mapScr').classList.toggle('w7',mapWorld===7); $('#mapScr').classList.toggle('hasworld',!wb.hidden||!bk.hidden);
+    $('#mapScr').classList.toggle('w1',mapWorld===1); $('#mapScr').classList.toggle('w2',mapWorld===2); $('#mapScr').classList.toggle('w3',mapWorld===3); $('#mapScr').classList.toggle('w4',mapWorld===4); $('#mapScr').classList.toggle('w5',mapWorld===5); $('#mapScr').classList.toggle('w6',mapWorld===6); $('#mapScr').classList.toggle('w7',mapWorld===7); $('#mapScr').classList.toggle('hasworld',!wb.hidden||!bk.hidden);
     $('#mapScr h2').textContent={1:'The Isle',2:'The Outer Isles',3:'The Deep Dark',4:'The Shift Dimension',5:'The Forge',6:'The Void',7:'The Core of Creations'}[mapWorld];}
   $('#mapPower').textContent=ST.power; $('#mapShards').textContent=SAVE.shards; $('#mapShardIco').src=iconURL('shard','#7fe0c8','#e8fff8');
   const box=$('#nodes'); box.innerHTML='';
@@ -4259,7 +4305,7 @@ const arrowCap=()=>80+20*upLv('quv');
 /* --- weekly limited stock --- */
 const WEEK0=Date.UTC(2026,0,5), WEEKMS=7*864e5; // weeks start Monday 00:00 UTC
 const weekNow=()=>Math.floor((Date.now()-WEEK0)/WEEKMS);
-function progressTier(){let n=0; for(let b=0;b<5;b++) if(SAVE.cleared[b+'-2']) n++; return Math.min(5,n);}
+function progressTier(){let n=0; for(let b=0;b<5;b++) if(SAVE.cleared[levelKey(b,BIOMES[b].levels.length)]) n++; return Math.min(5,n);}
 function limitedPrice(it){return Math.max(50,Math.round(it.pow*(it.rar==='unique'?14:7)/10)*10);}
 function rollStock(week){const r=srand(7919+week*131), bi=progressTier(), pick=list=>{const base=list.filter(e=>!e.ev&&!e.rg); let pool=base.filter(e=>e.tier<=bi&&e.tier>=bi-1); if(!pool.length) pool=base; return pool[(r()*pool.length)|0];};
   const plan=[['sword','rare'],['weapon','rare'],['sword','rare'],[r()<.5?'usword':'uweapon','unique'],['armor','rare'],['armor','rare'],['uarmor','unique'],['art','rare'],['art','rare'],['uart','unique']];
@@ -4475,6 +4521,7 @@ function onMsg(code,m){if(!m||typeof m!=='object') return; const H=MP.role==='ho
   case 'kill': if(C&&MP.inGame) netKill(m); break;
   case 'bdown': if(C&&MP.inGame) netBossDown(m); break;
   case 'blk': if(C&&MP.inGame) netBlock(m); break;
+  case 'gate': if(MP.inGame&&L){openGate(m.i,true); if(H) bcast({t:'gate',i:m.i});} break;
   case 'cine': if(C&&MP.inGame&&boss){if(m.k==='boss') startCine(bossCine(boss),()=>{$('#bossBar').hidden=false;}); else if(m.k==='trans'){L.form2=true; startCine(transformCine(boss),()=>{});} else if(m.k==='form') shiftForm(boss,m.id,true);} break;
   case 'complete': if(H){bcast({t:'complete'});} if((H||C)&&MP.inGame&&run&&!run.done) completeLevel(true); break;
   case 'wipe': if(C&&MP.inGame&&run&&!run.done) run.endT=1.2; break;
