@@ -19,6 +19,15 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🏰 Version 4.5
+
+- **Levels built from their titles:** every level now has big set pieces that match its name. Old Mill Cellar has windmills and millstones, the Buried Bazaar has market stalls and carts, the Upside-Down Library has shelves hanging from the ceiling and flying books, Crown Vault has a throne and treasure, the Grand Stage has a theatre stage and spotlights, and so on for all 170 levels. Trees, rocks and other scenery are back in every level too.
+- **Key golems open gates themselves:** once a key golem following you gets close to its gate, it walks to the lock on its own and opens it.
+- **Upgrade gear:** in the Pack, the new **Upgrade gear** button above Enchant spends diamonds to raise an item by one level, up to level 10. Each level adds a little power.
+- **Sound off button:** the top right of the main menu has a button that turns all music and sound effects off, or back on.
+- **A brighter Deep Dark.**
+- **Google sign-in** now works in the Windows and Mac apps, in the Android app (phones, tablets and Chromebooks) and in any browser, using a short code from google.com/device.
+
 ## 💎 The Three Great Legends
 
 Beat the Shapeless One at the Core of Forms and three adventurers walk into the arena. They find three crystals, take them, and become the **Supreme Creator**, the **Grand Magician** and the **Omega Enchanter**. Then they escape through a portal. **Stop the 3 great legends!**

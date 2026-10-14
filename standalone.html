@@ -55,6 +55,11 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #sigCall{position:fixed;left:50%;top:13%;transform:translateX(-50%);font:700 clamp(18px,3.2vw,30px)/1.1 'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase;text-shadow:0 0 14px currentColor,0 2px 0 #000;pointer-events:none;opacity:0;z-index:30;white-space:nowrap}
 #sigCall.show{animation:sigIn 1.7s ease-out forwards}
 @keyframes sigIn{0%{opacity:0;transform:translateX(-50%) scale(1.5)}12%{opacity:1;transform:translateX(-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-10px)}}
+#muteAll{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));z-index:4;display:flex;align-items:center;gap:8px;padding:8px 12px;font:inherit;font-size:14px;color:#f3e6c4;background:rgba(7,17,22,.82);border:3px solid var(--rim);box-shadow:inset 0 0 0 2px var(--edge);cursor:pointer}
+#muteAll svg{width:22px;height:22px;fill:currentColor}
+#muteAll.off{color:#ff8a6a}
+#muteAll:focus-visible{outline:3px solid #ffd36a;outline-offset:2px}
+@media (max-width:560px){#muteAll span{display:none}}
 #adminBtn{position:fixed;right:12px;bottom:12px;z-index:60;width:46px;height:46px;border-radius:50%;border:2px solid #ffd36a;background:rgba(20,16,10,.85);color:#ffd36a;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 0 14px rgba(255,211,106,.4)}
 #adminBtn[hidden],#adminPanel[hidden]{display:none}
 #adminPanel{position:fixed;inset:0;z-index:61;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}
@@ -223,6 +228,13 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 .enctag{color:#d8b0ff;font-family:var(--display)}
 .ench.soul b{color:#d8b0ff}
 .encrow{margin-bottom:6px}
+.uprow{margin-bottom:6px;align-items:center;flex-wrap:wrap}
+.upbtn{background:linear-gradient(#2fa88a,#1a7058);border-color:#0e4a3a;color:#fff}
+.upbtn:disabled{opacity:.5;cursor:not-allowed}
+.upneed{color:var(--mute);font-size:12px;margin-left:6px}
+.uptag{color:#7fe0c8;font-family:var(--display)}
+.uplv{color:#7fe0c8;font-size:.8em}
+#detail.upflash{animation:upFlash .6s ease-out}@keyframes upFlash{0%{box-shadow:0 0 0 0 rgba(127,224,200,.9)}100%{box-shadow:0 0 0 18px rgba(127,224,200,0)}}
 .enchbtn{background:linear-gradient(#8a4ad8,#5a26a8);border-color:#3a1678;color:#fff}
 .enchbtn img{width:14px;height:14px;image-rendering:pixelated;vertical-align:-2px;margin:0 2px 0 4px}
 .enchbtn[aria-disabled="true"]{opacity:.55}
@@ -1187,7 +1199,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='4.4.0', SAVE_VERSION=7;
+const APP_VERSION='4.5.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1275,7 +1287,7 @@ function genLevel(bi,boss,lay){
      if(order.length>=11&&mid!==e){const t=ringOf(mid); if(t.length&&t.length<14&&!inR(reach([tE,t]),mid)) tM=t;}
      if(tM){const kM=pickRoom(reach([tE,tM]),[e,mid],1), kE=pickRoom(reach([tE]),[e,mid,kM],midI+1); if(kM&&kE){mkG(tM,kM); mkG(tE,kE);} else tM=null;}
      if(!tM&&!gates.length){const kE=pickRoom(reach([tE]),[e],Math.floor(order.length*.4)); if(kE) mkG(tE,kE);}}}
-  return {w,h,g,start:{x:(s.cx+.5)*T,y:(s.cy+.5)*T},exit:{x:(e.cx+.5)*T,y:(e.cy+.5)*T},chests,spawns,bossAt:null,gates,keys,rooms:order.map(r=>({x:(r.cx+.5)*T,y:(r.y+1.5)*T}))};}
+  return {w,h,g,start:{x:(s.cx+.5)*T,y:(s.cy+.5)*T},exit:{x:(e.cx+.5)*T,y:(e.cy+.5)*T},chests,spawns,bossAt:null,gates,keys,rooms:order.map(r=>({x:(r.cx+.5)*T,y:(r.y+1.5)*T})),rects:order.map(r=>({x:r.x,y:r.y,w:r.w,h:r.h}))};}
 
 /* ---------------- world state ---------------- */
 let mode='menu', prevMode='play';
@@ -1283,7 +1295,8 @@ let allies=[];
 let L=null,P=null,ents=[],projs=[],hazards=[],parts=[],texts=[],loot=[],boss=null,cam={x:0,y:0},shakeT=0,shakeA=0,flashT=0,flashCol='#fff';
 let run=null, amb=[], bigMap=false;
 const solid=(x,y)=>{const tx=Math.floor(x/T),ty=Math.floor(y/T); if(tx<0||ty<0||tx>=L.w||ty>=L.h) return true; return L.g[ty*L.w+tx]===1;};
-const blocked=(x,y,r)=>solid(x-r,y-r)||solid(x+r,y-r)||solid(x-r,y+r)||solid(x+r,y+r);
+const ogAt=(x,y)=>{const O=L.og; if(!O) return false; const tx=Math.floor(x/T),ty=Math.floor(y/T); return tx>=0&&ty>=0&&tx<L.w&&ty<L.h&&O[ty*L.w+tx]===1;};
+const blocked=(x,y,r)=>solid(x-r,y-r)||solid(x+r,y-r)||solid(x-r,y+r)||solid(x+r,y+r)||(!!L.og&&(ogAt(x-r,y-r)||ogAt(x+r,y-r)||ogAt(x-r,y+r)||ogAt(x+r,y+r)));
 function moveCirc(e,dx,dy){const n=Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/(e.r*.8))||1; dx/=n; dy/=n;
   for(let i=0;i<n;i++){ if(!blocked(e.x+dx,e.y,e.r)) e.x+=dx; if(!blocked(e.x,e.y+dy,e.r)) e.y+=dy; }}
 function shake(a){if(REDUCED) a*=.3; shakeA=Math.max(shakeA,a); shakeT=.25;}
@@ -3810,7 +3823,7 @@ const B3={
  tempest:{void:0x0e1218,sky:0xb8c8dc,gnd:0x2a3240,sun:0xd8e8ff,hi:.75,si:.8,rock:0x4a525e,top:0x8a94a4,tree:'stormpillar',floorDeco:['pebble','shardD','pebble'],fl:[0x5a6270,0x4e5664,0x666e7c]},
  temple:{void:0x0c140a,sky:0xd8e8b0,gnd:0x2a3a1a,sun:0xfff0b0,hi:.8,si:.95,rock:0x6a6650,top:0x6a8a3a,tree:'jungletree',floorDeco:['tuft','vineD','flower','tuft'],fl:[0x4a5a3a,0x5a6a42,0x6a6248]},
  reef:{void:0x041a24,sky:0x7fd8e8,gnd:0x0a2a3a,sun:0x9fefff,hi:.85,si:.7,rock:0x1e4a52,top:0x3a8a8a,tree:'coral',floorDeco:['kelpD','shellD','coralbit','kelpD'],fl:[0x2a5a6a,0x245262,0x346a72],pool:0x0a3a4a,fogN:9,fogF:30},
- deepdark:{void:0x020406,sky:0x4a6a80,gnd:0x060a0e,sun:0x9abad8,hi:.85,si:.75,rock:0x161c22,top:0x22303a,tree:'gloomspire',floorDeco:['veinD','pebble','veinD','boneD'],fl:[0x1a2228,0x141a20,0x20282e],pool:0x0a2a2a,fogN:8,fogF:26},
+ deepdark:{void:0x0c1820,sky:0x9ac0d8,gnd:0x1e2c36,sun:0xd0e6ff,hi:1.3,si:1.15,bright:1,rock:0x34424e,top:0x48606e,tree:'gloomspire',floorDeco:['veinD','pebble','veinD','boneD'],fl:[0x3a4a56,0x32424e,0x42525e],pool:0x1a4a4a,fogN:16,fogF:44},
  sculk:{void:0x01080a,sky:0x3a8a8a,gnd:0x041010,sun:0x8affff,hi:.85,si:.75,rock:0x0a1e22,top:0x123a40,tree:'veintree',floorDeco:['veinD','veinD','pebble'],fl:[0x10242a,0x0c1e22,0x163036],pool:0x04302e,fogN:8,fogF:28},
  monarch:{void:0x120a1a,sky:0xe8c8ff,gnd:0x2a1a3a,sun:0xffe0a0,hi:.8,si:.95,rock:0x3a2a4a,top:0x6a4a8a,tree:'royalbanner',floorDeco:['flower','pebble','tuft'],fl:[0x3a2a4a,0x42304f,0x4c3a5a]},
  harmony:{void:0x0e1a0a,sky:0xe8fff0,gnd:0x3a6a2a,sun:0xfff8e0,hi:.9,si:1.05,rock:0x6a8a4a,top:0x7ac04a,tree:'bigflower',floorDeco:['flower','tuft','flower','tuft'],fl:[0x5a9a3a,0x68a844,0x7ab04e]},
@@ -3922,6 +3935,7 @@ function themeFor(name,bi,isBoss){const T2={wall:[['stairs',/step|stair|ascent|t
 function themedEnv(E0,TH){const E=Object.assign({},E0); if(!TH||!TH.name) return E; let sum=0; for(const ch of TH.name) sum+=ch.charCodeAt(0); const hj=(hash(sum,TH.name.length*13)-.5)*.08;
   const tw=(c,k)=>{const col=new THREE.Color(c); if(TH.tint&&TH.tintK) col.lerp(new THREE.Color(TH.tint),TH.tintK*k); col.offsetHSL(hj,0,0); return col.getHex();};
   E.fl=E0.fl.map(c=>tw(c,1)); E.top=tw(E0.top,.6); E.rock=tw(E0.rock,.4); E.si=E0.si*(TH.sun||1); E.hi=E0.hi*(TH.hemi||TH.sun||1); E.fogN=(E0.fogN||22)*(TH.fog||1); E.fogF=(E0.fogF||44)*(TH.fog||1);
+  if(E0.bright){E.si=Math.max(E.si,E0.si); E.hi=Math.max(E.hi,E0.hi); E.fogN=Math.max(E.fogN,E0.fogN); E.fogF=Math.max(E.fogF,E0.fogF);}
   if(TH.pools&&!E.lava&&!E.pool) E.pool=0x2f5a6a; return E;}
 function floorPattern(fs){const W2=new THREE.Color('#dff0ff'), SC=new THREE.Color('#0a2228'), CY=new THREE.Color('#2affe0'), MS=new THREE.Color('#3f6a2a'), WT=new THREE.Color('#ffffff'), R3i=(v,m)=>Math.round(v*3)*m;
   switch(fs){
@@ -4039,6 +4053,7 @@ function buildLevel3D(){
   if(E.lava||E.pool){const pth=(L.theme&&L.theme.pools)||.965, ps=[]; for(let y=1;y<H-1;y++) for(let x=1;x<W-1;x++) if(isF(x,y)&&isF(x+1,y)&&isF(x,y+1)&&isF(x-1,y)&&isF(x,y-1)&&hash(x*7,y*13)>pth&&Math.hypot(x+.5-L.start.x/T,y+.5-L.start.y/T)>3) ps.push({x:x+.5,y:.012,z:y+.5,sx:.35+hash(x,y)*.4,sy:.25+hash(y,x)*.35,sz:1,rx:-Math.PI/2,rz:hash(x+2,y)*6});
     inst(gCircle,E.lava?new THREE.MeshBasicMaterial({color:E.lava}):new THREE.MeshStandardMaterial({color:E.pool,roughness:.05,metalness:.3}),ps,false);}
   // underlay for the void
+  try{placeStructures(E,bio,isF);}catch(e){console.warn('structures',e);}
   const under=new THREE.Mesh(gPlane,new THREE.MeshBasicMaterial({color:E.void})); under.rotation.x=-Math.PI/2; under.scale.set(W+40,H+40,1); under.position.set(W/2,-.05,H/2); levelGroup.add(under);
 }
 
@@ -4162,8 +4177,21 @@ function openGate(i,fromNet){const G=L&&L.gates&&L.gates[i]; if(!G||G.open) retu
 function updKeys(dt){if(!L||!L.keys||!P) return; for(const k of L.keys){if(k.state==='used') continue; const G=L.gates[k.gate]; if(!G||G.open){k.state='used'; continue;}
     const d=Math.hypot(P.x-k.x,P.y-k.y);
     if(k.state==='idle'){k.walk+=dt*2; if(d<48&&!P.dead){k.state='follow'; if(typeof sfx==='function') sfx('key'); toast('A key golem follows you! Lead it to the locked gate.','#ffd36a'); puff(k.x,k.y,'#ffd36a',14,120,.5,5);}}
-    else {if(d>56){const sp=Math.min(d-48,(d>300?420:240)*dt); moveCirc(k,(P.x-k.x)/d*sp,(P.y-k.y)/d*sp); k.walk+=dt*12; k.face=Math.atan2(P.y-k.y,P.x-k.x);} if(d>700){k.x=P.x; k.y=P.y+30;}
-      if(Math.hypot(k.x-G.x,k.y-G.y)<120) openGate(k.gate);}}}
+    else if(k.state==='follow'){if(d>56){const sp=Math.min(d-48,(d>300?420:240)*dt); moveCirc(k,(P.x-k.x)/d*sp,(P.y-k.y)/d*sp); k.walk+=dt*12; k.face=Math.atan2(P.y-k.y,P.x-k.x);} if(d>700){k.x=P.x; k.y=P.y+30;}
+      // close to its gate (the golem or the player): it takes over and walks to the lock by itself
+      if(Math.hypot(k.x-G.x,k.y-G.y)<330||Math.hypot(P.x-G.x,P.y-G.y)<260){k.path=keyPath(k,G); k.state='toGate'; k.stuck=0; toast('The key golem heads for the gate!','#ffd36a');}}
+    else if(k.state==='toGate'){const gd=Math.hypot(k.x-G.x,k.y-G.y); k.stuck+=dt;
+      if(gd<70||!k.path||!k.path.length||k.stuck>7){if(gd>=90){const g=k.path&&k.path.length?k.path[k.path.length-1]:(k.goal!=null?{x:k.goal%L.w,y:(k.goal/L.w)|0}:null); puff(k.x,k.y,'#ffd36a',12,120,.5,5); if(g){k.x=(g.x+.5)*T; k.y=(g.y+.5)*T;} else {k.x=G.x+(P.x-G.x)*.2; k.y=G.y+(P.y-G.y)*.2;} puff(k.x,k.y,'#ffd36a',12,120,.5,5);} k.state='unlock'; k.ut=0; k.face=Math.atan2(G.y-k.y,G.x-k.x); continue;}
+      const n=k.path[0], tx=(n.x+.5)*T, ty=(n.y+.5)*T, dd=Math.hypot(tx-k.x,ty-k.y); if(dd<8){k.path.shift(); continue;}
+      const sp=Math.min(dd,320*dt); moveCirc(k,(tx-k.x)/dd*sp,(ty-k.y)/dd*sp); k.walk+=dt*13; k.face=Math.atan2(ty-k.y,tx-k.x);}
+    else if(k.state==='unlock'){k.ut+=dt; k.face=Math.atan2(G.y-k.y,G.x-k.x); if(k.ut>.25&&!k.clk){k.clk=1; if(typeof sfx==='function') sfx('key'); puff(k.x+Math.cos(k.face)*20,k.y+Math.sin(k.face)*20,'#ffd36a',10,90,.4,4);} if(k.ut>1.0) openGate(k.gate);}}}
+// shortest walk over open floor from the golem to a tile beside its gate
+function keyPath(k,G){const W=L.w,H=L.h, sx=Math.floor(k.x/T), sy=Math.floor(k.y/T), goal=new Set(), gt=new Set(G.tiles.map(t=>t.y*W+t.x));
+  for(const t of G.tiles) for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const x=t.x+dx,y=t.y+dy; if(x>=0&&y>=0&&x<W&&y<H&&L.g[y*W+x]!==1&&!(L.og&&L.og[y*W+x])&&!gt.has(y*W+x)) goal.add(y*W+x);}
+  k.goal=goal.size?[...goal][0]:null;
+  const prev=new Int32Array(W*H).fill(-2), q=[sy*W+sx]; prev[sy*W+sx]=-1; let end=-1;
+  for(let h=0;h<q.length&&h<20000;h++){const c=q[h]; if(goal.has(c)){end=c; break;} const cx=c%W, cy=(c/W)|0; for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const x=cx+dx,y=cy+dy; if(x<0||y<0||x>=W||y>=H) continue; const i=y*W+x; if(prev[i]!==-2||L.g[i]===1||(L.og&&L.og[i])) continue; prev[i]=c; q.push(i);}}
+  if(end<0) return null; const path=[]; for(let c=end;c>=0&&c!==sy*W+sx;c=prev[c]) path.unshift({x:c%W,y:(c/W)|0}); return path;}
 function buildKeyGolem(){const R=model(),B=R.userData.body; bossTex(); const st=M('#8a8478',{roughness:.9,flatShading:true}), st2=M('#6a645c',{roughness:.9,flatShading:true}), gold=M('#f0c040',{metalness:.85,roughness:.25,emissive:new THREE.Color('#8a6a10'),emissiveIntensity:.5}), eye=glow('#7fe0ff',2);
   R.userData.legs=[limb(B,-.1,.32,0,.3,.07,st2),limb(B,.1,.32,0,.3,.07,st2)]; add(B,gBox,st,0,.5,0,.36,.34,.28); add(B,gBox,st2,0,.5,.13,.2,.18,.03);
   const hd=new THREE.Group(); hd.position.y=.8; B.add(hd); add(hd,gBox,st,0,0,0,.26,.22,.24); add(hd,gSphL,eye,-.06,.02,.125,.03); add(hd,gSphL,eye,.06,.02,.125,.03); add(hd,gCone,st2,0,.15,0,.05,.1,.05); R.userData.head=hd;
@@ -4172,7 +4200,7 @@ function buildKeyGolem(){const R=model(),B=R.userData.body; bossTex(); const st=
   const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0xffd36a,transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending})); gl.position.y=.7; gl.scale.set(1.5,1.5,1); R.add(gl); R.userData.glow=gl;
   applyHi(R); detailize(R); R.scale.setScalar(1.05); CUR=null; return R;}
 function syncKey(k){if(k.state==='used') return; const m=ensure(k,buildKeyGolem,'kg'), u=m.userData; m.position.set(k.x*S,k.state==='idle'?Math.abs(Math.sin(time*3))*.08:0,k.y*S); m.rotation.y=yawOf(k.face);
-  animLimbs(m,k.walk,k.state==='follow'); u.keyM.rotation.z=Math.sin(time*2.4)*.12; u.glow.material.opacity=.35+.25*Math.sin(time*4);}
+  animLimbs(m,k.walk,k.state==='follow'||k.state==='toGate'); if(k.state==='unlock'){u.arms.forEach(a=>a.rotation.x=-1.5); u.keyM.rotation.z=Math.min(1,k.ut*1.4)*Math.PI*.5;} else u.keyM.rotation.z=Math.sin(time*2.4)*.12; u.glow.material.opacity=.35+.25*Math.sin(time*4);}
 function buildGateTile(t){const R=model(); bossTex(); const iron=M('#3a3a42',{metalness:.7,roughness:.35}), stone=M('#7a7468',{roughness:.9,flatShading:true}), stone2=M('#5a564e',{roughness:.9,flatShading:true});
   const bars=new THREE.Group(); R.add(bars); R.userData.bars=bars;
   for(let i=0;i<5;i++){add(bars,gCyl,iron,-.4+i*.2,.65,0,.035,1.3,.035); add(bars,gCone,iron,-.4+i*.2,1.35,0,.045,.12,.045);} for(const y of [.25,.75,1.12]) add(bars,gBox,iron,0,y,0,.96,.06,.06);
@@ -4722,16 +4750,22 @@ function renderDetail(){const box=$('#detail'); let it=null, inBag=false;
   const eqFor=it.slot==='weapon'?SAVE.eq.weapon:it.slot==='armor'?SAVE.eq.armor:(SAVE.eq.a1||SAVE.eq.a2);
   const salv=Math.round(it.pow/4*R.m);
   const ec=enchCost(it); box.classList.toggle('isenc',!!it.encd);
-  box.innerHTML=`<img src="${iconOf(it)}" alt="" class="${it.encd?'encimg':''}" style="width:56px;height:56px;image-rendering:pixelated"><div class="rar" style="color:${R.col}">${R.label} ${it.slot==='artifact'?'artifact':it.slot}${it.encd?' · <span class="enctag">✦ Enchanted</span>':''}</div><h3 style="color:${R.col}">${it.name}</h3>
+  box.innerHTML=`<img src="${iconOf(it)}" alt="" class="${it.encd?'encimg':''}" style="width:56px;height:56px;image-rendering:pixelated"><div class="rar" style="color:${R.col}">${R.label} ${it.slot==='artifact'?'artifact':it.slot}${it.encd?' · <span class="enctag">✦ Enchanted</span>':''}</div><h3 style="color:${R.col}">${it.name}${it.up?` <span class="uplv">+${it.up}</span>`:''}</h3>
    <div>Power <b>${it.pow}</b> · from ${BIOMES[it.bi].name}</div>${it.boss?`<div style="color:var(--unique);font-family:var(--display)">Guardian loot · ${BOSSES[it.boss].name}</div>`:''}
    <ul>${itemLines(it).map(([a,b])=>`<li>${a}: <b>${b}</b></li>`).join('')}${ench}</ul>
    ${it.slot==='artifact'?`<div style="color:var(--mute)">${it.kind==='summon'&&MINIONS[it.minion]?`Summons ${it.count>1?it.count+' ':'a '}${MINIONS[it.minion].n}${it.count>1?'s':''} that ${ROLE_TXT[MINIONS[it.minion].role][it.count>1?1:0]}, until they are defeated.`:ARTS[it.kind].desc}</div>`:''}
    ${inBag?cmp(it,eqFor):''}
+   <div class="actions uprow">${(it.up||0)>=UP_MAX?`<span class="uptag">⬆ Fully upgraded · level ${UP_MAX}</span>`:`<button class="btn small upbtn" data-act="up" ${SAVE.shards<gearCost(it)?'disabled':''} aria-label="Upgrade this gear for ${gearCost(it)} diamonds">⬆ Upgrade gear · level ${(it.up||0)} → ${(it.up||0)+1} · 💎 ${gearCost(it)}</button>${SAVE.shards<gearCost(it)?`<span class="upneed">Need ${gearCost(it)-SAVE.shards} more diamonds</span>`:''}`}</div>
    <div class="actions encrow">${it.encd?`<span class="enctag">✦ Enchanted: +25% power, a new enchantment and ${SOUL_ABIL[it.slot][0]}</span>`:`<button class="btn small enchbtn" data-act="ench">✦ Enchant · Free</button>`}</div>
    <div class="actions">${inBag?(it.slot==='artifact'?`<button class="btn small gold" data-act="eq1">Slot 1</button><button class="btn small gold" data-act="eq2">Slot 2</button><button class="btn small gold" data-act="eq3">Slot 3</button><button class="btn small gold" data-act="eq4">Slot 4</button><button class="btn small gold" data-act="eq5">Slot 5</button><button class="btn small gold" data-act="eq6">Slot 6</button><button class="btn small gold" data-act="eq7">Slot 7</button><button class="btn small gold" data-act="eq8">Slot 8</button>`:`<button class="btn small gold" data-act="eq">Equip</button>`)+`<button class="btn small danger" data-act="salv">Salvage +${salv}</button>`
      :(it.slot==='artifact'?`<button class="btn small" data-act="uneq">Unequip</button>`:`<span class="empty">Equipped</span>`)}</div>`;
   box.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>invAction(b.dataset.act,it));}
 const enchCost=it=>0;
+// gear upgrades: spend diamonds to raise an item a level at a time (each level adds a little power)
+const UP_MAX=10, gearCost=it=>Math.max(25,Math.round((it.pow||10)*(.45+.2*(it.up||0))/5)*5);
+function upgradeItem(it){const c=gearCost(it); if((it.up||0)>=UP_MAX||SAVE.shards<c) return false; SAVE.shards-=c; it.up=(it.up||0)+1;
+  it.pow=Math.round(it.pow*1.06)+1; if(it.dmg) it.dmg=Math.max(it.dmg+1,Math.round(it.dmg*1.05)); if(it.hp) it.hp=Math.max(it.hp+2,Math.round(it.hp*1.05)); if(it.red) it.red=+Math.min(.6,it.red+.005).toFixed(3); if(it.pot) it.pot=+(it.pot*1.04).toFixed(2);
+  toast(`${it.name} upgraded to level ${it.up}!`,'#7fe0c8'); if(typeof sfx==='function') sfx('enchant'); return true;}
 function enchantItem(it){if(it.encd) return false; it.encd=true; it.pow=Math.round(it.pow*1.25);
   if(it.dmg) it.dmg=Math.round(it.dmg*1.2); if(it.hp) it.hp=Math.round(it.hp*1.2); if(it.red) it.red=+Math.min(.5,it.red+.03).toFixed(2); if(it.pot) it.pot=+(it.pot*1.2).toFixed(2);
   const pool=Object.keys(it.slot==='weapon'?W_ENCH:it.slot==='armor'?A_ENCH:R_ENCH).filter(n=>!it.ench.includes(n));
@@ -4739,6 +4773,7 @@ function enchantItem(it){if(it.encd) return false; it.encd=true; it.pow=Math.rou
     if(n==='Quickened') it.cdm=+((it.cdm||1)*.8).toFixed(2); else if(n==='Empowered') it.pot=+(it.pot*1.25).toFixed(2); else if(n==='Widened') it.rad=+((it.rad||1)*1.25).toFixed(2); else if(n==='Lasting') it.dur=+((it.dur||1)*1.25).toFixed(2);}
   toast(`${it.name} is enchanted!`,'#b45cff'); return true;}
 function invAction(act,it){const idx=SAVE.inv.indexOf(it);
+  if(act==='up'){if(upgradeItem(it)){if(P&&(mode==='inv'||mode==='play')){const oldMax=ST.maxhp; calcStats(); if(ST.maxhp>oldMax) P.hp+=ST.maxhp-oldMax;} const box=$('#detail'); box.classList.remove('upflash'); void box.offsetWidth; box.classList.add('upflash');} persist(); renderInv(); if(P) refreshSlots(); return;}
   if(act==='ench'){if(enchantItem(it)){if(P&&(mode==='inv'||mode==='play')){const oldMax=ST.maxhp; calcStats(); if(ST.maxhp>oldMax) P.hp+=ST.maxhp-oldMax;} const box=$('#detail'); box.classList.remove('enchflash'); void box.offsetWidth; box.classList.add('enchflash');} persist(); renderInv(); if(P) refreshSlots(); return;}
   if(act==='salv'){SAVE.inv.splice(idx,1); SAVE.shards+=Math.round(it.pow/4*RAR[it.rar].m); invSel=null;}
   else if(act==='eq'||/^eq[1-8]$/.test(act)){const slot=act==='eq'?it.slot:'a'+act[2]; const old=SAVE.eq[slot]; SAVE.inv.splice(idx,1); if(old) SAVE.inv.splice(idx,0,old); SAVE.eq[slot]=it; invSel={where:'eq',slot};
@@ -5068,9 +5103,10 @@ const GOOGLE_AUTH={webClientId:'',deviceClientId:'613022041641-ncjhv5n6a3jvt46v2
 const NAME_RE=/^[A-Za-z0-9 _\-]{3,16}$/;
 let authBusy=null, pendingGoogle=null;
 function authEnv(){ if(window.__forceAuth) return window.__forceAuth;
-  if(DESK.on) return GOOGLE_AUTH.deviceClientId?'device':'unconfigured';
+  // Windows/Mac apps, the Android app (phones, tablets and Chromebooks) and any browser use Google's code sign-in
+  if(DESK.on||window.IsleAndroid) return GOOGLE_AUTH.deviceClientId?'device':'unconfigured';
   if(window.claude||!/^https?:$/.test(location.protocol)) return 'unsupported';
-  return GOOGLE_AUTH.webClientId?'gis':'unconfigured';}
+  return GOOGLE_AUTH.webClientId?'gis':GOOGLE_AUTH.deviceClientId?'device':'unconfigured';}
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const GIFT_KEY='1akwo3z6zhf';
 function keyOf(str){let h1=0xdeadbeef^6,h2=0x41c6ce57^6; for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i); h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677);}
@@ -5088,7 +5124,7 @@ function openSigninShell(){$('#signin').hidden=false;}
 function closeSignin(){$('#signin').hidden=true; if(authBusy){authBusy.cancel=true; authBusy=null;} renderAcct();}
 function sbox(html){const b=$('#signinBox'); b.innerHTML=html; const c=b.querySelector('[data-close]'); if(c) c.onclick=closeSignin; const f=b.querySelector('input,button'); if(f) f.focus();}
 function openSignin(){openSigninShell(); const env=authEnv();
-  if(env==='unsupported') return sbox(`<h2>Sign in</h2><p class="sp">Google sign-in works in the Windows and Mac apps and in the hosted web version of the game. It can't run in this copy, which is either the preview page or the offline file.</p><div class="row"><button class="btn" data-close>Close</button></div>`);
+  if(env==='unsupported') return sbox(`<h2>Sign in</h2><p class="sp">Google sign-in works in the Windows, Mac and Android apps (including on Chromebooks) and in the web version of the game at thinkinglink.github.io/isle-of-six-crowns. It can't run in this copy, which is the preview page or an offline file.</p><div class="row"><button class="btn" data-close>Close</button></div>`);
   if(env==='unconfigured') return sbox(`<h2>Sign in</h2><p class="sp">Google sign-in hasn't been switched on in this copy of the game yet. It needs the game's Google Client ID, which the game's creator adds.</p><div class="row"><button class="btn" data-close>Close</button></div>`);
   if(env==='gis') return startGIS();
   startDevice();}
@@ -5100,7 +5136,15 @@ function startGIS(){sbox(`<h2>Sign in</h2><p class="sp">Use your Google account 
   .catch(()=>authError('Could not reach Google. Check your internet connection and try again.'));}
 async function gpost(url,params){const body=new URLSearchParams(params).toString();
   try{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body}); return await r.json();}
-  catch(e){ if(!DESK.on) throw e; const out=await Neutralino.os.execCommand(`curl -s -X POST "${url}" -H "Content-Type: application/x-www-form-urlencoded" -d "${body}"`); return JSON.parse(out.stdOut);}}
+  catch(e){
+    if(window.IsleAndroid&&IsleAndroid.httpPost){const t=IsleAndroid.httpPost(url,body); if(t) return JSON.parse(t); throw e;}
+    if(!DESK.on) throw e; const win=typeof NL_OS!=='undefined'&&NL_OS==='Windows';
+    let out=null; try{out=await Neutralino.os.execCommand(`${win?'curl.exe':'curl'} -s -X POST "${url}" -H "Content-Type: application/x-www-form-urlencoded" -d "${body}"`);}catch(er){}
+    if(out&&out.stdOut&&out.stdOut.trim()) return JSON.parse(out.stdOut);
+    if(win){// older Windows without curl: ask PowerShell (it reports Google's "keep waiting" replies as errors, so read the body either way)
+      const ps=`try{(Invoke-WebRequest -UseBasicParsing -Method Post -Uri '${url}' -ContentType 'application/x-www-form-urlencoded' -Body '${body}').Content}catch{$_.ErrorDetails.Message}`;
+      const o2=await Neutralino.os.execCommand(`powershell -NoProfile -ExecutionPolicy Bypass -Command "${ps}"`); if(o2&&o2.stdOut&&o2.stdOut.trim()) return JSON.parse(o2.stdOut);}
+    throw e;}}
 async function startDevice(){const job={cancel:false}; authBusy=job;
   sbox(`<h2>Sign in</h2><p class="sp">Connecting to Google…</p><div class="row"><button class="btn small" data-close>Cancel</button></div>`);
   let d; try{d=await gpost('https://oauth2.googleapis.com/device/code',{client_id:GOOGLE_AUTH.deviceClientId,scope:'openid email profile'});}catch(e){return authError('Could not reach Google. Check your internet connection and try again.');}
@@ -5110,7 +5154,7 @@ async function startDevice(){const job={cancel:false}; authBusy=job;
     <div class="ucode" id="ucode">${esc(d.user_code)}</div>
     <div class="row"><button class="btn gold" id="openG">Open the sign-in page</button><button class="btn" id="copyG">Copy code</button></div>
     <p class="sp" id="devStatus">Waiting for you to finish in the browser…</p><div class="row"><button class="btn small" data-close>Cancel</button></div>`);
-  $('#openG').onclick=()=>{try{DESK.on?Neutralino.os.open(url):window.open(url,'_blank');}catch(e){}};
+  $('#openG').onclick=()=>{try{if(window.IsleAndroid&&IsleAndroid.openUrl) IsleAndroid.openUrl(url); else if(DESK.on) Neutralino.os.open(url); else window.open(url,'_blank');}catch(e){}};
   $('#copyG').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(d.user_code).then(()=>{$('#copyG').textContent='Copied';},()=>{}).catch(()=>{}); const r=document.createRange(); r.selectNodeContents($('#ucode')); const s=getSelection(); s.removeAllRanges(); s.addRange(r);};
   let wait=(d.interval||5)*1000; const until=Date.now()+(d.expires_in||900)*1000;
   while(!job.cancel&&Date.now()<until){await new Promise(r=>setTimeout(r,wait)); if(job.cancel) return;
@@ -5715,7 +5759,7 @@ function auInit(){if(AU.ctx){if(AU.ctx.state==='suspended') AU.ctx.resume(); ret
   AU.dist={}; auApplyVol(); setInterval(auTick,25);}
 ['pointerdown','keydown','touchstart'].forEach(ev=>addEventListener(ev,auInit,{passive:true}));
 document.addEventListener('visibilitychange',()=>{if(!AU.ctx) return; if(document.hidden) AU.ctx.suspend(); else AU.ctx.resume();});
-function auApplyVol(){if(!AU.ctx) return; const t=AU.ctx.currentTime; AU.mus.gain.setTargetAtTime(AU.vol.music*AU.vol.music*2.6,t,.05); AU.sfx.gain.setTargetAtTime(AU.vol.sfx*AU.vol.sfx*1.6,t,.05);}
+function auApplyVol(){if(!AU.ctx) return; const t=AU.ctx.currentTime, on=AU.vol.muted?0:1; AU.mus.gain.setTargetAtTime(on*AU.vol.music*AU.vol.music*2.6,t,.05); AU.sfx.gain.setTargetAtTime(on*AU.vol.sfx*AU.vol.sfx*1.6,t,.05);}
 function distCurve(k){if(AU.dist[k]) return AU.dist[k]; const n=1024, cu=new Float32Array(n); for(let i=0;i<n;i++){const x=i/n*2-1; cu[i]=(1+k)*x/(1+k*Math.abs(x));} return AU.dist[k]=cu;}
 function crushCurve(steps){const k='c'+steps; if(AU.dist[k]) return AU.dist[k]; const n=1024, cu=new Float32Array(n); for(let i=0;i<n;i++){const x=i/n*2-1; cu[i]=Math.round(x*steps)/steps;} return AU.dist[k]=cu;}
 // one synth voice
@@ -5785,7 +5829,7 @@ function sendRev(c,node,amt){if(!amt||!AU.revIn) return; const s=c.createGain();
 function vib(c,t,end,target,rate,cents,delay=.15){const l=c.createOscillator(), g=c.createGain(); l.frequency.value=rate; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(cents,t+delay+.2); l.connect(g); for(const o of target) g.connect(o.detune); l.start(t); l.stop(end);}
 function noiseSrc(c,t,end){const s=c.createBufferSource(); s.buffer=AU.noise; s.loop=true; s.start(t,Math.random()*1.5); s.stop(end); return s;}
 // one note on a named instrument
-function inst(name,dest,t,m,dur,vel=1,rev=.25){const c=AU.ctx, f=mtof(m); let end=t+dur+1.2, out;
+function minst(name,dest,t,m,dur,vel=1,rev=.25){const c=AU.ctx, f=mtof(m); let end=t+dur+1.2, out;
   const hi=f>900?.6:1;
   switch(name){
   case 'piano':case 'pbass':{const decay=Math.min(3.2,1.6*Math.pow(261/f,.45)), g=c.createGain(), p=g.gain; p.setValueAtTime(0,t); p.linearRampToValueAtTime(.32*vel*hi,t+.004); p.setTargetAtTime(0,t+.004,decay*.45); p.setTargetAtTime(0,t+dur,.09); end=t+Math.min(dur+.5,decay*2.2)+.05;
@@ -5900,21 +5944,21 @@ function playStep(S,i,t,bus){const st=i%16, bar=Math.floor(i/16), ch=S.prog[bar]
   // bass
   if(S.bassPat[st]&&!(sec===0&&bar<1&&!S.menu)){let n=deg(ch)-24; while(n<34) n+=12; while(n>50) n-=12;
     if(S.style==='jazz') n=deg(ch+[0,2,4,5][(st/4)|0])-24+(n<34?12:0); else if(st%8===6&&!S.boss) n+=7;
-    inst(S.bass,bus,t,n,sd*(S.style==='rock'||S.style==='metal'?1.6:S.boss?1.8:3.4),v.bass*(st%4===0?1:.8));}
+    minst(S.bass,bus,t,n,sd*(S.style==='rock'||S.style==='metal'?1.6:S.boss?1.8:3.4),v.bass*(st%4===0?1:.8));}
   // harmony
   const chord=k=>{let n=deg(ch+k)-12; while(n<48) n+=12; while(n>67) n-=12; return n;};
-  if(S.hp==='sustain'&&st===0) for(const k of [0,2,4]) inst(S.harm,bus,t,chord(k),sd*15.5,v.harm*.8);
-  else if(S.hp==='piano'&&S.compPat[st]) for(const k of (st===0?[0,2,4]:[2,4])) inst('piano',bus,t,chord(k),sd*(st===0?7:3),v.harm*.55);
-  else if(S.hp==='comp'&&S.compPat[st]) for(const k of [0,2,4,6]) inst(S.harm,bus,t,chord(k),sd*2.5,v.harm*.55);
-  else if(S.hp==='stab'&&(st===0||st===10)&&sec>0) for(const k of [0,2,4]) inst(S.harm,bus,t,chord(k),sd*(st?3:5),v.harm*.6);
-  else if(S.hp==='arp'&&S.arpPat[st]) inst(S.harm,bus,t,chord(S.arpShape[st%S.arpShape.length])+12,sd*2,v.harm*.7);
-  else if(S.hp==='rock'&&S.bassPat[st]&&sec>0) inst('power',bus,t,deg(ch)-12+(deg(ch)-12<40?12:0),sd*(st%4===0?3.5:1.6),v.harm);
-  else if(S.hp==='chug'&&sec>0){if(S.bassPat[st]||st%2===0) inst('chug',bus,t,deg(ch)-12+(deg(ch)-12<40?12:0),sd,v.harm); if(st===0) inst('choirpad',bus,t,chord(0),sd*15,v.harm*.7);}
+  if(S.hp==='sustain'&&st===0) for(const k of [0,2,4]) minst(S.harm,bus,t,chord(k),sd*15.5,v.harm*.8);
+  else if(S.hp==='piano'&&S.compPat[st]) for(const k of (st===0?[0,2,4]:[2,4])) minst('piano',bus,t,chord(k),sd*(st===0?7:3),v.harm*.55);
+  else if(S.hp==='comp'&&S.compPat[st]) for(const k of [0,2,4,6]) minst(S.harm,bus,t,chord(k),sd*2.5,v.harm*.55);
+  else if(S.hp==='stab'&&(st===0||st===10)&&sec>0) for(const k of [0,2,4]) minst(S.harm,bus,t,chord(k),sd*(st?3:5),v.harm*.6);
+  else if(S.hp==='arp'&&S.arpPat[st]) minst(S.harm,bus,t,chord(S.arpShape[st%S.arpShape.length])+12,sd*2,v.harm*.7);
+  else if(S.hp==='rock'&&S.bassPat[st]&&sec>0) minst('power',bus,t,deg(ch)-12+(deg(ch)-12<40?12:0),sd*(st%4===0?3.5:1.6),v.harm);
+  else if(S.hp==='chug'&&sec>0){if(S.bassPat[st]||st%2===0) minst('chug',bus,t,deg(ch)-12+(deg(ch)-12<40?12:0),sd,v.harm); if(st===0) minst('choirpad',bus,t,chord(0),sd*15,v.harm*.7);}
   // counter part / arpeggio
-  if(S.arp&&sec>=1&&S.arpPat[st]&&!(S.arp==='strpad'||S.arp==='choirpad')){let n=deg(ch+S.arpShape[st%S.arpShape.length]); while(n<60) n+=12; while(n>84) n-=12; inst(S.arp,bus,t,n,sd*1.5,v.arp*(st%4===0?1:.75));}
-  else if(S.arp&&(S.arp==='strpad'||S.arp==='choirpad')&&st===0&&sec>=2) for(const k of [0,4]) inst(S.arp,bus,t,chord(k)+12,sd*15,v.arp*.7);
+  if(S.arp&&sec>=1&&S.arpPat[st]&&!(S.arp==='strpad'||S.arp==='choirpad')){let n=deg(ch+S.arpShape[st%S.arpShape.length]); while(n<60) n+=12; while(n>84) n-=12; minst(S.arp,bus,t,n,sd*1.5,v.arp*(st%4===0?1:.75));}
+  else if(S.arp&&(S.arp==='strpad'||S.arp==='choirpad')&&st===0&&sec>=2) for(const k of [0,4]) minst(S.arp,bus,t,chord(k)+12,sd*15,v.arp*.7);
   // lead
-  const m=S.mel[i]; if(m&&!(sec===0&&!S.menu&&bar<2)) {inst(S.lead,bus,t,m.n,m.d,v.lead*(sec===3?1.1:1)); if(S.menu&&sec>=1) inst('strings',bus,t,m.n-12,m.d,.35);}}
+  const m=S.mel[i]; if(m&&!(sec===0&&!S.menu&&bar<2)) {minst(S.lead,bus,t,m.n,m.d,v.lead*(sec===3?1.1:1)); if(S.menu&&sec>=1) minst('strings',bus,t,m.n-12,m.d,.35);}}
 /* MUSIC-END */
 function musicWant(){if(!$('#menu').hidden||!$('#mapScr').hidden||!L||L.menu) return 'menu'; if(boss&&boss.awake&&!boss.dead) return 'boss:'+boss.id+':'+L.bi; return 'lvl:'+L.bi+':'+L.li;}
 function auTick(){const c=AU.ctx; if(!c||c.state!=='running') return; const want=musicWant();
@@ -5984,7 +6028,12 @@ const SFX={
   $('#volClose').onclick=()=>{p.hidden=true;}; p.addEventListener('click',e=>{if(e.target===p) p.hidden=true;}); ['keydown','keyup'].forEach(t=>p.addEventListener(t,e=>e.stopPropagation()));
   window.openVol=()=>{auInit(); sync(); p.hidden=false;};
   const mb=document.querySelector('#menu .menu-btns'); if(mb){const b=document.createElement('button'); b.className='btn'; b.id='btnSound'; b.textContent='Sound'; b.onclick=openVol; mb.appendChild(b);}
-  const pr=$('#pGfx'); if(pr){const b=document.createElement('button'); b.className='btn'; b.id='pSound'; b.textContent='Sound'; b.onclick=openVol; pr.after(b);}})();
+  const pr=$('#pGfx'); if(pr){const b=document.createElement('button'); b.className='btn'; b.id='pSound'; b.textContent='Sound'; b.onclick=openVol; pr.after(b);}
+  // one tap in the top right of the main menu turns all music and sound effects off (and back on)
+  const menu=$('#menu'); if(menu){const m=document.createElement('button'); m.id='muteAll'; m.type='button';
+    const ico=on=>on?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    const paint=()=>{const on=!AU.vol.muted; m.innerHTML=ico(on)+'<span>'+(on?'Sound on':'Sound off')+'</span>'; m.setAttribute('aria-pressed',String(!on)); m.setAttribute('aria-label',on?'Turn off all music and sound effects':'Turn music and sound effects back on'); m.classList.toggle('off',!on);};
+    m.onclick=e=>{e.stopPropagation(); AU.vol.muted=!AU.vol.muted; auSave(); auInit(); auApplyVol(); paint(); if(!AU.vol.muted) sfx('ui');}; paint(); menu.appendChild(m); window.paintMute=paint;}})();
 document.addEventListener('click',e=>{if(e.target.closest('.btn')) sfx('ui');},true);
 /* ---- hooks: every move, hit and boss action makes a sound ---- */
 (function(){const wrapF=(o,pre,post)=>function(...args){let st; try{st=pre&&pre(...args);}catch(e){} const r=o.apply(this,args); try{post&&post(st,...args);}catch(e){} return r;};
@@ -6005,6 +6054,170 @@ document.addEventListener('click',e=>{if(e.target.closest('.btn')) sfx('ui');},t
   updChests=wrapF(updChests,()=>L?L.chests.filter(c=>c.open).length:0,(n)=>{if(L&&L.chests.filter(c=>c.open).length>n) sfx('chest');});
   for(const k in ACT){const A=ACT[k], s0=A.start; A.start=function(b){try{if(!(SIG[b.id]&&SIG[b.id][0]===k)) sfx('act',b,k);}catch(e){} if(s0) return s0.apply(this,arguments);};}})();
 
+/*STRUCTS-START*/
+/* ================= v4.5 set pieces: every level is built around what its title says ================= */
+// Each structure is drawn in tile units around its own centre (y is up, walls are 1.35 tall), then merged into a few meshes.
+// size = footprint in tiles (it blocks movement there), so rooms stay walkable around it.
+const gTRI=(()=>{const g=new THREE.CylinderGeometry(1,1,1,3); g.userData.cached=true; return g;})();
+const STRUCT={
+ // --- nature ---
+ bigtree:{size:3,b(A,m,r){A(gCyl,m.wd2,0,.9,0,.32,1.8,.32); for(let i=0;i<6;i++){const a=i/6*TAU; A(gCone,m.wd2,Math.cos(a)*.4,.18,Math.sin(a)*.4,.14,.5,.14,Math.sin(a)*1.1,0,-Math.cos(a)*1.1);}
+   for(let i=0;i<7;i++){const a=i/7*TAU, rr=i?.6:0; A(gIco,i%2?m.lf:m.lf2,Math.cos(a)*rr,2.0+(i%3)*.18,Math.sin(a)*rr,.75-(i?0:-.1),.6,.75);} for(let i=0;i<4;i++) A(gSph,m.gl,Math.cos(i*1.7)*.8,1.7+i*.1,Math.sin(i*1.7)*.8,.05);}},
+ willowtree:{size:3,b(A,m){A(gCyl,m.wd2,0,.8,0,.26,1.6,.26); A(gIco,m.lf2,0,1.9,0,.95,.55,.95); for(let i=0;i<12;i++){const a=i/12*TAU; A(gCyl,m.lf,Math.cos(a)*.85,1.2,Math.sin(a)*.85,.05,1.1,.05);}}},
+ mushrooms:{size:2,b(A,m){[[0,0,1.2,.55],[.45,.3,.8,.35],[-.4,.35,.6,.3],[.3,-.45,.5,.25]].forEach(([x,z,h,r])=>{A(gCyl,m.pa,x,h/2,z,r*.28,h,r*.28); A(gCap,m.cl,x,h,z,r,r*.55,r); A(gSph,m.gl,x+r*.4,h+r*.25,z,.05);});}},
+ flowerbed:{size:2,b(A,m){A(gCyl,m.st2,0,.08,0,.85,.16,.85); A(gCyl,m.lf2,0,.17,0,.78,.04,.78); for(let i=0;i<14;i++){const a=i*2.4, rr=.15+((i*37)%10)/14; A(gCyl,m.lf,Math.cos(a)*rr,.3,Math.sin(a)*rr,.02,.25,.02); A(gSph,i%3?m.cl:m.au,Math.cos(a)*rr,.45,Math.sin(a)*rr,.08,.05,.08);}}},
+ stonecircle:{size:3,b(A,m){for(let i=0;i<7;i++){const a=i/7*TAU; A(gBox,i%2?m.st:m.st2,Math.cos(a)*1.1,.55,Math.sin(a)*1.1,.28,1.1,.2,0,-a,0); A(gBox,m.gl,Math.cos(a)*1.0,.75,Math.sin(a)*1.0,.1,.18,.03,0,-a,0);} A(gCyl,m.st2,0,.06,0,.5,.12,.5); A(gOct,m.gl,0,.5,0,.12,.22,.12);}},
+ reeds:{size:2,b(A,m){for(let i=0;i<16;i++){const a=i*2.4, rr=((i*29)%10)/12; const h=.7+((i*13)%7)/8; A(gCyl,m.lf2,Math.cos(a)*rr,h/2,Math.sin(a)*rr,.025,h,.025,Math.sin(i)*.15,0,Math.cos(i)*.15); A(gCyl,m.wd,Math.cos(a)*rr,h,Math.sin(a)*rr,.04,.14,.04);}
+   for(let i=0;i<3;i++){const a=i*2.1; A(gCyl,m.wd2,Math.cos(a)*.5,.6,Math.sin(a)*.5,.03,1.2,.03); A(gBox,m.gl,Math.cos(a)*.5,1.15,Math.sin(a)*.5,.12,.16,.12);}}},
+ orchardtree:{size:2,b(A,m){A(gCyl,m.wd,0,.55,0,.12,1.1,.12); A(gIco,m.lf,0,1.35,0,.6,.5,.6); for(let i=0;i<7;i++){const a=i/7*TAU; A(gSph,m.au,Math.cos(a)*.5,1.2+(i%2)*.2,Math.sin(a)*.5,.07);} A(gBox,m.wd2,.6,.15,.3,.3,.3,.3); A(gSph,m.au,.6,.33,.3,.08);}},
+ roots:{size:3,b(A,m){for(let i=0;i<8;i++){const a=i/8*TAU; A(gCyl,m.wd2,Math.cos(a)*.6,.25,Math.sin(a)*.6,.12,1.4,.12,Math.sin(a)*1.25,0,-Math.cos(a)*1.25);} A(gIco,m.lf2,0,.4,0,.45,.3,.45); A(gSph,m.gl,0,.75,0,.1);}},
+ hedgewall:{size:2,b(A,m){A(gBox,m.lf2,0,.5,0,1.8,1,.5); for(let i=0;i<5;i++) A(gIco,m.lf,-.8+i*.4,1.0,0,.28); for(let i=0;i<6;i++) A(gCone,m.wd2,-.8+i*.32,.6,.27,.03,.18,.03,Math.PI/2,0,0);}},
+ // --- buildings and ruins ---
+ ruin:{size:3,b(A,m){for(let i=0;i<5;i++){const a=i/5*TAU, h=[1.6,.7,1.2,.4,1.0][i]; A(gCyl,m.st,Math.cos(a)*1.0,h/2,Math.sin(a)*1.0,.16,h,.16); A(gBox,m.st2,Math.cos(a)*1.0,h+.04,Math.sin(a)*1.0,.42,.08,.42);} A(gCyl,m.st,.2,.15,-.2,.16,1.3,.16,0,.5,Math.PI/2); A(gBox,m.st2,-.3,.1,.3,.5,.2,.4,0,.4,0); A(gIco,m.st2,.4,.1,.5,.18);}},
+ tower:{size:3,b(A,m){A(gCyl,m.st,0,1.2,0,.8,2.4,.8); A(gCyl,m.st2,0,2.45,0,.9,.15,.9); for(let i=0;i<8;i++){const a=i/8*TAU; A(gBox,m.st,Math.cos(a)*.82,2.65,Math.sin(a)*.82,.2,.25,.2,0,-a,0);} A(gBox,m.gl,0,1.6,.8,.16,.3,.04); A(gBox,m.wd2,0,.4,.8,.36,.75,.05); A(gCone,m.cl2,0,3.1,0,.75,.7,.75);}},
+ house:{size:3,b(A,m){A(gBox,m.st,0,.6,0,1.9,1.2,1.5); A(gTRI,m.cl2,0,1.45,0,.95,2.1,.55,-Math.PI/2,0,Math.PI/2); A(gBox,m.wd2,0,.45,.76,.42,.9,.04); A(gBox,m.gl,-.6,.75,.76,.3,.28,.03); A(gBox,m.gl,.6,.75,.76,.3,.28,.03); A(gBox,m.st2,.6,1.9,-.3,.22,.6,.22);}},
+ windmill:{size:3,b(A,m){A(gCyl,m.st,0,1.1,0,.75,2.2,.75); A(gCone,m.cl2,0,2.55,0,.85,.7,.85); A(gCyl,m.wd2,0,2.0,.8,.06,.3,.06,Math.PI/2,0,0); for(let i=0;i<4;i++) A(gBox,m.wd,Math.cos(i*Math.PI/2+.4)*.7,2.0+Math.sin(i*Math.PI/2+.4)*.7,.95,.22,1.4,.03,0,0,i*Math.PI/2+.4+Math.PI/2);
+   A(gBox,m.wd2,0,.45,.76,.4,.9,.04); A(gCyl,m.st2,1.1,.12,.4,.35,.14,.35);}},
+ tent:{size:2,b(A,m){A(gCone,m.cl,0,.6,0,.85,1.2,.85); A(gBox,m.cl2,0,.35,.6,.35,.7,.05); A(gCyl,m.wd2,0,1.25,0,.03,.3,.03); A(gCyl,m.wd,.85,.08,.5,.06,.4,.06,0,0,Math.PI/2); A(gCone,m.fi,.85,.25,.5,.12,.3,.12);}},
+ well:{size:2,b(A,m){A(gCyl,m.st,0,.35,0,.55,.7,.55); A(gCyl,m.wa,0,.66,0,.45,.04,.45); A(gCyl,m.wd2,-.45,.95,0,.05,1.2,.05); A(gCyl,m.wd2,.45,.95,0,.05,1.2,.05); A(gTRI,m.cl2,0,1.65,0,.45,1.2,.3,-Math.PI/2,0,Math.PI/2); A(gCyl,m.wd,0,1.15,0,.04,.9,.04,0,0,Math.PI/2);}},
+ fountain:{size:3,b(A,m){A(gCyl,m.st,0,.2,0,1.2,.4,1.2); A(gCyl,m.wa,0,.38,0,1.08,.05,1.08); A(gCyl,m.st2,0,.7,0,.18,.9,.18); A(gCyl,m.st,0,1.1,0,.55,.1,.55); A(gCyl,m.wa,0,1.16,0,.48,.03,.48); A(gSph,m.st2,0,1.3,0,.16); A(gCone,m.gl,0,1.5,0,.06,.3,.06);}},
+ stairs:{size:3,b(A,m){for(let i=0;i<6;i++) A(gBox,i%2?m.st:m.st2,0,.1+i*.2,-1.0+i*.32,1.6,.2,.4); A(gBox,m.st2,0,1.2,.8,1.6,.2,.5); A(gCyl,m.st,-.8,1.6,.8,.12,.8,.12); A(gCyl,m.st,.8,1.6,.8,.12,.8,.12); A(gCone,m.fi,-.8,2.1,.8,.08,.2,.08); A(gCone,m.fi,.8,2.1,.8,.08,.2,.08);}},
+ arch:{size:3,b(A,m){A(gBox,m.st,-1.0,.95,0,.35,1.9,.35); A(gBox,m.st,1.0,.95,0,.35,1.9,.35); A(gBox,m.st2,0,2.0,0,2.4,.3,.4); A(gBox,m.gl,0,2.0,.21,1.6,.08,.02); for(const s of [-1,1]) A(gOct,m.gl,s*1.0,1.3,.19,.08,.12,.03);}},
+ bridge:{size:3,b(A,m){A(gBox,m.wd,0,.18,0,2.6,.08,1.0); for(let i=0;i<7;i++) A(gBox,m.wd2,-1.2+i*.4,.2,0,.06,.06,1.02); for(const s of [-1,1]){for(let i=0;i<5;i++) A(gCyl,m.wd2,-1.2+i*.6,.5,s*.48,.04,.6,.04); A(gBox,m.wd,0,.78,s*.48,2.6,.05,.05); A(gCyl,m.cl2,0,.6,s*.48,.012,2.6,.012,0,0,Math.PI/2);} A(gBox,m.gl,1.25,.95,.48,.1,.14,.1);}},
+ pyramid:{size:3,b(A,m){for(let i=0;i<4;i++) A(gBox,i%2?m.sa:m.st,0,.2+i*.38,0,2.6-i*.6,.4,2.6-i*.6); A(gBox,m.st2,0,.4,1.3,.5,.8,.06); A(gOct,m.au,0,1.85,0,.14,.22,.14); for(const s of [-1,1]) A(gBox,m.st2,s*.5,.55,1.35,.15,1.1,.15);}},
+ obelisk:{size:2,b(A,m){A(gBox,m.st2,0,.12,0,1.0,.24,1.0); A(gBox,m.st,0,1.2,0,.4,2.0,.4); A(gCone,m.st,0,2.4,0,.29,.4,.29,0,Math.PI/4,0); for(let i=0;i<4;i++) A(gBox,m.gl,0,.6+i*.4,.205,.18,.06,.01);}},
+ altar:{size:2,b(A,m){A(gBox,m.st2,0,.15,0,1.4,.3,1.0); A(gBox,m.st,0,.55,0,1.0,.5,.6); A(gBox,m.cl,0,.81,0,1.04,.03,.64); for(const s of [-1,1]){A(gCyl,m.pa,s*.4,.92,0,.04,.2,.04); A(gCone,m.fi,s*.4,1.06,0,.025,.07,.025);} A(gOct,m.gl,0,1.1,0,.12,.2,.12);}},
+ statue:{size:2,b(A,m){A(gBox,m.st2,0,.25,0,.9,.5,.9); A(gBox,m.st,0,.55,0,.7,.1,.7); A(gCyl,m.st,0,.95,0,.18,.7,.14); A(gSph,m.st,0,1.4,0,.17); A(gCone,m.st,0,.75,0,.32,.5,.26); A(gCyl,m.st,.25,1.25,0,.06,.5,.06,0,0,.6); A(gCyl,m.st,-.22,1.5,0,.05,.6,.05,0,0,-.3); A(gCone,m.au,-.3,1.85,0,.04,.25,.04);}},
+ throne:{size:3,b(A,m){A(gBox,m.st2,0,.15,0,2.2,.3,1.8); A(gBox,m.st,0,.38,0,1.6,.16,1.3); A(gBox,m.cl,0,.32,.9,.8,.02,.8); A(gBox,m.au,0,.7,-.2,.8,.5,.6); A(gBox,m.au,0,1.4,-.45,.8,1.4,.14); for(let i=0;i<5;i++) A(gCone,m.au,-.32+i*.16,2.2,-.45,.05,.22,.05); A(gOct,m.gl,0,1.7,-.37,.1,.14,.04);
+   for(const s of [-1,1]){A(gBox,m.au,s*.45,.95,-.15,.1,.3,.6); A(gCyl,m.wd2,s*1.0,1.0,-.6,.04,1.8,.04); A(gBox,m.cl,s*1.0,1.4,-.56,.36,.8,.02);}}},
+ banners:{size:2,b(A,m){for(const s of [-1,0,1]){A(gCyl,m.wd2,s*.6,.95,0,.04,1.9,.04); A(gBox,s?m.cl:m.cl2,s*.6,1.4,.04,.4,.8,.02); A(gCone,m.au,s*.6,1.95,0,.05,.12,.05);} A(gBox,m.st2,0,.06,0,1.6,.12,.4);}},
+ // --- treasure, war and work ---
+ treasure:{size:2,b(A,m){A(gCone,m.au,0,.2,0,.8,.4,.8); for(let i=0;i<9;i++){const a=i*2.2; A(gCyl,m.au,Math.cos(a)*.6,.03,Math.sin(a)*.6,.08,.04,.08);} A(gBox,m.wd2,.5,.25,-.3,.45,.35,.3); A(gBox,m.au,.5,.25,-.14,.47,.06,.04); A(gCyl,m.au,-.4,.35,.3,.07,.3,.07); A(gOct,m.gl,0,.5,0,.1,.16,.1);}},
+ weaponrack:{size:2,b(A,m){A(gBox,m.wd2,0,.6,0,1.6,.08,.12); A(gBox,m.wd2,0,.2,0,1.6,.08,.12); for(const s of [-1,1]) A(gBox,m.wd,s*.78,.55,0,.08,1.1,.12); for(let i=0;i<5;i++){A(gCyl,m.wd,-.6+i*.3,.75,.08,.02,1.3,.02,.15,0,0); A(gCone,m.mt,-.6+i*.3,1.45,.18,.04,.18,.02,.15,0,0);} A(gBox,m.mt,.5,.3,.3,.4,.5,.06);}},
+ dummies:{size:2,b(A,m){for(const [x,z] of [[-.5,0],[.5,.2]]){A(gCyl,m.wd2,x,.5,z,.04,1.0,.04); A(gCyl,m.sa,x,.85,z,.2,.5,.16); A(gSph,m.sa,x,1.25,z,.14); A(gCyl,m.wd2,x,.95,z,.03,.7,.03,0,0,Math.PI/2);} A(gBox,m.st2,0,.05,.1,1.6,.1,.6);}},
+ barricade:{size:2,b(A,m){for(let i=0;i<4;i++){A(gCyl,m.wd,-.75+i*.5,.4,0,.06,1.0,.06,.6,0,0); A(gCyl,m.wd,-.75+i*.5,.4,0,.06,1.0,.06,-.6,0,0); A(gCone,m.mt,-.75+i*.5,.75,.3,.04,.18,.04,.6,0,0);} A(gCyl,m.wd2,0,.4,0,.05,1.8,.05,0,0,Math.PI/2);}},
+ forge:{size:3,b(A,m){A(gBox,m.st,-.5,.6,-.2,1.0,1.2,.9); A(gBox,m.fi,-.5,.45,.26,.5,.4,.04); A(gCyl,m.st2,-.5,1.6,-.2,.2,1.0,.2); A(gBox,m.mt,.6,.38,.2,.5,.16,.25); A(gBox,m.mt,.6,.2,.2,.25,.25,.2); A(gCone,m.mt,.92,.4,.2,.08,.18,.08,0,0,Math.PI/2);
+   A(gCyl,m.wa,.4,.22,-.6,.25,.44,.25); A(gBox,m.wd2,-.5,.15,.6,.4,.3,.3); A(gCyl,m.wd,1.05,.6,-.4,.04,1.2,.04); A(gBox,m.mt,1.05,1.15,-.4,.18,.1,.1);}},
+ gears:{size:3,b(A,m){for(const [x,y,z,r] of [[-.4,1.0,0,.75],[.55,.6,.1,.45],[.2,1.65,-.05,.35]]){A(gCyl,m.mt,x,y,z,r,.14,r,Math.PI/2,0,0); A(gCyl,m.au,x,y,z+.08,r*.25,.06,r*.25,Math.PI/2,0,0); for(let i=0;i<10;i++){const a=i/10*TAU; A(gBox,m.mt,x+Math.cos(a)*r,y+Math.sin(a)*r,z,.12,.12,.14,0,0,a);}}
+   A(gBox,m.st2,0,.08,0,2.2,.16,.8); A(gCyl,m.mt,1.0,1.0,-.2,.08,2.0,.08); A(gCone,m.fi,1.0,2.1,-.2,.08,.25,.08);}},
+ conveyor:{size:3,b(A,m){A(gBox,m.st2,0,.35,0,2.6,.12,.6); for(let i=0;i<7;i++) A(gCyl,m.mt,-1.2+i*.4,.3,0,.08,.62,.08,Math.PI/2,0,0); for(const s of [-1,1]){A(gBox,m.mt,s*1.2,.15,0,.08,.3,.6);} for(let i=0;i<3;i++) A(gBox,i%2?m.au:m.fi,-.8+i*.8,.55,0,.3,.28,.3); A(gBox,m.mt,0,1.0,0,.12,1.3,.12); A(gCone,m.mt,0,1.65,0,.35,.3,.35,Math.PI,0,0);}},
+ cart:{size:2,b(A,m){A(gBox,m.wd,0,.45,0,1.3,.3,.75); for(const [x,z] of [[-.45,.42],[.45,.42],[-.45,-.42],[.45,-.42]]) A(gCyl,m.wd2,x,.25,z,.25,.06,.25,Math.PI/2,0,0); A(gBox,m.wd2,.2,.75,0,.4,.35,.4); A(gBox,m.cl,-.3,.7,0,.42,.3,.42); A(gCyl,m.wd2,.95,.4,0,.03,.8,.03,0,0,Math.PI/2);}},
+ stall:{size:2,b(A,m){A(gBox,m.wd,0,.4,0,1.5,.08,.7); A(gBox,m.wd2,0,.2,0,1.4,.4,.6); for(const [x,z] of [[-.7,.35],[.7,.35],[-.7,-.35],[.7,-.35]]) A(gCyl,m.wd2,x,.8,z,.03,1.6,.03); A(gTRI,m.cl,0,1.75,0,.5,1.7,.25,-Math.PI/2,0,Math.PI/2); for(let i=0;i<5;i++) A(gSph,i%2?m.au:m.cl2,-.55+i*.27,.52,.1,.1);}},
+ crates:{size:2,b(A,m){A(gBox,m.wd,-.3,.25,-.2,.5,.5,.5); A(gBox,m.wd2,.3,.25,.1,.5,.5,.5); A(gBox,m.wd,-.05,.72,-.05,.45,.45,.45,0,.3,0); A(gCyl,m.wd2,.55,.3,-.5,.22,.6,.22); A(gCyl,m.mt,.55,.3,-.5,.23,.04,.23);}},
+ millstone:{size:2,b(A,m){A(gCyl,m.st,0,.15,0,.8,.3,.8); A(gCyl,m.st2,0,.55,0,.6,.24,.6,0,0,.1); A(gCyl,m.wd2,0,.7,0,.06,.9,.06); A(gCyl,m.wd,.45,1.0,0,.04,1.0,.04,0,0,Math.PI/2); for(let i=0;i<3;i++) A(gCyl,m.cl2,-.7+i*.15,.25,.7,.14,.5,.14);}},
+ cage:{size:2,b(A,m){A(gCyl,m.mt,0,.05,0,.7,.1,.7); A(gCyl,m.mt,0,1.6,0,.7,.08,.7); for(let i=0;i<12;i++){const a=i/12*TAU; A(gCyl,m.mt,Math.cos(a)*.68,.82,Math.sin(a)*.68,.025,1.55,.025);} A(gCone,m.mt,0,1.85,0,.72,.5,.72); A(gCyl,m.mt,0,2.4,0,.02,.6,.02); A(gIco,m.bn,.1,.2,.1,.18);}},
+ chains:{size:2,b(A,m){for(const s of [-1,1]){A(gBox,m.st2,s*.75,.9,0,.3,1.8,.3); for(let i=0;i<8;i++) A(gTor,m.mt,s*.6-s*i*.16,1.55-Math.sin(i/7*Math.PI)*.5,0,.07,.07,.07,0,i%2?Math.PI/2:0,0);} A(gBox,m.mt,0,.25,0,.5,.5,.35); A(gTor,m.mt,0,.6,0,.12,.12,.12);}},
+ // --- magic, crystals and spirits ---
+ crystals:{size:2,b(A,m){[[0,0,1.6,.28],[.45,.2,1.0,.18],[-.4,.3,.9,.16],[.2,-.45,.7,.14],[-.3,-.35,1.2,.2]].forEach(([x,z,h,r],i)=>A(gOct,m.cr,x,h/2,z,r,h/2+.1,r,x*.6,i,-z*.6)); A(gSph,m.gl,0,.4,0,.18);}},
+ runestones:{size:3,b(A,m){for(let i=0;i<5;i++){const a=i/5*TAU, h=.9+(i%2)*.4; A(gBox,m.st,Math.cos(a)*.95,h/2,Math.sin(a)*.95,.32,h,.22,0,-a,0); A(gBox,m.gl,Math.cos(a)*.84,h*.6,Math.sin(a)*.84,.14,.3,.02,0,-a+Math.PI/2,0);} A(gCyl,m.gl,0,.03,0,.7,.02,.7);}},
+ portalarch:{size:3,b(A,m){A(gTor,m.st,0,1.25,0,1.0,1.0,1.4); A(gCyl,m.cr,0,1.25,0,.9,.03,.9,Math.PI/2,0,0); A(gBox,m.st2,0,.08,0,2.3,.16,.7); for(const s of [-1,1]) A(gOct,m.gl,s*1.05,1.25,0,.1,.16,.1); A(gOct,m.gl,0,2.35,0,.12,.18,.12);}},
+ floatrock:{size:2,b(A,m){A(gIco,m.st,0,1.2,0,.7,.35,.6); A(gCone,m.st2,0,.75,0,.5,.6,.45,Math.PI,0,0); A(gIco,m.lf,0,1.45,0,.55,.12,.5); A(gIco,m.st,.9,1.8,.2,.25,.15,.22); A(gCone,m.st2,.9,1.6,.2,.18,.3,.16,Math.PI,0,0); A(gSph,m.gl,0,.35,0,.09);}},
+ mirrors:{size:3,b(A,m){for(let i=0;i<3;i++){const a=(i-1)*.55, x=Math.sin(a)*1.0, z=-Math.cos(a)*.6; A(gBox,m.au,x,.95,z,.62,1.6,.08,0,a,0); A(gBox,m.cr,x+Math.sin(a)*.04*0,.95,z+.045,.5,1.45,.02,0,a,0); A(gOct,m.au,x,1.85,z,.08,.12,.04,0,a,0);}}},
+ doors:{size:3,b(A,m){for(let i=0;i<3;i++){const x=-1+i; A(gBox,m.wd2,x-.32,.75,0,.1,1.5,.14); A(gBox,m.wd2,x+.32,.75,0,.1,1.5,.14); A(gBox,m.wd2,x,1.52,0,.74,.1,.14); A(gBox,i===1?m.gl:(i?m.cl:m.wd),x,.72,0,.54,1.42,.05); A(gSph,m.au,x+.18,.7,.04,.04);}}},
+ bookshelves:{size:3,b(A,m){for(const s of [-1,1]){A(gBox,m.wd2,s*.75,1.0,0,.9,2.0,.35); for(let r=0;r<4;r++){A(gBox,m.wd,s*.75,.3+r*.45,.03,.86,.04,.33); for(let k=0;k<6;k++) A(gBox,[m.cl,m.cl2,m.au,m.lf2][(k+r)%4],s*.75-.35+k*.14,.44+r*.45,.06,.1,.24,.24);}} A(gBox,m.wd,0,.4,.8,.8,.06,.5); A(gBox,m.pa,0,.45,.8,.3,.03,.22,0,.3,0); A(gCyl,m.pa,.3,.52,.8,.03,.14,.03); A(gCone,m.fi,.3,.63,.8,.02,.06,.02);}},
+ flyingbooks:{size:3,b(A,m){for(const s of [-1,1]){A(gBox,m.wd2,s*.75,1.95,0,.9,1.2,.35); for(let r=0;r<2;r++) for(let k=0;k<6;k++) A(gBox,[m.cl,m.cl2,m.au,m.lf2][(k+r)%4],s*.75-.35+k*.14,2.2-r*.45,.06,.1,.24,.24,Math.PI,0,0);} for(let i=0;i<7;i++){const a=i*1.3; A(gBox,[m.cl,m.au,m.cl2][i%3],Math.cos(a)*.6,.6+i*.16,Math.sin(a)*.5,.24,.05,.18,.4,a,.3);} A(gBox,m.wd,0,2.6,0,1.0,.06,.6);}},
+ scrolls:{size:2,b(A,m){A(gBox,m.wd,0,.45,0,1.2,.06,.6); for(const [x,z] of [[-.5,-.25],[.5,-.25],[-.5,.25],[.5,.25]]) A(gCyl,m.wd2,x,.22,z,.04,.44,.04); for(let i=0;i<4;i++) A(gCyl,m.pa,-.4+i*.25,.53,0,.05,.4,.05,0,0,Math.PI/2); A(gCyl,m.st2,.4,.55,-.2,.08,.1,.08); A(gCyl,m.wa,.4,.6,-.2,.06,.02,.06); A(gCyl,m.cl2,0,.08,.6,.5,.04,.35);}},
+ cauldron:{size:2,b(A,m){A(gSph,m.mt,0,.4,0,.5,.42,.5); A(gCyl,m.gl,0,.72,0,.42,.04,.42); for(let i=0;i<3;i++) A(gSph,m.gl,Math.cos(i*2)*.15,.82+i*.06,Math.sin(i*2)*.15,.06); for(let i=0;i<3;i++){const a=i/3*TAU; A(gCyl,m.mt,Math.cos(a)*.38,.12,Math.sin(a)*.38,.04,.25,.04);} A(gCyl,m.wd2,.0,.1,0,.6,.08,.08,0,.5,Math.PI/2); A(gCone,m.fi,0,.08,0,.3,.15,.3);}},
+ candles:{size:2,b(A,m){for(let i=0;i<9;i++){const a=i*2.4, rr=.15+((i*31)%10)/14, h=.15+((i*7)%5)/10; A(gCyl,m.pa,Math.cos(a)*rr,h/2,Math.sin(a)*rr,.05,h,.05); A(gCone,m.fi,Math.cos(a)*rr,h+.05,Math.sin(a)*rr,.025,.08,.025);} A(gCyl,m.cl2,0,.01,0,.75,.02,.75);}},
+ lanterns:{size:2,b(A,m){for(const [x,z,h] of [[0,0,1.6],[.6,.3,1.1],[-.5,.4,1.3]]){A(gCyl,m.mt,x,h/2,z,.035,h,.035); A(gBox,m.mt,x+.12,h,z,.26,.03,.03); A(gCyl,m.mt,x+.22,h-.08,z,.006,.14,.006); A(gBox,m.gl,x+.22,h-.22,z,.12,.16,.12); A(gCone,m.mt,x+.22,h-.11,z,.1,.08,.1);}}},
+ graves:{size:3,b(A,m){for(let i=0;i<6;i++){const x=-.8+(i%3)*.8, z=i<3?-.5:.5; A(gBox,m.st,x,.3,z,.36,.6,.1,0,0,(i%2?.08:-.06)); A(gBox,m.lf2,x,.03,z+.35,.3,.06,.6);} for(let i=0;i<8;i++) A(gCyl,m.mt,-1.2+i*.34,.35,1.2,.02,.7,.02); A(gBox,m.mt,0,.6,1.2,2.4,.03,.03); A(gCyl,m.wd2,1.2,.9,-1.0,.06,1.8,.06); A(gIco,m.lf2,1.2,1.9,-1.0,.25,.4,.25);}},
+ bones:{size:3,b(A,m){A(gCyl,m.bn,0,.25,0,.12,2.4,.12,0,0,Math.PI/2); for(let i=0;i<6;i++){const x=-.9+i*.36; for(const s of [-1,1]) A(gTor,m.bn,x,.5,0,.55-Math.abs(i-2.5)*.06,.55,.55,0,Math.PI/2,0);} A(gSph,m.bn,1.35,.35,0,.35,.28,.3); A(gBox,m.st2,1.55,.3,.12,.08,.06,.08); A(gCone,m.bn,1.6,.6,.25,.05,.4,.05,.4,0,-.5);}},
+ coral:{size:2,b(A,m){for(let i=0;i<7;i++){const a=i*2.3, rr=((i*29)%10)/14; A(gCyl,i%2?m.cl:m.au,Math.cos(a)*rr,.4,Math.sin(a)*rr,.06,.8+(i%3)*.3,.06,Math.sin(i)*.3,0,Math.cos(i)*.3); A(gSph,i%2?m.cl:m.gl,Math.cos(a)*rr,.85+(i%3)*.15,Math.sin(a)*rr,.1);} A(gIco,m.st,0,.15,0,.6,.3,.6); A(gCap,m.pa,.5,.05,-.4,.18,.12,.18);}},
+ shipwreck:{size:3,b(A,m){A(gBox,m.wd2,0,.25,0,2.4,.2,.9,0,.15,.12); for(let i=0;i<6;i++){for(const s of [-1,1]) A(gCyl,m.wd,-1.0+i*.4,.55,s*.4,.05,.9,.05,s*.35,0,0);} A(gCyl,m.wd,.3,1.1,0,.07,2.0,.07,0,0,.3); A(gBox,m.cl2,.5,1.4,.02,.7,.8,.02,0,0,.3); A(gBox,m.wd2,-1.1,.5,0,.3,.6,.9);}},
+ nest:{size:3,b(A,m){A(gTor,m.wd2,0,.25,0,1.0,1.0,1.8,Math.PI/2,0,0); A(gCyl,m.wd,0,.12,0,.9,.2,.9); for(let i=0;i<10;i++){const a=i/10*TAU; A(gCyl,m.wd,Math.cos(a)*1.0,.35,Math.sin(a)*1.0,.03,.8,.03,Math.sin(a)*1.2,a,0);} for(let i=0;i<3;i++) A(gSph,m.pa,Math.cos(i*2.1)*.3,.35,Math.sin(i*2.1)*.3,.2,.26,.2); A(gIco,m.lf,.9,.4,.5,.2);}},
+ web:{size:2,b(A,m){for(const s of [-1,1]) A(gCyl,m.wd2,s*.8,.9,0,.05,1.8,.05); for(let r=1;r<5;r++) A(gTor,m.pa,0,1.0,0,r*.18,r*.18,.03); for(let i=0;i<8;i++) A(gCyl,m.pa,0,1.0,0,.006,1.6,.006,0,0,i/8*Math.PI); A(gSph,m.cl2,.2,.8,0,.12);}},
+ cocoon:{size:2,b(A,m){A(gSph,m.cl2,0,.6,0,.5,.7,.5); for(let i=0;i<8;i++){const a=i/8*TAU; A(gCyl,m.cl,Math.cos(a)*.5,.4,Math.sin(a)*.5,.05,.9,.05,Math.sin(a)*.6,0,-Math.cos(a)*.6);} A(gSph,m.gl,0,.6,.42,.12);}},
+ pumpkins:{size:3,b(A,m){for(let i=0;i<6;i++){const a=i*2.4, rr=.3+((i*31)%10)/12, s=.2+((i*7)%4)/12; A(gSph,m.au,Math.cos(a)*rr,s*.7,Math.sin(a)*rr,s,s*.8,s); A(gCyl,m.lf2,Math.cos(a)*rr,s*1.45,Math.sin(a)*rr,.03,.12,.03); if(i%2) A(gBox,m.fi,Math.cos(a)*rr,s*.75,Math.sin(a)*rr+s*.95,s*.6,s*.18,.02);}
+   A(gCyl,m.wd2,0,.8,0,.04,1.6,.04); A(gCyl,m.wd2,0,1.2,0,.03,1.0,.03,0,0,Math.PI/2); A(gCone,m.cl2,0,1.05,0,.3,.6,.25); A(gSph,m.au,0,1.55,0,.16); A(gCone,m.cl2,0,1.78,0,.2,.25,.2);}},
+ scarecrow:{size:2,b(A,m){A(gCyl,m.wd2,0,.8,0,.04,1.6,.04); A(gCyl,m.wd2,0,1.25,0,.03,1.1,.03,0,0,Math.PI/2); A(gCone,m.cl,0,1.05,0,.3,.6,.25); A(gSph,m.sa,0,1.55,0,.15); A(gCone,m.cl2,0,1.78,0,.2,.25,.2); A(gBox,m.gl,0,1.55,.14,.12,.03,.02);}},
+ // --- fire, ice, sand, void, sculk, clay ---
+ lavavent:{size:2,b(A,m){A(gCone,m.st2,0,.4,0,.8,.8,.8); A(gCyl,m.fi,0,.82,0,.22,.04,.22); A(gCone,m.fi,0,1.0,0,.12,.4,.12); for(let i=0;i<4;i++){const a=i/4*TAU; A(gBox,m.fi,Math.cos(a)*.55,.03,Math.sin(a)*.55,.5,.02,.06,0,a,0);}}},
+ iceberg:{size:2,b(A,m){[[0,0,1.6,.35],[.45,.2,1.0,.25],[-.4,.3,1.2,.22],[.1,-.45,.8,.2]].forEach(([x,z,h,r],i)=>A(gOct,m.ic,x,h/2,z,r,h/2+.1,r,x*.4,i,-z*.4)); A(gIco,m.pa,0,.1,0,.8,.2,.8);}},
+ snowman:{size:2,b(A,m){A(gIco,m.pa,0,.1,0,.9,.18,.9); A(gCone,m.lf2,.4,.6,.3,.35,1.0,.35); A(gCone,m.pa,.4,.9,.3,.25,.5,.25); A(gCone,m.lf2,-.4,.5,-.2,.3,.8,.3); A(gCone,m.pa,-.4,.75,-.2,.2,.4,.2); A(gIco,m.ic,0,.3,-.5,.25);}},
+ dunes:{size:3,b(A,m){A(gSph,m.sa,0,0,0,1.3,.45,1.0); A(gBox,m.st,.5,.5,.2,.3,1.0,.3,0,0,.25); A(gBox,m.st2,-.5,.25,-.3,.6,.15,.3,0,.6,0); A(gIco,m.bn,-.6,.35,.4,.18);}},
+ voidspire:{size:2,b(A,m){A(gOct,m.st2,0,1.0,0,.3,1.0,.3); for(let i=0;i<3;i++){const a=i/3*TAU; A(gOct,m.st2,Math.cos(a)*.45,.5,Math.sin(a)*.45,.14,.5,.14,Math.cos(a)*.3,0,-Math.sin(a)*.3);} A(gTor,m.gl,0,1.4,0,.45,.45,.2,Math.PI/2,0,0); A(gSph,m.gl,0,2.1,0,.1);}},
+ sculkgrowth:{size:2,b(A,m){A(gCap,m.cl2,0,0,0,.9,.25,.9); for(let i=0;i<6;i++){const a=i/6*TAU; A(gCyl,m.cl2,Math.cos(a)*.5,.4,Math.sin(a)*.5,.06,.8,.06,Math.sin(a)*.3,0,-Math.cos(a)*.3); A(gSph,m.gl,Math.cos(a)*.6,.8,Math.sin(a)*.6,.08);} A(gSph,m.gl,0,.3,0,.18);}},
+ clayfigures:{size:3,b(A,m){for(const [x,z,s,done] of [[-.7,0,1,0],[.1,.3,.8,1],[.8,-.2,.6,0]]){A(gCyl,m.cy,x,.5*s,z,.22*s,1.0*s,.18*s); A(done?gSph:gIco,m.cy,x,1.15*s,z,.18*s); if(done){A(gCyl,m.cy,x+.25*s,.7*s,z,.05*s,.6*s,.05*s,0,0,.5);} else A(gIco,m.cy,x+.2,.2,z+.2,.2);} A(gCyl,m.wd2,1.2,.45,.8,.03,.9,.03); A(gBox,m.mt,1.2,.92,.8,.12,.06,.04);}},
+ storm:{size:2,b(A,m){A(gCyl,m.st2,0,.2,0,.5,.4,.5); A(gCyl,m.mt,0,1.3,0,.05,2.2,.05); for(let i=0;i<4;i++) A(gTor,m.mt,0,.8+i*.4,0,.12,.12,.4,Math.PI/2,0,0); A(gSph,m.gl,0,2.45,0,.14); A(gOct,m.gl,.25,1.9,0,.03,.4,.03,0,0,.6);}},
+ stage:{size:3,b(A,m){A(gBox,m.wd,0,.2,0,2.6,.4,1.6); A(gBox,m.wd2,0,.41,0,2.5,.02,1.5); for(const s of [-1,1]){A(gBox,m.cl,s*1.15,1.2,-.6,.4,2.0,.1); A(gCyl,m.au,s*1.3,1.2,.7,.06,2.0,.06);} A(gBox,m.cl,0,2.2,-.6,2.6,.3,.12); A(gBox,m.au,0,2.4,-.6,2.6,.08,.14); A(gCyl,m.cl2,0,.43,.2,.35,.02,.35); A(gCyl,m.cl2,0,.62,.2,.18,.35,.18); A(gCyl,m.cl2,0,.8,.2,.28,.03,.28);}},
+ spotlights:{size:2,b(A,m){for(const s of [-1,1]){A(gCyl,m.mt,s*.5,.7,0,.04,1.4,.04); A(gCyl,m.mt,s*.5,1.45,.1,.12,.25,.12,.7,0,0); A(gCyl,m.gl,s*.5,1.4,.22,.1,.02,.1,.7,0,0);} A(gBox,m.cl2,0,.05,0,1.4,.1,.5);}},
+ lightpillar:{size:2,b(A,m){A(gCyl,m.st,0,.15,0,.6,.3,.6); A(gCyl,m.pa,0,1.2,0,.18,2.0,.18); A(gCyl,m.au,0,2.25,0,.25,.1,.25); A(gOct,m.gl,0,2.55,0,.14,.24,.14); for(let i=0;i<4;i++) A(gBox,m.au,0,.6+i*.4,.18,.12,.04,.02);}},
+ shields:{size:2,b(A,m){A(gBox,m.wd2,0,.9,-.1,1.6,1.4,.1); for(let i=0;i<3;i++) A(gCyl,i===1?m.au:m.mt,-.5+i*.5,1.0,0,.26,.05,.26,Math.PI/2,0,0); for(let i=0;i<3;i++) A(gOct,m.gl,-.5+i*.5,1.0,.04,.06,.08,.02);}},
+ blisters:{size:2,b(A,m){for(let i=0;i<6;i++){const a=i*2.3, rr=((i*29)%10)/13, s=.18+((i*7)%4)/14; A(gSph,i%2?m.cl:m.cl2,Math.cos(a)*rr,s*.5,Math.sin(a)*rr,s,s*.8,s); A(gSph,m.gl,Math.cos(a)*rr,s*.9,Math.sin(a)*rr,s*.3);} A(gCap,m.cl2,0,0,0,.9,.15,.9);}},
+};
+// What each level is built around (structures are used in order across its rooms)
+const TITLE_SETS={
+ 'Hollow Grove':['bigtree','mushrooms','stonecircle'],'Old Mill Cellar':['millstone','crates','windmill','cart'],'Bramble Steps':['stairs','hedgewall','ruin'],'Sunken Orchard':['orchardtree','well','cart'],'Thornwall Gate':['arch','hedgewall','tower'],
+ 'Glass Canyon':['crystals','dunes','obelisk'],'Buried Bazaar':['stall','cart','tent','crates'],'Sandstone Stairs':['stairs','pyramid','obelisk'],'Dune Sea Ruins':['ruin','dunes','statue'],'Tomb of the Scorpion Kings':['pyramid','treasure','statue','bones'],
+ 'Sunken Chapel':['altar','candles','ruin','graves'],'Rotroot Hollow':['roots','mushrooms','willowtree'],'Lantern Bog':['lanterns','reeds','willowtree'],'Drowned Steps':['stairs','reeds','ruin'],'Witchroot Gate':['arch','cauldron','roots'],
+ 'Frozen Pass':['iceberg','tent','snowman'],'Glacier Vault':['iceberg','treasure','arch'],'Icefall Stairs':['stairs','iceberg','snowman'],'Snowbound Ruins':['ruin','snowman','iceberg'],'Rimewall Gate':['arch','iceberg','tower'],
+ 'Ashen Steps':['stairs','lavavent','ruin'],'Forge of Embers':['forge','gears','crates'],'Magma Bridge':['bridge','lavavent','obelisk'],'Obsidian Halls':['obelisk','statue','lavavent'],'Caldera Gate':['arch','lavavent','tower'],
+ 'Gate of Echoes':['arch','banners','statue'],'Throne Ascent':['stairs','banners','statue'],'Hall of Banners':['banners','statue','weaponrack'],'Crown Vault':['treasure','throne','banners'],'Stair of Kings':['stairs','statue','throne'],
+ 'Pumpkin Patch':['pumpkins','scarecrow','cart'],'Crooked Orchard':['orchardtree','scarecrow','pumpkins'],'Witchlight Bog':['cauldron','lanterns','reeds'],'Bone Chapel':['bones','altar','candles'],'Lantern Crypt':['lanterns','graves','candles'],'Haunted Manor':['house','candles','graves'],'Moonlit Graveyard':['graves','lanterns','bigtree'],
+ 'Stormbreak Steps':['stairs','storm','ruin'],'Hall of Echoing Thunder':['storm','statue','banners'],'Lightning Rod Galleries':['storm','gears','obelisk'],'The Eye Chamber':['portalarch','storm','runestones'],
+ 'Vinewrapped Gate':['arch','roots','hedgewall'],'Sunken Courtyard':['fountain','ruin','statue'],'Shrine of Roots':['altar','roots','bigtree'],'Moss-Choked Sanctum':['statue','ruin','roots'],
+ 'Kelp Shallows':['coral','reeds','shipwreck'],'Pearl Trench':['coral','treasure','crystals'],'Wreck of the Harvester':['shipwreck','crates','coral'],'Sunless Abyss':['bones','coral','crystals'],
+ 'Echoing Descent':['stairs','sculkgrowth','crystals'],'Whispering Caverns':['crystals','mushrooms','sculkgrowth'],'Ancient Halls':['statue','ruin','obelisk'],'Shrieking Depths':['sculkgrowth','bones','cage'],'The Silent City':['house','tower','ruin'],'Steps of the Great Portal':['stairs','portalarch','obelisk'],
+ 'Creeping Veins':['sculkgrowth','roots','blisters'],'Hollow Bloom':['sculkgrowth','flowerbed','cocoon'],'Pulse Chamber':['sculkgrowth','altar','obelisk'],'The Overgrowth Maw':['sculkgrowth','bones','roots'],
+ 'Royal Gardens':['flowerbed','fountain','statue','hedgewall'],'Gilded Barracks':['dummies','weaponrack','banners','tent'],'Hall of Wings':['statue','banners','nest'],'Throne Approach':['banners','statue','throne'],
+ 'Seedling Fields':['flowerbed','orchardtree','well'],'Sprout Hollow':['mushrooms','flowerbed','roots'],'Pollinator Grove':['flowerbed','bigtree','nest'],'Nester Heights':['nest','floatrock','bigtree'],
+ 'Silent Meadow':['flowerbed','stonecircle','sculkgrowth'],'Soul-Stained Fields':['sculkgrowth','graves','flowerbed'],'Corrupted Chorus':['stage','sculkgrowth','candles'],'The Last Verse':['altar','sculkgrowth','portalarch'],
+ 'Slag Gates':['arch','lavavent','crates'],'Bellows Hall':['forge','gears','chains'],'The Pouring Floor':['conveyor','forge','lavavent'],'Crucible Bridge':['bridge','forge','lavavent'],
+ 'Sulfur Flats':['lavavent','dunes','bones'],'Ashfall Canyon':['lavavent','ruin','obelisk'],'Boiling Springs':['lavavent','fountain','crystals'],"The Wyrm's Coil":['bones','lavavent','treasure'],
+ 'Rampart Road':['barricade','tower','banners'],'The Armory':['weaponrack','shields','crates'],'Chain Halls':['chains','cage','banners'],"Warlord's Gate":['arch','barricade','banners'],
+ 'Rivers of Fire':['bridge','lavavent','obelisk'],'The Anvil Steps':['stairs','forge','chains'],'Hall of Hammers':['forge','weaponrack','statue'],'Before the Throne':['throne','banners','statue'],
+ 'Drifting Stones':['floatrock','runestones','crystals'],'The Quiet Dark':['voidspire','candles','obelisk'],'Falling Stars':['crystals','floatrock','voidspire'],"Watcher's Gaze":['voidspire','statue','portalarch'],
+ 'Broken Sky':['floatrock','ruin','crystals'],'Crystal Fault':['crystals','iceberg','obelisk'],'The Torn Path':['bridge','floatrock','portalarch'],"Weaver's Web":['web','cocoon','crystals'],
+ 'Pale Rows':['flowerbed','graves','voidspire'],'Silent Blossoms':['flowerbed','bigtree','stonecircle'],'The Grey Orchard':['orchardtree','voidspire','scarecrow'],'Heart of the Null':['voidspire','altar','portalarch'],
+ 'Edge of Everything':['floatrock','voidspire','arch'],'Collapsing Paths':['bridge','floatrock','ruin'],'The Last Light':['lightpillar','candles','voidspire'],'Into the Endless':['portalarch','floatrock','voidspire'],
+ 'The Endless Stacks':['bookshelves','scrolls','candles'],'Hall of Whispers':['bookshelves','statue','candles'],'The Ink Wells':['scrolls','well','bookshelves'],'Archive of Ages':['bookshelves','scrolls','obelisk'],
+ 'Shattered Plains':['ruin','obelisk','bones'],'The Broken Road':['ruin','cart','arch'],'Rubble Fields':['ruin','crates','bones'],'The Crater':['lavavent','ruin','crystals'],
+ 'The White Steps':['stairs','lightpillar','statue'],'Hall of Shields':['shields','statue','banners'],'Garden of Light':['flowerbed','lightpillar','fountain'],'The Bright Gate':['arch','lightpillar','shields'],
+ 'Blistered Marsh':['blisters','reeds','cocoon'],'The Seeping Hollow':['blisters','mushrooms','roots'],'Pustule Pits':['blisters','cocoon','bones'],"Mother's Nest":['nest','cocoon','blisters'],
+ 'Shifting Floor':['runestones','crystals','floatrock'],'Hall of Mirrors':['mirrors','statue','crystals'],'The Prism Way':['crystals','mirrors','obelisk'],'Heart of Change':['portalarch','crystals','runestones'],
+ 'Spellbloom Path':['flowerbed','runestones','lanterns'],'Runestone Glade':['runestones','stonecircle','bigtree'],'Faefire Hollow':['mushrooms','lanterns','bigtree'],'Whispering Willows':['willowtree','reeds','lanterns'],
+ 'Moonlit Shallows':['reeds','crystals','willowtree'],'Lantern Reeds':['reeds','lanterns','bridge'],'Drowned Circle':['stonecircle','reeds','ruin'],'The Moonwell':['well','fountain','runestones'],
+ 'Petal Steps':['stairs','flowerbed','orchardtree'],'Crystal Orchard':['crystals','orchardtree','flowerbed'],'Spellwoven Arbor':['bigtree','arch','runestones'],'Grove of Runes':['runestones','bigtree','obelisk'],
+ 'Gate of Glyphs':['arch','runestones','obelisk'],'Hall of Echoing Spells':['bookshelves','runestones','statue'],'Prism Stair':['stairs','crystals','mirrors'],'Omega Sanctum':['altar','runestones','portalarch'],
+ 'Glass Rampart':['mirrors','barricade','tower'],'Hall of Reflections':['mirrors','statue','candles'],'Shattered Gallery':['mirrors','ruin','statue'],'Mirror Gate':['arch','mirrors','banners'],
+ 'Door of Whispers':['doors','candles','bookshelves'],'Endless Corridor':['doors','lanterns','statue'],'Upside-Down Library':['flyingbooks','bookshelves','scrolls'],'The Last Door':['doors','portalarch','candles'],
+ 'Fog Bridge':['bridge','lanterns','ruin'],'Haunted Barracks':['dummies','weaponrack','graves'],'Spectral Crypt':['graves','candles','altar'],'Keep of Shadows':['tower','banners','chains'],
+ 'Curtain Hall':['stage','spotlights','candles'],'Trapdoor Theatre':['stage','crates','spotlights'],'Hall of Vanishing':['mirrors','doors','spotlights'],'The Grand Stage':['stage','spotlights','banners'],
+ 'Clay Flats':['clayfigures','dunes','ruin'],'Half-Formed Hills':['clayfigures','floatrock','ruin'],"Sculptor's Canyon":['clayfigures','statue','scrolls'],'Unfinished Road':['cart','clayfigures','stairs'],
+ 'Gear Halls':['gears','conveyor','chains'],'Molten Assembly':['conveyor','forge','gears'],'Blueprint Vault':['scrolls','gears','treasure'],'Engine of Making':['gears','forge','conveyor'],
+ 'Floating Isles':['floatrock','bridge','storm'],'Storm Bridge':['bridge','storm','floatrock'],'Thunder Steps':['stairs','storm','obelisk'],'Eye of the Storm':['storm','portalarch','floatrock'],
+ 'Stair of Beginnings':['stairs','lightpillar','statue'],'Hall of First Light':['lightpillar','statue','banners'],'Collapsing Heavens':['floatrock','lightpillar','ruin'],'Seat of the Maker':['throne','lightpillar','clayfigures']};
+// boss arenas use their island's flavour
+const ARENA_SETS={meadow:['stonecircle','bigtree'],desert:['obelisk','pyramid'],swamp:['willowtree','cauldron'],frost:['iceberg','iceberg'],volcano:['lavavent','obelisk'],spire:['statue','banners'],hallow:['pumpkins','graves'],tempest:['storm','obelisk'],temple:['ruin','roots'],reef:['coral','shipwreck'],
+ deepdark:['portalarch','sculkgrowth'],sculk:['sculkgrowth','cocoon'],monarch:['throne','banners'],harmony:['flowerbed','bigtree'],singers:['sculkgrowth','stonecircle'],cinder:['forge','gears'],brimstone:['lavavent','bones'],citadel:['banners','barricade'],throne:['forge','throne'],
+ expanse:['voidspire','floatrock'],rift:['crystals','web'],nullgarden:['voidspire','flowerbed'],edge:['floatrock','voidspire'],knowledge:['bookshelves','scrolls'],destruction:['ruin','lavavent'],immunity:['lightpillar','shields'],infection:['blisters','cocoon'],forms:['crystals','mirrors'],
+ glimmer:['runestones','bigtree'],moonwell:['well','reeds'],starpetal:['crystals','flowerbed'],enchspire:['runestones','portalarch'],mirror:['mirrors','statue'],falsedoors:['doors','candles'],phantomkeep:['graves','tower'],magistage:['stage','spotlights'],unmade:['clayfigures','ruin'],worldforge:['gears','forge'],shatteredsky:['storm','floatrock'],creatorthrone:['lightpillar','throne']};
+function structMats(E,bio){const col=c=>new THREE.Color(c), rk=col(E.rock), tp=col(E.top), acc=col(bio.accent||'#ffd36a'), d=bio.deco||[];
+  const M2=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.8},o)), G2=(c,i=1.6)=>M2(c,{emissive:c,emissiveIntensity:i,roughness:.4});
+  return {st:M2(rk.clone().lerp(col('#9a948a'),.35)),st2:M2(rk.clone().multiplyScalar(.7)),wd:M2(col('#8a5a34')),wd2:M2(col('#5a3a22')),mt:M2(col('#5a5e66'),{metalness:.45,roughness:.4}),au:M2(col('#d8a840'),{metalness:.5,roughness:.3}),
+   cl:M2(col(d[0]||bio.accent||'#b03a32').lerp(col('#7a2a2a'),.25)),cl2:M2(col(bio.wallF||'#3a2a3a').multiplyScalar(1.1)),lf:M2(tp.clone().lerp(col('#4f8a2e'),.4)),lf2:M2(tp.clone().multiplyScalar(.7).lerp(col('#2f5a1e'),.4)),
+   gl:G2(acc,1.6),fi:G2(col('#ff9a3a'),2),wa:M2(col(E.pool||'#2a5a7a'),{roughness:.1,metalness:.3}),bn:M2(col('#e0d6c0'),{roughness:.6}),cr:M2(acc.clone().lerp(col('#ffffff'),.35),{emissive:acc,emissiveIntensity:.5,roughness:.1,metalness:.2}),
+   ic:M2(col('#bfe6ff'),{roughness:.08,metalness:.25,emissive:col('#2a6a9a'),emissiveIntensity:.3}),sa:M2(col('#d8b676')),cy:M2(col('#a87850'),{roughness:.95}),pa:M2(col('#ece2c8'),{roughness:.85})};}
+// merge every part of one structure into one mesh per material
+function bakeStruct(parts){const by=new Map(); for(const p of parts){let a=by.get(p.m); if(!a){a=[]; by.set(p.m,a);} a.push(p);} const out=[];
+  for(const [m,list] of by){let n=0; const geos=list.map(p=>{let g=p.g.index?p.g.toNonIndexed():p.g.clone(); g.applyMatrix4(p.mx); n+=g.attributes.position.count; return g;});
+    const pos=new Float32Array(n*3), nor=new Float32Array(n*3); let o=0; for(const g of geos){pos.set(g.attributes.position.array,o*3); nor.set(g.attributes.normal.array,o*3); o+=g.attributes.position.count; g.dispose();}
+    const bg=new THREE.BufferGeometry(); bg.setAttribute('position',new THREE.BufferAttribute(pos,3)); bg.setAttribute('normal',new THREE.BufferAttribute(nor,3)); bg.computeBoundingSphere(); const me=new THREE.Mesh(bg,m); me.castShadow=QT!=='low'; me.receiveShadow=true; out.push(me);} return out;}
+function placeStructures(E,bio,isF){if(!levelGroup||!L) return; const name=L.theme&&L.theme.name, set=(name&&TITLE_SETS[name])||ARENA_SETS[bio.id]||['ruin','crystals']; const mats=structMats(E,bio); L.og=new Uint8Array(L.w*L.h);
+  const avoid=[L.start,L.exit,L.bossAt,...(L.chests||[]),...(L.rooms||[]),...(L.keys||[]),...((L.gates||[]).map(g=>({x:g.x,y:g.y})))].filter(Boolean).map(p=>({x:p.x/T,y:p.y/T}));
+  const rects=L.rects&&L.rects.length?L.rects:(L.arena?[L.arena]:[]); let n=0, maxN=QT==='low'?10:QT==='medium'?18:26; const geoOf=g=>QT==='low'?g:(midGeo().get(g)||g);
+  const tryPut=(kind,cx,cy,rot)=>{const D=STRUCT[kind]; if(!D) return false; const s=D.size, h=(s-1)/2; const x0=Math.round(cx-h), y0=Math.round(cy-h);
+    for(let y=y0-1;y<=y0+s;y++) for(let x=x0-1;x<=x0+s;x++){if(!isF(x,y)) return false; if(L.og[y*L.w+x]) return false;}
+    const mx=x0+s/2, my=y0+s/2; for(const a of avoid) if(Math.hypot(a.x-mx,a.y-my)<s/2+1.2) return false;
+    const parts=[], base=new THREE.Matrix4().compose(new THREE.Vector3(mx,0,my),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,rot,0)),new THREE.Vector3(1,1,1)), q=new THREE.Quaternion(), e=new THREE.Euler();
+    const A=(g,m,x,y,z,sx,sy=sx,sz=sx,rx=0,ry=0,rz=0)=>{const mm=new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),q.setFromEuler(e.set(rx,ry,rz)),new THREE.Vector3(sx,sy,sz)); parts.push({g:geoOf(g),m,mx:base.clone().multiply(mm)});};
+    D.b(A,mats); for(const me of bakeStruct(parts)) levelGroup.add(me); for(let y=y0;y<y0+s;y++) for(let x=x0;x<x0+s;x++) L.og[y*L.w+x]=1; n++; return true;};
+  rects.forEach((r,ri)=>{if(n>=maxN) return; const want=r.w*r.h>70?2:1; let placed=0; const cand=[];
+    for(let y=r.y+1;y<r.y+r.h-1;y++) for(let x=r.x+1;x<r.x+r.w-1;x++){const dc=Math.hypot(x-(r.x+r.w/2),y-(r.y+r.h/2)); cand.push({x,y,k:hash(x*7+ri,y*13)-dc*.06});}
+    cand.sort((a,b)=>a.k-b.k); for(const c of cand){if(placed>=want||n>=maxN) break; const kind=set[(ri*2+placed)%set.length], cx=c.x+.5, cy=c.y+.5; const rot=Math.round(Math.atan2((r.x+r.w/2)-cx,(r.y+r.h/2)-cy)/(Math.PI/2))*(Math.PI/2); if(tryPut(kind,cx,cy,rot)) placed++;}});
+  L.structN=n; for(const m of Object.values(mats)) if(!levelGroup.children.some(c=>c.material===m)) m.dispose();}
+
+/*STRUCTS-END*/
 /*LEGENDS-START*/
 /* ================= v4.4: The Three Legends ================= */
 const LEGENDS={omegaenchanter:{col:'#2affa0',col2:'#c8ffe0',world:8,name:'The Omega Enchanter',short:'Omega Enchanter',crystal:'emerald',sid:'ocean1'},

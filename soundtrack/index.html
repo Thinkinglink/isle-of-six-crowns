@@ -209,7 +209,7 @@ function sendRev(c,node,amt){if(!amt||!AU.revIn) return; const s=c.createGain();
 function vib(c,t,end,target,rate,cents,delay=.15){const l=c.createOscillator(), g=c.createGain(); l.frequency.value=rate; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(cents,t+delay+.2); l.connect(g); for(const o of target) g.connect(o.detune); l.start(t); l.stop(end);}
 function noiseSrc(c,t,end){const s=c.createBufferSource(); s.buffer=AU.noise; s.loop=true; s.start(t,Math.random()*1.5); s.stop(end); return s;}
 // one note on a named instrument
-function inst(name,dest,t,m,dur,vel=1,rev=.25){const c=AU.ctx, f=mtof(m); let end=t+dur+1.2, out;
+function minst(name,dest,t,m,dur,vel=1,rev=.25){const c=AU.ctx, f=mtof(m); let end=t+dur+1.2, out;
   const hi=f>900?.6:1;
   switch(name){
   case 'piano':case 'pbass':{const decay=Math.min(3.2,1.6*Math.pow(261/f,.45)), g=c.createGain(), p=g.gain; p.setValueAtTime(0,t); p.linearRampToValueAtTime(.32*vel*hi,t+.004); p.setTargetAtTime(0,t+.004,decay*.45); p.setTargetAtTime(0,t+dur,.09); end=t+Math.min(dur+.5,decay*2.2)+.05;
@@ -324,23 +324,23 @@ function playStep(S,i,t,bus){const st=i%16, bar=Math.floor(i/16), ch=S.prog[bar]
   // bass
   if(S.bassPat[st]&&!(sec===0&&bar<1&&!S.menu)){let n=deg(ch)-24; while(n<34) n+=12; while(n>50) n-=12;
     if(S.style==='jazz') n=deg(ch+[0,2,4,5][(st/4)|0])-24+(n<34?12:0); else if(st%8===6&&!S.boss) n+=7;
-    inst(S.bass,bus,t,n,sd*(S.style==='rock'||S.style==='metal'?1.6:S.boss?1.8:3.4),v.bass*(st%4===0?1:.8));}
+    minst(S.bass,bus,t,n,sd*(S.style==='rock'||S.style==='metal'?1.6:S.boss?1.8:3.4),v.bass*(st%4===0?1:.8));}
   // harmony
   const chord=k=>{let n=deg(ch+k)-12; while(n<48) n+=12; while(n>67) n-=12; return n;};
-  if(S.hp==='sustain'&&st===0) for(const k of [0,2,4]) inst(S.harm,bus,t,chord(k),sd*15.5,v.harm*.8);
-  else if(S.hp==='piano'&&S.compPat[st]) for(const k of (st===0?[0,2,4]:[2,4])) inst('piano',bus,t,chord(k),sd*(st===0?7:3),v.harm*.55);
-  else if(S.hp==='comp'&&S.compPat[st]) for(const k of [0,2,4,6]) inst(S.harm,bus,t,chord(k),sd*2.5,v.harm*.55);
-  else if(S.hp==='stab'&&(st===0||st===10)&&sec>0) for(const k of [0,2,4]) inst(S.harm,bus,t,chord(k),sd*(st?3:5),v.harm*.6);
-  else if(S.hp==='arp'&&S.arpPat[st]) inst(S.harm,bus,t,chord(S.arpShape[st%S.arpShape.length])+12,sd*2,v.harm*.7);
-  else if(S.hp==='rock'&&S.bassPat[st]&&sec>0) inst('power',bus,t,deg(ch)-12+(deg(ch)-12<40?12:0),sd*(st%4===0?3.5:1.6),v.harm);
-  else if(S.hp==='chug'&&sec>0){if(S.bassPat[st]||st%2===0) inst('chug',bus,t,deg(ch)-12+(deg(ch)-12<40?12:0),sd,v.harm); if(st===0) inst('choirpad',bus,t,chord(0),sd*15,v.harm*.7);}
+  if(S.hp==='sustain'&&st===0) for(const k of [0,2,4]) minst(S.harm,bus,t,chord(k),sd*15.5,v.harm*.8);
+  else if(S.hp==='piano'&&S.compPat[st]) for(const k of (st===0?[0,2,4]:[2,4])) minst('piano',bus,t,chord(k),sd*(st===0?7:3),v.harm*.55);
+  else if(S.hp==='comp'&&S.compPat[st]) for(const k of [0,2,4,6]) minst(S.harm,bus,t,chord(k),sd*2.5,v.harm*.55);
+  else if(S.hp==='stab'&&(st===0||st===10)&&sec>0) for(const k of [0,2,4]) minst(S.harm,bus,t,chord(k),sd*(st?3:5),v.harm*.6);
+  else if(S.hp==='arp'&&S.arpPat[st]) minst(S.harm,bus,t,chord(S.arpShape[st%S.arpShape.length])+12,sd*2,v.harm*.7);
+  else if(S.hp==='rock'&&S.bassPat[st]&&sec>0) minst('power',bus,t,deg(ch)-12+(deg(ch)-12<40?12:0),sd*(st%4===0?3.5:1.6),v.harm);
+  else if(S.hp==='chug'&&sec>0){if(S.bassPat[st]||st%2===0) minst('chug',bus,t,deg(ch)-12+(deg(ch)-12<40?12:0),sd,v.harm); if(st===0) minst('choirpad',bus,t,chord(0),sd*15,v.harm*.7);}
   // counter part / arpeggio
-  if(S.arp&&sec>=1&&S.arpPat[st]&&!(S.arp==='strpad'||S.arp==='choirpad')){let n=deg(ch+S.arpShape[st%S.arpShape.length]); while(n<60) n+=12; while(n>84) n-=12; inst(S.arp,bus,t,n,sd*1.5,v.arp*(st%4===0?1:.75));}
-  else if(S.arp&&(S.arp==='strpad'||S.arp==='choirpad')&&st===0&&sec>=2) for(const k of [0,4]) inst(S.arp,bus,t,chord(k)+12,sd*15,v.arp*.7);
+  if(S.arp&&sec>=1&&S.arpPat[st]&&!(S.arp==='strpad'||S.arp==='choirpad')){let n=deg(ch+S.arpShape[st%S.arpShape.length]); while(n<60) n+=12; while(n>84) n-=12; minst(S.arp,bus,t,n,sd*1.5,v.arp*(st%4===0?1:.75));}
+  else if(S.arp&&(S.arp==='strpad'||S.arp==='choirpad')&&st===0&&sec>=2) for(const k of [0,4]) minst(S.arp,bus,t,chord(k)+12,sd*15,v.arp*.7);
   // lead
-  const m=S.mel[i]; if(m&&!(sec===0&&!S.menu&&bar<2)) {inst(S.lead,bus,t,m.n,m.d,v.lead*(sec===3?1.1:1)); if(S.menu&&sec>=1) inst('strings',bus,t,m.n-12,m.d,.35);}}
+  const m=S.mel[i]; if(m&&!(sec===0&&!S.menu&&bar<2)) {minst(S.lead,bus,t,m.n,m.d,v.lead*(sec===3?1.1:1)); if(S.menu&&sec>=1) minst('strings',bus,t,m.n-12,m.d,.35);}}
 
-const VER='4.4.0';
+const VER='4.5.0';
 // ---- the album ----
 const T=[]; const scaleName=a=>Object.keys(SCALES).find(k=>SCALES[k]===a)||'';
 const NICE={major:'major',minor:'minor',dorian:'dorian',phrygian:'phrygian',harm:'harmonic minor',lydian:'lydian',mixo:'mixolydian',whole:'whole-tone',dim:'diminished',hijaz:'hijaz'};
