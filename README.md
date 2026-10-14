@@ -152,3 +152,9 @@ The Equip best button in your pack puts on your strongest weapon, armor and arti
 ## 🗝️ Bigger levels, locked gates and key golems
 
 Levels are now about twice as large, with more rooms and more monsters. Each level's exit is sealed behind an iron gate. Find the glowing key golem, lead it to the gate and the gate opens; bigger levels have two gates and two key golems. Every region of the first island now has five levels before its guardian, and your old progress carries over.
+
+## 🎸 A real band for every track, and redesigned bosses
+
+The music now uses real-sounding instruments in place of thin beeps: piano, strings, choir, brass, French horn, flute, fiddle, tin whistle, harp, electric guitar, electric piano, saxophone, pipe organ, marimba, kalimba and bells, over rock, metal, orchestral, taiko, marching, folk, jazz brush and electronic drum kits. Every track is played in its own style (rock, metal, orchestral, epic choir, piano, folk, jazz, ambient, tribal, march, synthwave or cathedral organ), with an intro, a main theme, a contrasting part and a big finish. Every melody stays in its instrument's comfortable range, so nothing squeaks.
+
+Eighteen bosses have been rebuilt from scratch, with sculpted bodies, horns, claws, armour, cloth and glowing details. Each keeps its theme but is bigger and scarier: the Bramble King, Sand Sultan Ashkar, Mother Murk, the Rime Warden, the Cinderheart Colossus, the Pumpkin King, the Hollow Sovereign and the Sovereign Unbound, Thunderhead, the Mossback Behemoth, Lanternmaw, the Echo Tyrant, the Monarch, the Harmonizer, the Corrupted Singer, the Foundry Colossus, the Brimstone Wyrm and the Iron Warlord. The rest follow in the next update.

@@ -1135,7 +1135,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='4.1.0', SAVE_VERSION=7;
+const APP_VERSION='4.2.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -2106,9 +2106,531 @@ function buildEnemy(e){
   if(QT!=='low'){const H2=midGeo(); R.traverse(o=>{if(o.isMesh){const g=H2.get(o.geometry); if(g) o.geometry=g;}}); bossTex(); detailize(R);}
   addWarn(R); R.scale.setScalar(e.r/13); CUR=null; return R;}
 
+/*BOSS2-START*/
+/* ================= v4.2 boss sculpting kit: organic, layered, high-detail parts ================= */
+const KG=new Map(), QK=()=>QT==='low'?.55:QT==='medium'?.8:1;
+const kg=(key,fn)=>{let g=KG.get(key); if(!g){g=fn(); g.userData.cached=true; KG.set(key,g);} return g;};
+const V3=(a)=>new THREE.Vector3(a[0],a[1],a[2]);
+function lathe(key,prof,seg=40){return kg('la'+key,()=>new THREE.LatheGeometry(prof.map(p=>new THREE.Vector2(p[0],p[1])),Math.max(10,Math.round(seg*QK()))));}
+// a curved tube that tapers from r0 to r1 along a path (horns, claws, tendrils, roots, ribs, fingers)
+function taperGeo(pts,r0,r1,tub=24,rad=12,flat=1,pw=1.15){const curve=new THREE.CatmullRomCurve3(pts.map(V3)), q=QK(); tub=Math.max(6,Math.round(tub*q)); rad=Math.max(6,Math.round(rad*q)); const fr=curve.computeFrenetFrames(tub,false), pos=[],uv=[],idx=[];
+  for(let i=0;i<=tub;i++){const t=i/tub, P=curve.getPointAt(t), N=fr.normals[i], Bn=fr.binormals[i], r=r0+(r1-r0)*Math.pow(t,pw);
+    for(let j=0;j<=rad;j++){const a=j/rad*TAU, c=Math.cos(a), s=Math.sin(a)*flat; pos.push(P.x+r*(c*N.x+s*Bn.x),P.y+r*(c*N.y+s*Bn.y),P.z+r*(c*N.z+s*Bn.z)); uv.push(j/rad,t*3);}}
+  // close the base
+  const P0=curve.getPointAt(0), c0=pos.length/3; pos.push(P0.x,P0.y,P0.z); uv.push(.5,0); for(let j=0;j<rad;j++) idx.push(c0,j+1,j);
+  for(let i=0;i<tub;i++) for(let j=0;j<rad;j++){const a=i*(rad+1)+j, b=a+rad+1; idx.push(a,b,a+1,b,b+1,a+1);}
+  const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2)); g.setIndex(idx); g.computeVertexNormals(); return g;}
+function taper(key,pts,r0,r1,tub,rad,flat,pw){return kg('tp'+key,()=>taperGeo(pts,r0,r1,tub,rad,flat,pw));}
+// a lumpy, muscled or rocky sphere
+function blob(seed,amt=.12,freq=1){return kg('bl'+seed+'|'+amt+'|'+freq,()=>{const q=QK(), g=new THREE.SphereGeometry(1,Math.round(44*q),Math.round(30*q)), p=g.attributes.position, r=srand(seed*31+7), a=[0,1,2,3,4,5].map(()=>r()*6);
+  for(let i=0;i<p.count;i++){const x=p.getX(i)*freq,y=p.getY(i)*freq,z=p.getZ(i)*freq; const k=1+amt*(Math.sin(x*3.1+a[0])*Math.sin(y*2.7+a[1])+.6*Math.sin(z*4.3+a[2]+y*1.3)+.35*Math.sin(x*7.1+z*6.2+a[3])+.2*Math.sin(y*9.3+a[4]+x*2)); p.setXYZ(i,p.getX(i)*k,p.getY(i)*k,p.getZ(i)*k);} g.computeVertexNormals(); return g;});}
+// a hard, faceted rock or crystal
+function shard(seed,amt=.3,det=1){return kg('sh'+seed+'|'+amt+'|'+det,()=>{let g=new THREE.IcosahedronGeometry(1,det); g=g.index?g.toNonIndexed():g; const p=g.attributes.position, r=srand(seed*13+5), v=new Map();
+  for(let i=0;i<p.count;i++){const key=p.getX(i).toFixed(3)+','+p.getY(i).toFixed(3)+','+p.getZ(i).toFixed(3); if(!v.has(key)) v.set(key,1+(r()-.5)*amt); const k=v.get(key); p.setXYZ(i,p.getX(i)*k,p.getY(i)*k,p.getZ(i)*k);} g.computeVertexNormals(); return g;});}
+// a long pointed crystal prism
+function crystal(seed,sides=6){return kg('cr'+seed+'|'+sides,()=>{const r=srand(seed), pr=[[0,-.5],[.22,-.42],[.26+r()*.04,.2],[.18,.32],[0,.62+r()*.15]]; const g=new THREE.LatheGeometry(pr.map(p=>new THREE.Vector2(p[0],p[1])),sides); g.computeVertexNormals(); return g;});}
+// cloth: a robe / skirt with folds and a torn, uneven hem
+function robeGeo(key,rTop,rBot,h,folds=9,foldAmt=.08,tatter=.25,seed=1,arc=TAU){return kg('rb'+key,()=>{const q=QK(), g=new THREE.CylinderGeometry(rTop,rBot,h,Math.round(72*q),Math.round(14*q),true,0,arc), p=g.attributes.position, r=srand(seed), s1=r()*6,s2=r()*6,s3=r()*6;
+  for(let i=0;i<p.count;i++){let x=p.getX(i),y=p.getY(i),z=p.getZ(i); const a=Math.atan2(x,z), v=(y+h/2)/h, f=1+foldAmt*Math.sin(a*folds+s1)*(1-v*.8)+foldAmt*.5*Math.sin(a*folds*2.3+s2)*(1-v);
+    const jag=tatter*h*Math.pow(.5+.5*Math.sin(a*13+s1),2)*(.4+.6*(.5+.5*Math.sin(a*5+s3)))+tatter*h*.25*(.5+.5*Math.sin(a*31+s2)); const yb=-h/2, y2=yb+jag+(y-yb)*(h-jag)/h;
+    p.setXYZ(i,x*f,y2,z*f);} g.computeVertexNormals(); return g;});}
+// a curved cape / mantle hanging from the shoulders, with a ragged hem
+function capeGeo(key,w,h,curve=.5,flare=.35,tatter=.22,seed=3){return kg('cp'+key,()=>{const q=QK(), g=new THREE.PlaneGeometry(w,h,Math.round(22*q),Math.round(22*q)), p=g.attributes.position, r=srand(seed), s1=r()*6,s2=r()*6;
+  for(let i=0;i<p.count;i++){let x=p.getX(i),y=p.getY(i); const v=(h/2-y)/h, ww=1+flare*v; x*=ww; const a=x/(w*.5*(1+flare))*curve*1.6; const R0=w*.6; let X=Math.sin(a)*R0*(1+v*.3), Z=-(1-Math.cos(a))*R0*.7-v*h*.12+.04*Math.sin(x*14+s1)*v;
+    const jag=tatter*h*Math.pow(.5+.5*Math.sin(x*17+s1),2)*(.5+.5*Math.sin(x*7+s2)); if(v>.6) y=y+jag*(v-.6)/.4; p.setXYZ(i,X,y-h/2,Z);} g.computeVertexNormals(); return g;});}
+// a flat bent leaf / feather / blade outline
+function leafGeo(key,len,w,bend=.15,tip=1,notch=0){return kg('lf'+key,()=>{const sh=new THREE.Shape(); sh.moveTo(0,0); sh.bezierCurveTo(w*.9,len*.15,w*.7*tip,len*.7,0,len); sh.bezierCurveTo(-w*.7*tip,len*.7,-w*.9,len*.15,0,0); const g=new THREE.ShapeGeometry(sh,Math.round(12*QK())), p=g.attributes.position;
+  for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i); p.setZ(i,bend*Math.pow(y/len,2)*len-Math.abs(x)*.25+(notch?Math.sin(y*40)*notch:0));} g.computeVertexNormals(); return g;});}
+// a bat-like membrane stretched between bone tips (root at 0,0,0)
+function membraneGeo(key,tips,scallop=.3){return kg('mb'+key,()=>{const pos=[]; const o=[0,0,0]; for(let i=0;i<tips.length-1;i++){const a=tips[i], b=tips[i+1], m=[(a[0]+b[0])/2*(1-scallop),(a[1]+b[1])/2*(1-scallop),(a[2]+b[2])/2*(1-scallop)]; const n=6;
+  for(let k=0;k<n;k++){const t0=k/n,t1=(k+1)/n; const pt=t=>{const u=1-t; return [u*u*a[0]+2*u*t*m[0]+t*t*b[0],u*u*a[1]+2*u*t*m[1]+t*t*b[1],u*u*a[2]+2*u*t*m[2]+t*t*b[2]];}; pos.push(...o,...pt(t0),...pt(t1));}}
+  const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); g.computeVertexNormals(); const uv=[]; for(let i=0;i<pos.length/3;i++) uv.push(pos[i*3]*.6,pos[i*3+1]*.6); g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2)); return g;});}
+function put(p,g,m,x=0,y=0,z=0,sx=1,sy=sx,sz=sx,rx=0,ry=0,rz=0){const me=new THREE.Mesh(g,m); me.position.set(x,y,z); me.scale.set(sx,sy,sz); me.rotation.set(rx,ry,rz); me.castShadow=true; p.add(me); return me;}
+function grp(p,x=0,y=0,z=0,rx=0,ry=0,rz=0){const g=new THREE.Group(); g.position.set(x,y,z); g.rotation.set(rx,ry,rz); p.add(g); return g;}
+// a horn: from base b along direction d, curling by c, tapering to a point
+function horn(p,key,b,d,len,c,r0,m,segs=6){const pts=[]; for(let k=0;k<=segs;k++){const t=k/segs; pts.push([b[0]+(d[0]*t+c[0]*t*t)*len,b[1]+(d[1]*t+c[1]*t*t)*len,b[2]+(d[2]*t+c[2]*t*t)*len]);} return put(p,taper('hn'+key,pts,r0,r0*.04,26,12,1,.9),m);}
+// a ringed horn (ridges along it)
+function ridgeHorn(p,key,b,d,len,c,r0,m,m2){const h=horn(p,key,b,d,len,c,r0,m); const pts=[]; for(let k=1;k<6;k++){const t=k/7; const P=[b[0]+(d[0]*t+c[0]*t*t)*len,b[1]+(d[1]*t+c[1]*t*t)*len,b[2]+(d[2]*t+c[2]*t*t)*len]; const T=[d[0]+2*c[0]*t,d[1]+2*c[1]*t,d[2]+2*c[2]*t]; const rr=r0*(1-Math.pow(t,.9))*1.08;
+  const ring=put(p,gTor,m2||m,P[0],P[1],P[2],rr,rr,rr*2.2); ring.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),new THREE.Vector3(T[0],T[1],T[2]).normalize());} return h;}
+// glowing eye with a soft additive flare
+function eye(p,x,y,z,s,col,inten=2.6,flare=true){const e=put(p,gSph,glow(col,inten),x,y,z,s,s,s*.7); e.castShadow=false; if(flare&&BTEX.glow){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:new THREE.Color(col),transparent:true,opacity:.75,depthWrite:false,blending:THREE.AdditiveBlending})); sp.position.set(x,y,z+s*.4); sp.scale.set(s*7,s*7,1); p.add(sp);} return e;}
+// row of fangs along an arc
+function fangs(p,m,n,w,y,z,len,dir=-1,curve=.25,r=.02){const out=[]; for(let i=0;i<n;i++){const t=n>1?i/(n-1):.5, x=(t-.5)*w, zz=z-Math.pow((t-.5)*2,2)*curve*w*.5, l=len*(1-Math.abs(t-.5)*.8)*(i%2?.7:1); const f=put(p,gCone,m,x,y+dir*l*.5,zz,r*(i%2?.8:1),l,r*(i%2?.8:1)); if(dir>0) f.rotation.x=0; else f.rotation.x=Math.PI; out.push(f);} return out;}
+// a clawed hand: palm + jointed curved fingers with nails
+function claw(p,key,skin,nail,n=4,len=.2,r=.035,spread=.9,curl=.6){const h=grp(p); put(h,blob(77,.12),skin,0,0,0,r*2.6,r*2.2,r*2); for(let i=0;i<n;i++){const a=(n>1?(i/(n-1)-.5):0)*spread, th=i===0&&n>3; const dx=Math.sin(a), dz=Math.cos(a)*.3; const L=len*(th?.7:1)*(1-Math.abs(a)*.25);
+  const pts=[[dx*r*1.6,-r*.5,dz*r],[dx*(r*1.6+L*.4),-r-L*.45,dz*r+L*.18],[dx*(r*1.6+L*.6),-r-L*.85,dz*r+L*curl*.55],[dx*(r*1.6+L*.6),-r-L*1.05,dz*r+L*curl]];
+  put(h,taper(key+'f'+i+n,pts,r*.62,r*.42,10,8),skin); const tp=pts[3], tq=pts[2]; const nm=put(h,taper(key+'n'+i+n,[tq,tp,[tp[0]*1.02,tp[1]-L*.18,tp[2]+L*curl*.55]],r*.4,r*.02,8,8),nail);} return h;}
+// two-segment arm hanging from a shoulder pivot (animated by the walker)
+function arm(p,x,y,z,o){const g=grp(p,x,y,z), s=o.side||1, l1=o.l1||.42, l2=o.l2||.4, r=o.r||.07, k=o.key||'a'; const el=[s*(o.out||.04),-l1,o.fwd||.06];
+  put(g,blob(o.seed||11,.14),o.sh||o.m,0,0,0,r*1.9,r*1.7,r*1.8); put(g,taper(k+'u'+l1+r,[[0,0,0],[el[0]*.5,-l1*.5,el[2]*.3],el],r*1.25,r*.9,14,12),o.m); put(g,blob((o.seed||11)+3,.1),o.m2||o.m,el[0],el[1],el[2],r*1.05);
+  const wr=[el[0]+s*(o.out2||.02),el[1]-l2,el[2]+(o.fwd2||.12)]; put(g,taper(k+'l'+l2+r,[el,[(el[0]+wr[0])/2,(el[1]+wr[1])/2,(el[2]+wr[2])/2+.02],wr],r*1.05,r*.8,14,12),o.m2||o.m);
+  const hd=grp(g,wr[0],wr[1],wr[2]); g.userData.hand=hd; g.userData.elbow=el; return g;}
+// a digitigrade or straight leg from hip height down to the ground
+function leg(p,x,y,z,o){const g=grp(p,x,y,z), r=o.r||.1, H=y, k=o.key||'l', dg=o.dig||0; const kn=[0,-H*.5,dg?H*.22:.05], an=[0,-H*.86,dg?-H*.08:.01], ft=[0,-H+.02,(o.foot||.18)];
+  put(g,blob(o.seed||21,.12),o.sh||o.m,0,0,0,r*1.6,r*1.4,r*1.6); put(g,taper(k+'t'+H+r,[[0,0,0],[0,-H*.25,kn[2]*.7],kn],r*1.35,r*.95,14,12),o.m); put(g,blob((o.seed||21)+5,.12),o.m2||o.m,kn[0],kn[1],kn[2],r*1.05);
+  put(g,taper(k+'s'+H+r,[kn,[0,(kn[1]+an[1])/2,(kn[2]+an[2])/2],an],r*1.0,r*.7,14,12),o.m2||o.m); const fg=grp(g,an[0],an[1],an[2]); put(fg,blob((o.seed||21)+9,.1),o.m2||o.m,0,-H*.08,(o.foot||.18)*.35,r*1.2,r*.75,(o.foot||.18)*.75);
+  if(o.toes) for(let i=0;i<o.toes;i++){const a=(i/(o.toes-1)-.5)*.9; put(fg,taper(k+'to'+i+H,[[Math.sin(a)*r*.6,-H*.1,(o.foot||.18)*.55],[Math.sin(a)*r*1.2,-H*.13,(o.foot||.18)*1.05],[Math.sin(a)*r*1.3,-H*.14+-.01,(o.foot||.18)*1.25]],r*.32,r*.03,8,6),o.nail||o.m);}
+  return g;}
+// a regal / brutal spiked crown
+function crownR(p,y,r,m,gem,n=7,h=.18,twist=0){const g=grp(p,0,y,0); put(g,lathe('crb'+r,[[r*.98,-.03],[r*1.06,-.02],[r*1.08,.04],[r,.06],[r*.96,.05]],48),m); for(let i=0;i<n;i++){const a=i/n*TAU, hh=h*(i%2?.62:1); const sp=put(g,taper('crs'+hh+r,[[0,0,0],[0,hh*.5,r*.06],[0,hh,-r*.04+twist]],r*.11,.003,10,6),m,Math.sin(a)*r,.04,Math.cos(a)*r); sp.rotation.y=a; sp.rotation.x=.12;
+  if(gem&&i%2===0) put(g,gOct,gem,Math.sin(a)*r*1.06,.03,Math.cos(a)*r*1.06,r*.07,r*.1,r*.05).rotation.y=a;} return g;}
+// fuzzy floating motes that the animator can drift
+function motes(p,n,col,rad,y0,y1,size=.02){const out=[]; const m=glow(col,2.4); for(let i=0;i<n;i++){const a=Math.random()*TAU, rr=rad*(.5+Math.random()*.5); const s=put(p,gSphL,m,Math.cos(a)*rr,y0+Math.random()*(y1-y0),Math.sin(a)*rr,size*(.6+Math.random()*.8)); s.castShadow=false; s.userData.o=[a,rr,s.position.y,.3+Math.random()*.8]; out.push(s);} return out;}
+const NOV=m=>{m.userData.noVein=true; return m;};
+// a jointed dangling chain the animator sways (hair, wraps, tendrils, tentacles)
+function chain(p,x,y,z,ry,n,len,r0,m,m2,axis='y'){const g=grp(p,x,y,z,0,ry,0), segs=[]; let q=g; for(let k=0;k<n;k++){const sg=grp(q); if(k){if(axis==='y') sg.position.y=-len; else sg.position.z=len;} const rr=r0*(1-k/(n+1)), r2=r0*(1-(k+1)/(n+1));
+  put(sg,taper('ch'+axis+len+'|'+rr.toFixed(4),axis==='y'?[[0,0,0],[0,-len*.5,.004],[0,-len,0]]:[[0,0,0],[0,.004,len*.5],[0,0,len]],rr,r2,8,8),k%2&&m2?m2:m); segs.push(sg); q=sg;} return segs;}
+
+const BOSS2={};
+function pumpkinGeo(){return kg('pumpk',()=>{const q=QK(), g=new THREE.SphereGeometry(1,Math.round(64*q),Math.round(40*q)), p=g.attributes.position; for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i), a=Math.atan2(x,z), k=1-.09*Math.pow(Math.abs(Math.cos(a*4)),.6)+.03*Math.sin(a*11+y*3); p.setXYZ(i,x*k,y*.78*(1-.12*Math.pow(Math.max(0,y),4)),z*k);} g.computeVertexNormals(); return g;});}
+function thinTor(){return kg('thintor',()=>new THREE.TorusGeometry(1,.05,10,64));}
+function carveGeo(key,pts){return kg('cv'+key,()=>{const sh=new THREE.Shape(); sh.moveTo(pts[0][0],pts[0][1]); for(const p of pts.slice(1)) sh.lineTo(p[0],p[1]); return new THREE.ExtrudeGeometry(sh,{depth:.03,bevelEnabled:false});});}
+function grinGeo(){return kg('grin',()=>{const sh=new THREE.Shape(), w=.13, n=9; sh.moveTo(-w,.02); for(let i=0;i<=n;i++){const x=-w+i/n*2*w, c=-.03*Math.pow(x/w,2); sh.lineTo(x,(i%2?-.005:.03)-c*-1-.0);} sh.lineTo(w,.02); for(let i=n;i>=0;i--){const x=-w+i/n*2*w; sh.lineTo(x,(i%2?-.055:-.02)+.025*Math.pow(x/w,2));} return new THREE.ExtrudeGeometry(sh,{depth:.03,bevelEnabled:false});});}
+/* ---------- The Bramble King: a walking, rotten oak lord strangled by his own thorns ---------- */
+BOSS2.bramble=(R,B,u)=>{const bark=M('#4a3220',{roughness:1}), bark2=M('#2b1c12',{roughness:1}), moss=M('#4c7a28',{roughness:.95}), moss2=M('#6f9a34',{roughness:.9}), thorn=NOV(M('#1a120a',{roughness:.6})), sap=glow('#c9ff6a',2.2), berry=glow('#ff3a3a',1.8), shroom=NOV(M('#c9b48a',{roughness:.6})), cap=NOV(M('#7a2a1a',{roughness:.5}));
+  u.legs=[leg(B,-.24,.62,0,{m:bark,m2:bark2,r:.13,key:'brl',toes:4,nail:thorn,seed:3}),leg(B,.24,.62,0,{m:bark,m2:bark2,r:.13,key:'brl',toes:4,nail:thorn,seed:4})];
+  // roots spilling from the hips like a skirt
+  for(let i=0;i<9;i++){const a=i/9*TAU+.2; put(B,taper('brr'+i,[[Math.sin(a)*.22,.62,Math.cos(a)*.18],[Math.sin(a)*.38,.4,Math.cos(a)*.3],[Math.sin(a)*.48,.18,Math.cos(a)*.4]],.05,.008,12,8),i%2?bark2:bark);}
+  const T=grp(B,0,.62,0); u.torso=T; T.rotation.x=.18;
+  put(T,blob(5,.16,1.3),bark,0,.42,0,.44,.5,.36); put(T,blob(6,.18),bark2,0,.12,.02,.36,.26,.3); put(T,blob(7,.2),bark,-.2,.6,.12,.2,.18,.16); put(T,blob(8,.2),bark,.2,.6,.12,.2,.18,.16);
+  // bark ridges and glowing sap seams
+  for(let i=0;i<14;i++){const a=i/14*TAU, s=Math.sin(a), c=Math.cos(a); put(T,taper('brk'+(i%4),[[0,-.05,0],[.02,.3,.03],[0,.62,0]],.035,.012,10,6),i%2?bark2:bark,s*.4,.12,c*.32,1,1,1,0,a,0);
+    if(i%3===0) put(T,taper('brsap'+(i%2),[[0,0,0],[.01,.18,0],[-.01,.38,0]],.012,.004,10,6),sap,s*.41,.2,c*.33,1,1,1,0,a,0).castShadow=false;}
+  // a hollow in the chest with a burning heart-seed
+  put(T,blob(9,.1),M('#0a0604'),0,.42,.3,.13,.17,.06); u.core=put(T,shard(3,.4),sap,0,.42,.32,.07,.09,.05);
+  // strangling thorn vines spiralling the trunk
+  for(let v=0;v<2;v++){const pts=[]; for(let k=0;k<=22;k++){const t=k/22, a=t*TAU*1.6+v*Math.PI; pts.push([Math.sin(a)*.43,-.02+t*.75,Math.cos(a)*.35]);} put(T,taper('brv'+v,pts,.025,.02,60,8),bark2);
+    for(let k=1;k<22;k+=2){const P=pts[k], a=Math.atan2(P[0],P[2]); const th=put(T,gCone,thorn,P[0]*1.07,P[1],P[2]*1.07,.012,.07,.012); th.rotation.set(Math.PI/2,0,0); th.rotation.y=a; th.lookAt(new THREE.Vector3(P[0]*3,P[1]+.1,P[2]*3)); th.rotateX(Math.PI/2);}}
+  // mossy shoulders with toadstools
+  for(const s of [-1,1]){put(T,blob(12+s,.25),moss,s*.36,.7,0,.2,.12,.2); put(T,blob(14+s,.3),moss2,s*.42,.75,-.06,.11,.07,.11); for(let i=0;i<3;i++){const x=s*(.3+i*.06), z=-.08+i*.07; put(T,gCyl,shroom,x,.78+i*.01,z,.012,.06,.012); put(T,gCap,cap,x,.81+i*.01,z,.04-i*.006,.025,.04-i*.006);}}
+  // back thorns
+  for(let i=0;i<7;i++){const y=.2+i*.09, x=(i%2?.1:-.1); const th=put(T,taper('brbt'+(i%3),[[0,0,0],[0,.06,-.1],[0,.16,-.22]],.035,.003,10,6),thorn,x,y,-.3); th.rotation.z=x*2;}
+  // arms: long branches with splintered claws
+  const aL=arm(T,-.46,.66,0,{side:-1,m:bark,m2:bark2,sh:moss,r:.085,l1:.4,l2:.42,out:.06,key:'bra',seed:31}), aR=arm(T,.46,.66,0,{side:1,m:bark,m2:bark2,sh:moss,r:.085,l1:.4,l2:.42,out:.06,key:'bra',seed:32}); u.arms=[aL,aR]; u.armsFwd=.25;
+  for(const a of [aL,aR]){claw(a.userData.hand,'brc',bark2,thorn,5,.26,.035,1.1,.7); u.vines=u.vines||[]; const vg=grp(a,0,-.35,.05); u.vines.push(vg); for(let k=0;k<3;k++){put(vg,taper('brhv'+k,[[0,0,0],[.02*k,-.12,.02],[-.02,-.26-k*.05,.03]],.012,.004,12,6),k%2?moss2:bark2,(k-1)*.04,0,0);} put(vg,gSphL,berry,0,-.3,.03,.018).castShadow=false;}
+  // head: a carved, splitting bark skull
+  const H=grp(T,0,.86,.12); u.head=H; put(H,blob(41,.14),bark,0,0,0,.2,.22,.2); put(H,blob(42,.15),bark2,0,.07,.1,.2,.07,.12); // heavy brow
+  for(const s of [-1,1]){put(H,gSph,M('#050302'),s*.075,.02,.15,.05,.045,.03); eye(H,s*.075,.02,.17,.026,'#c9ff6a',3);}
+  const J=grp(H,0,-.08,.06); u.jaw=J; put(J,blob(43,.15),bark2,0,-.04,.04,.15,.07,.13); fangs(J,thorn,7,.18,-.0,.15,.07,1,.3,.012); fangs(H,thorn,6,.16,-.08,.17,.05,-1,.3,.011);
+  // antler crown, twisted branches with glowing berries
+  for(const s of [-1,1]){horn(H,'bran'+s,[s*.1,.16,0],[s*.45,1,-.1],.5,[s*.3,-.1,-.15],.035,bark2); horn(H,'bran2'+s,[s*.22,.34,-.03],[s*.6,.8,.3],.22,[s*.1,-.2,0],.018,bark2); horn(H,'bran3'+s,[s*.17,.27,-.04],[-s*.2,1,-.3],.2,[s*.1,0,-.1],.016,bark);
+    for(let k=0;k<4;k++) put(H,gSphL,berry,s*(.12+k*.07),.22+k*.08,-.03-k*.02,.018).castShadow=false;}
+  crownR(H,.14,.17,thorn,berry,9,.12);
+  u.anim=(u,b)=>{if(u.core) u.core.rotation.y=time*.8;};};
+/* ---------- Sand Sultan Ashkar: a mummified tyrant rising out of a living sandstorm ---------- */
+BOSS2.sultan=(R,B,u)=>{u.float=true; u.legs=[]; const sand=M('#c9a060',{roughness:1}), sand2=M('#9a7440',{roughness:1}), skin=M('#5a3a24',{roughness:.85}), wrap=NOV(M('#d8c8a0',{roughness:.95,side:THREE.DoubleSide})), gold=NOV(M('#f0c050',{metalness:0.50,roughness:.22})), lapis=NOV(M('#1e3a8a',{metalness:0.30,roughness:.3})), tq=glow('#4fd0c0',2.6), robe=M('#6a1a24',{roughness:.8,side:THREE.DoubleSide}), bone=NOV(M('#e8dcc0',{roughness:.6}));
+  // the sand vortex instead of legs
+  const V=grp(B,0,0,0); u.rings=[]; put(V,robeGeo('sultv',.3,.06,.8,7,.12,.3,4),sand,0,.4,0,1,1,1,Math.PI,0,0);
+  for(let i=0;i<5;i++){const r=put(V,thinTor(),i%2?sand2:sand,0,.1+i*.15,0,.44-i*.07,.44-i*.07,.6); r.rotation.x=Math.PI/2; u.rings.push(r);} for(let i=0;i<14;i++){const a=i/14*TAU; put(V,taper('sultst'+(i%3),[[0,0,0],[.06,.25,.02],[.02,.55,0]],.03,.004,12,6),sand2,Math.sin(a)*.2,.1,Math.cos(a)*.2,1,1,1,0,a,-.35);}
+  const T=grp(B,0,.82,0); u.torso=T; T.rotation.x=.1;
+  // tattered royal robe and a gaunt, bandaged ribcage
+  put(T,robeGeo('sultr',.22,.34,.6,11,.06,.35,9),robe,0,.05,0); put(T,lathe('sultc',[[0,0],[.2,.02],[.25,.18],[.27,.38],[.24,.5],[.12,.58],[0,.6]]),skin,0,.0,0,1,1,.8);
+  for(let i=0;i<5;i++){put(T,gTor,bone,0,.16+i*.07,.06,.2-i*.012,.16,.18).rotation.x=Math.PI/2+.15;}
+  for(let i=0;i<6;i++){const w=put(T,gBand,wrap,0,.06+i*.08,0,.255+(i%2)*.01,.035,.21); w.rotation.z=(i%2?.12:-.1);}
+  // gold collar & scarab-shell pauldrons
+  put(T,lathe('sultcol',[[.12,.52],[.32,.46],[.36,.43],[.2,.56]]),gold,0,0,0); for(let i=0;i<9;i++){const a=(i/8-.5)*2.4; put(T,gOct,i%2?lapis:tq,Math.sin(a)*.3,.47,Math.cos(a)*.22,.025,.035,.015).rotation.y=a;}
+  for(const s of [-1,1]){const pa=grp(T,s*.3,.52,0); put(pa,gCap,gold,0,0,0,.14,.1,.14).rotation.z=-s*.5; put(pa,gCap,lapis,0,.02,0,.1,.07,.1).rotation.z=-s*.5; for(let k=0;k<3;k++) put(pa,taper('sulp'+k,[[0,0,0],[s*.04,.05,0],[s*.1,.12,-.02]],.018,.002,8,6),gold,s*(.04+k*.03),.04,-.04+k*.04);}
+  // head: a withered skull in a tall cobra-hood crown
+  const H=grp(T,0,.7,.04); u.head=H; put(H,blob(51,.08),skin,0,0,0,.13,.16,.14); put(H,gSph,M('#0b0604'),0,-.07,.11,.07,.05,.04);
+  for(const s of [-1,1]){put(H,gSph,M('#050302'),s*.05,.03,.11,.035,.03,.02); eye(H,s*.05,.03,.125,.018,'#4fd0c0',3.2);} fangs(H,bone,8,.1,-.07,.13,.04,-1,.2,.008);
+  put(H,lathe('sultcrown',[[.1,0],[.15,.05],[.14,.18],[.11,.32],[.06,.42],[.03,.46],[0,.47]]),gold,0,.07,-.02); put(H,lathe('sultcrown2',[[.151,.05],[.155,.09],[.15,.12]]),lapis,0,.07,-.02);
+  const hood=put(H,leafGeo('sulthood',.5,.42,.1,1.2),NOV(M('#c99a4b',{metalness:0.45,roughness:.3,side:THREE.DoubleSide})),0,-.12,-.07); hood.rotation.x=-.08;
+  const cob=grp(H,0,.3,.12); put(cob,taper('sultcob',[[0,-.2,-.05],[0,-.08,.02],[0,.02,.03],[0,.06,.05]],.02,.012,12,8),gold); put(cob,gSph,gold,0,.07,.05,.03,.025,.04); eye(cob,0,.075,.085,.007,'#ff3a2a',3,false);
+  // four arms: two scimitars and a pair holding a sand orb
+  const aL=arm(T,-.36,.48,0,{side:-1,m:skin,m2:wrap,sh:gold,r:.055,l1:.36,l2:.36,key:'sua',seed:52}), aR=arm(T,.36,.48,0,{side:1,m:skin,m2:wrap,sh:gold,r:.055,l1:.36,l2:.36,key:'sua',seed:53}); u.arms=[aL,aR]; u.armsFwd=.35;
+  for(const a of [aL,aR]){const h=a.userData.hand; claw(h,'suc',skin,gold,4,.12,.022,.8,.5); const sw=grp(h,0,-.05,.05); put(sw,gCyl,gold,0,0,0,.018,.14,.018).rotation.x=Math.PI/2; put(sw,gBox,gold,0,0,.07,.12,.02,.02);
+    const bl=put(sw,taper('suscim',[[0,0,.08],[0,.04,.35],[0,.16,.6],[0,.3,.72]],.045,.004,20,4,.2),NOV(M('#e8e8f0',{metalness:0.50,roughness:.15})),0,0,0); bl.castShadow=true;}
+  u.smallArms=[]; for(const s of [-1,1]){const a=arm(T,s*.24,.28,.08,{side:s,m:skin,m2:wrap,r:.035,l1:.2,l2:.2,key:'susa',seed:54}); a.rotation.z=s*.2; claw(a.userData.hand,'susc',skin,gold,4,.08,.016,.8,.6); u.smallArms.push(a);}
+  u.core=put(T,gSph,glow('#ffd36a',2.4),0,.08,.42,.07); u.orbit=[0,1,2,3,4,5].map(i=>put(B,shard(60+i,.5),i%2?sand:gold,0,1,0,.05,.07,.05));
+  u.ribbons=[]; for(let i=0;i<5;i++){const a=(i/4-.5)*2.2+Math.PI; u.ribbons.push(chain(T,Math.sin(a)*.24,.1,Math.cos(a)*.22,a,4,.12,.025,wrap,robe,'y'));}
+  u.anim=(u,b)=>{u.rings.forEach((r,i)=>{r.rotation.x=Math.PI/2+Math.sin(time*1.3+i)*.08; r.rotation.z=time*(2+i*.6)*(i%2?-1:1); r.position.x=Math.sin(time*3+i)*.03;}); V.rotation.y=time*1.6;};};
+/* ---------- Mother Murk: a towering bog hag in rotting shawls ---------- */
+BOSS2.witch=(R,B,u)=>{const skin=M('#6a8a4a',{roughness:.7}), skin2=M('#4a6a34',{roughness:.8}), rag=M('#2e2638',{roughness:.95,side:THREE.DoubleSide}), rag2=M('#3e3a2a',{roughness:.95,side:THREE.DoubleSide}), hat=M('#221a2c',{roughness:.9,side:THREE.DoubleSide}), hair=NOV(M('#3a3a30',{roughness:1})), nail=NOV(M('#1a1410',{roughness:.5})), bone=NOV(M('#d8ccb0',{roughness:.6})), wood=NOV(M('#3a2614',{roughness:.95})), gl=glow('#b7f06a',2.6), moss=M('#4a6a2a',{roughness:1});
+  u.legs=[leg(B,-.12,.5,0,{m:skin2,r:.05,key:'wl',toes:3,nail,seed:61}),leg(B,.12,.5,0,{m:skin2,r:.05,key:'wl',toes:3,nail,seed:62})];
+  const T=grp(B,0,.5,0); u.torso=T; T.rotation.x=.42;
+  // layered rotting robes and shawl with moss caught in the hem
+  put(B,robeGeo('wr1',.2,.44,.62,9,.1,.35,11),rag,0,.33,0); put(B,robeGeo('wr2',.22,.38,.4,7,.1,.45,12),rag2,0,.46,0);
+  for(let i=0;i<8;i++){const a=i/8*TAU; put(B,blob(70+i,.3),moss,Math.sin(a)*.4,.06,Math.cos(a)*.4,.07,.03,.07);}
+  put(T,blob(63,.1),rag,0,.25,0,.24,.3,.2); put(T,capeGeo('wsh',.62,.5,.7,.3,.35,5),rag2,0,.52,.0); put(T,blob(64,.1),skin2,0,.45,-.1,.16,.12,.12); // hunched back
+  // hanging charms: bottles, bones, a little skull
+  for(let i=0;i<5;i++){const x=(i-2)*.08, y=.2-Math.abs(i-2)*.03; put(T,gCyl,M('#e8e0d0'),x,y+.08,.22,.003,.12,.003); if(i%2) put(T,gSph,glow(i===1?'#b7f06a':'#d8a0ff',1.6),x,y,.22,.025,.035,.025); else put(T,taper('wbn'+i,[[0,0,0],[0,-.03,0],[0,-.06,0]],.01,.008,6,6),bone,x,y+.02,.22);}
+  put(T,blob(65,.06),bone,0,.12,.24,.04,.045,.04);
+  // long grasping arms
+  const aL=arm(T,-.27,.46,.02,{side:-1,m:rag,m2:skin,sh:rag2,r:.045,l1:.36,l2:.4,key:'wa',seed:66}), aR=arm(T,.27,.46,.02,{side:1,m:rag,m2:skin,sh:rag2,r:.045,l1:.36,l2:.4,key:'wa',seed:67}); u.arms=[aL,aR]; u.armsFwd=.55;
+  claw(aL.userData.hand,'wc',skin,nail,5,.2,.022,1.2,.8);
+  // the staff: knotted driftwood topped by a caged skull lantern
+  const st=grp(aR.userData.hand,0,0,.02); claw(st,'wc2',skin,nail,5,.14,.022,.9,1);
+  put(st,taper('wstaff',[[0,-.5,0],[.02,-.1,.02],[-.02,.4,0],[0,.75,.03]],.022,.016,30,8),wood); const tp=grp(st,0,.8,.03); put(tp,blob(68,.06),bone,0,0,0,.05,.055,.05); eye(tp,-.017,.005,.04,.01,'#b7f06a',3,false); eye(tp,.017,.005,.04,.01,'#b7f06a',3,false);
+  for(let i=0;i<6;i++){const a=i/6*TAU; put(tp,taper('wcage',[[0,-.05,0],[.07,.02,0],[0,.12,0]],.006,.004,10,4),wood,0,0,0,1,1,1,0,a,0);} u.flame=put(tp,gSph,gl,0,.1,0,.07,.1,.07);
+  // head: long gaunt face, hooked nose, mismatched eyes and a jutting chin
+  const H=grp(T,0,.62,.14); u.head=H; H.rotation.x=-.3; put(H,blob(69,.08),skin,0,0,0,.12,.15,.12); put(H,taper('wnose',[[0,0,0],[0,-.01,.09],[0,-.07,.14],[0,-.1,.12]],.03,.008,14,8),skin,0,.0,.1);
+  put(H,taper('wchin',[[0,0,0],[0,-.06,.05],[0,-.1,.1]],.045,.012,12,8),skin,0,-.08,.04); put(H,gSph,M('#0a0604'),-.045,.03,.1,.035,.025,.02); put(H,gSph,M('#0a0604'),.05,.025,.1,.03,.03,.02);
+  eye(H,-.045,.03,.115,.022,'#d8ff6a',3.2); eye(H,.05,.025,.115,.013,'#d8ff6a',3); put(H,blob(71,.3),skin2,.07,.07,.07,.03); put(H,gCone,nail,-.02,-.075,.1,.006,.02,.006).rotation.x=Math.PI; put(H,gCone,nail,.025,-.07,.1,.006,.025,.006).rotation.x=Math.PI;
+  u.ribbons=[]; for(let i=0;i<7;i++){const a=(i/6-.5)*2.6+Math.PI; u.ribbons.push(chain(H,Math.sin(a)*.11,.04,Math.cos(a)*.1,a,4,.1,.012,hair,hair,'y'));}
+  // the great crooked hat
+  const HT=grp(H,0,.1,-.01); put(HT,lathe('wbrim',[[0,0],[.3,-.01],[.33,-.04],[.31,.0],[.12,.02]],48),hat,0,0,0,1,1,1,.12,0,.08); const hc=[[0,0,0],[0,.18,-.02],[.02,.36,-.08],[.12,.48,-.06],[.24,.46,.04]];
+  put(HT,taper('whatc',hc,.15,.01,30,20,1,.7),hat); put(HT,gBand,M('#4a2a1a'),0,.04,0,.152,.04,.152); put(HT,gBox,M('#c9a040',{metalness:0.45}),0,.04,.15,.05,.04,.01);
+  for(let i=0;i<3;i++){put(HT,gCyl,M('#d0c8a0'),.1-i*.03,.1+i*.06,-.08,.008,.03,.008); put(HT,gCap,glow('#b7f06a',1),.1-i*.03,.12+i*.06,-.08,.03,.02,.03);}
+  const wg=glow('#b7f06a',1.1); u.orbit=[0,1,2,3].map(i=>{const w=put(B,gSph,wg,0,1,0,.03); w.castShadow=false; return w;});
+  u.anim=(u,b)=>{if(u.flame) u.flame.scale.set(.07,.1+Math.sin(time*12)*.025,.07);};};
+/* ---------- The Rime Warden: a glacier-armoured giant with an ice glaive ---------- */
+BOSS2.warden=(R,B,u)=>{const flesh=M('#3a4e5e',{roughness:.6}), flesh2=M('#2a3a48',{roughness:.7}), ice=NOV(M('#a8d8f0',{roughness:.05,metalness:0.35,emissive:new THREE.Color('#0e4a70'),emissiveIntensity:.5,flatShading:true})), ice2=NOV(M('#5a90b8',{roughness:.1,metalness:0.45,emissive:new THREE.Color('#082a48'),emissiveIntensity:.4,flatShading:true})), fur=NOV(M('#d8dde4',{roughness:1,side:THREE.DoubleSide})), iron=NOV(M('#2a3440',{metalness:0.45,roughness:.35})), gl=glow('#9fefff',3);
+  u.legs=[leg(B,-.25,.66,0,{m:flesh,m2:ice2,r:.14,key:'wdl',toes:3,nail:ice,seed:81}),leg(B,.25,.66,0,{m:flesh,m2:ice2,r:.14,key:'wdl',toes:3,nail:ice,seed:82})];
+  for(const s of [-1,1]){put(u.legs[s<0?0:1],shard(83,.4),ice,0,-.28,.12,.13,.17,.08); put(u.legs[s<0?0:1],shard(84,.4),ice2,0,-.5,.1,.1,.1,.08);}
+  const T=grp(B,0,.66,0); u.torso=T; T.rotation.x=.16;
+  put(T,blob(85,.12),flesh,0,.42,0,.48,.46,.34); put(T,blob(86,.15),flesh2,0,.14,.03,.36,.24,.28);
+  // jagged breastplate of glacier ice
+  [[0,.5,.25,.22,.2,.1],[-.2,.42,.22,.15,.18,.1],[.2,.42,.22,.15,.18,.1],[0,.26,.26,.2,.12,.08],[-.15,.12,.22,.12,.1,.08],[.15,.12,.22,.12,.1,.08]].forEach(([x,y,z,a,bb,c],i)=>put(T,shard(90+i,.35),i%2?ice2:ice,x,y,z,a,bb,c));
+  u.core=put(T,gOct,gl,0,.38,.33,.05,.08,.03);
+  // huge crystal clusters erupting from the shoulders and spine
+  for(const s of [-1,1]){put(T,blob(95+s,.2),ice2,s*.46,.74,0,.2,.16,.2); for(let i=0;i<6;i++){const a=i/6*TAU; const c=put(T,crystal(100+i),i%2?ice:ice2,s*(.48+Math.cos(a)*.07),.82,Math.sin(a)*.08,.12,.35+((i*7)%4)*.06,.12); c.rotation.set(Math.sin(a)*.5,0,-s*(.4+Math.cos(a)*.3));}}
+  for(let i=0;i<5;i++){const c=put(T,crystal(110+i),ice,(i-2)*.08,.5+i*.06,-.3,.1,.28+i*.03,.1); c.rotation.x=-.6;}
+  put(T,capeGeo('wdcape',.9,.95,.6,.3,.3,8),fur,0,.78,-.22);
+  // head: an ice-crusted helm with a single burning slit and an icicle beard
+  const H=grp(T,0,.9,.1); u.head=H; put(H,blob(120,.06),flesh,0,0,0,.16,.17,.16); put(H,shard(121,.3),ice2,0,.04,0,.2,.2,.19); put(H,gBox,M('#020406'),0,.03,.17,.18,.03,.04); u.spots=[put(H,gBox,gl,0,.03,.185,.16,.012,.02)];
+  for(let i=0;i<7;i++){const x=(i-3)*.035; put(H,gCone,ice,x,-.12-Math.abs(3-i)*-.01,.13,.016,.14-Math.abs(3-i)*.015,.016).rotation.x=Math.PI;}
+  for(const s of [-1,1]) ridgeHorn(H,'wdh'+s,[s*.12,.1,-.02],[s*.8,.6,-.2],.3,[s*.1,.5,.1],.04,ice,ice2);
+  for(let i=0;i<5;i++){const c=put(H,crystal(130+i),ice,(i-2)*.06,.17,-.04,.05,.18+((i+1)%3)*.06,.05); c.rotation.z=-(i-2)*.25;}
+  // arms: one carries the glaive, the other a cracked tower shield of ice
+  const aL=arm(T,-.52,.7,0,{side:-1,m:flesh,m2:ice2,sh:ice,r:.11,l1:.38,l2:.38,key:'wda',seed:141}), aR=arm(T,.52,.7,0,{side:1,m:flesh,m2:ice2,sh:ice,r:.11,l1:.38,l2:.38,key:'wda',seed:142}); u.arms=[aL,aR];
+  claw(aL.userData.hand,'wdc',flesh,ice,4,.12,.045,.8,.5); claw(aR.userData.hand,'wdc',flesh,ice,4,.12,.045,.8,.5);
+  const sh=grp(aL.userData.hand,-.05,.12,.1); put(sh,shard(150,.18),ice2,0,0,0,.06,.42,.3); put(sh,shard(151,.3),ice,-.03,.1,0,.05,.18,.16); for(let k=0;k<5;k++) put(sh,crystal(155+k,5),ice,-.04,-.2+k*.1,(k%2?.2:-.2),.04,.12,.04).rotation.x=(k%2?-1:1)*1.2; eye(sh,-.07,0,0,.03,'#9fefff',3,false);
+  const gv=grp(aR.userData.hand,0,0,.05); put(gv,gCyl,iron,0,0,0,.022,1.4,.022).rotation.x=Math.PI/2; const bl=grp(gv,0,0,.72); put(bl,crystal(152,5),ice,0,.14,0,.12,.5,.05); put(bl,crystal(153,5),ice2,0,-.1,.04,.08,.3,.04).rotation.z=Math.PI*.85; put(bl,gTor,iron,0,0,0,.05,.05,.05).rotation.x=Math.PI/2;
+  put(gv,crystal(154,5),ice,0,0,-.72,.05,.16,.05).rotation.x=-Math.PI/2;
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,crystal(160+i,5),i%2?ice:ice2,0,1,0,.04,.12,.04));};
+/* ---------- Cinderheart Colossus: obsidian slabs held together by a molten heart ---------- */
+BOSS2.golem=(R,B,u)=>{const ob=M('#1e1618',{roughness:.55,metalness:0.15}), ob2=M('#2e2220',{roughness:.8}), mag=glow('#ff6a1a',2.6), mag2=glow('#ffb03a',2.8), ash=M('#3a3230',{roughness:1});
+  u.legs=[]; for(const s of [-1,1]){const g=grp(B,s*.3,.55,0); put(g,shard(170+s,.35),ob,0,-.12,0,.18,.2,.18); put(g,taper('gol',[[0,-.1,0],[0,-.35,.02],[0,-.48,0]],.12,.1,8,8),mag,0,0,0); put(g,shard(172+s,.3),ob2,0,-.38,.02,.2,.18,.2); put(g,shard(174+s,.3),ob,0,-.5,.08,.21,.07,.26); u.legs.push(g);}
+  const T=grp(B,0,.62,0); u.torso=T; T.rotation.x=.22;
+  // the molten heart, visible through the gaps between slabs
+  u.core=put(T,gSph,mag2,0,.45,.05,.3,.32,.26); put(T,gSph,mag,0,.42,0,.36,.38,.3);
+  [[0,.62,.12,.4,.22,.25,0],[-.3,.5,.08,.22,.3,.24,1],[.3,.5,.08,.22,.3,.24,2],[0,.32,.2,.3,.16,.16,3],[0,.15,.05,.36,.18,.26,4],[0,.55,-.22,.42,.36,.2,5],[-.2,.25,.15,.16,.14,.14,6],[.2,.25,.15,.16,.14,.14,7]].forEach(([x,y,z,a,bb,c,i])=>{const s=put(T,shard(180+i,.35),i%3?ob:ob2,x,y,z,a,bb,c); s.rotation.set(i*.7,i*1.3,i*.4);});
+  // magma dripping from the seams
+  for(let i=0;i<10;i++){const a=i/10*TAU; put(T,taper('gdrip'+(i%3),[[0,0,0],[0,-.06,0],[0,-.12-(i%3)*.04,0]],.018,.004,8,6),mag2,Math.sin(a)*.32,.3,Math.cos(a)*.25).castShadow=false;}
+  // volcanic chimneys on the back, spouting flame
+  u.flames=[]; for(const s of [-1,1]){const c=put(T,lathe('gchim',[[.1,0],[.08,.2],[.06,.32],[.075,.36],[.05,.36]]),ob2,s*.2,.65,-.3); c.rotation.set(-.5,0,s*.3); const f=put(T,gCone,mag2,s*.2+s*.12*.0,.95,-.48,.06,.25,.06); f.rotation.set(-.5,0,s*.3); f.castShadow=false; u.flames.push(f);}
+  // head: low, horned, a molten grill for a mouth
+  const H=grp(T,0,.82,.24); u.head=H; put(H,shard(190,.25),ob,0,0,0,.18,.15,.17); put(H,shard(191,.25),ob2,0,.07,.04,.2,.06,.14);
+  for(const s of [-1,1]){eye(H,s*.075,.01,.15,.028,'#ffb24a',3.4); horn(H,'gh'+s,[s*.14,.06,0],[s*1,.4,.4],.32,[0,.4,-.6],.05,ob2); horn(H,'gh2'+s,[s*.1,.1,-.08],[s*.4,1,-.6],.2,[0,-.3,-.3],.03,ob);}
+  for(let i=0;i<5;i++) put(H,gBox,mag2,(i-2)*.035,-.08,.15,.012,.06,.02);
+  // enormous slab arms ending in boulder fists
+  const mk=(s)=>{const g=grp(T,s*.56,.66,0); put(g,shard(200+s,.3),ob2,0,0,0,.24,.22,.24); put(g,gSph,mag,0,-.24,0,.1,.14,.1); put(g,shard(202+s,.3),ob,0,-.28,.02,.16,.22,.16); put(g,gSph,mag,0,-.52,.04,.1); const f=grp(g,0,-.68,.06); put(f,shard(204+s,.3),ob,0,0,0,.24,.22,.22); for(let k=0;k<4;k++) put(f,shard(206+k,.4),ob2,(k-1.5)*.1,-.12,.14,.07,.08,.07); put(f,gSph,mag2,0,-.02,.0,.12); return g;};
+  u.arms=[mk(-1),mk(1)]; u.armsFwd=.15;
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,shard(220+i,.5),i%2?ob:mag,0,1,0,.06));};
+/* ---------- The Pumpkin King: a gaunt harvest lord with a burning carved head ---------- */
+BOSS2.pumpking=(R,B,u)=>{const coat=M('#2a1630',{roughness:.85,side:THREE.DoubleSide}), coat2=M('#1a0e1e',{roughness:.9,side:THREE.DoubleSide}), straw=NOV(M('#c9a04a',{roughness:1})), pump=NOV(M('#ff7a1a',{roughness:.5,emissive:new THREE.Color('#ff3a00'),emissiveIntensity:.18})), pump2=NOV(M('#c9500a',{roughness:.6})), vine=NOV(M('#2a4a14',{roughness:.8})), wood=NOV(M('#3a2414',{roughness:.9})), gl=glow('#ffb02a',3), fl=glow('#ff7a1a',2.6), metal=NOV(M('#8a8a92',{metalness:0.50,roughness:.25}));
+  u.legs=[leg(B,-.13,.78,0,{m:coat2,r:.06,key:'pkl',toes:0,seed:231}),leg(B,.13,.78,0,{m:coat2,r:.06,key:'pkl',toes:0,seed:232})];
+  for(const l of u.legs) for(let k=0;k<5;k++) put(l,taper('pkst'+k,[[0,0,0],[.01*k,-.04,.01],[0,-.08,.02*k]],.008,.002,6,4),straw,(k-2)*.02,-.72,0);
+  const T=grp(B,0,.78,0); u.torso=T; T.rotation.x=.12;
+  put(B,robeGeo('pkcoat',.2,.36,.72,8,.1,.45,21,TAU*.82),coat,0,.6,0,1,1,1,0,Math.PI+TAU*.09,0); put(T,blob(233,.08),coat,0,.3,0,.2,.34,.15); put(T,capeGeo('pkcol',.5,.32,.9,-.1,.25,7),coat2,0,.72,-.02).rotation.x=-.25;
+  for(let i=0;i<6;i++){const s=put(T,taper('pkstr'+i,[[0,0,0],[.02,.05,.02],[.05,.1,.02]],.01,.002,6,4),straw,(i%2?.16:-.16)+(i-2.5)*.01,.6,.06); s.rotation.z=(i%2?-.6:.6);}
+  put(T,gBand,M('#5a3a20'),0,.08,0,.21,.05,.16); put(T,gBox,metal,0,.08,.16,.06,.05,.015);
+  // vines strangling the body
+  {const pts=[]; for(let k=0;k<=18;k++){const t=k/18,a=t*TAU*2; pts.push([Math.sin(a)*.22,-.05+t*.62,Math.cos(a)*.17]);} put(T,taper('pkvine',pts,.012,.01,50,6),vine);}
+  // shoulders: small rotting pumpkins
+  for(const s of [-1,1]){put(T,pumpkinGeo(),pump2,s*.24,.62,0,.09,.08,.09); put(T,gCyl,vine,s*.24,.69,0,.01,.03,.01);}
+  const aL=arm(T,-.27,.58,0,{side:-1,m:coat,m2:coat2,sh:coat2,r:.045,l1:.4,l2:.42,key:'pka',seed:234}), aR=arm(T,.27,.58,0,{side:1,m:coat,m2:coat2,sh:coat2,r:.045,l1:.4,l2:.42,key:'pka',seed:235}); u.arms=[aL,aR]; u.armsFwd=.2;
+  claw(aL.userData.hand,'pkc',wood,wood,5,.22,.02,1.1,.8); const hr=aR.userData.hand; claw(hr,'pkc',wood,wood,5,.15,.02,.9,1);
+  // the scythe
+  const sc=grp(hr,0,-.02,.03); put(sc,taper('pkhaft',[[0,-.6,0],[.02,0,0],[0,.9,.04]],.018,.014,24,8),wood); const bl=put(sc,leafGeo('pkblade',.85,.22,.0,.5),NOV(M('#c8c8d0',{metalness:0.50,roughness:.2,side:THREE.DoubleSide})),0,.86,.04); bl.rotation.set(0,Math.PI/2,-Math.PI*.55); put(sc,gTor,metal,0,.86,.04,.03,.03,.03);
+  // the head: a huge carved pumpkin with a jagged burning grin
+  const H=grp(T,0,.84,.03); u.head=H; put(H,pumpkinGeo(),pump,0,0,0,.24,.22,.24); put(H,gSph,gl,0,0,0,.2,.17,.2).castShadow=false;
+  for(const s of [-1,1]){const e=put(H,carveGeo('pkeye',[[-.05,-.03],[.05,-.035],[s*.02,.05]]),gl,s*.085,.045,.205,1,1,1,-.15,s*.38,0); e.castShadow=false;}
+  const mw=put(H,grinGeo(),gl,0,-.075,.205,1,1,1,.12,0,0); mw.castShadow=false;
+  put(H,taper('pkstem',[[0,0,0],[.02,.06,0],[.06,.1,.02],[.08,.09,.05]],.035,.015,16,8),vine,0,.15,0);
+  for(let k=0;k<3;k++){const a=k/3*TAU; put(H,taper('pktend'+k,[[0,0,0],[.06,.04,.02],[.08,.1,-.02],[.04,.13,.02]],.008,.003,14,6),vine,Math.cos(a)*.04,.17,Math.sin(a)*.04,1,1,1,0,a,0);}
+  crownR(H,.13,.13,wood,fl,8,.13,.02);
+  // candles on the shoulders
+  u.flames=[]; for(const s of [-1,1]) for(let k=0;k<2;k++){const x=s*(.2+k*.07), z=-.05+k*.06; put(T,gCyl,M('#e8e0c8'),x,.74,z,.012,.08-k*.02,.012); const f=put(T,gCone,fl,x,.8-k*.01,z,.012,.035,.012); f.castShadow=false; u.flames.push(f);}
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=put(B,pumpkinGeo(),i%2?pump:pump2,0,1,0,.05,.05,.05); return g;});
+  u.anim=(u,b)=>{mw.material.emissiveIntensity=2.6+Math.sin(time*7)*.8+(Math.random()<.05?1.5:0);};};
+
+/* ---------- The Hollow Sovereign: an empty suit of royal armour, a void where the king should be ---------- */
+BOSS2.sov1=(R,B,u)=>{const steel=NOV(M('#6a6488',{metalness:0.45,roughness:.28})), steel2=NOV(M('#3e3850',{metalness:0.45,roughness:.35})), trim=NOV(M('#c9a24a',{metalness:0.50,roughness:.22})), cape=M('#3a1a4a',{roughness:.85,side:THREE.DoubleSide}), cape2=M('#1e0e28',{roughness:.9,side:THREE.DoubleSide}), voidM=NOV(M('#030206',{roughness:1})), vio=glow('#c8b8ff',2.8), vio2=glow('#8a5cff',2.2);
+  const L=o=>leg(B,o,.66,0,{m:steel2,m2:steel,sh:steel,r:.085,key:'svl',toes:0,seed:300+o*10}); u.legs=[L(-.15),L(.15)];
+  for(const l of u.legs){put(l,lathe('svgreave',[[.07,0],[.1,.06],[.11,.2],[.09,.3],[.06,.32]],32),steel,0,-.62,.02); put(l,gCap,trim,0,-.33,.06,.07,.05,.07).rotation.x=Math.PI/2; put(l,gCone,steel,0,-.33,.12,.025,.08,.025).rotation.x=Math.PI/2;}
+  const T=grp(B,0,.66,0); u.torso=T; T.rotation.x=.05;
+  // faulds of overlapping plates and a hollow, hinged cuirass
+  put(B,robeGeo('svfault',.2,.3,.34,10,.04,.12,31),steel2,0,.56,0); put(B,robeGeo('svfault2',.21,.28,.22,10,.03,.1,32),steel,0,.66,0);
+  put(T,lathe('svcuir',[[.16,0],[.24,.05],[.29,.22],[.3,.42],[.27,.56],[.16,.63],[0,.66]],48),steel,0,.0,0,1,1,.78);
+  for(let i=0;i<4;i++) put(T,gBand,trim,0,.08+i*.14,0,.25+i*.012,.015,.2);
+  put(T,lathe('svplastron',[[0,.12],[.09,.18],[.12,.4],[.08,.56],[0,.6]],24),steel2,0,0,.05,1,1,.9,0,0,0);
+  // a hole torn through the chest, nothing inside but violet dark
+  put(T,blob(301,.2),voidM,0,.38,.2,.11,.13,.05); u.core=put(T,gSph,vio2,0,.38,.17,.05); u.souls=[0,1,2,3,4,5].map(i=>{const g=grp(T,0,.38,.2); put(g,gSphL,vio,0,0,0,.012); return g;});
+  // layered spiked pauldrons
+  for(const s of [-1,1]){const p=grp(T,s*.32,.58,0,0,0,-s*.25); for(let k=0;k<3;k++) put(p,gCap,k%2?steel2:steel,s*.02*k,-.03*k,0,.17-k*.02,.12-k*.01,.17-k*.02); put(p,gTor,trim,0,-.005,0,.17,.17,.12).rotation.x=Math.PI/2;
+    for(let k=0;k<3;k++) put(p,taper('svsp'+k,[[0,0,0],[s*.03,.07,0],[s*.08,.16+k*.03,-.02]],.03,.002,10,8),steel2,s*(.02+k*.05),.08,-.05+k*.05);}
+  put(T,capeGeo('svcape',.62,1.25,.6,.35,.3,33),cape,0,.6,-.16); put(T,capeGeo('svcape2',.58,1.0,.55,.3,.45,34),cape2,0,.58,-.13);
+  // chains of the five stolen crowns hang from the belt
+  for(let i=0;i<5;i++){const a=(i/4-.5)*2.2; const c=chain(B,Math.sin(a)*.27,.74,Math.cos(a)*.22,a,3,.07,.01,trim,steel2,'y');}
+  const aL=arm(T,-.36,.52,0,{side:-1,m:steel2,m2:steel,sh:steel,r:.06,l1:.34,l2:.34,key:'sva',seed:310}), aR=arm(T,.36,.52,0,{side:1,m:steel2,m2:steel,sh:steel,r:.06,l1:.34,l2:.34,key:'sva',seed:311}); u.arms=[aL,aR]; u.armsFwd=.15;
+  for(const a of [aL,aR]){put(a,lathe('svvamb',[[.05,0],[.075,.04],[.08,.18],[.065,.22]],24),steel,0,-.58,.12,1,1,1,0,0,0); claw(a.userData.hand,'svc',steel2,trim,4,.13,.03,.8,.5);}
+  // the greatsword
+  const sw=grp(aR.userData.hand,0,-.02,.04); put(sw,gCyl,steel2,0,0,0,.022,.24,.022).rotation.x=Math.PI/2; put(sw,gBox,trim,0,0,.13,.26,.04,.04); put(sw,gSph,vio,0,0,-.13,.035);
+  const bl=put(sw,taper('svblade',[[0,0,.15],[0,0,.7],[0,0,1.25],[0,0,1.4]],.07,.004,20,4,.16,.6),NOV(M('#9a96b0',{metalness:0.50,roughness:.18})),0,0,0); put(sw,taper('svrune',[[0,0,.2],[0,0,1.2]],.012,.004,10,4,.3),vio,0,.012,0).castShadow=false;
+  // the empty helm: a crowned great-helm with only two lights inside
+  const H=grp(T,0,.78,.02); u.head=H; put(H,lathe('svhelm',[[0,-.14],[.12,-.13],[.15,-.02],[.15,.1],[.12,.18],[.05,.21],[0,.22]],40),steel,0,0,0,1,1,1.05); put(H,gBox,voidM,0,.0,.13,.17,.06,.06); put(H,gBox,voidM,0,-.06,.14,.05,.08,.05);
+  eye(H,-.045,.0,.15,.017,'#c8b8ff',3.4); eye(H,.045,.0,.15,.017,'#c8b8ff',3.4); put(H,gBand,trim,0,-.1,0,.13,.03,.14);
+  for(const s of [-1,1]) ridgeHorn(H,'svh'+s,[s*.12,.1,-.02],[s*.6,.9,-.2],.28,[s*.2,-.2,-.2],.03,steel2,trim);
+  u.crown=crownR(H,.2,.13,trim,vio,7,.16);
+  // the five stolen crowns circle him
+  u.orbit=[0,1,2,3,4].map(i=>{const g=grp(B,0,1,0); crownR(g,0,.07,trim,glow(['#ff6a4a','#ffd36a','#7aff9a','#7ad8ff','#d88aff'][i],2),5,.07); g.rotation.x=.3; return g;});};
+/* ---------- The Sovereign Unbound: the void freed from the armour, a horned wraith in endless tatters ---------- */
+BOSS2.sov2=(R,B,u)=>{u.float=true; u.legs=[]; const robe=M('#1a1028',{roughness:.85,side:THREE.DoubleSide}), robe2=M('#0c0614',{roughness:.9,side:THREE.DoubleSide}), bone=NOV(M('#d8d0e8',{roughness:.45})), boneD=NOV(M('#8a80a0',{roughness:.6})), voidM=NOV(M('#020104',{roughness:1})), vio=glow('#d48cff',2.8), vio2=glow('#b45cff',2.4), trim=NOV(M('#c9a24a',{metalness:0.50,roughness:.22}));
+  put(B,robeGeo('su1',.26,.6,1.3,12,.12,.5,41),robe,0,.75,0); put(B,robeGeo('su2',.24,.48,1.0,9,.14,.6,42),robe2,0,.95,0);
+  u.ribbons=[]; for(let i=0;i<8;i++){const a=i/8*TAU; u.ribbons.push(chain(B,Math.sin(a)*.4,.25,Math.cos(a)*.4,a,4,.14,.04,robe2,robe,'y'));}
+  const T=grp(B,0,1.2,0); u.torso=T;
+  // an open, skeletal ribcage around a heart of void
+  put(T,taper('suspine',[[0,-.2,-.08],[0,0,-.1],[0,.3,-.06]],.035,.025,14,8),boneD);
+  for(let i=0;i<5;i++){for(const s of [-1,1]){const y=-.12+i*.08, w=.2-Math.abs(i-1.5)*.025; put(T,taper('surib'+i,[[0,0,-.08],[s*w,-.02,0],[s*w*.7,-.05,.12],[s*.03,-.06,.15]],.016,.008,16,6),bone,0,y,0);}}
+  u.core=put(T,gSph,vio2,0,.05,.02,.1); put(T,blob(401,.25),voidM,0,.05,.02,.13,.15,.11); u.souls=[0,1,2,3,4,5,6].map(()=>{const g=grp(T,0,.05,.05); put(g,gSphL,vio,0,0,0,.014); return g;});
+  put(T,capeGeo('sumantle',.56,.42,.9,.2,.5,43),robe2,0,.34,-.08).rotation.x=-.1;
+  for(const s of [-1,1]) for(let k=0;k<3;k++) put(T,taper('sushs'+k,[[0,0,0],[s*.04,.08,0],[s*.1,.2+k*.04,-.04]],.035,.002,10,8),boneD,s*(.2+k*.07),.3,-.03+k*.03);
+  // long skeletal arms with scythe claws
+  const aL=arm(T,-.27,.28,0,{side:-1,m:bone,m2:boneD,sh:robe2,r:.035,l1:.42,l2:.42,out:.08,key:'sua2',seed:402}), aR=arm(T,.27,.28,0,{side:1,m:bone,m2:boneD,sh:robe2,r:.035,l1:.42,l2:.42,out:.08,key:'sua2',seed:403}); u.arms=[aL,aR]; u.armsFwd=.35;
+  for(const a of [aL,aR]) claw(a.userData.hand,'sucl',bone,glow('#e0b0ff',1.6),4,.3,.022,1,1.1);
+  // the horned, crowned skull
+  const H=grp(T,0,.46,.04); u.head=H; put(H,blob(404,.06),bone,0,0,0,.14,.16,.15); put(H,blob(405,.1),bone,0,-.09,.07,.09,.05,.08); u.jaw=grp(H,0,-.08,.02); put(u.jaw,blob(406,.08),boneD,0,-.04,.06,.08,.035,.07); fangs(u.jaw,bone,6,.1,0,.12,.03,1,.2,.007); fangs(H,bone,6,.1,-.1,.13,.03,-1,.2,.007);
+  for(const s of [-1,1]){put(H,gSph,voidM,s*.05,.02,.11,.04,.04,.03); eye(H,s*.05,.02,.13,.018,'#e0b0ff',3.6);}
+  put(H,gSph,voidM,0,-.04,.14,.02,.03,.015);
+  for(const s of [-1,1]){ridgeHorn(H,'suh'+s,[s*.1,.1,-.02],[s*.5,1,-.3],.5,[s*.4,-.2,-.3],.035,boneD,bone); horn(H,'suh2'+s,[s*.12,.02,-.06],[s*1,-.2,-.4],.25,[0,.5,0],.022,bone);}
+  u.crown=crownR(H,.14,.12,trim,vio,9,.2,.02);
+  // a halo of black spears behind the head
+  u.halo=grp(T,0,.5,-.18); for(let i=0;i<14;i++){const a=i/14*TAU; const sp=put(u.halo,taper('suhal',[[0,0,0],[0,.1,0],[0,.24,0]],.02,.002,8,6),i%2?voidM:boneD,Math.sin(a)*.24,Math.cos(a)*.24,0); sp.rotation.z=-a;} put(u.halo,thinTor(),vio2,0,0,0,.24,.24,.24);
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,crystal(410+i,5),i%2?vio:voidM,0,1,0,.04,.14,.04));};
+/* ---------- Thunderhead the Storm Sentinel: a bronze-and-stone titan riding its own thundercloud ---------- */
+BOSS2.stormsentinel=(R,B,u)=>{u.float=true; u.legs=[]; const stone=M('#4a5260',{roughness:.8}), stone2=M('#353b46',{roughness:.85}), bronze=NOV(M('#b8743a',{metalness:0.50,roughness:.3})), bronze2=NOV(M('#6a8a7a',{metalness:0.45,roughness:.45})), cloud=NOV(M('#5a6270',{roughness:1})), cloud2=NOV(M('#3a404c',{roughness:1})), bolt=glow('#7fd8ff',3), bolt2=glow('#e8f8ff',3);
+  // the thundercloud it rides
+  const C=grp(B,0,.42,0); u.cloud=C; for(let i=0;i<16;i++){const a=i/16*TAU, r=.2+(i%3)*.12; put(C,blob(500+i,.18),i%2?cloud:cloud2,Math.sin(a)*r,(i%4)*.05-.08,Math.cos(a)*r,.18+(i%3)*.04,.13,.18+(i%2)*.03);}
+  for(let i=0;i<6;i++){const a=i/6*TAU; put(C,taper('ssbolt'+(i%2),[[0,0,0],[.04,-.12,.02],[-.03,-.2,0],[.03,-.34,.01]],.012,.004,12,5),bolt2,Math.sin(a)*.32,-.08,Math.cos(a)*.32).castShadow=false;}
+  const T=grp(B,0,.72,0); u.torso=T; T.rotation.x=.08;
+  // weathered stone torso bound in verdigris bronze
+  put(T,blob(520,.1),stone,0,.3,0,.42,.38,.32); put(T,blob(521,.12),stone2,0,.02,.02,.3,.18,.24);
+  put(T,lathe('sscuir',[[.2,.15],[.33,.2],[.36,.35],[.33,.5],[.2,.58]],40),bronze2,0,0,0,1,1,.95); for(let i=0;i<3;i++) put(T,gBand,bronze,0,.22+i*.13,0,.345-Math.abs(i-1)*.02,.025,.32);
+  // the lightning heart
+  u.core=put(T,gOct,bolt2,0,.36,.33,.06,.09,.04); put(T,thinTor(),bronze,0,.36,.31,.1,.1,.4);
+  // copper rods jutting from the back crackle with charge
+  u.orbit=[]; for(let i=0;i<5;i++){const a=(i/4-.5)*1.6; const rd=grp(T,Math.sin(a)*.25,.5,-.22+Math.cos(a)*-.02,-.4,0,-a*.6); put(rd,gCyl,bronze,0,.22,0,.018,.44,.018); put(rd,gSph,bolt,0,.46,0,.03); for(let k=0;k<3;k++) put(rd,thinTor(),bronze2,0,.08+k*.1,0,.035,.035,.6).rotation.x=Math.PI/2;}
+  // massive shoulders and coil-wrapped gauntlets
+  for(const s of [-1,1]){put(T,blob(530+s,.12),stone,s*.42,.55,0,.2,.18,.2); put(T,gCap,bronze2,s*.42,.6,0,.22,.14,.22).rotation.z=-s*.3; for(let k=0;k<3;k++) put(T,crystal(535+k,4),bolt,s*(.45+k*.03),.72+k*.02,-.05+k*.06,.03,.12,.03).rotation.z=-s*.5;}
+  const aL=arm(T,-.5,.5,0,{side:-1,m:stone,m2:stone2,sh:stone,r:.09,l1:.32,l2:.34,key:'ssa',seed:540}), aR=arm(T,.5,.5,0,{side:1,m:stone,m2:stone2,sh:stone,r:.09,l1:.32,l2:.34,key:'ssa',seed:541}); u.arms=[aL,aR];
+  for(const a of [aL,aR]){for(let k=0;k<5;k++) put(a,thinTor(),bronze,0,-.42-k*.05,.14,.1,.1,.5).rotation.x=Math.PI/2+.25; const h=a.userData.hand; put(h,blob(545,.2),bronze2,0,-.04,0,.12,.1,.12); claw(h,'ssc',bronze2,bronze,4,.14,.04,.9,.5); put(h,gSph,bolt,0,-.12,.05,.06).castShadow=false;}
+  // head: a storm-helm with a visor of lightning and rod horns
+  const H=grp(T,0,.7,.08); u.head=H; put(H,blob(550,.06),stone2,0,0,0,.15,.15,.15); put(H,lathe('sshelm',[[0,-.1],[.14,-.08],[.17,.04],[.15,.13],[.06,.19],[0,.2]],40),bronze2,0,0,-.01);
+  put(H,gBox,M('#04060a'),0,.01,.15,.2,.05,.06); u.spots=[put(H,gBox,bolt2,0,.01,.175,.18,.016,.02)];
+  for(const s of [-1,1]){horn(H,'ssh'+s,[s*.13,.08,0],[s*.5,1,-.1],.4,[s*.2,0,-.3],.025,bronze); put(H,gSph,bolt,s*.22,.48,-.12,.035).castShadow=false;}
+  put(H,taper('sscrest',[[0,.18,.08],[0,.26,-.05],[0,.24,-.22]],.03,.005,14,6,.35),bronze);
+  // arcs leap between the rods and the heart
+  u.arcs=[0,1,2].map(()=>{const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(21),3)); g.userData.own=true; const l=new THREE.Line(g,new THREE.LineBasicMaterial({color:0xbfefff,transparent:true,opacity:.9})); l.frustumCulled=false; B.add(l); return l;});
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=put(B,blob(560+i,.2),i%2?cloud:cloud2,0,1,0,.06,.05,.06); return g;});
+  u.anim=(u,b)=>{u.cloud.rotation.y=time*.6; u.cloud.children.forEach((c,i)=>{if(c.material===bolt2) c.visible=Math.random()<.35;});};};
+/* ---------- The Mossback Behemoth: an ancient beast with a drowned shrine grown into its back ---------- */
+BOSS2.mossback=(R,B,u)=>{u.legType='quad'; const hide=M('#4a4a36',{roughness:.85}), hide2=M('#33331f',{roughness:.9}), rock=M('#6a6a5a',{roughness:.95}), moss=M('#4f7a2a',{roughness:1}), moss2=M('#6a9a34',{roughness:1}), horn_=NOV(M('#d8c8a0',{roughness:.5})), stoneS=NOV(M('#9a9888',{roughness:.9})), gold=NOV(M('#e8c860',{metalness:0.45,roughness:.3})), gl=glow('#e8c860',2.6), wood=NOV(M('#4a3220',{roughness:1})), leaf=NOV(M('#3a7a2a',{roughness:.8,side:THREE.DoubleSide}));
+  u.legs=[]; for(const [x,z] of [[-.38,.38],[.38,.38],[-.38,-.4],[.38,-.4]]){const g=leg(B,x,.55,z,{m:hide,m2:hide2,sh:rock,r:.13,key:'mbl',toes:4,nail:horn_,foot:.16,seed:600+Math.round(x*10+z*20)}); u.legs.push(g);}
+  const T=grp(B,0,.62,0); u.torso=T;
+  put(T,blob(610,.1),hide,0,.12,0,.55,.36,.72); put(T,blob(611,.1),hide2,0,-.04,0,.48,.24,.62);
+  // the shell: a hill of mossy boulders and slabs
+  const SH=grp(T,0,.3,-.04); put(SH,blob(612,.18),rock,0,.02,0,.6,.32,.74); put(SH,blob(613,.25),moss,0,.12,0,.55,.24,.66);
+  for(let i=0;i<14;i++){const a=i/14*TAU, r=.48+(i%2)*.06; const s=put(SH,shard(620+i,.4),i%3?rock:stoneS,Math.sin(a)*r*.95,-.06+(i%3)*.03,Math.cos(a)*r*1.2,.12,.09,.12); s.rotation.set(i,i*2,0);}
+  for(let i=0;i<10;i++){const a=i*2.4, r=.15+i*.03; put(SH,blob(640+i,.35),i%2?moss:moss2,Math.sin(a)*r,.2+Math.cos(i)*.04,Math.cos(a)*r*1.2,.12,.06,.12);}
+  // the sunken shrine on its back: broken columns, an archway and a glowing idol
+  const shr=grp(SH,0,.26,-.08); put(shr,gBox,stoneS,0,0,0,.36,.04,.32); for(const [x,z,h] of [[-.14,-.12,.32],[.14,-.12,.22],[-.14,.12,.12],[.14,.12,.3]]){put(shr,gCyl,stoneS,x,h/2,z,.035,h,.035); put(shr,gBox,stoneS,x,h+.01,z,.09,.025,.09);}
+  put(shr,gBox,stoneS,0,.33,-.12,.36,.04,.07); put(shr,gCone,stoneS,0,.39,-.12,.2,.08,.05).rotation.y=Math.PI/4; const idol=grp(shr,0,.04,0); put(idol,gCyl,gold,0,.06,0,.04,.12,.04); put(idol,gSph,gold,0,.15,0,.04); u.core=put(idol,gOct,gl,0,.22,0,.03,.05,.03);
+  // two little trees and mushrooms growing on it
+  for(const [x,z,s] of [[.3,.25,1],[-.32,.3,.8]]){const tr=grp(SH,x,.18,z,0,0,0); tr.scale.setScalar(s); put(tr,taper('mbtree',[[0,0,0],[.02,.15,0],[-.02,.3,.02]],.025,.012,12,6),wood); for(let k=0;k<5;k++) put(tr,blob(660+k,.3),k%2?moss:moss2,Math.cos(k*1.3)*.07,.3+(k%3)*.04,Math.sin(k*1.3)*.07,.09,.07,.09);}
+  for(let i=0;i<5;i++){const x=-.4+i*.2, z=-.45+(i%2)*.1; put(SH,gCyl,stoneS,x,.12,z,.01,.06,.01); put(SH,gCap,glow('#c8e070',1.4),x,.15,z,.035,.02,.035);}
+  // hanging moss beards along the shell edge
+  u.ribbons=[]; for(let i=0;i<8;i++){const a=(i/7-.5)*2.6; u.ribbons.push(chain(SH,Math.sin(a)*.58,-.05,Math.cos(a)*.7,a,3,.07,.025,moss,moss2,'y'));}
+  // the head: low and broad, root-like horns, tusks, a mossy beard
+  const H=grp(T,0,.08,.7); u.head=H; put(H,blob(670,.1),hide,0,0,0,.24,.2,.26); put(H,blob(671,.12),hide2,0,-.06,.14,.2,.1,.16); put(H,blob(672,.15),rock,0,.12,0,.22,.08,.22);
+  for(const s of [-1,1]){put(H,gSph,M('#0a0804'),s*.12,.04,.17,.04,.035,.03); eye(H,s*.12,.04,.19,.022,'#e8c860',3.2); ridgeHorn(H,'mbh'+s,[s*.18,.1,0],[s*1,.4,-.3],.4,[s*-.2,.5,-.4],.06,horn_,rock); horn(H,'mbt'+s,[s*.1,-.1,.22],[s*.3,.4,.6],.18,[0,.3,-.2],.025,horn_);}
+  u.jaw=grp(H,0,-.1,.04); put(u.jaw,blob(673,.1),hide2,0,-.02,.08,.17,.06,.16); fangs(u.jaw,horn_,6,.2,.03,.22,.04,1,.3,.01);
+  for(let i=0;i<6;i++){const x=(i-2.5)*.05; u.ribbons.push(chain(u.jaw,x,-.05,.12,0,3,.06,.018,moss,moss2,'y'));}
+  // tail
+  u.tail=grp(T,0,.06,-.68); put(u.tail,taper('mbtail',[[0,0,0],[0,-.05,-.2],[.04,-.12,-.4]],.12,.02,16,10),hide); for(let k=0;k<3;k++) put(u.tail,shard(680+k,.4),rock,0,.04-k*.03,-.1-k*.12,.06-k*.01);};
+/* ---------- Lanternmaw: an abyssal angler with a lure that lies ---------- */
+BOSS2.lanternmaw=(R,B,u)=>{u.float=true; u.legs=[]; u.arms=[]; const skin=M('#163a4a',{roughness:.45}), skin2=M('#0a1c26',{roughness:.5}), belly=M('#4a6a6a',{roughness:.55}), fin=NOV(M('#1e5a6a',{roughness:.4,side:THREE.DoubleSide,transparent:true,opacity:.85})), tooth=NOV(M('#e8f0e0',{roughness:.3})), gl=glow('#d8ff6a',3.2), gl2=glow('#9fffd0',2.4);
+  const BD=grp(B,0,1.0,0); u.fishBody=BD;
+  put(BD,blob(700,.06),skin,0,.05,-.1,.62,.55,.72); put(BD,blob(701,.08),belly,0,-.12,.05,.5,.36,.58); put(BD,blob(702,.15),skin2,0,.3,-.15,.42,.2,.5);
+  // knobbly ridge and scars
+  for(let i=0;i<9;i++){put(BD,gCone,skin2,0,.52-i*.01,.2-i*.11,.03,.12-i*.008,.03).rotation.x=-.5;}
+  // the vast underbite
+  u.jaw=grp(BD,0,-.18,.25); put(u.jaw,blob(703,.06),skin,0,-.02,.2,.55,.16,.42); put(u.jaw,blob(704,.08),belly,0,-.08,.2,.48,.08,.36);
+  const tf=(p,n,y,z,len,dir,w)=>{for(let i=0;i<n;i++){const a=(i/(n-1)-.5)*2.4, x=Math.sin(a)*w, zz=z+Math.cos(a)*w*.8-w*.55, l=len*(.6+.4*Math.cos(a))*(i%2?.7:1); const t=put(p,taper('lmt'+(i%2),[[0,0,0],[0,dir*.5,.1],[0,dir,.32]],.06,.004,10,6),tooth,x,y,zz,.6*l/.3,l/.3*.5,.6*l/.3,0,0,0); t.scale.setScalar(l*3);}};
+  tf(u.jaw,15,.06,.45,.13,1,.48); tf(BD,13,-.14,.62,.11,-1,.44);
+  // tiny dead eyes
+  for(const s of [-1,1]){put(BD,gSph,M('#020404'),s*.38,.18,.42,.06); eye(BD,s*.38,.18,.47,.03,'#f0fff0',2.4);}
+  // the lure: a jointed stalk ending in a lantern of false light
+  u.stalk=grp(BD,0,.5,.25); const st=[[0,0,0],[0,.25,.08],[0,.42,.28],[0,.44,.52],[0,.34,.66]]; put(u.stalk,taper('lmst',st,.035,.015,30,8),skin2);
+  const lu=grp(u.stalk,0,.28,.66); put(lu,gSph,gl,0,0,0,.08); put(lu,thinTor(),skin2,0,.0,0,.085,.085,.5); put(lu,thinTor(),skin2,0,0,0,.085,.085,.5).rotation.y=Math.PI/2; u.lure=lu;
+  if(BTEX.glow){const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0xd8ff6a,transparent:true,opacity:.85,depthWrite:false,blending:THREE.AdditiveBlending})); sp.scale.set(.42,.42,1); lu.add(sp);}
+  // glowing photophores
+  u.spots=[]; for(let i=0;i<14;i++){const a=(i%7)/6*1.8-.9, s=i<7?-1:1; u.spots.push(put(BD,gSph,i===0?gl2:gl2,s*.55*Math.cos(a*.6),-.05+Math.sin(a)*.18,a*.4-.1,.022));}
+  u.fins=[]; for(const s of [-1,1]){const f=grp(BD,s*.5,-.05,.0); put(f,leafGeo('lmfin',.4,.28,.1,1.2,.01),fin,0,0,0,1,1,1,0,s*1.3,-s*1.2); u.fins.push(f);}
+  put(BD,leafGeo('lmdors',.5,.3,.15,1.1,.01),fin,0,.45,-.35,1,1,1,-.9,0,0);
+  u.tail=grp(BD,0,.05,-.72); put(u.tail,taper('lmtail',[[0,0,0],[0,0,-.25],[0,.02,-.45]],.24,.06,16,12,.8),skin); put(u.tail,leafGeo('lmtf',.5,.4,.0,1.3,.01),fin,0,.02,-.42,1,1,1,-Math.PI/2,0,0).rotation.set(-Math.PI/2,Math.PI/2,0);
+  // trailing barbels
+  u.tentacles=[]; for(let i=0;i<4;i++){const a=(i/3-.5)*1.6; u.tentacles.push(chain(u.jaw,Math.sin(a)*.35,-.1,.4,0,4,.1,.02,skin2,belly,'y'));}
+  u.anim=(u,b)=>{u.lure.children[0].material.emissiveIntensity=2.4+Math.sin(time*3)*1.2; u.fishBody.rotation.z=Math.sin(time*.9)*.05;};};
+/* ---------- The Echo Tyrant: a blind cave tyrant that hunts by sound, with a crystal heart that beats ---------- */
+BOSS2.echotyrant=(R,B,u)=>{const hide=M('#2e3844',{roughness:.7}), hide2=M('#1a222c',{roughness:.75}), plate=NOV(M('#4a5866',{roughness:.45,metalness:0.30})), bone=NOV(M('#c8c0b0',{roughness:.5})), cry=NOV(M('#b48cff',{roughness:.1,metalness:0.20,emissive:new THREE.Color('#7a4adf'),emissiveIntensity:1.2})), cy=glow('#3affe0',1.8), vio=glow('#b48cff',2.6);
+  u.legs=[leg(B,-.24,.64,0,{m:hide,m2:hide2,sh:plate,r:.13,key:'etl',toes:3,nail:bone,dig:1,foot:.22,seed:801}),leg(B,.24,.64,0,{m:hide,m2:hide2,sh:plate,r:.13,key:'etl',toes:3,nail:bone,dig:1,foot:.22,seed:802})];
+  const T=grp(B,0,.64,0); u.torso=T; T.rotation.x=.32;
+  put(T,blob(810,.12),hide,0,.42,0,.46,.48,.34); put(T,blob(811,.12),hide2,0,.14,.02,.34,.24,.28); put(T,blob(812,.1),hide,0,.66,-.12,.4,.26,.28);
+  // armoured plates along the ribs and the resonating crystal heart
+  for(let i=0;i<4;i++) for(const s of [-1,1]) put(T,taper('etrb'+i,[[0,0,-.1],[s*.3,-.02,.05],[s*.24,-.04,.24]],.03,.015,14,6),bone,0,.2+i*.11,0);
+  u.heart=grp(T,0,.4,.3); put(u.heart,shard(813,.3),cry,0,0,0,.8,1,.6); put(u.heart,gSph,vio,0,0,0,.5);
+  // back of tall crystal resonators
+  u.resn=[]; for(let i=0;i<9;i++){const a=(i/8-.5)*1.8, y=.55+Math.cos(a)*.2; const c=put(T,crystal(820+i,5),cry,Math.sin(a)*.32,y,-.25,.06,.32+Math.cos(a)*.2,.06); c.rotation.set(-.5,0,-a*.6); u.resn.push(c);}
+  for(let i=0;i<5;i++) put(T,shard(830+i,.3),plate,0,.25+i*.12,-.3,.2-i*.015,.07,.14);
+  // long arms with blade claws for dragging along the cave floor
+  const aL=arm(T,-.5,.62,0,{side:-1,m:hide,m2:hide2,sh:plate,r:.09,l1:.46,l2:.48,key:'eta',seed:840}), aR=arm(T,.5,.62,0,{side:1,m:hide,m2:hide2,sh:plate,r:.09,l1:.46,l2:.48,key:'eta',seed:841}); u.arms=[aL,aR]; u.armsFwd=.3;
+  for(const a of [aL,aR]){claw(a.userData.hand,'etc',hide2,bone,3,.32,.045,.8,.9); for(let k=0;k<3;k++) put(a,crystal(845+k,4),cry,0,-.2-k*.12,-.08,.03,.1,.03).rotation.x=-1;}
+  // the eyeless head: a fan of sound-catching bone plates around a wide jaw
+  const H=grp(T,0,.88,.18); u.head=H; H.rotation.x=-.3; put(H,blob(850,.1),hide,0,0,0,.2,.16,.24); put(H,blob(851,.12),plate,0,.08,.04,.19,.06,.2);
+  u.fan=[]; for(let i=0;i<7;i++){const a=(i/6-.5)*2.6; const f=grp(H,Math.sin(a)*.16,.06+Math.cos(a)*.08,-.05,0,0,-a); put(f,leafGeo('etfan',.32,.1,.05,.8,.004),NOV(M('#8a8098',{roughness:.5,side:THREE.DoubleSide})),0,0,0,1,1,1,-.3,0,0); put(f,taper('etfr',[[0,0,0],[0,.16,-.02],[0,.32,-.06]],.012,.003,10,5),bone); u.fan.push(f);}
+  put(H,gSph,M('#05070a'),0,-.04,.22,.12,.05,.03); u.jaw=grp(H,0,-.08,.06); put(u.jaw,blob(852,.1),hide2,0,-.03,.1,.17,.05,.16); fangs(u.jaw,bone,9,.26,.01,.23,.05,1,.3,.01); fangs(H,bone,9,.26,-.07,.24,.05,-1,.3,.01);
+  for(let i=0;i<5;i++) put(H,gSph,cy,(i-2)*.05,.02,.23,.012).castShadow=false;
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,crystal(860+i,5),cry,0,1,0,.04,.12,.04));
+  u.anim=(u,b)=>{const k=Math.pow(Math.max(0,Math.sin(time*2.6)),8); u.resn.forEach((c,i)=>c.material.emissiveIntensity=1+2.5*Math.pow(Math.max(0,Math.sin(time*2.6-i*.25)),8)); u.fan.forEach((f,i)=>f.rotation.x=-.1*k+Math.sin(time*1.4+i)*.06);};};
+
+/* ---------- The Monarch, the Clawed King: a gaunt crowned tyrant dragging two enormous hands ---------- */
+BOSS2.monarch=(R,B,u)=>{const robe=M('#2a1a3a',{roughness:.8,side:THREE.DoubleSide}), robe2=M('#160c20',{roughness:.85,side:THREE.DoubleSide}), fur=NOV(M('#e8e2d8',{roughness:1})), furS=NOV(M('#141018',{roughness:1})), skin=M('#3a3446',{roughness:.6}), claw_=NOV(M('#1a1420',{roughness:.35,metalness:.3})), gold=NOV(M('#d8b04a',{metalness:.5,roughness:.25})), mask=NOV(M('#e8e0d0',{roughness:.35})), gl=glow('#7affb0',3);
+  u.legs=[leg(B,-.13,.6,0,{m:robe2,r:.06,key:'mol',toes:3,nail:claw_,seed:900}),leg(B,.13,.6,0,{m:robe2,r:.06,key:'mol',toes:3,nail:claw_,seed:901})];
+  put(B,robeGeo('mor1',.22,.42,.66,12,.08,.22,51),robe,0,.4,0); 
+  const T=grp(B,0,.66,0); u.torso=T; T.rotation.x=.2;
+  put(T,lathe('mobody',[[.12,0],[.2,.08],[.22,.3],[.25,.48],[.2,.58],[0,.62]],40),robe,0,0,0,1,1,.8); put(T,gBand,gold,0,.06,0,.205,.04,.165); put(T,capeGeo('motrain',.62,1.25,.9,.6,.2,52),robe2,0,.58,-.16).rotation.x=-.12;
+  // ermine mantle with black tails
+  put(T,lathe('momantle',[[.1,.62],[.3,.57],[.36,.49],[.33,.45],[.2,.52],[.1,.6]],48),fur,0,0,0,1,1,.85); for(let i=0;i<14;i++){const a=i/14*TAU; put(T,gSph,furS,Math.sin(a)*.33,.48,Math.cos(a)*.28,.012,.022,.012);}
+  put(T,gOct,gl,0,.36,.19,.035,.06,.02); for(const s of [-1,1]) put(T,thinTor(),gold,s*.1,.5,.17,.04,.04,.5);
+  // arms: thin upper arms swelling into huge forearms and colossal clawed hands that scrape the ground
+  const mk=s=>{const a=arm(T,s*.36,.5,0,{side:s,m:robe,m2:skin,sh:fur,r:.055,l1:.32,l2:.46,out:.12,out2:.08,fwd2:.16,key:'moa',seed:910+s}); const e=a.userData.elbow; put(a,blob(915+s,.15),skin,e[0]+s*.04,e[1]-.24,e[2]+.1,.1,.2,.1);
+    for(let k=0;k<4;k++) put(a,crystal(920+k,5),gl,e[0]+s*.08,e[1]-.15-k*.06,e[2]+.05,.015,.05,.015).rotation.z=s*1.2;
+    const h=a.userData.hand; put(h,blob(925+s,.12),skin,0,-.05,.03,.14,.1,.13); const c=claw(h,'mocl',skin,claw_,5,.36,.05,1.3,.8); return a;};
+  const aL=mk(-1), aR=mk(1); u.arms=[aL,aR]; u.armsFwd=.1; u.claws=[];
+  // head: a cracked porcelain mask fused to a skull, under a towering crown of spires
+  const H=grp(T,0,.74,.04); u.head=H; put(H,blob(930,.06),skin,0,0,-.02,.13,.15,.14); put(H,lathe('momask',[[0,-.13],[.08,-.12],[.12,-.04],[.13,.06],[.1,.13],[0,.15]],32,),mask,0,0,.04,1,1,.7);
+  for(const s of [-1,1]){put(H,gBox,M('#020302'),s*.045,.02,.135,.05,.012,.02).rotation.z=s*-.25; eye(H,s*.045,.02,.14,.012,'#7affb0',3.6);}
+  for(let i=0;i<3;i++) put(H,taper('mocrk'+i,[[0,0,0],[.02*(i-1),-.04,0],[.01*(i-1),-.09,0]],.004,.002,6,4),gl,(i-1)*.03,-.02,.14).castShadow=false;
+  put(H,gBox,M('#020302'),0,-.08,.13,.07,.008,.02);
+  const CR=grp(H,0,.12,0); u.crown=CR; put(CR,lathe('mocrb',[[.12,0],[.15,.05],[.14,.1],[.12,.1]],40),gold);
+  for(let i=0;i<9;i++){const a=i/9*TAU, h=i%2?.2:.38; const sp=put(CR,taper('mosp'+(i%2),[[0,0,0],[0,h*.5,.01],[0,h,-.02]],.022,.002,12,6),gold,Math.sin(a)*.13,.08,Math.cos(a)*.13); sp.rotation.set(Math.cos(a)*.15,0,-Math.sin(a)*.15); if(i%2===0) put(CR,gOct,gl,Math.sin(a)*.145,.07,Math.cos(a)*.145,.015,.025,.01);}
+  // a royal sigil turning behind him
+  u.sigil=grp(T,0,.7,-.32); put(u.sigil,thinTor(),gold,0,0,0,.34,.34,.5); put(u.sigil,thinTor(),gl,0,0,0,.28,.28,.3); for(let i=0;i<12;i++){const a=i/12*TAU; put(u.sigil,gOct,i%3?gold:gl,Math.sin(a)*.34,Math.cos(a)*.34,0,.02,.04,.01).rotation.z=-a;}
+  u.orbit=[0,1,2,3].map(i=>{const g=grp(B,0,1,0); put(g,gOct,i%2?gl:gold,0,0,0,.04,.07,.04); return g;});};
+/* ---------- The Harmonizer: a hovering bloom that conducts the meadow with a thorned baton ---------- */
+BOSS2.harmonizer=(R,B,u)=>{u.float=true; u.legs=[]; const stem=M('#3a6a22',{roughness:.7}), stem2=M('#24481a',{roughness:.75}), leafM=NOV(M('#4a8a2a',{roughness:.6,side:THREE.DoubleSide})), leafM2=NOV(M('#2e6a1e',{roughness:.6,side:THREE.DoubleSide})), pet=NOV(M('#ffc8e8',{roughness:.45,side:THREE.DoubleSide,emissive:new THREE.Color('#ff7ac0'),emissiveIntensity:.12})), pet2=NOV(M('#e86aa8',{roughness:.5,side:THREE.DoubleSide})), thorn=NOV(M('#1a2a10',{roughness:.5})), gl=glow('#ffe0f4',2.8), gold=glow('#ffd86a',2.4);
+  // roots trailing below like a conductor's coat tails
+  u.tentacles=[]; for(let i=0;i<6;i++){const a=i/6*TAU; u.tentacles.push(chain(B,Math.sin(a)*.12,.62,Math.cos(a)*.12,a,4,.12,.025,stem2,stem,'y'));}
+  const T=grp(B,0,.62,0); u.torso=T;
+  // a slender twisted stem body wrapped in a coat of leaves
+  put(T,taper('hmbody',[[0,0,0],[.03,.2,.02],[-.02,.42,0],[0,.6,.02]],.11,.07,24,14),stem);
+  for(let i=0;i<10;i++){const a=i/10*TAU, y=.04+(i%3)*.05; const l=put(T,leafGeo('hmcoat',.42,.14,.1,.9),i%2?leafM:leafM2,Math.sin(a)*.08,y+.3,Math.cos(a)*.08); l.rotation.set(Math.PI,a,0); l.rotateX(-.25);}
+  for(let i=0;i<6;i++){const a=i/6*TAU+.3; const l=put(T,leafGeo('hmcol',.22,.1,.08,1),leafM,Math.sin(a)*.06,.56,Math.cos(a)*.06); l.rotation.set(0,a,0); l.rotateX(.6);}
+  for(let i=0;i<8;i++) put(T,gCone,thorn,Math.sin(i*2.1)*.1,.08+i*.06,Math.cos(i*2.1)*.1,.012,.05,.012).rotation.set(Math.cos(i*2.1)*1.4,0,-Math.sin(i*2.1)*1.4);
+  // leaf wings that beat in time
+  u.leafWings=[]; for(const s of [-1,1]) for(let k=0;k<2;k++){const pv=grp(T,s*.06,.45-k*.12,-.05); pv.userData.sd=s; const l=put(pv,leafGeo('hmwing'+k,.6-k*.15,.24-k*.05,.12,1.1,.004),k?leafM2:leafM,0,0,0); l.rotation.set(0,s*.25,-s*(1.25+k*.35)); u.leafWings.push(pv);}
+  // vine arms: one conducts with a thorned baton
+  const aL=arm(T,-.12,.5,0,{side:-1,m:stem,m2:stem2,sh:leafM,r:.035,l1:.3,l2:.32,out:.12,key:'hma',seed:950}), aR=arm(T,.12,.5,0,{side:1,m:stem,m2:stem2,sh:leafM,r:.035,l1:.3,l2:.32,out:.12,key:'hma',seed:951}); u.arms=[aL,aR]; u.armsFwd=.45;
+  claw(aL.userData.hand,'hmc',stem,thorn,4,.12,.016,1,.6); const hd=aR.userData.hand; claw(hd,'hmc',stem,thorn,4,.1,.016,.8,1);
+  const bt=grp(hd,0,-.02,.04); put(bt,taper('hmbaton',[[0,0,0],[0,.02,.25],[0,.05,.5]],.014,.003,16,6),stem2); for(let k=0;k<4;k++) put(bt,gCone,thorn,0,.012+.01*k,.1+k*.1,.006,.03,.006); put(bt,gSph,gold,0,.05,.5,.02);
+  // the head: a great bud whose petals open and close like breathing
+  const H=grp(T,0,.72,.0); u.head=H; put(H,blob(952,.1),stem2,0,-.04,0,.12,.08,.12); u.bud=[];
+  for(let ring=0;ring<2;ring++) for(let i=0;i<7;i++){const a=i/7*TAU+ring*.45; const rg=grp(H,0,0,0,0,a,0); const pv=grp(rg,0,-.02,.07+ring*.02); const p=put(pv,leafGeo('hmpet'+ring,.42-ring*.1,.2-ring*.04,-.18,1.05),ring?pet2:pet,0,0,0); p.rotation.x=.75+ring*.3; u.bud.push(pv);}
+  const ey=grp(H,0,.12,0); put(ey,gSph,M('#1a0a14'),0,0,0,.075); u.core=eye(ey,0,0,.06,.04,'#ffe0f4',3.2); for(let k=0;k<6;k++){const a=k/6*TAU; put(ey,taper('hmst',[[0,0,0],[0,.06,0],[.01,.12,.01]],.006,.004,8,4),gold,Math.sin(a)*.05,.02,Math.cos(a)*.05).rotation.set(Math.cos(a)*.6,0,-Math.sin(a)*.6);}
+  // floating pollen-notes
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=grp(B,0,1,0); for(let k=0;k<5;k++){const p=put(g,leafGeo('hmmini',.08,.05,0,1),i%2?pet:pet2,0,0,0); p.rotation.z=k/5*TAU;} put(g,gSph,gold,0,0,.005,.015); return g;});};
+/* ---------- The Corrupted Singer: a veiled choir-wraith whose song has cracked into a scream ---------- */
+BOSS2.corruptedsinger=(R,B,u)=>{u.float=true; u.legs=[]; const gown=M('#2a1a3a',{roughness:.6,side:THREE.DoubleSide}), gown2=M('#1a0e26',{roughness:.7,side:THREE.DoubleSide}), skin=M('#c8c0d8',{roughness:.45}), veil=NOV(M('#d8d0f0',{roughness:.5,side:THREE.DoubleSide,transparent:true,opacity:.75})), sculk=M('#0c2a30',{roughness:.55}), gl=glow('#2affe0',2.6), vio=glow('#c89aff',2.6), pipe=NOV(M('#b8a8d0',{metalness:.45,roughness:.3}));
+  put(B,robeGeo('cs1',.14,.5,1.2,14,.1,.3,61),gown,0,.72,0); put(B,robeGeo('cs2',.16,.42,.8,10,.12,.45,62),gown2,0,.9,0);
+  // corruption creeping up the gown
+  for(let i=0;i<9;i++){const a=i/9*TAU, pts=[]; for(let k=0;k<=5;k++){const t=k/5; pts.push([Math.sin(a+t*.6)*(.5-t*.32),.1+t*.9,Math.cos(a+t*.6)*(.5-t*.32)]);} put(B,taper('csv'+i,pts,.03,.006,24,8),i%3?sculk:gl);}
+  for(let i=0;i<10;i++){const a=i/10*TAU; put(B,blob(630+i,.3),sculk,Math.sin(a)*.42,.12,Math.cos(a)*.42,.08,.05,.08);}
+  const T=grp(B,0,1.3,0); u.torso=T;
+  put(T,lathe('csbod',[[.08,-.1],[.14,0],[.15,.12],[.11,.22],[.05,.28]],32),gown,0,0,0,1,1,.8); put(T,gOct,vio,0,.08,.12,.03,.05,.015);
+  // the long neck and veiled face, with a mouth that opens far too wide
+  put(T,taper('csneck',[[0,.26,0],[0,.36,.02],[0,.46,.03]],.04,.035,12,10),skin);
+  const H=grp(T,0,.54,.04); u.head=H; put(H,blob(640,.04),skin,0,0,0,.1,.13,.11); put(H,capeGeo('csveil',.3,.38,.9,.35,.25,63),veil,0,.14,.01).rotation.x=-.08;
+  for(const s of [-1,1]) eye(H,s*.04,.03,.1,.012,'#c89aff',3,false);
+  u.jaw=grp(H,0,-.05,.06); put(u.jaw,gSph,M('#05020a'),0,-.02,.03,.045,.06,.02); put(u.jaw,gSph,gl,0,-.02,.025,.03,.045,.02);
+  // an organ-pipe halo
+  const halo=grp(T,0,.6,-.12); u.halo=halo; u.myPipes=[]; for(let i=0;i<11;i++){const a=(i/10-.5)*2.4, l=.18+Math.cos(a)*.22; const p=grp(halo,Math.sin(a)*.26,Math.cos(a)*.2,0,0,0,-a*.9); put(p,gCyl,pipe,0,l/2,0,.022,l,.022); put(p,gCyl,M('#05030a'),0,l+.002,0,.016,.01,.016); const gm=put(p,gSph,i%2?vio:gl,0,l+.02,0,.016); u.myPipes.push(gm);}
+  // long arms raised to sing, fingers spread
+  const aL=arm(T,-.16,.2,0,{side:-1,m:gown,m2:skin,sh:gown2,r:.03,l1:.32,l2:.32,out:.1,key:'csa',seed:650}), aR=arm(T,.16,.2,0,{side:1,m:gown,m2:skin,sh:gown2,r:.03,l1:.32,l2:.32,out:.1,key:'csa',seed:651}); u.arms=[aL,aR]; u.armsFwd=.8;
+  for(const a of [aL,aR]){claw(a.userData.hand,'csc',skin,M('#1a1024'),5,.14,.014,1.4,.3); u.ribbons=u.ribbons||[]; u.ribbons.push(chain(a,0,-.3,-.02,0,4,.1,.025,gown2,gown,'y'));}
+  u.souls=[0,1,2,3,4,5].map(()=>{const g=grp(T,0,.08,.15); put(g,gSphL,gl,0,0,0,.012); return g;});
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=grp(B,0,1,0); put(g,gBox,i%2?vio:NOV(M('#e8e0f0',{roughness:.4})),0,0,0,.08,.1,.004); return g;});
+  u.anim=(u,b)=>{u.myPipes.forEach((g,i)=>g.material.emissiveIntensity=1.6+1.6*Math.max(0,Math.sin(time*5-i*.7))); u.jaw.scale.y=1+.4*Math.max(0,Math.sin(time*2.3));};};
+/* ---------- The Foundry Colossus: a walking blast furnace of riveted iron and pistons ---------- */
+BOSS2.foundrycolossus=(R,B,u)=>{const iron=NOV(M('#4a4a52',{metalness:.45,roughness:.4})), iron2=NOV(M('#2a2a30',{metalness:.4,roughness:.5})), rust=M('#6a3a22',{roughness:.85}), brass=NOV(M('#c8963a',{metalness:.5,roughness:.3})), mol=glow('#ff7a1a',2.8), mol2=glow('#ffc040',3), soot=M('#1a1818',{roughness:1});
+  const L=s=>{const g=grp(B,s*.3,.62,0); put(g,blob(700+s,.08),iron2,0,0,0,.14,.12,.14); put(g,gCyl,iron,0,-.2,0,.1,.32,.1); put(g,gCyl,brass,0,-.2,.0,.06,.42,.06); put(g,gSph,iron2,0,-.38,.02,.1); put(g,gCyl,iron,0,-.5,.02,.08,.2,.08); const f=grp(g,0,-.6,.06); put(f,gBox,iron2,0,0,0,.24,.06,.32); for(let k=0;k<3;k++) put(f,gBox,iron,(k-1)*.08,-.0,.18,.06,.05,.06); return g;};
+  u.legs=[L(-1),L(1)];
+  const T=grp(B,0,.66,0); u.torso=T; T.rotation.x=.08;
+  // the furnace body: a riveted boiler with a roaring grated door
+  put(T,lathe('fcboil',[[.3,0],[.38,.06],[.42,.3],[.42,.52],[.36,.66],[.2,.72],[0,.74]],48),iron,0,0,0,1,1,.88);
+  for(let r=0;r<4;r++) for(let i=0;i<20;i++){const a=i/20*TAU; put(T,gSphL,brass,Math.sin(a)*.42,.12+r*.14,Math.cos(a)*.37,.012);}
+  for(let i=0;i<3;i++) put(T,gBand,iron2,0,.1+i*.2,0,.425,.03,.375);
+  const door=grp(T,0,.36,.36); put(door,gCyl,iron2,0,0,0,.18,.04,.18).rotation.x=Math.PI/2; u.core=put(door,gCircle,mol2,0,0,.025,.15); for(let k=0;k<5;k++) put(door,gBox,iron2,(k-2)*.06,0,.03,.015,.3,.02); put(door,thinTor(),brass,0,0,.02,.18,.18,.5);
+  u.flames=[]; for(let k=0;k<5;k++){const f=put(door,gCone,mol,(k-2)*.05,-.04,.05,.025,.12,.01); f.castShadow=false; u.flames.push(f);}
+  // smokestacks
+  for(const [x,z,h] of [[-.22,-.2,.5],[.22,-.2,.4],[0,-.28,.62]]){put(T,gCyl,iron2,x,.7+h/2,z,.07,h,.07); put(T,gCyl,rust,x,.7+h,z,.085,.05,.085); const f=put(T,gCone,mol,x,.78+h,z,.05,.2,.05); f.castShadow=false; u.flames.push(f);}
+  // the head: a riveted welder's helm with a molten slit
+  const H=grp(T,0,.82,.12); u.head=H; put(H,lathe('fchelm',[[0,-.1],[.13,-.08],[.14,.06],[.1,.12],[0,.13]],32),iron2); put(H,gBox,mol2,0,.0,.12,.16,.02,.03); for(const s of [-1,1]) put(H,gCyl,brass,s*.14,.0,0,.03,.04,.03).rotation.z=Math.PI/2;
+  // arms: a piston arm with a forge-hammer fist, and one carrying a crucible of molten iron
+  const mkArm=s=>{const g=grp(T,s*.48,.55,0); put(g,gSph,iron2,0,0,0,.14); put(g,gCyl,iron,0,-.2,.02,.08,.32,.08); put(g,gCyl,brass,s*.07,-.2,.04,.025,.36,.025); put(g,gSph,iron2,0,-.38,.04,.09); put(g,gCyl,iron,0,-.55,.08,.07,.3,.07); put(g,gCyl,brass,-s*.06,-.55,.08,.022,.32,.022); g.userData.hand=grp(g,0,-.72,.1); return g;};
+  const aL=mkArm(-1), aR=mkArm(1); u.arms=[aL,aR];
+  {const h=aR.userData.hand; put(h,gBox,iron2,0,-.08,0,.22,.2,.22); put(h,gBox,iron,0,-.08,0,.26,.08,.26); for(let k=0;k<4;k++) put(h,gBox,brass,(k-1.5)*.06,-.19,.06,.04,.03,.04);}
+  {const h=aL.userData.hand; put(h,gCyl,iron2,0,-.05,.0,.02,.12,.02); const cr=grp(h,0,-.14,.08); put(cr,lathe('fccruc',[[0,-.1],[.1,-.08],[.14,.04],[.15,.08],[.13,.08],[.12,.04],[0,-.06]],32),iron2); put(cr,gCircle,mol2,0,.07,0,.12).rotation.x=-Math.PI/2; put(cr,taper('fcpour',[[.14,.06,0],[.2,.0,0],[.22,-.2,0],[.22,-.45,0]],.03,.015,16,8),mol2,0,0,0).castShadow=false;}
+  // chains and gears
+  for(const s of [-1,1]){const g=put(T,lathe('fcgear',[[.08,-.02],[.1,-.02],[.1,.02],[.08,.02]],12),brass,s*.36,.5,.12,1,1,1,Math.PI/2,0,0); for(let k=0;k<8;k++){const a=k/8*TAU; put(T,gBox,brass,s*.36+Math.cos(a)*.11,.5+Math.sin(a)*.11,.12,.03,.03,.03).rotation.z=a;}}
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,shard(740+i,.4),i%2?soot:mol,0,1,0,.05));};
+/* ---------- The Brimstone Wyrm: a burning serpent dragon rising from the sulfur ---------- */
+BOSS2.brimstonewyrm=(R,B,u)=>{u.legs=[]; u.arms=[]; const sc=M('#5a1a10',{roughness:.5}), sc2=M('#3a0e08',{roughness:.6}), belly=M('#c87a2a',{roughness:.6}), horn_=NOV(M('#2a1a14',{roughness:.4})), mol=glow('#ffcc3a',2.8), mol2=glow('#ff6a1a',2.6), fin=NOV(M('#a82a14',{roughness:.5,side:THREE.DoubleSide}));
+  // coils lying in the brimstone
+  for(let i=0;i<3;i++){const r=.42-i*.08; const c=put(B,kg('bwcoil'+i,()=>new THREE.TorusGeometry(r,.11-i*.015,16,48,TAU*.85)),i%2?sc2:sc,0,.11+i*.13,-.05,1,1,1,Math.PI/2,0,i*1.7);}
+  // the rising neck, built from scaled segments that sway (nested so the whole body ripples)
+  u.wyrm=[]; let p=grp(B,0,.4,-.05); const N=9;
+  for(let i=0;i<N;i++){const sg=grp(p,0,i?.13:0,i?.035:0); const r=.16-i*.006; put(sg,blob(760+i,.06),i%2?sc:sc2,0,.06,0,r,.1,r*.95); put(sg,blob(770+i,.08),belly,0,.06,r*.55,r*.7,.09,r*.5);
+    put(sg,taper('bwsp'+(i%3),[[0,0,0],[0,.05,-.06],[0,.08,-.14]],.03,.002,10,6),horn_,0,.1,-r*.7); if(i%2) for(const s of [-1,1]) put(sg,leafGeo('bwfrill',.16,.07,.05,1,.004),fin,s*r*.9,.06,0,1,1,1,0,s*1.2,-s*1.3);
+    u.wyrm.push(sg); p=sg;}
+  // the head
+  const H=grp(p,0,.16,.06,-.5,0,0); u.head=H; put(H,blob(780,.06),sc,0,0,.06,.15,.12,.2); put(H,blob(781,.08),sc2,0,.06,.02,.14,.06,.16);
+  put(H,taper('bwsnout',[[0,0,0],[0,-.01,.1],[0,-.03,.18]],.09,.05,12,12,.8),sc,0,-.02,.18);
+  for(const s of [-1,1]){eye(H,s*.09,.05,.17,.022,'#ffcc3a',3.4); ridgeHorn(H,'bwh'+s,[s*.08,.08,0],[s*.3,.5,-.8],.4,[s*.1,-.1,-.2],.04,horn_,sc2); horn(H,'bwh2'+s,[s*.13,.0,.02],[s*1,0,-.6],.18,[0,.3,0],.02,horn_);
+    put(H,leafGeo('bwear',.22,.1,.04,1,.004),fin,s*.13,.04,-.02,1,1,1,-.8,s*.6,-s*1.1);}
+  u.jaw=grp(H,0,-.07,.06); put(u.jaw,blob(782,.08),belly,0,-.02,.12,.1,.04,.16); fangs(u.jaw,NOV(M('#f0e0c0')),8,.14,.01,.26,.05,1,.5,.009); fangs(H,NOV(M('#f0e0c0')),8,.15,-.08,.3,.05,-1,.5,.009);
+  put(u.jaw,gSph,mol,0,0,.12,.06,.02,.1).castShadow=false;
+  // molten cracks along the back, little forelimbs, fire mane
+  u.flames=[]; for(let i=1;i<N;i+=2){const f=put(u.wyrm[i],gCone,mol2,0,.2,-.06,.03,.12,.03); f.castShadow=false; u.flames.push(f);}
+  for(const s of [-1,1]){const fl=grp(u.wyrm[3],s*.15,.05,.05); put(fl,taper('bwleg',[[0,0,0],[s*.08,-.06,.06],[s*.1,-.14,.1]],.03,.02,10,8),sc2); claw(fl,'bwcl',sc2,horn_,3,.06,.016,.8,.6).position.set(s*.1,-.14,.1);}
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,shard(790+i,.4),i%2?mol:horn_,0,1,0,.04));};
+/* ---------- The Iron Warlord: a spiked war-commander under twin battle standards ---------- */
+BOSS2.ironwarlord=(R,B,u)=>{const iron=NOV(M('#4a4a54',{metalness:.45,roughness:.32})), iron2=NOV(M('#26262e',{metalness:.45,roughness:.4})), red=M('#7a1a14',{roughness:.8,side:THREE.DoubleSide}), mail=NOV(M('#5a5a60',{metalness:.4,roughness:.55})), gold=NOV(M('#c8963a',{metalness:.5,roughness:.3})), gl=glow('#ff4a2a',3), wood=NOV(M('#3a2414'));
+  u.legs=[leg(B,-.17,.66,0,{m:iron2,m2:iron,sh:iron,r:.1,key:'iwl',toes:0,seed:820}),leg(B,.17,.66,0,{m:iron2,m2:iron,sh:iron,r:.1,key:'iwl',toes:0,seed:821})];
+  for(const l of u.legs){put(l,gCap,iron,0,-.33,.07,.08,.06,.08).rotation.x=Math.PI/2; put(l,gCone,iron2,0,-.33,.14,.03,.1,.03).rotation.x=Math.PI/2; put(l,gBox,iron2,0,-.64,.08,.13,.06,.24);}
+  put(B,robeGeo('iwmail',.24,.33,.36,14,.03,.1,71),mail,0,.58,0); for(let i=0;i<6;i++){const a=(i/5-.5)*1.4; put(B,gBox,iron,Math.sin(a)*.28,.52,Math.cos(a)*.24,.1,.22,.02).rotation.y=a;}
+  const T=grp(B,0,.66,0); u.torso=T; T.rotation.x=.1;
+  put(T,lathe('iwcuir',[[.2,0],[.3,.08],[.34,.3],[.33,.48],[.24,.6],[0,.64]],48),iron,0,0,0,1,1,.8); put(T,lathe('iwab',[[.2,0],[.25,.04],[.25,.14],[.2,.16]],32),iron2,0,0,0,1,1,.8);
+  for(let i=0;i<5;i++) put(T,gCone,iron2,(i-2)*.09,.36,.25-Math.abs(i-2)*.02,.025,.1,.025).rotation.x=Math.PI/2; put(T,gOct,gl,0,.46,.25,.03,.05,.02);
+  // gigantic spiked pauldrons
+  for(const s of [-1,1]){const p=grp(T,s*.36,.58,0,0,0,-s*.2); for(let k=0;k<3;k++) put(p,gCap,k%2?iron2:iron,0,-k*.04,0,.22-k*.03,.14-k*.02,.22-k*.03); put(p,thinTor(),gold,0,-.0,0,.22,.22,.4).rotation.x=Math.PI/2;
+    for(let k=0;k<5;k++){const a=(k/4-.5)*1.6; put(p,taper('iwsp',[[0,0,0],[0,.1,0],[0,.24,-.02]],.035,.002,12,8),iron2,Math.sin(a)*.12+s*.03,.06,Math.cos(a)*.1).rotation.set(Math.cos(a)*.5,0,-s*.5-Math.sin(a)*.3);}}
+  // twin battle standards on the back
+  for(const s of [-1,1]){const pole=grp(T,s*.16,.3,-.24,0,0,s*.12); put(pole,gCyl,wood,0,.6,0,.014,1.3,.014); put(pole,gCone,iron,0,1.3,0,.025,.1,.025); const fl=put(pole,capeGeo('iwflag',.3,.5,.2,.1,.25,72),red,0,1.2,.01); fl.rotation.y=Math.PI/2*s*0; put(pole,gOct,gl,.0,1.0,.03,.04,.06,.01);}
+  put(T,capeGeo('iwcape',.66,1.0,.5,.3,.3,73),red,0,.6,-.2);
+  const aL=arm(T,-.44,.54,0,{side:-1,m:iron2,m2:iron,sh:iron,r:.075,l1:.33,l2:.34,key:'iwa',seed:830}), aR=arm(T,.44,.54,0,{side:1,m:iron2,m2:iron,sh:iron,r:.075,l1:.33,l2:.34,key:'iwa',seed:831}); u.arms=[aL,aR];
+  for(const a of [aL,aR]){for(let k=0;k<3;k++) put(a,gCone,iron2,0,-.5-k*.06,-.07,.02,.07,.02).rotation.x=-1.6; const h=a.userData.hand; claw(h,'iwc',iron2,iron,4,.12,.035,.8,.6);
+    const ax=grp(h,0,-.02,.03); put(ax,gCyl,wood,0,0,.1,.018,.7,.018).rotation.x=Math.PI/2; const bl=put(ax,leafGeo('iwaxe',.32,.26,0,1.4),iron,0,.0,.36,1,1,1,0,Math.PI/2,0); bl.rotation.set(0,Math.PI/2,Math.PI/2); put(ax,gCone,iron2,0,0,.48,.02,.1,.02).rotation.x=Math.PI/2;}
+  // horned great-helm with a burning T-visor
+  const H=grp(T,0,.78,.04); u.head=H; put(H,lathe('iwhelm',[[0,-.14],[.13,-.12],[.15,0],[.14,.12],[.08,.18],[0,.2]],40),iron); put(H,gBox,M('#030303'),0,.02,.13,.17,.03,.05); put(H,gBox,M('#030303'),0,-.04,.14,.04,.1,.05);
+  put(H,gBox,gl,0,.02,.155,.15,.012,.01); put(H,gBox,gl,0,-.04,.165,.02,.08,.01); put(H,taper('iwcrest',[[0,.18,.1],[0,.26,-.04],[0,.22,-.24]],.04,.004,14,6,.3),gold);
+  for(const s of [-1,1]) ridgeHorn(H,'iwh'+s,[s*.13,.06,0],[s*1,.25,.2],.38,[0,.8,-.4],.045,iron2,gold);
+  u.orbit=[0,1,2,3].map(i=>put(B,gOct,i%2?gl:iron,0,1,0,.04,.07,.04));};
+
+/*BOSS2-END*/
 function buildBoss(b){
-  const R=model(),B=R.userData.body,id=b.id;
-  switch(id){
+  const R=model(),B=R.userData.body,id=b.id; bossTex();
+  if(BOSS2[id]) BOSS2[id](R,B,R.userData); else switch(id){
   case 'bramble':{const h=bruteBase({skin:'#5a3e24',skinOpt:{roughness:1},eye:'#c9ff6a',eyeGlow:true}); const leaf=M('#4f8a2e',{flatShading:true,roughness:.9}), leaf2=M('#6aa83a',{flatShading:true});
     for(const [x,y,z,s,l] of [[0,.3,0,.3,0],[-.22,.2,.05,.2,1],[.22,.22,-.05,.22,0],[.05,.18,-.17,.2,1],[-.1,.36,.1,.17,1],[.15,.4,.08,.14,0]]) add(h.head,gIco,l?leaf2:leaf,x,y,z,s);
     const thorn=M('#2a1e10'); for(let i=0;i<12;i++){const a=i/12*TAU; const t=add(h.torso,gCone,thorn,Math.cos(a)*.36,.25+(i%3)*.12,Math.sin(a)*.28,.03,.16,.03); t.rotation.set(Math.sin(a)*1.4,0,-Math.cos(a)*1.4);}
@@ -2490,7 +3012,7 @@ function bossTex(){if(BTEX.detail) return BTEX;
   d.strokeStyle='rgba(90,90,90,.45)'; d.lineWidth=1; for(let i=0;i<46;i++){let x=r()*256,y=r()*256; d.beginPath(); d.moveTo(x,y); for(let k=0;k<6;k++){x+=(r()-.5)*30; y+=(r()-.5)*30; d.lineTo(x,y);} d.stroke();}
   const im=d.getImageData(0,0,256,256), px=im.data; for(let i=0;i<px.length;i+=4){const n=(r()-.5)*26; px[i]=clamp(px[i]+n,0,255); px[i+1]=clamp(px[i+1]+n,0,255); px[i+2]=clamp(px[i+2]+n,0,255);} d.putImageData(im,0,0);
   BTEX.detail=new THREE.CanvasTexture(dc); BTEX.detail.wrapS=BTEX.detail.wrapT=THREE.RepeatWrapping; BTEX.detail.repeat.set(2,2); texCache.set(dc,BTEX.detail); return BTEX;}
-function detailize(R){R.traverse(o=>{const m=o.material; if(!o.isMesh||!m||!m.isMeshStandardMaterial||m.map||m.transparent) return; if(m.emissive&&m.emissive.getHex()!==0) return;
+function detailize(R){R.traverse(o=>{const m=o.material; if(!o.isMesh||!m||!m.isMeshStandardMaterial||m.map||m.transparent||m.userData.noDetail) return; if(m.emissive&&m.emissive.getHex()!==0) return;
   m.map=BTEX.detail; m.bumpMap=BTEX.detail; m.bumpScale=.025; m.flatShading=false; m.needsUpdate=true;});}
 function addBossAura(R,col){const u=R.userData, c=new THREE.Color(col), add2=(g,mat,y,sc)=>{const me=new THREE.Mesh(g,mat); me.position.y=y; me.scale.setScalar(sc); me.rotation.x=-Math.PI/2; R.add(me); return me;};
   const disc=add2(gCircle,new THREE.MeshBasicMaterial({map:BTEX.glow,color:c,transparent:true,opacity:.45,depthWrite:false,blending:THREE.AdditiveBlending}),.04,1.8);
@@ -2529,7 +3051,7 @@ const groundCrackTex=()=>canvasTex('gcrk',256,(d,r)=>{d.translate(128,128); d.st
 const smokeTex=()=>canvasTex('smoke',128,(d,r)=>{for(let i=0;i<26;i++){const x=64+(r()-.5)*60,y=64+(r()-.5)*50,rad=18+r()*30, g=d.createRadialGradient(x,y,0,x,y,rad); g.addColorStop(0,'rgba(255,255,255,.22)'); g.addColorStop(1,'rgba(255,255,255,0)'); d.fillStyle=g; d.fillRect(0,0,128,128);}});
 // Dark corruption veins that glow in the boss's own colour, pulsing like a heartbeat
 function corruptize(R,col){const u=R.userData, c=new THREE.Color(col); u.veins=[];
-  for(const m of u.mats){if(!m.isMeshStandardMaterial||m.transparent) continue; if(m.emissive.getHex()!==0){if(m.emissiveIntensity<1.8) m.emissiveIntensity*=1.35; m.userData.ei=m.emissiveIntensity; continue;}
+  for(const m of u.mats){if(!m.isMeshStandardMaterial||m.transparent||m.userData.noVein) continue; if(m.emissive.getHex()!==0){if(m.emissiveIntensity<1.8) m.emissiveIntensity*=1.35; m.userData.ei=m.emissiveIntensity; continue;}
     m.color.multiplyScalar(.88); m.emissive.copy(c); m.emissiveMap=lineTex('vein',777,.9,6); m.emissiveIntensity=.85; m.userData.e0=m.emissive.clone(); m.userData.ei=.85; m.userData.vein=true; m.needsUpdate=true; u.veins.push(m);}}
 const AURA_VS='varying vec2 vUv; void main(){vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}';
 const AURA_FS=`uniform float t,amp,per; uniform vec3 c1,c2; varying vec2 vUv;
@@ -2578,7 +3100,7 @@ function bossExtra(m,b){const u=m.userData; if(b.roar>0&&!b._roaring&&!b.hidden&
   if(u.pipes) u.pipes.forEach((t,i)=>{const k=.5+.5*Math.sin(time*5-i*.7); t.scale.setScalar(.032*(1+k*.6));}); if(u.mega){updMega(u.mega,b); const k=u.mega.k, F=u.auraFx; if(F&&k<1){F.disc.material.opacity*=k; F.ring.material.opacity*=k; F.ring2.material.opacity*=k; F.glow.material.opacity*=k*k; F.glow2.material.opacity*=k*k; F.light.intensity*=k;}} const pd=b.powerDown||0, pk=b.purity||0;
   if(u.tintMats&&u.pk!==pk){u.pk=pk; setPurity(u,pk);}
   if(u.veins&&!u.fl){const k=(1-pd*(Math.random()<.3?1:.75))*(1-pk*.15); for(let i=0;i<u.veins.length;i++){const mt=u.veins[i]; mt.emissiveIntensity=mt.userData.ei*k*(.55+.45*Math.sin(time*2.6+i*.7));}}
-  if(!u.body) return;
+  if(!u.body) return; if(u.anim) u.anim(u,b);
   if(pd>0){if(u.spots&&u.spots[0]) u.spots[0].material.emissiveIntensity*=(1-pd)*(Math.random()<.2?.2:1); if(u.core) u.core.material.emissiveIntensity*=1-pd*.9; u.body.rotation.x+=.35*pd; u.body.scale.y*=1-.14*pd;}
   else if(!(b.roar>0)){const br=Math.sin(time*1.8+(u.ph||0)); u.body.scale.set(u.body.scale.x*(1+.012*br),u.body.scale.y*(1+.028*br),u.body.scale.z*(1+.012*br));}
   if(u.head&&!(b.roar>0)&&P&&!b.dead&&!b.hidden){const hd=u.head; if(hd.userData.ry0==null){hd.userData.ry0=hd.rotation.y; hd.userData.rx0=hd.rotation.x;} const rel=clamp(((b.face-angTo(b,P))%TAU+TAU*1.5)%TAU-Math.PI,-.7,.7); u.hy=lerp(u.hy||0,rel,.08); hd.rotation.y=hd.userData.ry0+u.hy; hd.rotation.x=hd.userData.rx0+Math.sin(time*1.3+(u.ph||0))*.05;}
@@ -4710,62 +5232,187 @@ function nz(dest,o){const c=AU.ctx,t=o.t,src=c.createBufferSource(); src.buffer=
   src.connect(f); let node=f; if(o.dist){const ws=c.createWaveShaper(); ws.curve=distCurve(o.dist); f.connect(ws); node=ws;} node.connect(g); g.connect(dest); if(o.rev){const s=c.createGain(); s.gain.value=o.rev; g.connect(s); s.connect(AU.revIn);} src.start(t,Math.random()); src.stop(t+o.d+.05);}
 const mtof=m=>440*Math.pow(2,(m-69)/12);
 /* ---- the composer ---- */
+/* MUSIC-START */
+// v4.2 score engine: real-sounding instruments (piano, strings, choir, brass, rock guitar, drum kits and more) and a different band for every track.
 const SCALES={major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10],dorian:[0,2,3,5,7,9,10],phrygian:[0,1,3,5,7,8,10],harm:[0,2,3,5,7,8,11],lydian:[0,2,4,6,7,9,11],mixo:[0,2,4,5,7,9,10],whole:[0,2,4,6,8,10],dim:[0,2,3,5,6,8,9,11],hijaz:[0,1,4,5,7,8,10]};
 const MOODS={
- nature:{sc:['major','mixo','dorian','lydian'],bpm:[92,118],lead:['triangle','square'],bass:'triangle',drum:'light',arp:.6,pad:.5,root:[60,67]},
- desert:{sc:['hijaz','harm','phrygian'],bpm:[96,116],lead:['square','sawtooth'],bass:'square',drum:'tribal',arp:.4,pad:.4,root:[57,64]},
- swamp:{sc:['dorian','minor','phrygian'],bpm:[76,96],lead:['triangle','sine'],bass:'sine',drum:'light',arp:.3,pad:.7,root:[55,62]},
- frost:{sc:['lydian','major','dorian'],bpm:[70,92],lead:['sine','triangle'],bass:'sine',drum:'sparse',arp:.8,pad:.8,root:[62,69],bell:1},
- fire:{sc:['phrygian','harm','hijaz'],bpm:[112,140],lead:['sawtooth','square'],bass:'sawtooth',drum:'heavy',arp:.5,pad:.4,root:[52,59]},
- dark:{sc:['minor','phrygian','dim'],bpm:[62,86],lead:['sine','triangle'],bass:'sine',drum:'heart',arp:.3,pad:.9,root:[50,57]},
- void:{sc:['whole','dim','lydian'],bpm:[64,90],lead:['sine','triangle'],bass:'sine',drum:'sparse',arp:.7,pad:.9,root:[53,60],bell:1},
- royal:{sc:['major','mixo','lydian'],bpm:[92,112],lead:['sawtooth','square'],bass:'triangle',drum:'march',arp:.3,pad:.6,root:[58,65]},
- storm:{sc:['minor','dorian'],bpm:[122,146],lead:['sawtooth','square'],bass:'sawtooth',drum:'heavy',arp:.7,pad:.5,root:[52,59]},
- water:{sc:['dorian','lydian','mixo'],bpm:[78,100],lead:['triangle','sine'],bass:'sine',drum:'light',arp:.8,pad:.7,root:[57,64]},
- knowledge:{sc:['dorian','minor','harm'],bpm:[84,104],lead:['square','triangle'],bass:'triangle',drum:'sparse',arp:.8,pad:.5,root:[57,64]},
- infect:{sc:['dim','phrygian','harm'],bpm:[84,104],lead:['sawtooth','square'],bass:'square',drum:'tribal',arp:.4,pad:.7,root:[50,57]},
- forms:{sc:['whole','lydian','dim'],bpm:[96,122],lead:['triangle','sawtooth'],bass:'triangle',drum:'light',arp:.9,pad:.6,root:[55,62]},
- holy:{sc:['lydian','major'],bpm:[80,98],lead:['sine','triangle'],bass:'sine',drum:'sparse',arp:.6,pad:.9,root:[60,67],bell:1},
- hallow:{sc:['harm','minor'],bpm:[100,122],lead:['square','triangle'],bass:'square',drum:'tribal',arp:.5,pad:.5,root:[55,62]},
- sculk:{sc:['phrygian','dim','minor'],bpm:[66,88],lead:['sine','sawtooth'],bass:'sawtooth',drum:'heart',arp:.4,pad:.9,root:[48,55]}};
+ nature:{sc:['major','mixo','dorian','lydian'],root:[55,62],styles:['folk','orchestral','piano','folk']},
+ desert:{sc:['hijaz','harm','phrygian'],root:[52,59],styles:['tribal','folk','rock','tribal']},
+ swamp:{sc:['dorian','minor','phrygian'],root:[50,57],styles:['ambient','piano','folk','jazz']},
+ frost:{sc:['lydian','major','dorian','minor'],root:[55,62],styles:['piano','ambient','orchestral']},
+ fire:{sc:['phrygian','harm','hijaz','minor'],root:[48,55],styles:['rock','metal','choir','rock']},
+ dark:{sc:['minor','phrygian','dim'],root:[48,55],styles:['ambient','organ','piano']},
+ void:{sc:['whole','dim','lydian','minor'],root:[50,57],styles:['ambient','synth','organ','piano']},
+ royal:{sc:['major','mixo','lydian'],root:[53,60],styles:['march','orchestral','organ']},
+ storm:{sc:['minor','dorian','harm'],root:[48,55],styles:['rock','orchestral','metal','synth']},
+ water:{sc:['dorian','lydian','mixo'],root:[52,59],styles:['ambient','piano','synth','folk']},
+ knowledge:{sc:['dorian','minor','harm'],root:[52,59],styles:['jazz','piano','organ']},
+ infect:{sc:['dim','phrygian','harm'],root:[48,55],styles:['metal','choir','ambient']},
+ forms:{sc:['whole','lydian','dim','minor'],root:[50,57],styles:['synth','orchestral','rock','piano']},
+ holy:{sc:['lydian','major'],root:[55,62],styles:['organ','choir','orchestral']},
+ hallow:{sc:['harm','minor'],root:[50,57],styles:['organ','rock','folk']},
+ sculk:{sc:['phrygian','dim','minor'],root:[45,52],styles:['ambient','choir','organ']}};
 const BIOME_MOOD={meadow:'nature',desert:'desert',swamp:'swamp',frost:'frost',volcano:'fire',spire:'royal',hallow:'hallow',tempest:'storm',temple:'nature',reef:'water',deepdark:'dark',sculk:'sculk',monarch:'royal',harmony:'nature',singers:'sculk',
  cinder:'fire',brimstone:'fire',citadel:'royal',throne:'fire',expanse:'void',rift:'void',nullgarden:'void',edge:'void',knowledge:'knowledge',destruction:'fire',immunity:'holy',infection:'infect',forms:'forms',enchanted:'nature',illusion:'void',cataclysm:'storm'};
 function moodOf(bi){const B=BIOMES[bi]||{}; return BIOME_MOOD[B.id]||'nature';}
+// Each style is a band: a lead voice, a harmony part, a bass, an arpeggio/counter part and a drum kit.
+const STYLES={
+ orchestral:{name:'Orchestral',lead:['strings','horn','flute','brass'],harm:['strpad'],hp:'sustain',bass:['cello'],arp:['harp','pizz','strstac'],kit:['orch'],bpm:[84,112]},
+ rock:{name:'Rock',lead:['guitar','guitar','synthlead'],harm:['power'],hp:'rock',bass:['ebass'],arp:[null,'cleangtr'],kit:['rock'],bpm:[112,148]},
+ metal:{name:'Metal',lead:['guitar'],harm:['chug'],hp:'chug',bass:['ebass'],arp:[null,'choirpad'],kit:['metal'],bpm:[138,172]},
+ piano:{name:'Piano',lead:['piano'],harm:['piano'],hp:'piano',bass:['pbass'],arp:[null,'strpad'],kit:['soft','none'],bpm:[70,98]},
+ choir:{name:'Epic choir',lead:['brass','strings','choir'],harm:['choirpad'],hp:'sustain',bass:['cello'],arp:['strstac'],kit:['taiko'],bpm:[88,118]},
+ folk:{name:'Folk',lead:['flute','fiddle','whistle'],harm:['harp'],hp:'arp',bass:['ubass'],arp:['lute','harp'],kit:['folk'],bpm:[96,126]},
+ ambient:{name:'Ambient',lead:['bell','epiano','flute','piano'],harm:['pad'],hp:'sustain',bass:['sub'],arp:['bell',null,'kalimba'],kit:['heart','none'],bpm:[60,82]},
+ tribal:{name:'Tribal',lead:['ney','marimba','kalimba'],harm:['pad'],hp:'sustain',bass:['ubass'],arp:['kalimba','marimba'],kit:['hand'],bpm:[96,122]},
+ march:{name:'March',lead:['brass','horn'],harm:['brass'],hp:'stab',bass:['tuba'],arp:[null,'pizz'],kit:['march'],bpm:[96,116]},
+ jazz:{name:'Jazz',lead:['epiano','sax','piano'],harm:['epiano'],hp:'comp',bass:['upright'],arp:[null],kit:['brush'],bpm:[88,126]},
+ synth:{name:'Synthwave',lead:['synthlead','epiano'],harm:['synthpad'],hp:'sustain',bass:['synthbass'],arp:['synthpluck'],kit:['electro'],bpm:[100,124]},
+ organ:{name:'Cathedral organ',lead:['organ','choir'],harm:['organ'],hp:'sustain',bass:['organbass'],arp:[null,'bell'],kit:['none','soft'],bpm:[70,94]},
+ heroic:{name:'Heroic orchestra',lead:['brass'],harm:['strpad'],hp:'sustain',bass:['cello'],arp:['strstac'],kit:['orch'],bpm:[104,108]}};
+// where each voice sits, so nothing squeaks
+const RANGE={piano:[60,84],epiano:[58,80],strings:[60,81],horn:[55,74],brass:[57,77],flute:[67,88],fiddle:[62,84],whistle:[69,88],choir:[57,76],guitar:[55,79],synthlead:[57,79],bell:[67,86],ney:[60,79],marimba:[60,84],kalimba:[62,84],sax:[55,77],organ:[55,79]};
+const INAME={strings:'strings',horn:'french horn',flute:'flute',brass:'brass',guitar:'electric guitar',synthlead:'synth lead',piano:'piano',choir:'choir',fiddle:'fiddle',whistle:'tin whistle',bell:'bells',epiano:'electric piano',ney:'reed flute',marimba:'marimba',kalimba:'kalimba',sax:'saxophone',organ:'pipe organ'};
+/* ---- the instruments ---- */
+const GCURVE={}; function gtrCurve(k){if(GCURVE[k]) return GCURVE[k]; const n=1025, cu=new Float32Array(n); for(let i=0;i<n;i++){const x=i/(n-1)*2-1; cu[i]=Math.tanh(k*x)/Math.tanh(k);} return GCURVE[k]=cu;}
+function osc(c,type,f,t,end,det){const o=c.createOscillator(); o.type=type; o.frequency.setValueAtTime(Math.max(20,f),t); if(det) o.detune.setValueAtTime(det,t); o.start(t); o.stop(end); return o;}
+function lpf(c,f,q=.7,type='lowpass'){const fl=c.createBiquadFilter(); fl.type=type; fl.frequency.value=f; fl.Q.value=q; return fl;}
+function adsr(c,t,a,len,rel,peak,sus=1,dec=.3){const g=c.createGain(), p=g.gain; p.setValueAtTime(0,t); p.linearRampToValueAtTime(peak,t+a); if(sus!==1) p.setTargetAtTime(peak*sus,t+a,dec); p.setTargetAtTime(0,t+Math.max(a,len),rel/4); return g;}
+function sendRev(c,node,amt){if(!amt||!AU.revIn) return; const s=c.createGain(); s.gain.value=amt; node.connect(s); s.connect(AU.revIn);}
+function vib(c,t,end,target,rate,cents,delay=.15){const l=c.createOscillator(), g=c.createGain(); l.frequency.value=rate; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(cents,t+delay+.2); l.connect(g); for(const o of target) g.connect(o.detune); l.start(t); l.stop(end);}
+function noiseSrc(c,t,end){const s=c.createBufferSource(); s.buffer=AU.noise; s.loop=true; s.start(t,Math.random()*1.5); s.stop(end); return s;}
+// one note on a named instrument
+function inst(name,dest,t,m,dur,vel=1,rev=.25){const c=AU.ctx, f=mtof(m); let end=t+dur+1.2, out;
+  const hi=f>900?.6:1;
+  switch(name){
+  case 'piano':case 'pbass':{const decay=Math.min(3.2,1.6*Math.pow(261/f,.45)), g=c.createGain(), p=g.gain; p.setValueAtTime(0,t); p.linearRampToValueAtTime(.32*vel*hi,t+.004); p.setTargetAtTime(0,t+.004,decay*.45); p.setTargetAtTime(0,t+dur,.09); end=t+Math.min(dur+.5,decay*2.2)+.05;
+    const fl=lpf(c,Math.min(9000,f*7),.5); fl.frequency.setTargetAtTime(Math.min(4000,f*3),t,.25); fl.connect(g);
+    [[1,1,0],[2,.38,1],[3,.16,-2],[4,.08,3],[5,.035,0]].forEach(([k,a,dt])=>{const o=osc(c,k===1?'triangle':'sine',f*k*(1+k*k*.0004),t,end,dt), og=c.createGain(); og.gain.setValueAtTime(a,t); og.gain.setTargetAtTime(0,t,decay*(.55/k)); o.connect(og); og.connect(fl);});
+    {const o=osc(c,'sine',f,t,end,6), og=c.createGain(); og.gain.value=.5; o.connect(og); og.connect(fl);}
+    const n=noiseSrc(c,t,t+.05), nb=lpf(c,Math.min(8000,f*5),1,'bandpass'), ng=c.createGain(); ng.gain.setValueAtTime(.12*vel,t); ng.gain.exponentialRampToValueAtTime(.0001,t+.04); n.connect(nb); nb.connect(ng); ng.connect(g);
+    out=g; break;}
+  case 'epiano':{const g=adsr(c,t,.005,dur,.3,.3*vel,.0001,1.1), car=osc(c,'sine',f,t,end), mod=osc(c,'sine',f,t,end), mg=c.createGain(); mg.gain.setValueAtTime(f*1.8*vel,t); mg.gain.setTargetAtTime(f*.15,t,.12); mod.connect(mg); mg.connect(car.frequency);
+    const tine=osc(c,'sine',f*4,t,end), tg=c.createGain(); tg.gain.setValueAtTime(.06,t); tg.gain.setTargetAtTime(0,t,.05); tine.connect(tg); tg.connect(g); car.connect(g); end=t+Math.min(dur+.4,3); out=g; break;}
+  case 'strings':case 'strpad':case 'cello':{const pad=name!=='strings', a=pad?.35:.12, g=adsr(c,t,a,dur,pad?.7:.35,(pad?.06:.1)*vel), fl=lpf(c,name==='cello'?1100:pad?1600:2600,.6); fl.connect(g); const os=[];
+    for(const d of [-9,0,9]) {const o=osc(c,'sawtooth',f,t,end,d); o.connect(fl); os.push(o);} if(!pad){const o=osc(c,'sawtooth',f/2,t,end,3), og=c.createGain(); og.gain.value=.3; o.connect(og); og.connect(fl); os.push(o);} vib(c,t,end,os,5.2,pad?5:9,.25); out=g; rev+=.15; break;}
+  case 'strstac':case 'pizz':{const g=adsr(c,t,.005,name==='pizz'?.02:Math.min(dur,.12),name==='pizz'?.35:.12,(name==='pizz'?.22:.1)*vel,name==='pizz'?.0001:1,.12); if(name==='pizz'){const o=osc(c,'triangle',f,t,end), o2=osc(c,'sine',f*2,t,end), fl=lpf(c,2400,.7); o.connect(fl); o2.connect(fl); fl.connect(g);} else {const fl=lpf(c,2400,.6); fl.connect(g); for(const d of [-7,7]) osc(c,'sawtooth',f,t,end,d).connect(fl);} end=t+.8; out=g; break;}
+  case 'brass':case 'horn':case 'tuba':{const horn=name!=='brass', g=adsr(c,t,horn?.07:.04,dur,.18,(name==='tuba'?.16:horn?.12:.11)*vel,.8,.3), fl=lpf(c,300,1.2); const top=name==='tuba'?900:horn?1500:3200; fl.frequency.setValueAtTime(300,t); fl.frequency.linearRampToValueAtTime(top*(.7+.3*vel),t+.06); fl.frequency.setTargetAtTime(top*.6,t+.1,.3); fl.connect(g);
+    const os=[osc(c,'sawtooth',f,t,end,-4),osc(c,'sawtooth',f,t,end,4)]; os.forEach(o=>o.connect(fl)); if(horn){const o=osc(c,'triangle',f,t,end); o.connect(fl); os.push(o);} vib(c,t,end,os,5,6,.3); out=g; rev+=.1; break;}
+  case 'choir':case 'choirpad':{const pad=name==='choirpad', g=adsr(c,t,pad?.5:.18,dur,.6,(pad?.09:.13)*vel), sum=c.createGain(); sum.connect(g); const os=[osc(c,'sawtooth',f,t,end,-6),osc(c,'sawtooth',f,t,end,6),osc(c,'sawtooth',f*(pad?.5:1),t,end,0)];
+    const mix=c.createGain(); mix.gain.value=.5; os.forEach(o=>o.connect(mix)); for(const [ff,q,a] of [[730,7,1],[1090,8,.6],[2440,10,.3],[330,4,.5]]){const b=lpf(c,ff,q,'bandpass'), bg=c.createGain(); bg.gain.value=a*2.2; mix.connect(b); b.connect(bg); bg.connect(sum);} vib(c,t,end,os,4.8,12,.2); out=g; rev+=.3; break;}
+  case 'flute':case 'whistle':case 'ney':{const g=adsr(c,t,name==='ney'?.09:.06,dur,.12,(name==='whistle'?.08:.12)*vel,.85), o=osc(c,'sine',f,t,end), o2=osc(c,'triangle',f*2,t,end), og=c.createGain(); og.gain.value=name==='ney'?.18:.08; o.connect(g); o2.connect(og); og.connect(g);
+    const n=noiseSrc(c,t,end), nb=lpf(c,f*(name==='ney'?1.5:2),name==='ney'?1.5:3,'bandpass'), ng=c.createGain(); ng.gain.value=name==='ney'?.35:.18; n.connect(nb); nb.connect(ng); ng.connect(g); vib(c,t,end,[o,o2],5.4,name==='whistle'?10:7,.25); out=g; rev+=.15; break;}
+  case 'fiddle':case 'sax':{const sax=name==='sax', g=adsr(c,t,sax?.03:.05,dur,.14,.09*vel,.85), o=osc(c,'sawtooth',f,t,end), fl=lpf(c,sax?2200:3800,.6), bp=lpf(c,sax?1100:2400,1.1,'peaking'); bp.gain.value=8; o.connect(fl); fl.connect(bp); bp.connect(g);
+    if(sax){const o2=osc(c,'square',f,t,end,5), g2=c.createGain(); g2.gain.value=.4; o2.connect(g2); g2.connect(fl);} vib(c,t,end,[o],5.6,sax?14:11,.2); out=g; break;}
+  case 'guitar':case 'power':case 'chug':{const lead=name==='guitar', chug=name==='chug', g=adsr(c,t,.004,chug?.07:dur,chug?.08:lead?.2:.12,(lead?.07:chug?.08:.065)*vel,chug?.2:.8,chug?.05:.6), pre=c.createGain(); pre.gain.value=lead?5:4;
+    const ws=c.createWaveShaper(); ws.curve=gtrCurve(lead?6:8); const hp=lpf(c,90,.7,'highpass'), fl=lpf(c,chug?1100:lead?3400:2600,.8), cab=lpf(c,lead?1400:900,1,'peaking'); cab.gain.value=lead?5:3; pre.connect(ws); ws.connect(hp); hp.connect(fl); fl.connect(cab); cab.connect(g);
+    const os=[]; if(lead){os.push(osc(c,'sawtooth',f,t,end,-5),osc(c,'square',f,t,end,5));} else for(const k of [1,1.5,2]){os.push(osc(c,'sawtooth',f*k,t,end,(k-1)*6));} os.forEach(o=>o.connect(pre)); if(lead) vib(c,t,end,os,5.8,16,.25); if(chug) end=t+.4; out=g; rev=lead?.25:.08; break;}
+  case 'cleangtr':case 'lute':case 'harp':case 'synthpluck':{const harp=name==='harp', g=adsr(c,t,.003,.01,harp?1.4:name==='lute'?.7:.5,(harp?.13:.1)*vel,.0001,harp?.8:name==='lute'?.35:.25), fl=lpf(c,Math.min(9000,f*8),.8); fl.frequency.setTargetAtTime(Math.min(3000,f*2.2),t,harp?.3:.08); fl.connect(g);
+    const o=osc(c,name==='synthpluck'?'sawtooth':'triangle',f,t,end), o2=osc(c,name==='synthpluck'?'square':'sawtooth',f*(harp?2:1),t,end,4), g2=c.createGain(); g2.gain.value=harp?.15:.35; o.connect(fl); o2.connect(g2); g2.connect(fl); end=t+(harp?2.5:1.4); out=g; rev+=harp?.25:.1; break;}
+  case 'marimba':case 'kalimba':{const k=name==='kalimba', g=adsr(c,t,.002,.01,k?.9:.5,.2*vel,.0001,k?.3:.18), o=osc(c,'sine',f,t,end), o2=osc(c,'sine',f*(k?5.4:4),t,end), g2=c.createGain(); g2.gain.setValueAtTime(.25,t); g2.gain.setTargetAtTime(0,t,.03); o.connect(g); o2.connect(g2); g2.connect(g); end=t+1.2; out=g; break;}
+  case 'bell':{const g=c.createGain(); g.gain.value=.11*vel; [[1,1,1.6],[2.76,.45,.9],[5.4,.25,.45],[8.9,.12,.25]].forEach(([k,a,d])=>{const o=osc(c,'sine',f*k,t,t+d*3), og=c.createGain(); og.gain.setValueAtTime(a,t); og.gain.setTargetAtTime(0,t,d*.6); o.connect(og); og.connect(g);}); end=t+5; out=g; rev+=.35; break;}
+  case 'organ':case 'organbass':{const g=adsr(c,t,.03,dur,.25,(name==='organbass'?.1:.07)*vel), trem=c.createGain(), lfo=c.createOscillator(), lg=c.createGain(); trem.gain.value=.85; lfo.frequency.value=6.2; lg.gain.value=.15; lfo.connect(lg); lg.connect(trem.gain); lfo.start(t); lfo.stop(end); trem.connect(g);
+    (name==='organbass'?[[.5,.8],[1,1],[2,.4]]:[[1,1],[2,.75],[3,.45],[4,.35],[6,.18],[8,.12]]).forEach(([k,a])=>{const o=osc(c,'sine',f*k,t,end), og=c.createGain(); og.gain.value=a*.5; o.connect(og); og.connect(trem);}); out=g; rev+=.35; break;}
+  case 'synthlead':{const g=adsr(c,t,.01,dur,.18,.07*vel,.85), fl=lpf(c,2600,3); fl.connect(g); const os=[osc(c,'sawtooth',f,t,end,-8),osc(c,'sawtooth',f,t,end,8)]; os.forEach(o=>o.connect(fl)); vib(c,t,end,os,5.5,10,.25); out=g; rev+=.15; break;}
+  case 'synthpad':case 'pad':{const g=adsr(c,t,.7,dur,1,(name==='pad'?.055:.05)*vel), fl=lpf(c,name==='pad'?900:1500,.8); fl.connect(g); for(const d of [-12,0,12]) osc(c,name==='pad'?'triangle':'sawtooth',f,t,end+1,d).connect(fl); osc(c,'sine',f/2,t,end+1).connect(fl); end+=1; out=g; rev+=.35; break;}
+  case 'ebass':case 'synthbass':case 'ubass':case 'upright':case 'sub':{const g=adsr(c,t,.005,dur,.1,(name==='sub'?.24:.17)*vel,name==='upright'||name==='ubass'?.35:.7,.25), fl=lpf(c,name==='synthbass'?300:name==='sub'?200:700,name==='synthbass'?4:.8);
+    if(name==='synthbass'){fl.frequency.setValueAtTime(2200,t); fl.frequency.setTargetAtTime(300,t,.08);} fl.connect(g);
+    if(name==='sub') osc(c,'sine',f,t,end).connect(fl); else if(name==='upright'||name==='ubass'){osc(c,'triangle',f,t,end).connect(fl); const o2=osc(c,'sine',f*2,t,end), g2=c.createGain(); g2.gain.value=.25; o2.connect(g2); g2.connect(fl);} else {osc(c,'sawtooth',f,t,end).connect(fl); osc(c,name==='ebass'?'square':'sawtooth',f,t,end,7).connect(fl); const sb=osc(c,'sine',f,t,end), sg=c.createGain(); sg.gain.value=1.4; sb.connect(sg); sg.connect(g);}
+    out=g; rev=.04; end=t+dur+.5; break;}
+  default:return;}
+  out.connect(dest); sendRev(c,out,rev);}
+// one drum hit
+function drum(name,dest,t,vel=1,pitch=0){const c=AU.ctx, g=c.createGain(); g.gain.value=vel; g.connect(dest); let rev=.12;
+  const tone=(f0,f1,dec,amp,type='sine')=>{const o=osc(c,type,f0,t,t+dec*4+.05), og=c.createGain(); o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dec*.7); og.gain.setValueAtTime(amp,t); og.gain.setTargetAtTime(0,t+.005,dec/3); o.connect(og); og.connect(g);};
+  const nzz=(ft,f,q,dec,amp,a=.001)=>{const n=noiseSrc(c,t,t+dec*4+.05), fl=lpf(c,f,q,ft), ng=c.createGain(); ng.gain.setValueAtTime(0,t); ng.gain.linearRampToValueAtTime(amp,t+a); ng.gain.setTargetAtTime(0,t+a,dec/3); n.connect(fl); fl.connect(ng); ng.connect(g); return ng;};
+  switch(name){
+  case 'kickt':tone(170,60,.1,.6); nzz('highpass',3000,.7,.01,.3); break;
+  case 'kick':tone(160,48,.3,.9); nzz('highpass',3000,.7,.012,.25); break;
+  case 'kick808':tone(110,42,.7,.95); break;
+  case 'snare':tone(200,165,.09,.35,'triangle'); nzz('bandpass',2100,.7,.2,.55); nzz('highpass',5000,.7,.12,.25); rev=.2; break;
+  case 'clap':for(let k=0;k<3;k++){const n=noiseSrc(c,t+k*.012,t+.3), fl=lpf(c,1400,1.2,'bandpass'), ng=c.createGain(); ng.gain.setValueAtTime(.6,t+k*.012); ng.gain.setTargetAtTime(0,t+k*.012,k===2?.06:.008); n.connect(fl); fl.connect(ng); ng.connect(g);} rev=.25; break;
+  case 'hat':nzz('highpass',8000,.8,.04,.28); break;
+  case 'ohat':nzz('highpass',7500,.8,.28,.22); break;
+  case 'ride':nzz('highpass',6000,.6,.5,.12); tone(3400,3300,.4,.05); break;
+  case 'crash':nzz('highpass',4500,.5,1.4,.32); nzz('bandpass',9000,.5,.8,.15); rev=.3; break;
+  case 'tom':tone(140+pitch,100+pitch*.7,.28,.7); nzz('lowpass',1200,.7,.05,.15); rev=.2; break;
+  case 'taiko':tone(95+pitch,48,.6,1); nzz('lowpass',500,.7,.12,.5); rev=.45; break;
+  case 'timpani':{const f=pitch||98; tone(f*1.02,f,1.1,.75); tone(f*1.5,f*1.48,.6,.2); nzz('lowpass',700,.7,.08,.3); rev=.4; break;}
+  case 'shaker':nzz('bandpass',6500,1.2,.05,.2,.012); break;
+  case 'bodhran':tone(120,78,.22,.75); nzz('lowpass',1400,.7,.06,.25); break;
+  case 'hand':tone(260+pitch,200+pitch,.12,.5); nzz('bandpass',1800,.8,.05,.25); break;
+  case 'brush':nzz('bandpass',3200,.6,.22,.22,.03); break;
+  case 'roll':for(let k=0;k<6;k++){const n=noiseSrc(c,t+k*.035,t+k*.035+.08), fl=lpf(c,2400,.8,'bandpass'), ng=c.createGain(); ng.gain.setValueAtTime(.18+k*.04,t+k*.035); ng.gain.setTargetAtTime(0,t+k*.035,.02); n.connect(fl); fl.connect(ng); ng.connect(g);} break;
+  }
+  sendRev(c,g,rev);}
+// drum patterns for every kit: A and B variations plus a fill on the last bar of each phrase
+const mpat=s=>s.split('').map(ch=>ch==='x'?1:ch==='o'?.55:ch==='.'?0:+ch/9);
+const KITS={
+ rock:{A:{kick:'x.....x.x.......',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.'},B:{kick:'x.....x.x.x.....',snare:'....x.......x..o',hat:'xoxoxoxoxoxoxoxo'},fill:{tom:'........x.x.xx..',snare:'............xxxx'},crash:4},
+ metal:{A:{kickt:'x.x.x.x.x.x.x.x.',snare:'....x.......x...',ride:'x...x...x...x...'},B:{kickt:'xxx.xxx.xxx.xxx.',snare:'....x.......x...',hat:'x.x.x.x.x.x.x.x.'},fill:{snare:'x.x.x.x.xxxxxxxx',tom:'........x.x.x.x.'},crash:2},
+ orch:{A:{timpani:'x.......o.......',hat:''},B:{timpani:'x.....o.x.......',roll:'............x...'},fill:{timpani:'x...x...x.x.xxxx'},crash:8},
+ taiko:{A:{taiko:'x..x..x.x..x..o.',hand:'..o...o...o...o.'},B:{taiko:'x...x.x.x...x.xx',hand:'.o.o.o.o.o.o.o.o'},fill:{taiko:'x.x.x.x.xxxxxxxx'},crash:8},
+ march:{A:{kick:'x...x...x...x...',snare:'x.ox..x.x.ox..xo'},B:{kick:'x...x...x...x...',snare:'xoxox.x.xoxox.xx'},fill:{roll:'x...x...x...x...',snare:'............xxxx'},crash:4},
+ soft:{A:{kick:'x.......x.......',shaker:'..o...o...o...o.'},B:{kick:'x.......x.......',shaker:'.o.o.o.o.o.o.o.o',brush:'....o.......o...'},fill:{shaker:'oooooooooooooooo'},crash:0},
+ folk:{A:{bodhran:'x..x..x.x..x..o.',shaker:'..o...o...o...o.'},B:{bodhran:'x.ox.ox.x.ox.oxo',shaker:'oooooooooooooooo'},fill:{bodhran:'x.x.x.x.xxxxxxxx'},crash:0},
+ hand:{A:{hand:'x..o..x.o.x..o..',kick:'x.......x.......',shaker:'o.o.o.o.o.o.o.o.'},B:{hand:'x.ox.ox.x.ox.oxo',kick:'x..x....x..x....',shaker:'oooooooooooooooo'},fill:{tom:'x.x.x.x.xxxxxxxx'},crash:0},
+ heart:{A:{kick:'x..o............'},B:{kick:'x..o....x..o....'},fill:{kick:'x..o....x..o....'},crash:0},
+ brush:{A:{ride:'x..xx..xx..xx..x',brush:'....x.......x...',kick:'x.........x.....'},B:{ride:'x..xx..xx..xx..x',brush:'..o.x..o..o.x..o',kick:'x.....x...x.....'},fill:{snare:'........o.o.oooo'},crash:0},
+ electro:{A:{kick808:'x...x...x...x...',clap:'....x.......x...',ohat:'..x...x...x...x.'},B:{kick808:'x...x...x..xx...',clap:'....x.......x...',hat:'xxxxxxxxxxxxxxxx'},fill:{clap:'....x...x.x.xxxx'},crash:8},
+ none:{A:{},B:{},fill:{},crash:0}};
 function makeSong(key){const r=srand(strHash(key)), pick=a=>a[Math.floor(r()*a.length)], rint2=(a,b)=>a+Math.floor(r()*(b-a+1));
-  let mood, boss=key.startsWith('boss:'), menu=key==='menu';
-  if(menu) mood={sc:['major'],bpm:[106,106],lead:['sawtooth'],bass:'sawtooth',drum:'march',arp:.5,pad:1,root:[62,62],heroic:1};
-  else {const bi=+key.split(':')[boss?2:1]; mood=Object.assign({},MOODS[moodOf(bi)]||MOODS.nature);}
-  const S={key,boss,menu}; S.scale=SCALES[pick(mood.sc)]; if(boss&&!menu) S.scale=SCALES[pick(['harm','phrygian','minor','dim','hijaz'])];
-  S.bpm=rint2(mood.bpm[0],mood.bpm[1])+(boss?18:0); S.root=rint2(mood.root[0],mood.root[1]); S.stepDur=60/S.bpm/4; S.bars=menu?16:pick([8,8,12,16]); S.len=S.bars*16;
-  S.lead=pick(mood.lead); S.bassType=mood.bass; S.drum=boss?pick(['heavy','tribal','heavy']):mood.drum; S.bell=!!mood.bell; S.heroic=!!mood.heroic; S.lp=rint2(1400,3600);
+  const boss=key.startsWith('boss:'), menu=key==='menu'; let mood, style;
+  if(menu){mood={sc:['major'],root:[55,55]}; style='heroic';}
+  else {const bi=+key.split(':')[boss?2:1], mk=moodOf(bi); mood=MOODS[mk]||MOODS.nature;
+    style=boss?pick(mk==='fire'||mk==='infect'?['metal','rock','choir']:mk==='holy'||mk==='royal'?['choir','orchestral','organ']:mk==='void'||mk==='forms'?['choir','synth','rock','metal']:['choir','rock','orchestral','metal']):pick(mood.styles);}
+  const ST=STYLES[style], S={key,boss,menu,style,styleName:ST.name};
+  S.scale=SCALES[pick(mood.sc)]; if(boss) S.scale=SCALES[pick(['harm','phrygian','minor','dim','hijaz','minor'])];
+  S.bpm=rint2(ST.bpm[0],ST.bpm[1])+(boss&&style!=='metal'?12:0); S.root=rint2(mood.root[0],mood.root[1]); S.stepDur=60/S.bpm/4;
+  S.bars=menu?16:pick([16,16,24]); S.len=S.bars*16;
+  S.lead=menu?'brass':pick(ST.lead); S.harm=pick(ST.harm); S.hp=ST.hp; S.bass=pick(ST.bass); S.arp=pick(ST.arp); S.kit=pick(ST.kit); if(boss&&(S.kit==='none'||S.kit==='soft'||S.kit==='heart')) S.kit=style==='organ'?'orch':'taiko'; S.drum=S.kit; S.swing=style==='jazz'?.33:0;
+  S.instruments=[INAME[S.lead]||S.lead];
   const N=S.scale.length, deg=d=>S.root+S.scale[((d%N)+N)%N]+12*Math.floor(d/N);
-  const PROGS=menu?[[0,4,5,3],[0,3,4,4],[5,3,0,4],[0,4,5,3]]:boss?[[0,0,5,6],[0,3,5,4],[0,1,0,6],[0,5,3,4]]:[[0,5,3,4],[0,3,4,0],[0,6,5,6],[0,2,3,4],[0,4,5,3],[5,3,0,4],[0,3,0,4],[0,1,3,4]];
-  const pa=pick(PROGS), pb=pick(PROGS); S.prog=[]; for(let b=0;b<S.bars;b++) S.prog.push((b<S.bars/2?pa:pb)[b%4]);
-  // rhythm banks
-  const pat=s=>s.split('').map(ch=>ch==='x'?1:ch==='o'?.6:0);
-  const KICK={light:['x.......x.......','x.......x...x...'],heavy:['x..x..x...x.x...','x.x...x.x..x..x.'],tribal:['x..x..x.x..x....','x...x.x...x..x..'],sparse:['x...............','x.......o.......'],heart:['x..x............','x..x....x..x....'],march:['x.......x.......','x...x...x...x...']};
-  const SNARE={light:['....x.......x...'],heavy:['....x.......x..o','....x..o....x...'],tribal:['......x.....x.x.','....o...x...o...'],sparse:['................','........o.......'],heart:['................'],march:['....x.oo....x.xo','..o.x...o.o.x.oo']};
-  const HAT={light:['..x...x...x...x.','x.x.x.x.x.x.x.x.'],heavy:['xoxoxoxoxoxoxoxo','x.xox.xox.xox.xo'],tribal:['x.o.x.o.x.o.x.o.'],sparse:['........x.......','....x.......x...'],heart:['................'],march:['x.x.x.x.x.x.x.x.']};
-  S.kick=pat(pick(KICK[S.drum])); S.snare=pat(pick(SNARE[S.drum])); S.hat=pat(pick(HAT[S.drum])); S.tom=S.drum==='tribal'||S.drum==='march'||menu;
-  S.bassPat=pat(pick(boss?['x.x.x.x.x.x.x.x.','x..xx..xx..xx..x','xxx.xxx.xxx.xxx.']:menu?['x...x...x...x...','x..x..x.x...x...']:['x.......x.......','x...x...x...x...','x..x..x.x...x...','x.....x.x.......']));
-  S.arpOn=r()<mood.arp||boss; S.arpPat=pat(pick(['x.x.x.x.x.x.x.x.','xxxxxxxxxxxxxxxx','x..x..x.x..x..x.','x.xx.xx.x.xx.xx.'])); S.arpShape=pick([[0,2,4,7],[0,4,2,4],[0,2,4,2],[4,2,0,2],[0,4,7,4]]); S.padOn=r()<mood.pad||menu;
-  // melody: phrases built on chord tones, answered in the second half
-  S.mel=new Array(S.len).fill(null); const motif=[]; {let d=pick([4,2,0,7]); const rhythm=pat(pick(menu?['x...x.x.x...x...','x.....x.x.x.x...','x...x...x.x.x...']:['x.x...x.x...x...','x...x.x...x.x...','x..x..x...x.x...','x.....x...x.....','xx..x.x.x...x...']));
-    for(let i=0;i<32;i++){if(rhythm[i%16]){const step=menu&&i%16===0?pick([0,4,7]):pick([-2,-1,-1,1,1,2,0,3,-3]); d=Math.max(-2,Math.min(11,d+step)); motif.push({i,d});}}}
-  for(let b=0;b<S.bars;b+=2){const var2=(b/2)%2===1, off=S.prog[b]; motif.forEach((m,k)=>{let d=m.d+(var2&&k%3===2?pick([1,-1,2]):0)+(var2&&b>=S.bars/2?2:0); const i=b*16+m.i; if(i<S.len){const nx=motif[k+1], dur=(nx?nx.i-m.i:6)*S.stepDur; S.mel[i]={n:deg(d+off)+12,d:Math.min(dur*.92,S.stepDur*8)};}});}
-  S.deg=deg; S.vol={lead:menu?.2:.16,bass:.2,pad:.09,arp:.075,kick:.7,snare:.32,hat:.09}; if(S.lead==='sawtooth'||S.lead==='square'){S.vol.lead*=.75;} return S;}
-function playStep(S,i,t,bus){const st=i%16, bar=Math.floor(i/16), ch=S.prog[bar], deg=S.deg, sd=S.stepDur, v=S.vol;
-  if(S.kick[st]){vox(bus,{t,type:'sine',f:S.menu?110:140,f2:42,glide:.12,d:.05,r:.18,v:v.kick*S.kick[st]}); if(S.menu) nz(bus,{t,ft:'lowpass',f:400,d:.25,v:.12});}
-  if(S.snare[st]){nz(bus,{t,ft:'bandpass',f:S.menu?1800:2200,q:.7,d:S.menu?.12:.16,v:v.snare*S.snare[st],rev:.2}); vox(bus,{t,type:'triangle',f:220,f2:150,d:.03,r:.06,v:.08*S.snare[st]});}
-  if(S.hat[st]) nz(bus,{t,ft:'highpass',f:7000,d:S.hat[st]>.8?.05:.03,v:v.hat*S.hat[st]});
-  if(S.tom&&st===14&&bar%4===3){for(let k=0;k<3;k++) vox(bus,{t:t+k*sd*.66,type:'sine',f:180-k*35,f2:70,d:.08,r:.2,v:.22,rev:.25});}
-  if(S.bassPat[st]){const n=deg(ch)-24+(st%8===6&&!S.boss?7:0); vox(bus,{t,type:S.bassType,f:mtof(n),d:sd*(S.boss?1.6:3.2),r:.08,v:v.bass*(S.bassType==='sawtooth'||S.bassType==='square'?.6:1),lp:S.bassType==='sine'?0:500});}
-  if(S.padOn&&st===0){for(const k of [0,2,4]){const n=deg(ch+k)-(S.menu?0:12); for(const dt of [-7,7]) vox(bus,{t,type:S.menu?'sawtooth':'triangle',f:mtof(n),det:dt,d:sd*15,a:sd*3,r:sd*4,v:v.pad*(S.menu?.6:1),lp:S.menu?1600:1100,rev:.5});}
-    if(S.menu&&bar%2===0) vox(bus,{t,type:'sawtooth',f:mtof(deg(ch)-12),d:sd*7,a:.06,r:.3,v:.07,lp:900,rev:.4});}
-  if(S.arpOn&&S.arpPat[st]){const n=deg(ch+S.arpShape[st%S.arpShape.length])+(S.bell?12:0); vox(bus,{t,type:S.bell?'sine':'triangle',f:mtof(n),d:sd*.6,r:S.bell?.6:.12,v:v.arp*(S.bell?1.2:1),rev:S.bell?.6:.25});
-    if(S.bell) vox(bus,{t,type:'sine',f:mtof(n)*2.76,d:.02,r:.3,v:v.arp*.3});}
-  const m=S.mel[i]; if(m){const f=mtof(m.n); vox(bus,{t,type:S.lead,f,d:m.d,a:S.heroic?.03:.012,r:.18,v:v.lead,lp:S.lead==='sine'?0:S.lp,vib:5.5,vibA:m.d>.3?12:4,rev:.35,sus:S.heroic?.85:.7});
-    if(S.heroic) vox(bus,{t,type:'square',f:f/2,d:m.d,a:.03,r:.15,v:v.lead*.35,lp:1200});}}
+  const PROGS=menu?[[0,4,5,3],[0,3,4,4],[5,3,0,4],[0,4,5,3]]:boss?[[0,0,5,6],[0,3,5,4],[0,1,0,6],[0,5,3,4],[0,6,5,4]]:[[0,5,3,4],[0,3,4,0],[0,6,5,6],[0,2,3,4],[0,4,5,3],[5,3,0,4],[0,3,0,4],[0,1,3,4]];
+  const pa=pick(PROGS), pb=pick(PROGS), pc=pick(PROGS); S.prog=[]; S.sec=[];
+  // sections: an intro, the main theme, a contrasting part and a climax
+  for(let b=0;b<S.bars;b++){const q=b/S.bars; const sec=menu?(q<.25?1:q<.75?1:2):(q<.25?0:q<.5?1:q<.75?2:3); S.sec.push(sec); S.prog.push((sec===2?pb:sec===3?pc:pa)[b%4]);}
+  S.kick=null; S.bassPat=mpat(pick(boss?['x.x.x.x.x.x.x.x.','x..xx..xx..xx..x','xx.xx.xx.x.xx.x.']:style==='rock'||style==='metal'?['x.x.x.x.x.x.x.x.','x..x..x.x..x..x.']:style==='jazz'?['x...x...x...x...']:menu?['x...x...x.x.x...']:['x.......x.......','x...x...x...x...','x..x..x.x...x...','x.....x.x.......']));
+  S.arpPat=mpat(pick(['x.x.x.x.x.x.x.x.','xxxxxxxxxxxxxxxx','x..x..x.x..x..x.','x.xx.xx.x.xx.xx.'])); S.arpShape=pick([[0,2,4,7],[0,4,2,4],[0,2,4,2],[4,2,0,2],[0,4,7,4],[0,2,4,6]]);
+  S.compPat=mpat(pick(['x.....x.x.......','..x....x...x....','x..x..x...x..x..','x.......x...x...']));
+  // melody: a motif built on chord tones, answered and varied, placed in the lead's own singing range
+  S.mel=new Array(S.len).fill(null); const motif=[]; {let d=pick([4,2,0,7]); const rhythm=mpat(pick(menu?['x...x.x.x...x...','x.....x.x.x.x...','x...x...x.x.x...']:['x.x...x.x...x...','x...x.x...x.x...','x..x..x...x.x...','x.....x...x.....','xx..x.x.x...x...','x...x...x.x.x.x.','x.....xx..x.x...']));
+    for(let i=0;i<32;i++){if(rhythm[i%16]){const step=menu&&i%16===0?pick([0,4,7]):pick([-2,-1,-1,1,1,1,2,0,-3,3]); d=Math.max(-2,Math.min(9,d+step)); if(i>=28) d=pick([0,2,4]); motif.push({i,d});}}}
+  const rg=RANGE[S.lead]||[60,80], center=(rg[0]+rg[1])/2, avg=motif.reduce((a,m)=>a+deg(m.d),0)/Math.max(1,motif.length); let oct=Math.round((center-avg)/12)*12;
+  for(let b=0;b<S.bars;b+=2){if(S.sec[b]===0&&!menu&&b<2) continue; const var2=(b/2)%2===1, off=S.prog[b]; motif.forEach((m,k)=>{let d=m.d+(var2&&k%3===2?pick([1,-1,2]):0)+(S.sec[b]===3?2:0); const i=b*16+m.i; if(i<S.len){const nx=motif[k+1], dur=(nx?nx.i-m.i:6)*S.stepDur; let n=deg(d+off)+oct; while(n>rg[1]) n-=12; while(n<rg[0]) n+=12; S.mel[i]={n,d:Math.min(dur*.95,S.stepDur*8)};}});}
+  S.deg=deg; S.vol={lead:.5,harm:.45,bass:.5,arp:.33,drum:.46}; if(menu){S.vol.lead=.55;} if(style==='organ'){S.vol.harm=.75; S.vol.lead=.7;}
+  S.instruments=[INAME[S.lead]||S.lead, S.harm, S.bass, S.arp, S.kit].filter(Boolean); return S;}
+function playStep(S,i,t,bus){const st=i%16, bar=Math.floor(i/16), ch=S.prog[bar], deg=S.deg, sd=S.stepDur, v=S.vol, sec=S.sec[bar];
+  if(S.swing&&st%2===1) t+=sd*S.swing;
+  // drums
+  const K=KITS[S.kit]||KITS.none, phraseEnd=bar%4===3, part=sec===0&&!S.menu?(bar%2?K.A:{}):(phraseEnd&&st>=8?Object.assign({},sec>=2?K.B:K.A,K.fill):(sec>=2?K.B:K.A));
+  const dv=v.drum*(sec===0?.6:sec===3?1.1:1);
+  for(const nm in part){const p=part[nm]; if(!p||!p.length) continue; const h=p[st]==='x'?1:p[st]==='o'?.55:0; if(h){const pitch=nm==='timpani'?mtof(deg(ch)-24):nm==='tom'?(st%4)*-12:nm==='hand'?(st%3)*40:0; drum(nm,bus,t,dv*h*(nm==='kick'||nm==='kick808'||nm==='kickt'?1:nm==='timpani'?.9:.8),pitch);}}
+  if(K.crash&&st===0&&bar%K.crash===0&&sec>0) drum('crash',bus,t,dv*.7);
+  if(S.menu&&st===0&&bar%4===0) drum('timpani',bus,t,.6,mtof(deg(ch)-24));
+  // bass
+  if(S.bassPat[st]&&!(sec===0&&bar<1&&!S.menu)){let n=deg(ch)-24; while(n<34) n+=12; while(n>50) n-=12;
+    if(S.style==='jazz') n=deg(ch+[0,2,4,5][(st/4)|0])-24+(n<34?12:0); else if(st%8===6&&!S.boss) n+=7;
+    inst(S.bass,bus,t,n,sd*(S.style==='rock'||S.style==='metal'?1.6:S.boss?1.8:3.4),v.bass*(st%4===0?1:.8));}
+  // harmony
+  const chord=k=>{let n=deg(ch+k)-12; while(n<48) n+=12; while(n>67) n-=12; return n;};
+  if(S.hp==='sustain'&&st===0) for(const k of [0,2,4]) inst(S.harm,bus,t,chord(k),sd*15.5,v.harm*.8);
+  else if(S.hp==='piano'&&S.compPat[st]) for(const k of (st===0?[0,2,4]:[2,4])) inst('piano',bus,t,chord(k),sd*(st===0?7:3),v.harm*.55);
+  else if(S.hp==='comp'&&S.compPat[st]) for(const k of [0,2,4,6]) inst(S.harm,bus,t,chord(k),sd*2.5,v.harm*.55);
+  else if(S.hp==='stab'&&(st===0||st===10)&&sec>0) for(const k of [0,2,4]) inst(S.harm,bus,t,chord(k),sd*(st?3:5),v.harm*.6);
+  else if(S.hp==='arp'&&S.arpPat[st]) inst(S.harm,bus,t,chord(S.arpShape[st%S.arpShape.length])+12,sd*2,v.harm*.7);
+  else if(S.hp==='rock'&&S.bassPat[st]&&sec>0) inst('power',bus,t,deg(ch)-12+(deg(ch)-12<40?12:0),sd*(st%4===0?3.5:1.6),v.harm);
+  else if(S.hp==='chug'&&sec>0){if(S.bassPat[st]||st%2===0) inst('chug',bus,t,deg(ch)-12+(deg(ch)-12<40?12:0),sd,v.harm); if(st===0) inst('choirpad',bus,t,chord(0),sd*15,v.harm*.7);}
+  // counter part / arpeggio
+  if(S.arp&&sec>=1&&S.arpPat[st]&&!(S.arp==='strpad'||S.arp==='choirpad')){let n=deg(ch+S.arpShape[st%S.arpShape.length]); while(n<60) n+=12; while(n>84) n-=12; inst(S.arp,bus,t,n,sd*1.5,v.arp*(st%4===0?1:.75));}
+  else if(S.arp&&(S.arp==='strpad'||S.arp==='choirpad')&&st===0&&sec>=2) for(const k of [0,4]) inst(S.arp,bus,t,chord(k)+12,sd*15,v.arp*.7);
+  // lead
+  const m=S.mel[i]; if(m&&!(sec===0&&!S.menu&&bar<2)) {inst(S.lead,bus,t,m.n,m.d,v.lead*(sec===3?1.1:1)); if(S.menu&&sec>=1) inst('strings',bus,t,m.n-12,m.d,.35);}}
+/* MUSIC-END */
 function musicWant(){if(!$('#menu').hidden||!$('#mapScr').hidden||!L||L.menu) return 'menu'; if(boss&&boss.awake&&!boss.dead) return 'boss:'+boss.id+':'+L.bi; return 'lvl:'+L.bi+':'+L.li;}
 function auTick(){const c=AU.ctx; if(!c||c.state!=='running') return; const want=musicWant();
   if(want!==AU.want){AU.want=want; if(AU.bus){const ob=AU.bus; ob.gain.setTargetAtTime(0,c.currentTime,.35); setTimeout(()=>{try{ob.disconnect();}catch(e){}},2500);}
