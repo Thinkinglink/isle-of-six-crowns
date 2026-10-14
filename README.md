@@ -19,6 +19,18 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🎵 Six Crowns Soundtrack (music app)
+
+Listen to every piece of music from the game on its own: the heroic main theme plus the music of every level, boss arena and boss battle, grouped by island. You can play straight through, repeat a song, or shuffle. New music (like the Legends islands) shows up in the app automatically, with nothing to reinstall.
+
+| Device | Get it | How to install |
+|---|---|---|
+| **Windows** | [Six-Crowns-Soundtrack-Setup.exe](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Six-Crowns-Soundtrack-Setup.exe) | Run it. If Windows shows "Windows protected your PC", click **More info**, then **Run anyway**. |
+| **Mac** | [Six-Crowns-Soundtrack.dmg](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Six-Crowns-Soundtrack.dmg) | Open it and drag the app onto **Applications**. The first time, right-click it and choose **Open**. |
+| **Android** | [Six-Crowns-Soundtrack.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Six-Crowns-Soundtrack.apk) | Open the file on your phone or tablet and tap **Install**. |
+| **iPhone and iPad** | [Open in Safari](https://thinkinglink.github.io/isle-of-six-crowns/soundtrack/) | Tap **Share**, then **Add to Home Screen**. |
+| **Any browser** | [Listen now](https://thinkinglink.github.io/isle-of-six-crowns/soundtrack/) | Nothing to install. |
+
 ## Play together
 
 Open **Friends & Party** from the main menu or the map (key **F**).
