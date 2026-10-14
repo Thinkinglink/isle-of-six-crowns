@@ -19,6 +19,16 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 💎 The Three Great Legends
+
+Beat the Shapeless One at the Core of Forms and three adventurers walk into the arena. They find three crystals, take them, and become the **Supreme Creator**, the **Grand Magician** and the **Omega Enchanter**. Then they escape through a portal. **Stop the 3 great legends!**
+
+- **Enchanted Fields:** Glimmer Meadows, Moonwell Marsh, Starpetal Grove and the Enchanter's Spire. The final boss is the Omega Enchanter.
+- **Illusion Fortress:** Mirror Ramparts, the Hall of False Doors, Phantom Keep and the Magician's Stage. The final boss is the Grand Magician.
+- **Creators Cataclysm:** Unmade Plains, the Forge of Worlds, the Shattered Sky and the Throne of Creation. The final boss is the Supreme Creator.
+
+On these islands the legend appears in every boss cutscene and summons the boss. Each legend fights at a person's size. When it falls, it floats up, bursts with crystal light, and leaves its crystal behind. Then an arrow at the bottom right takes you to the next legend. Every new island has its own music, monsters, loot, bigger levels with key golems, and 5× boss health.
+
 ## 🎵 Six Crowns Soundtrack (music app)
 
 Listen to every piece of music from the game on its own: the heroic main theme plus the music of every level, boss arena and boss battle, grouped by island. You can play straight through, repeat a song, or shuffle. New music (like the Legends islands) shows up in the app automatically, with nothing to reinstall.

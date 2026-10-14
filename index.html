@@ -244,6 +244,14 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #mapScr.w5{background:radial-gradient(ellipse at 50% 55%,#3a0e06,#0e0302 72%)}
 #mapScr.w6{background:radial-gradient(ellipse at 50% 55%,#140a24,#000 72%)}
 #mapScr.w7{background:radial-gradient(ellipse at 55% 50%,#2a2048,#05040e 72%)}
+#mapScr.w8{background:radial-gradient(ellipse at 50% 55%,#0e3a2a,#020a06 72%)}
+#mapScr.w9{background:radial-gradient(ellipse at 50% 55%,#2a0e3a,#06020a 72%)}
+#mapScr.w10{background:radial-gradient(ellipse at 50% 55%,#3a2a0a,#0a0602 72%)}
+#legCard{position:fixed;inset:0;z-index:60;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center}
+#legCard h1{font-size:clamp(30px,6vw,64px);color:#f0c050;text-shadow:0 0 24px rgba(240,192,80,.55),0 4px 0 #6a4a10;margin:0;letter-spacing:.02em;opacity:0;transform:scale(.9)}
+#legCard p{color:#c8b890;max-width:560px;font-size:17px;margin:0;opacity:0}
+#legCard.in h1{animation:legIn 1.6s .4s ease-out forwards}#legCard.in p{animation:legFade 1.2s 1.8s ease-out forwards}#legCard .worldbtn{opacity:0}#legCard.in .worldbtn{animation:legFade .8s 2.6s ease-out forwards, wbpulse 1.4s 3.4s ease-in-out infinite}
+@keyframes legIn{to{opacity:1;transform:scale(1)}}@keyframes legFade{to{opacity:1}}
 .mapportal.forge{border-color:#ffb03a;background:radial-gradient(circle,#1a0604 30%,#ff7a1a 55%,#ffd040 75%,rgba(0,0,0,0) 76%);box-shadow:0 0 18px #ff6a1a,0 0 36px rgba(255,160,40,.5)}
 .mapportal.void{border-color:#e0d0ff;background:radial-gradient(circle,#000 34%,#3a2a6a 55%,#b48cff 75%,rgba(0,0,0,0) 76%);box-shadow:0 0 18px #b48cff,0 0 36px rgba(255,255,255,.35)}
 
@@ -797,7 +805,46 @@ const BIOMES=[
   skins:{melee:['Plague Husk','#4a5a2a','#9aff3a'],ranged:['Spitter','#3a4a2a','#c8ff6a'],lunge:['Blight Crawler','#2a3a1a','#9aff3a'],bomb:['Pus Bloat','#8ab03a','#2a3a10'],caster:['Rot Shaman','#3a2a3a','#9aff3a'],brute:['Swollen Brute','#5a6a3a','#c8ff6a']}},
  {id:'forms',name:"Core of Forms",world:7,lab:[0,0],levels:['Shifting Floor', 'Hall of Mirrors', 'The Prism Way', 'Heart of Change'],boss:'forms1',
   floor:['#1e1a2e','#241e36'],wallF:'#0a0814',wallT:'#3a3058',deco:['#7af0ff','#ffa030','#ffffff'],accent:'#7af0ff',amb:'void',map:['#2a2440','#322a4c','#221e36'],
-  skins:{melee:['Shifting Husk','#3a3058','#7af0ff'],ranged:['Prism Archer','#2a2448','#ffffff'],lunge:['Changeling','#1a1428','#ffa030'],bomb:['Unstable Form','#7af0ff','#1a1428'],caster:['Form Weaver','#2a1a3a','#ffa030'],brute:['Mirror Golem','#4a4a6a','#7af0ff']}}
+  skins:{melee:['Shifting Husk','#3a3058','#7af0ff'],ranged:['Prism Archer','#2a2448','#ffffff'],lunge:['Changeling','#1a1428','#ffa030'],bomb:['Unstable Form','#7af0ff','#1a1428'],caster:['Form Weaver','#2a1a3a','#ffa030'],brute:['Mirror Golem','#4a4a6a','#7af0ff']}},
+ // ---- The Three Legends: Enchanted Fields (world 8) ----
+ {id:'glimmer',name:'Glimmer Meadows',world:8,lab:[510,290],levels:['Spellbloom Path','Runestone Glade','Faefire Hollow','Whispering Willows'],boss:'thornstag',
+  floor:['#3a6a3a','#427442'],wallF:'#24402a',wallT:'#5aa86a',deco:['#2affa0','#ffe86a','#c8ffe0'],accent:'#2affa0',amb:'firefly',map:['#2f7a4a','#368452','#2a6e42'],
+  skins:{melee:['Spellbound Treant','#3a5a2a','#2affa0'],ranged:['Faefire Archer','#c8e8c0','#7affc8'],lunge:['Glimmer Fox','#e88a3a','#2affa0'],bomb:['Pixie Bomb','#ffe86a','#2a5a3a'],caster:['Rune Dryad','#4a7a4a','#c8ffe0'],brute:['Moss Guardian','#4a6a3a','#2affa0']}},
+ {id:'moonwell',name:'Moonwell Marsh',world:8,lab:[830,290],levels:['Moonlit Shallows','Lantern Reeds','Drowned Circle','The Moonwell'],boss:'moonhydra',
+  floor:['#2a4a4a','#2e5252'],wallF:'#163232',wallT:'#4a8a8a',deco:['#c8e8ff','#2affa0','#8ab0c8'],accent:'#c8e8ff',amb:'firefly',map:['#2a5a5e','#2e6266','#265256'],
+  skins:{melee:['Moon Drowned','#3a5a6a','#c8e8ff'],ranged:['Reed Archer','#9ab088','#c8e8ff'],lunge:['Marsh Serpent','#2a4a3a','#7affc8'],bomb:['Lantern Toad','#5a7a3a','#ffe86a'],caster:['Moonwell Witch','#2a3a5a','#c8e8ff'],brute:['Bog Colossus','#3a4a3a','#7affc8']}},
+ {id:'starpetal',name:'Starpetal Grove',world:8,lab:[830,600],levels:['Petal Steps','Crystal Orchard','Spellwoven Arbor','Grove of Runes'],boss:'runecolossus',
+  floor:['#4a5a3a','#526242'],wallF:'#2a3420',wallT:'#8ab05a',deco:['#ffb8e8','#2affa0','#fff2b0'],accent:'#ffb8e8',amb:'petal',map:['#4a7a3a','#548442','#426e34'],
+  skins:{melee:['Petal Knight','#e8a8c8','#2affa0'],ranged:['Thorn Archer','#5a7a3a','#ffb8e8'],lunge:['Starpetal Mantis','#7ab04a','#ffb8e8'],bomb:['Seed Bomb','#8a6a3a','#2affa0'],caster:['Grove Enchantress','#5a3a6a','#ffb8e8'],brute:['Rune Golem','#7a7a6a','#2affa0']}},
+ {id:'enchspire',name:"The Enchanter's Spire",world:8,lab:[510,600],levels:['Gate of Glyphs','Hall of Echoing Spells','Prism Stair','Omega Sanctum'],boss:'omegaenchanter',
+  floor:['#2a3a3a','#304242'],wallF:'#14221e',wallT:'#3a7a6a',deco:['#2affa0','#ffffff','#7affc8'],accent:'#2affa0',amb:'void',map:['#1e4a40','#225248','#1a4238'],
+  skins:{melee:['Glyph Warden','#2a4a40','#2affa0'],ranged:['Prism Archer','#c8f0e0','#2affa0'],lunge:['Spell Hound','#1a3a30','#7affc8'],bomb:['Arcane Wisp','#2affa0','#0a2a20'],caster:['Omega Acolyte','#0e2a24','#2affa0'],brute:['Crystal Juggernaut','#3a5a50','#2affa0']}},
+ // ---- Illusion Fortress (world 9) ----
+ {id:'mirror',name:'Mirror Ramparts',world:9,lab:[510,290],levels:['Glass Rampart','Hall of Reflections','Shattered Gallery','Mirror Gate'],boss:'mirrorknight',
+  floor:['#3a3448','#423c52'],wallF:'#1e1a2a',wallT:'#8a84b0',deco:['#e0d8ff','#c45aff','#9ae8ff'],accent:'#c45aff',amb:'void',map:['#4a4268','#524a72','#42385e'],
+  skins:{melee:['Mirror Soldier','#8a84b0','#e0d8ff'],ranged:['Glass Archer','#c8c8e8','#c45aff'],lunge:['Reflection Stalker','#3a3458','#e0d8ff'],bomb:['Shard Mite','#e0d8ff','#3a3458'],caster:['Looking-Glass Mage','#4a3a6a','#c45aff'],brute:['Mirror Golem','#9a94c0','#c45aff']}},
+ {id:'falsedoors',name:'Hall of False Doors',world:9,lab:[830,290],levels:['Door of Whispers','Endless Corridor','Upside-Down Library','The Last Door'],boss:'maskedjester',
+  floor:['#4a3a2a','#523e2e'],wallF:'#2a1a14',wallT:'#8a5a3a',deco:['#ff6aa8','#ffd36a','#c45aff'],accent:'#ff6aa8',amb:'hallow',map:['#5a3a4a','#644252','#503442'],
+  skins:{melee:['Doorway Ghoul','#5a4a3a','#ff6aa8'],ranged:['Keyhole Archer','#8a6a4a','#ffd36a'],lunge:['Corridor Crawler','#3a2a2a','#ff6aa8'],bomb:['Mimic Chest','#8a5a2a','#ffd36a'],caster:['Whispering Usher','#3a2440','#ff6aa8'],brute:['Doorframe Brute','#6a4a30','#c45aff']}},
+ {id:'phantomkeep',name:'Phantom Keep',world:9,lab:[830,600],levels:['Fog Bridge','Haunted Barracks','Spectral Crypt','Keep of Shadows'],boss:'phantasmdragon',
+  floor:['#2a2a3a','#303042'],wallF:'#12121e',wallT:'#5a5a7a',deco:['#9ae8ff','#c45aff','#e0e0ff'],accent:'#9ae8ff',amb:'gloom',map:['#2a2a4a','#303052','#242442'],
+  skins:{melee:['Phantom Soldier','#4a4a6a','#9ae8ff'],ranged:['Spectral Archer','#8a8ab0','#9ae8ff'],lunge:['Shade Wolf','#1a1a2a','#c45aff'],bomb:['Wailing Wisp','#9ae8ff','#1a1a2a'],caster:['Crypt Lich','#2a2a3a','#c45aff'],brute:['Phantom Ogre','#3a3a5a','#9ae8ff']}},
+ {id:'magistage',name:"The Magician's Stage",world:9,lab:[510,600],levels:['Curtain Hall','Trapdoor Theatre','Hall of Vanishing','The Grand Stage'],boss:'grandmagician',
+  floor:['#4a1a24','#521e2a'],wallF:'#22080e',wallT:'#8a2a3a',deco:['#c45aff','#ffd36a','#ff4a6a'],accent:'#c45aff',amb:'void',map:['#5a1a3a','#641e42','#501634'],
+  skins:{melee:['Marionette','#c8b8a0','#c45aff'],ranged:['Card Thrower','#2a1a2a','#ffd36a'],lunge:['Stage Hound','#3a1a2a','#ff4a6a'],bomb:['Trick Box','#8a2a3a','#ffd36a'],caster:['Illusionist','#2a1238','#c45aff'],brute:['Strongman Golem','#6a4a3a','#ff4a6a']}},
+ // ---- Creators Cataclysm (world 10) ----
+ {id:'unmade',name:'Unmade Plains',world:10,lab:[510,290],levels:['Clay Flats','Half-Formed Hills',"Sculptor's Canyon",'Unfinished Road'],boss:'claytitan',
+  floor:['#8a6a4a','#927252'],wallF:'#4a3424',wallT:'#b8946a',deco:['#ffc43a','#c8a070','#ffffff'],accent:'#ffc43a',amb:'sand',map:['#9a7a52','#a2825a','#8e6e4a'],
+  skins:{melee:['Clay Husk','#a07850','#ffc43a'],ranged:['Unfinished Archer','#c8a070','#ffc43a'],lunge:['Clay Hound','#8a6a4a','#ffffff'],bomb:['Kiln Bomb','#c86a3a','#ffc43a'],caster:['Sculptor Hand','#b8946a','#ffffff'],brute:['Clay Titanling','#7a5a3a','#ffc43a']}},
+ {id:'worldforge',name:'Forge of Worlds',world:10,lab:[830,290],levels:['Gear Halls','Molten Assembly','Blueprint Vault','Engine of Making'],boss:'worldsmith',
+  floor:['#3a3430','#423a36'],wallF:'#1e1a18',wallT:'#8a6a3a',deco:['#ffc43a','#ff7a1a','#7ad8ff'],accent:'#ffc43a',amb:'ember',map:['#4a3e34','#52463a','#42382e'],
+  skins:{melee:['Cog Soldier','#8a6a3a','#ffc43a'],ranged:['Rivet Archer','#6a6a72','#ff7a1a'],lunge:['Gear Spider','#5a4a3a','#ffc43a'],bomb:['Boiler Mite','#c86a2a','#ffc43a'],caster:['Blueprint Mage','#2a3a5a','#7ad8ff'],brute:['Steam Juggernaut','#4a4a52','#ff7a1a']}},
+ {id:'shatteredsky',name:'The Shattered Sky',world:10,lab:[830,600],levels:['Floating Isles','Storm Bridge','Thunder Steps','Eye of the Storm'],boss:'stormleviathan',
+  floor:['#5a6270','#626a78'],wallF:'#2a3040',wallT:'#9aa8c0',deco:['#ffc43a','#9fe8ff','#ffffff'],accent:'#9fe8ff',amb:'storm',map:['#5a6a82','#62728a','#52627a'],
+  skins:{melee:['Sky Knight','#c8d0e0','#ffc43a'],ranged:['Cloud Archer','#e0e8f0','#9fe8ff'],lunge:['Storm Hawk','#4a5a72','#ffc43a'],bomb:['Thunder Puff','#9fe8ff','#2a3a5a'],caster:['Gale Sorcerer','#3a4a6a','#9fe8ff'],brute:['Thunder Titan','#5a6272','#ffc43a']}},
+ {id:'creatorthrone',name:'Throne of Creation',world:10,lab:[510,600],levels:['Stair of Beginnings','Hall of First Light','Collapsing Heavens','Seat of the Maker'],boss:'supremecreator',
+  floor:['#5a4a2a','#62522e'],wallF:'#2a2010',wallT:'#d8b050',deco:['#ffc43a','#ffffff','#ff7a3a'],accent:'#ffc43a',amb:'void',map:['#6a5a2a','#72622e','#605226'],
+  skins:{melee:['Herald of Making','#d8b050','#ffffff'],ranged:['Light Archer','#f0e8d0','#ffc43a'],lunge:['Creation Hound','#8a6a2a','#ffffff'],bomb:['Star Seed','#ffc43a','#5a4a2a'],caster:['Creator Acolyte','#4a3a1a','#ffc43a'],brute:['Throne Colossus','#a88a4a','#ffffff']}}
 ];
 /* Halloween event: Hollowshade Isle is open until the start of November 1st (player's local time). */
 const EVENT_END=new Date(2026,10,1,0,0,0), EVENT_ACTIVE=()=>Date.now()<EVENT_END.getTime();
@@ -834,7 +881,19 @@ const BOSSES={
  forms1:{name:'The Shapeless One',hp:2400,r:40,spd:90,c1:'#5a6a7a',c2:'#7af0ff',acts:['slam','shards','charge','summon','ringshot'],shot:'#9af8ff',minion:'brute',form:'Form of Stone'},
  forms2:{name:'The Shapeless One · Form of Flame',hp:2400,r:40,spd:122,c1:'#5a1a0a',c2:'#ffa030',acts:['breath','fan','meteors','whirl','charge'],shot:'#ffb040',minion:'lunge',form:'Form of Flame'},
  forms3:{name:'The Shapeless One · Form of Stars',hp:2400,r:42,spd:112,c1:'#140e22',c2:'#ffffff',acts:['ringshot','shards','blink','tidal','strikes','summon','glyphs'],shot:'#e0d0ff',minion:'caster',form:'Form of Stars'},
- corruptedsinger:{name:'The Corrupted Singer',hp:1150,r:34,spd:96,c1:'#2a1a3a',c2:'#b47aff',acts:['ringshot','whirl','strikes','tidal','summon','fan'],shot:'#c89aff',minion:'caster'}
+ corruptedsinger:{name:'The Corrupted Singer',hp:1150,r:34,spd:96,c1:'#2a1a3a',c2:'#b47aff',acts:['ringshot','whirl','strikes','tidal','summon','fan'],shot:'#c89aff',minion:'caster'},
+ thornstag:{name:'The Thornspell Stag',hp:2600,r:40,spd:120,c1:'#2a4a2a',c2:'#2affa0',acts:['charge','vines','fan','summon','thorns'],shot:'#7affc8',minion:'lunge'},
+ moonhydra:{name:'The Moonwell Hydra',hp:2700,r:42,spd:84,c1:'#1e3a44',c2:'#c8e8ff',acts:['tidal','fan','pools','ringshot','summon'],shot:'#c8e8ff',minion:'caster'},
+ runecolossus:{name:'The Runic Colossus',hp:2850,r:44,spd:76,c1:'#4a5048',c2:'#2affa0',acts:['slam','glyphs','shards','summon','ringshot'],shot:'#2affa0',minion:'brute'},
+ omegaenchanter:{name:'The Omega Enchanter',hp:3400,r:16,spd:150,c1:'#0e2a24',c2:'#2affa0',acts:['blink','glyphs','spiral','ringshot','shards','fan','summon'],shot:'#2affa0',minion:'caster'},
+ mirrorknight:{name:'The Mirror Knight',hp:2900,r:36,spd:118,c1:'#4a4468',c2:'#e0d8ff',acts:['combo','charge','shards','blink','summon'],shot:'#e0d8ff',minion:'melee'},
+ maskedjester:{name:'The Masked Jester',hp:3000,r:40,spd:110,c1:'#3a1a2a',c2:'#ff6aa8',acts:['blink','meteors','spiral','summon','fan'],shot:'#ff6aa8',minion:'bomb'},
+ phantasmdragon:{name:'The Phantasm Dragon',hp:3150,r:46,spd:104,c1:'#1e1e3a',c2:'#9ae8ff',acts:['breath','blinknova','voidrain','fan','summon'],shot:'#9ae8ff',minion:'lunge'},
+ grandmagician:{name:'The Grand Magician',hp:3700,r:16,spd:155,c1:'#2a0e30',c2:'#c45aff',acts:['blink','blinknova','spiral','voidrain','orbs','summon','burst'],shot:'#d88aff',minion:'caster'},
+ claytitan:{name:'The Clay Titan',hp:3200,r:48,spd:72,c1:'#7a5a3a',c2:'#ffc43a',acts:['slam','quakebreak','smash','summon','meteors'],shot:'#ffc43a',minion:'brute'},
+ worldsmith:{name:'The Worldsmith Automaton',hp:3300,r:44,spd:92,c1:'#5a4a2a',c2:'#ffc43a',acts:['combo','strikes','meteors','summon','ringshot'],shot:'#ffd86a',minion:'melee'},
+ stormleviathan:{name:'The Storm Leviathan',hp:3450,r:48,spd:100,c1:'#3a4660',c2:'#9fe8ff',acts:['strikes','tidal','whirl','fan','summon'],shot:'#9fe8ff',minion:'lunge'},
+ supremecreator:{name:'The Supreme Creator',hp:4200,r:17,spd:150,c1:'#4a3a1a',c2:'#ffc43a',acts:['raisewall','structures','smash','spiral','strikes','meteors','summon','combo'],shot:'#ffe08a',minion:'brute'}
 };
 const WEAPONS={sword:{n:'Sword',dmg:11,rate:.42,reach:62,arc:2.0},axe:{n:'Axe',dmg:19,rate:.72,reach:58,arc:2.3},daggers:{n:'Twin Daggers',dmg:6,rate:.22,reach:46,arc:1.7},spear:{n:'Spear',dmg:13,rate:.55,reach:94,arc:.85},hammer:{n:'Maul',dmg:28,rate:1.0,reach:66,arc:2.6,stun:true}};
 const ARTS={nova:{n:'Ember Nova',cd:12,desc:'Burst of fire around you that burns enemies'},totem:{n:'Mending Charm',cd:22,desc:'Restores a large chunk of health'},gale:{n:'Gale Feather',cd:14,desc:'Move much faster for a few seconds'},storm:{n:'Arrow Storm',cd:16,desc:'Looses a ring of arrows in every direction'},ward:{n:'Iron Ward',cd:20,desc:'Take 75% less damage for a few seconds'},frost:{n:'Frost Nova',cd:14,desc:'Freezes nearby enemies solid'},lightning:{n:'Storm Call',cd:13,desc:'Lightning strikes the nearest enemies'},blades:{n:'Whirling Blades',cd:16,desc:'Blades circle you, cutting anything close'},meteor:{n:'Falling Star',cd:18,desc:'Calls down a meteor on the enemy ahead'},fury:{n:'Battle Fury',cd:20,desc:'Attack 40% faster and hit 20% harder'},summon:{n:'Summoning',cd:24,desc:'Summons allies that fight beside you for a while'}};
@@ -1135,7 +1194,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='4.3.0', SAVE_VERSION=7;
+const APP_VERSION='4.4.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1521,6 +1580,8 @@ function bossDown(b,fromNet){
   {const gs=CAT.uart.find(e=>e.bossSummon===b.id&&!e.ev); if(gs){const it=mkCatItem(gs,'uart',L.tier,'unique'); it.pot=+(it.pot*1.12).toFixed(2); it.pow=Math.round(it.pow*1.12); it.boss=b.id; dropLoot(b.x,b.y,{kind:'item',item:it});}}
   b.fallCine=true; b.deadAt=null;
   if(b.id==='sov2'){banner('The Sovereign falls','All six crowns are yours'); if(!run.guest){SAVE.cleared[L.bi+'-'+L.li]=true; SAVE.won=true;} persist(); run.victory=true; const vs=victoryCine(b), ds=defeatCine(b,true); const all=ds.concat(vs); all.cleanup=ds.cleanup; startCine(all,()=>{L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T,final:true}; banner('Collect your loot','Then step into the portal');});}
+  else if(b.id==='forms3'){const ds=defeatCine(b), ls=legendsOriginCine(b), all=ds.concat(ls); all.cleanup=()=>{if(ds.cleanup) ds.cleanup(); ls.cleanup();}; startCine(all,()=>legendsCard());}
+  else if(LEGENDS[b.id]) startCine(defeatCine(b),()=>legendDoneCard(b));
   else if(b.id==='echotyrant') startCine(defeatCine(b),()=>{L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T,big:true,cine:true}; banner('The Echo Tyrant falls','Collect your loot, then enter the great portal');});
   else startCine(defeatCine(b),()=>{banner('Guardian defeated','Collect your loot, then enter the portal'); L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T};});
 }
@@ -2860,6 +2921,216 @@ BOSS2.forms3=(R,B,u)=>{u.float=true; u.legs=[]; const star=glow('#ffffff',3), vi
   const rvio=NOV(M('#7a5ab0',{emissive:new THREE.Color('#7a5ab0'),emissiveIntensity:.7})), rcy=NOV(M('#4ab0c0',{emissive:new THREE.Color('#3a90a0'),emissiveIntensity:.7})), dst=NOV(M('#ffffff',{emissive:new THREE.Color('#d8d0ff'),emissiveIntensity:.9})); u.rings=[]; for(let i=0;i<3;i++){const r=put(B,hairTor(),i===1?rcy:rvio,0,1.1,0,.75+i*.18,.75+i*.18,1); u.rings.push(r); for(let k=0;k<8;k++){const a=k/8*TAU; put(r,gSphL,dst,Math.cos(a),Math.sin(a),0,.02/(.75+i*.18));}}
   u.orbit=[0,1,2,3,4,5,6,7].map(i=>put(B,gOct,[star,vio,cy][i%3],0,1,0,.04,.09,.04));
   u.anim=(u,b)=>{u.galaxy.rotation.z=time*.8;};};
+
+/* ---------- The Three Legends: adventurers remade by the crystals, still the size of a person ---------- */
+function legendBody(R,B,u,o){// o: col, robe, robe2, trim, skin
+  u.legs=[leg(B,-.1,.42,0,{m:o.leg,m2:o.leg2||o.leg,r:.055,key:'lgl'+o.k,toes:0,seed:2000}),leg(B,.1,.42,0,{m:o.leg,m2:o.leg2||o.leg,r:.055,key:'lgl'+o.k,toes:0,seed:2001})];
+  for(const l of u.legs){put(l,lathe('lgboot'+o.k,[[.05,0],[.07,.03],[.075,.12],[.06,.16]],24),o.trim,0,-.4,.01); put(l,gCap,o.trim,0,-.21,.05,.045,.035,.045).rotation.x=Math.PI/2;}
+  const T=grp(B,0,.42,0); u.torso=T; T.rotation.x=.04;
+  put(T,lathe('lgtorso'+o.k,[[.12,0],[.17,.06],[.2,.24],[.22,.4],[.16,.47],[0,.5]],40),o.robe,0,0,0,1,1,.78);
+  for(let i=0;i<2;i++) put(T,gBand,o.trim,0,.04+i*.36,0,.18+i*.03,.022,.14+i*.03);
+  // the chest crystal, the colour of the crystal they absorbed
+  const C=grp(T,0,.3,.15); put(C,thinTor(),o.trim,0,0,0,.075,.075,.6); u.chestGem=put(C,crystal(2010,6),glow(o.col,3),0,0,.01,.06,.11,.04); u.chestGem.rotation.x=Math.PI/2; u.core=u.chestGem;
+  for(let i=0;i<6;i++){const a=i/6*TAU; put(C,taper('lgcv'+o.k+i,[[0,0,0],[Math.cos(a)*.06,Math.sin(a)*.06,-.01],[Math.cos(a)*.14,Math.sin(a)*.12,-.03]],.006,.002,10,4),glow(o.col,2),0,0,0).castShadow=false;}
+  for(const s of [-1,1]){const p=grp(T,s*.21,.44,0,0,0,-s*.25); put(p,gCap,o.trim,0,0,0,.11,.07,.11); put(p,gCap,o.robe2,0,-.02,0,.095,.06,.095); o.pauldron&&o.pauldron(p,s);}
+  const aL=arm(T,-.24,.4,0,{side:-1,m:o.robe2,m2:o.skin,sh:o.robe2,r:.04,l1:.26,l2:.26,key:'lga'+o.k,seed:2020}), aR=arm(T,.24,.4,0,{side:1,m:o.robe2,m2:o.skin,sh:o.robe2,r:.04,l1:.26,l2:.26,key:'lga'+o.k,seed:2021}); u.arms=[aL,aR];
+  for(const a of [aL,aR]) claw(a.userData.hand,'lgc'+o.k,o.skin,glow(o.col,1.8),4,.08,.016,.9,.6);
+  const H=grp(T,0,.6,.01); u.head=H; put(H,blob(2030,.04),o.face,0,0,0,.12,.135,.12);
+  for(const s of [-1,1]){put(H,gSph,M('#050305'),s*.045,.02,.1,.032,.02,.02); eye(H,s*.045,.02,.115,.016,o.col,3.6); put(H,gBox,M('#100810'),s*.045,.055,.105,.06,.014,.02).rotation.z=s*-.4;}
+  return {T,H,aL,aR};}
+BOSS2.omegaenchanter=(R,B,u)=>{const col='#2affa0', robe=M('#0e3a30',{roughness:.6,side:THREE.DoubleSide}), robe2=M('#0a2620',{roughness:.65,side:THREE.DoubleSide}), trim=NOV(M('#c8ffe0',{metalness:.45,roughness:.25})), cry=NOV(M('#2affa0',{roughness:.08,metalness:.2,emissive:new THREE.Color('#0ea070'),emissiveIntensity:1.2})), skin=M('#3a6a5a',{roughness:.5}), leaf=NOV(M('#2a8a5a',{roughness:.5,side:THREE.DoubleSide}));
+  put(B,robeGeo('oerobe',.15,.34,.62,12,.08,.35,121),robe,0,.36,0); put(B,robeGeo('oerobe2',.16,.28,.36,9,.1,.45,122),robe2,0,.5,0);
+  const L0=legendBody(R,B,u,{k:'oe',col,robe,robe2,trim,skin,face:skin,leg:robe2,pauldron:(p,s)=>{for(let k=0;k<3;k++) put(p,crystal(2040+k,5),cry,s*.03*k,.04,-.04+k*.04,.025,.1+k*.02,.025).rotation.z=-s*(.5+k*.2);}});
+  // the hood with antlers of crystal
+  const H=L0.H; put(H,lathe('oehood',[[0,.18],[.1,.17],[.15,.08],[.155,-.06],[.12,-.13],[.08,-.1]],32),robe,0,.0,-.015,1,1,1.05);
+  for(const s of [-1,1]){horn(H,'oeant'+s,[s*.08,.12,-.02],[s*.6,1,-.2],.26,[s*.3,-.2,-.2],.016,trim); for(let k=0;k<3;k++) put(H,crystal(2050+k,5),cry,s*(.12+k*.04),.2+k*.035,-.04-k*.02,.012,.05,.012).rotation.z=-s*.6;}
+  put(T(L0),capeGeo('oecape',.42,.62,.6,.4,.3,123),robe2,0,.48,-.12);
+  // runic sash and the staff of the Omega crystal
+  put(L0.T,taper('oesash',[[-.18,.42,.12],[0,.24,.17],[.17,.04,.1]],.02,.02,16,6),glow(col,1.6)).castShadow=false;
+  const st=grp(L0.aR.userData.hand,0,0,.02); put(st,taper('oestaff',[[0,-.4,0],[.01,0,.01],[-.01,.42,0],[0,.6,.02]],.014,.011,24,8),NOV(M('#2a1a10',{roughness:.8}))); const tp=grp(st,0,.66,.02); put(tp,crystal(2060,6),cry,0,0,0,.05,.16,.05); for(let k=0;k<4;k++){const a=k/4*TAU; put(tp,taper('oecl',[[0,-.08,0],[Math.cos(a)*.05,0,Math.sin(a)*.05],[Math.cos(a)*.02,.08,Math.sin(a)*.02]],.006,.003,10,4),trim);}
+  // a ring of glyphs turning behind it, and spellbooks circling
+  u.halo=grp(L0.T,0,.62,-.14); put(u.halo,hairTor(),glow(col,1.8),0,0,0,.26,.26,1); for(let i=0;i<10;i++){const a=i/10*TAU; put(u.halo,gBox,glow(i%2?'#c8ffe0':col,2),Math.cos(a)*.26,Math.sin(a)*.26,0,.03,.045,.004).rotation.z=a;}
+  u.orbit=[0,1,2].map(i=>{const g=grp(B,0,1,0); put(g,gBox,NOV(M(['#2a6a4a','#4a2a1a','#1a3a5a'][i])),0,0,0,.09,.11,.03); put(g,gBox,NOV(M('#efe6d0')),0,0,.016,.08,.1,.005); return g;});
+  function T(l){return l.T;}};
+BOSS2.grandmagician=(R,B,u)=>{const col='#c45aff', coat=M('#1e0a26',{roughness:.5,side:THREE.DoubleSide}), coat2=M('#12061a',{roughness:.55,side:THREE.DoubleSide}), lining=M('#8a0e2a',{roughness:.5,side:THREE.DoubleSide}), trim=NOV(M('#e8c860',{metalness:.45,roughness:.25})), glove=NOV(M('#f0ece0',{roughness:.5})), mask=NOV(M('#f4ecdc',{roughness:.3}));
+  const L0=legendBody(R,B,u,{k:'gm',col,robe:coat,robe2:coat2,trim,skin:glove,face:mask,leg:coat2,pauldron:(p,s)=>{put(p,gCone,trim,s*.05,.05,0,.02,.09,.02).rotation.z=-s*.8;}});
+  // tailcoat with long split tails and a towering collar
+  for(const s of [-1,1]) put(L0.T,capeGeo('gmtail',.22,.62,.3,.2,.12,131),coat,s*.07,.12,-.1).rotation.set(.12,s*.25,0);
+  const col2=grp(L0.T,0,.5,-.04); put(col2,capeGeo('gmcollar',.5,.3,1,-.2,.05,132),lining,0,.18,-.04).rotation.x=Math.PI; put(col2,capeGeo('gmcollar2',.52,.32,1,-.2,.05,133),coat2,0,.19,-.06).rotation.x=Math.PI;
+  put(L0.T,capeGeo('gmcape',.48,.82,.6,.5,.25,134),lining,0,.48,-.13); put(L0.T,capeGeo('gmcape2',.5,.84,.6,.5,.25,135),coat,0,.49,-.14);
+  // porcelain grin mask, twisted horns and the tall hat
+  const H=L0.H; put(H,gBox,M('#050305'),0,-.055,.115,.09,.008,.02); for(let i=0;i<7;i++) put(H,gBox,M('#050305'),(i-3)*.013,-.055+(i%2?-.006:.006),.117,.003,.016,.01);
+  put(H,gBox,M('#050305'),0,-.055,.116,.12,.004,.01).rotation.z=.12;
+  for(const s of [-1,1]) ridgeHorn(H,'gmh'+s,[s*.1,.08,-.02],[s*.9,.5,-.4],.2,[s*-.4,.7,0],.022,coat2,trim);
+  const HT=grp(H,0,.12,0,-.08,0,.1); put(HT,lathe('gmbrim',[[0,0],[.17,-.005],[.19,.01],[.16,.02],[0,.02]],40),coat2); put(HT,lathe('gmhat',[[.1,0],[.105,.15],[.115,.28],[.12,.3],[0,.3]],40),coat); put(HT,gBand,lining,0,.04,0,.107,.04,.107); put(HT,crystal(2070,5),glow(col,3),0,.045,.1,.015,.03,.015).rotation.x=Math.PI/2;
+  // the wand and a storm of cards
+  const wd=grp(L0.aR.userData.hand,0,0,.02); put(wd,gCyl,coat2,0,0,.16,.008,.32,.008).rotation.x=Math.PI/2; put(wd,gCyl,glove,0,0,.31,.009,.04,.009).rotation.x=Math.PI/2; put(wd,gSph,glow(col,3),0,0,.34,.016);
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=grp(B,0,1,0); put(g,gBox,NOV(M('#f4f0e8',{roughness:.4})),0,0,0,.07,.1,.003); put(g,gOct,glow(i%2?'#ff3a5a':col,2.2),0,0,.003,.012,.018,.002); return g;});};
+BOSS2.supremecreator=(R,B,u)=>{const col='#ffc43a', gold=NOV(M('#e8c050',{metalness:.5,roughness:.22})), white=NOV(M('#f4ecdc',{roughness:.35})), dark=M('#2a2010',{roughness:.5}), skin=M('#6a5a3a',{roughness:.5}), cape=M('#8a1a14',{roughness:.6,side:THREE.DoubleSide}), light=glow('#fff2c0',2.6);
+  const L0=legendBody(R,B,u,{k:'sc',col,robe:white,robe2:gold,trim:gold,skin:gold,face:skin,leg:white,leg2:gold,pauldron:(p,s)=>{for(let k=0;k<4;k++) put(p,leafGeo('scpf',.14,.04,.02,1),gold,s*.05,.02,-.06+k*.04,1,1,1,0,0,-s*(1.2+k*.12));}});
+  put(B,robeGeo('scskirt',.17,.26,.24,14,.03,.08,141),gold,0,.4,0);
+  put(L0.T,capeGeo('sccape',.5,.86,.6,.45,.22,142),cape,0,.48,-.14);
+  // a crown of rays and a halo behind it
+  const H=L0.H; const cr=crownR(H,.1,.12,gold,glow(col,2.4),9,.16); u.crown=cr; put(H,gBox,light,0,.02,.12,.1,.012,.01);
+  u.halo=grp(L0.T,0,.66,-.13); put(u.halo,thinTor(),light,0,0,0,.22,.22,.4); for(let i=0;i<14;i++){const a=i/14*TAU; put(u.halo,taper('schr',[[0,0,0],[0,.06,0],[0,.13,0]],.012,.002,8,4),gold,Math.cos(a)*.24,Math.sin(a)*.24,0,1,1,1,0,0,a-Math.PI/2);}
+  // the Hammer of First Light
+  const hm=grp(L0.aR.userData.hand,0,0,.03); put(hm,gCyl,dark,0,0,.2,.014,.5,.014).rotation.x=Math.PI/2; const hd=grp(hm,0,0,.46); put(hd,gBox,gold,0,0,0,.18,.11,.11); put(hd,gBox,light,0,0,0,.19,.05,.12); put(hd,crystal(2080,6),glow(col,3),0,.08,0,.025,.06,.025);
+  // the shapes of creation circle it
+  const G=[gBox,gSph,gCone,gOct,gTor,gIco]; u.orbit=G.map((g,i)=>{const q=grp(B,0,1,0); put(q,g,i%2?gold:light,0,0,0,.045); return q;});};
+/* ---------- The Thornspell Stag: a towering enchanted stag with antlers of living crystal ---------- */
+BOSS2.thornstag=(R,B,u)=>{u.legType='quad'; const hide=M('#3a4a2a',{roughness:.7}), hide2=M('#24321a',{roughness:.75}), belly=M('#8a8a5a',{roughness:.7}), hoof=NOV(M('#1a1410',{roughness:.4})), cry=NOV(M('#2affa0',{roughness:.08,metalness:.2,emissive:new THREE.Color('#0ea070'),emissiveIntensity:1.1})), bark=M('#4a3220',{roughness:.9}), moss=M('#4f8a2e',{roughness:1}), gl=glow('#2affa0',2.4), fl=NOV(M('#ffe86a',{emissive:new THREE.Color('#ffd040'),emissiveIntensity:.6}));
+  u.legs=[]; for(const [x,z] of [[-.2,.42],[.2,.42],[-.2,-.42],[.2,-.42]]){const g=leg(B,x,.78,z,{m:hide,m2:hide2,r:.06,key:'tsl',toes:0,dig:z<0?1:0,foot:.08,seed:2100+Math.round(x*10+z*10)}); put(g,lathe('tshoof',[[.04,0],[.05,.02],[.045,.06]],16),hoof,0,-.78,.02); u.legs.push(g);}
+  const T=grp(B,0,.85,0); u.torso=T; put(T,blob(2110,.08),hide,0,.05,0,.3,.28,.58); put(T,blob(2111,.1),belly,0,-.1,.05,.24,.16,.46);
+  for(let i=0;i<6;i++){put(T,taper('tsrune'+i,[[0,0,0],[.01,.06,.04],[0,.12,.02]],.008,.006,10,4),gl,(i%2?.3:-.3),-.02+((i*3)%4)*.03,-.3+i*.12).castShadow=false;}
+  // a mane of moss and flowers
+  for(let i=0;i<9;i++){put(T,blob(2120+i,.35),i%3?moss:hide2,0,.24+Math.sin(i)*.03,.42-i*.09,.1,.08,.1); if(i%2) put(T,gSph,fl,Math.sin(i*2)*.08,.32,.4-i*.09,.02);}
+  // neck and the noble, terrible head
+  put(T,taper('tsneck',[[0,.1,.42],[0,.35,.58],[0,.52,.66]],.16,.11,16,12),hide);
+  const H=grp(T,0,.6,.7); u.head=H; put(H,blob(2130,.06),hide,0,0,0,.13,.14,.16); put(H,taper('tssnout',[[0,0,0],[0,-.04,.12],[0,-.08,.22]],.1,.06,14,12),hide2,0,-.02,.08); put(H,gSph,M('#0a0806'),0,-.1,.3,.04,.03,.03);
+  for(const s of [-1,1]){put(H,gSph,M('#050302'),s*.09,.04,.1,.035,.028,.025); eye(H,s*.095,.04,.115,.018,'#2affa0',3.4); put(H,leafGeo('tsear',.14,.06,.04,1),hide2,s*.12,.08,-.04,1,1,1,-.3,s*.4,-s*1.2);}
+  // the crystal antlers: branching tines tipped with crystal
+  for(const s of [-1,1]){const base=[s*.06,.12,-.02]; horn(H,'tsa1'+s,base,[s*.5,1,-.2],.62,[s*.5,-.1,-.3],.03,bark); const tines=[[.25,[s*.8,.6,.3],.2],[.45,[s*.2,1,.4],.22],[.6,[s*1,.4,-.2],.2],[.75,[s*.3,1,-.1],.18]];
+    for(const [t,d,l] of tines){const P0=[base[0]+(s*.5*t+s*.5*t*t)*.62,base[1]+(1*t-.1*t*t)*.62,base[2]+(-.2*t-.3*t*t)*.62]; horn(H,'tst'+s+t,P0,d,l,[0,.1,0],.016,bark); put(H,crystal(2140+Math.round(t*10),5),cry,P0[0]+d[0]*l,P0[1]+d[1]*l,P0[2]+d[2]*l,.022,.07,.022);}}
+  for(let k=0;k<5;k++) put(H,blob(2150+k,.3),moss,(k-2)*.05,.13,-.02,.04,.03,.04);
+  u.tail=grp(T,0,.18,-.56); put(u.tail,taper('tstail',[[0,0,0],[0,-.05,-.08],[0,-.12,-.12]],.05,.02,10,8),hide2);
+  u.orbit=[0,1,2,3].map(i=>put(B,crystal(2160+i,5),cry,0,1,0,.03,.09,.03));};
+/* ---------- The Moonwell Hydra: three moonstone heads rising from a silver pool ---------- */
+BOSS2.moonhydra=(R,B,u)=>{u.legs=[]; u.arms=[]; const sc=M('#1e3a44',{roughness:.35,metalness:.1}), sc2=M('#122630',{roughness:.45}), belly=M('#8ab0b8',{roughness:.4}), moon=NOV(M('#e8f4ff',{roughness:.15,emissive:new THREE.Color('#9ac8ff'),emissiveIntensity:.5})), fin=NOV(M('#4a8ab0',{roughness:.3,side:THREE.DoubleSide,transparent:true,opacity:.85})), tooth=NOV(M('#f0f4f0',{roughness:.3})), water=NOV(M('#2a5a7a',{roughness:.05,metalness:.3,transparent:true,opacity:.8}));
+  put(B,gCircle,water,0,.03,0,.95,.95,.95).rotation.x=-Math.PI/2; put(B,hairTor(),moon,0,.04,0,.95,.95,1).rotation.x=Math.PI/2;
+  put(B,blob(2200,.1),sc,0,.25,0,.62,.36,.55); put(B,blob(2201,.12),belly,0,.2,.2,.42,.24,.3);
+  for(let i=0;i<10;i++){const a=i/10*TAU; put(B,gCone,moon,Math.sin(a)*.4,.5,Math.cos(a)*.35-.05,.04,.16,.04).rotation.set(-Math.cos(a)*.5,0,Math.sin(a)*.5);}
+  u.wyrm=[]; const heads=[];
+  [[-1,.35],[0,0],[1,.35]].forEach(([s,back],hi)=>{let p=grp(B,s*.3,.48,.1-back*.3,0,s*.35,s*-.3); for(let i=0;i<6;i++){const sg=grp(p,0,i?.14:0,i?.03:0); const r=.12-i*.008; put(sg,blob(2210+i,.06),i%2?sc:sc2,0,.07,0,r,.09,r); put(sg,blob(2220+i,.08),belly,0,.07,r*.55,r*.6,.08,r*.4); if(i%2) put(sg,leafGeo('mhfin',.16,.07,.04,1,.004),fin,0,.1,-r*.8,1,1,1,-.4,0,0); u.wyrm.push(sg); p=sg;}
+    const H=grp(p,0,.17,.05,-.6,0,0); heads.push(H); put(H,blob(2230+hi,.06),sc,0,0,.05,.12,.09,.17); put(H,taper('mhsnout',[[0,0,0],[0,-.01,.1],[0,-.03,.16]],.07,.04,12,10,.8),sc2,0,-.02,.15);
+    for(const t of [-1,1]){eye(H,t*.075,.04,.13,.016,'#c8e8ff',3.4); horn(H,'mhh'+t,[t*.06,.07,0],[t*.4,.6,-.7],.2,[0,.2,0],.02,moon);} put(H,crystal(2240+hi,5),moon,0,.09,.03,.03,.08,.03).rotation.x=-.6;
+    const J=grp(H,0,-.06,.05); put(J,blob(2250,.08),belly,0,-.01,.1,.08,.03,.13); fangs(J,tooth,6,.11,.01,.2,.04,1,.4,.008); fangs(H,tooth,6,.12,-.06,.22,.04,-1,.4,.008); if(hi===1) u.jaw=J;});
+  u.head=heads[1];
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=put(B,gSph,moon,0,1,0,.04); return g;});};
+/* ---------- The Runic Colossus: standing stones locked together by glowing old words ---------- */
+BOSS2.runecolossus=(R,B,u)=>{const st=M('#6a7064',{roughness:.85}), st2=M('#4a5048',{roughness:.9}), moss=M('#4f7a2a',{roughness:1}), gl=glow('#2affa0',2.6), gold=glow('#ffe86a',2.2), rmat=new THREE.MeshBasicMaterial({map:runeTex(),color:0x2affa0,transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide});
+  const slab=(p,x,y,z,sx,sy,sz,seed,rx=0,ry=0,rz=0)=>{const m=put(p,shard(seed,.18),seed%3?st:st2,x,y,z,sx,sy,sz,rx,ry,rz); if(seed%2){const d=new THREE.Mesh(gPlane,rmat); d.position.set(x,y,z+sz*.92); d.scale.set(sx*1.1,sy*1.1,1); p.add(d);} return m;};
+  const L=s=>{const g=grp(B,s*.28,.64,0); slab(g,0,-.12,0,.16,.16,.16,2300+s); slab(g,0,-.36,.02,.14,.16,.14,2302+s); slab(g,0,-.58,.08,.18,.06,.24,2304+s); put(g,gSph,gl,0,-.25,0,.04).castShadow=false; return g;}; u.legs=[L(-1),L(1)];
+  const T=grp(B,0,.7,0); u.torso=T; T.rotation.x=.1; slab(T,0,.38,0,.42,.36,.3,2310); slab(T,-.26,.62,0,.2,.16,.24,2311,0,0,.3); slab(T,.26,.62,0,.2,.16,.24,2313,0,0,-.3); slab(T,0,.08,.02,.32,.14,.26,2315); slab(T,0,.4,-.32,.36,.3,.12,2317);
+  u.core=put(T,gOct,gl,0,.42,.32,.08,.12,.04); put(T,hairTor(),gold,0,.42,.31,.14,.14,1);
+  for(let i=0;i<8;i++) put(T,blob(2320+i,.35),moss,Math.sin(i*2)*.3,.65+Math.cos(i)*.05,Math.cos(i*2)*.2,.08,.04,.08);
+  const A=s=>{const g=grp(T,s*.5,.58,0); slab(g,0,-.08,0,.17,.17,.17,2330+s); put(g,gSph,gl,0,-.22,0,.04).castShadow=false; slab(g,0,-.34,.03,.13,.16,.13,2332+s); slab(g,0,-.6,.06,.2,.17,.18,2334+s); g.userData.hand=grp(g,0,-.7,.08); return g;}; u.arms=[A(-1),A(1)];
+  const H=grp(T,0,.86,.08); u.head=H; slab(H,0,0,0,.16,.14,.15,2340); put(H,gBox,M('#020302'),0,.0,.13,.18,.03,.04); eye(H,-.05,0,.15,.02,'#2affa0',3.6); eye(H,.05,0,.15,.02,'#2affa0',3.6); slab(H,0,.15,-.02,.2,.05,.18,2341);
+  // rune stones floating in a ring
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=grp(B,0,1,0); put(g,shard(2350+i,.25),st,0,0,0,.06,.09,.04); const d=new THREE.Mesh(gPlane,rmat); d.position.z=.045; d.scale.set(.1,.12,1); g.add(d); return g;});};
+/* ---------- The Mirror Knight: armour of mirror shards, a looking-glass shield and a sword of glass ---------- */
+BOSS2.mirrorknight=(R,B,u)=>{const mir=NOV(M('#c8c4e8',{metalness:.45,roughness:.04,flatShading:true})), mir2=NOV(M('#8a84b0',{metalness:.45,roughness:.08,flatShading:true})), dark=M('#1e1a2a',{roughness:.5}), glass=NOV(M('#e8f4ff',{roughness:0,metalness:.3,emissive:new THREE.Color('#9ae8ff'),emissiveIntensity:.5,transparent:true,opacity:.75})), gl=glow('#e0d8ff',2.6), vio=glow('#c45aff',2.4);
+  u.legs=[leg(B,-.16,.64,0,{m:dark,m2:mir2,sh:mir,r:.09,key:'mkl',toes:0,seed:2400}),leg(B,.16,.64,0,{m:dark,m2:mir2,sh:mir,r:.09,key:'mkl',toes:0,seed:2401})];
+  for(const l of u.legs){put(l,shard(2402,.4,0),mir,0,-.33,.07,.07,.08,.04); put(l,shard(2403,.4,0),mir2,0,-.52,.06,.07,.1,.05);}
+  const T=grp(B,0,.66,0); u.torso=T; T.rotation.x=.08; put(T,blob(2404,.06),dark,0,.32,0,.3,.34,.22);
+  // breastplate built from overlapping mirror shards
+  for(let i=0;i<16;i++){const a=(i%8)/8*TAU, y=.12+Math.floor(i/8)*.28; put(T,shard(2410+i,.45,0),i%2?mir:mir2,Math.sin(a)*.27,y+.06*Math.cos(a*2),Math.cos(a)*.2,.12,.14,.05,0,a,(i%3-1)*.3);}
+  for(const s of [-1,1]){const p=grp(T,s*.34,.58,0,0,0,-s*.25); for(let k=0;k<4;k++) put(p,shard(2430+k,.45,0),k%2?mir:mir2,s*k*.03,.02-k*.02,-.06+k*.04,.12,.06,.1,0,0,-s*.3);}
+  put(T,capeGeo('mkcape',.6,.95,.6,.35,.3,151),NOV(M('#2a2448',{roughness:.5,side:THREE.DoubleSide})),0,.6,-.18);
+  const aL=arm(T,-.38,.54,0,{side:-1,m:dark,m2:mir2,sh:mir,r:.065,l1:.32,l2:.32,key:'mka',seed:2440}), aR=arm(T,.38,.54,0,{side:1,m:dark,m2:mir2,sh:mir,r:.065,l1:.32,l2:.32,key:'mka',seed:2441}); u.arms=[aL,aR];
+  for(const a of [aL,aR]) claw(a.userData.hand,'mkc',mir2,mir,4,.1,.03,.8,.5);
+  // the looking-glass shield
+  const sh=grp(aL.userData.hand,-.06,.08,.08,0,-.3,0); put(sh,lathe('mksh',[[0,0],[.3,0],[.32,.02],[.3,.04],[0,.03]],8),mir2,0,0,0,1,1,1,Math.PI/2,0,Math.PI/8); put(sh,gCircle,glass,0,0,.045,.27,.27,1).rotation.y=0; put(sh,gOct,vio,0,0,.06,.04,.06,.01);
+  // the sword of glass
+  const sw=grp(aR.userData.hand,0,0,.04); put(sw,gCyl,dark,0,0,0,.016,.16,.016).rotation.x=Math.PI/2; put(sw,gBox,mir,0,0,.09,.2,.03,.03); put(sw,taper('mkblade',[[0,0,.1],[0,0,.6],[0,0,1.0],[0,0,1.12]],.06,.004,16,4,.12,.6),glass);
+  // helm with a mirror visor
+  const H=grp(T,0,.8,.04); u.head=H; put(H,lathe('mkhelm',[[0,-.13],[.12,-.11],[.14,0],[.13,.1],[.07,.15],[0,.16]],8),mir); put(H,gBox,glass,0,.0,.13,.18,.06,.02); u.spots=[put(H,gBox,gl,0,0,.142,.16,.012,.004)];
+  for(let i=0;i<5;i++) put(H,crystal(2450+i,4),glass,(i-2)*.05,.16,-.02,.025,.1+(2-Math.abs(i-2))*.03,.025);
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=grp(B,0,1,0); put(g,gCircle,glass,0,0,0,.08,.12,1); put(g,hairTor(),mir,0,0,0,.08,.12,1); return g;});};
+/* ---------- The Masked Jester: a towering marionette on strings, all grin and bells ---------- */
+BOSS2.maskedjester=(R,B,u)=>{u.float=true; u.legs=[]; const red=M('#8a1a3a',{roughness:.6}), blk=M('#1a0a14',{roughness:.6}), gold=NOV(M('#e8c050',{metalness:.45,roughness:.25})), mask=NOV(M('#f4ecdc',{roughness:.3})), wood=NOV(M('#4a2a1a',{roughness:.8})), str=NOV(M('#e0d8c8',{roughness:.5})), pk=glow('#ff6aa8',2.6), gl=glow('#ffd36a',2.6);
+  // the control bar floating overhead and its strings
+  const bar=grp(B,0,2.3,0); put(bar,gBox,wood,0,0,0,.6,.04,.04); put(bar,gBox,wood,0,0,0,.04,.04,.4); u.bar=bar;
+  const T=grp(B,0,.85,0); u.torso=T;
+  // diamond-patterned body and ruffled collar
+  put(T,lathe('mjbody',[[.08,-.1],[.17,0],[.19,.2],[.16,.38],[.1,.46],[0,.48]],8),red,0,0,0,1,1,.8); for(let i=0;i<8;i++){const a=i/8*TAU+Math.PI/8; put(T,gOct,i%2?blk:gold,Math.sin(a)*.18,.18,Math.cos(a)*.14,.04,.07,.02).rotation.y=a;}
+  for(let i=0;i<3;i++) put(T,lathe('mjruff'+i,[[.05,0],[.2-i*.03,.02],[.23-i*.03,.0],[.2-i*.03,-.02]],24),i%2?mask:pk,0,.46-i*.02,0);
+  put(T,robeGeo('mjskirt',.18,.32,.34,8,.2,.6,161),red,0,-.2,0); put(T,robeGeo('mjskirt2',.17,.28,.28,8,.2,.6,162),blk,0,-.16,0,1,1,1,0,Math.PI/8,0);
+  for(let i=0;i<8;i++){const a=i/8*TAU; u.ribbons=u.ribbons||[]; const c=chain(T,Math.sin(a)*.26,-.4,Math.cos(a)*.26,a,2,.06,.012,i%2?red:blk,null,'y'); put(c[1],gSph,gold,0,-.06,0,.022); u.ribbons.push(c);}
+  // dangling legs ending in curled shoes
+  for(const s of [-1,1]){const lg=chain(T,s*.1,-.25,0,0,3,.16,.03,s<0?red:blk,s<0?blk:red,'y'); put(lg[2],taper('mjshoe',[[0,-.16,0],[0,-.18,.1],[0,-.12,.16]],.03,.008,10,6),gold); (u.tentacles=u.tentacles||[]).push(lg);}
+  // long arms, juggling
+  const aL=arm(T,-.22,.4,0,{side:-1,m:red,m2:blk,sh:gold,r:.035,l1:.36,l2:.36,out:.1,key:'mja',seed:2500}), aR=arm(T,.22,.4,0,{side:1,m:blk,m2:red,sh:gold,r:.035,l1:.36,l2:.36,out:.1,key:'mja',seed:2501}); u.arms=[aL,aR]; u.armsFwd=.5;
+  for(const a of [aL,aR]) claw(a.userData.hand,'mjc',mask,M('#1a0a14'),5,.12,.016,1.2,.5);
+  // the grinning mask and the three-tailed hat with bells
+  const H=grp(T,0,.6,.02); u.head=H; put(H,blob(2510,.03),mask,0,0,0,.13,.15,.12);
+  for(const s of [-1,1]){put(H,gSph,M('#000000'),s*.045,.03,.1,.03,.02,.02); eye(H,s*.045,.03,.115,.012,'#ff6aa8',3.6); put(H,gCone,pk,s*.045,-.0,.115,.008,.04,.004).rotation.x=Math.PI;}
+  const gr=grp(H,0,-.06,.11); put(gr,lathe('mjgrin',[[0,-.01],[.1,0],[.11,.012],[0,.004]],24),M('#000000'),0,0,0,1,1,.3).rotation.x=Math.PI/2; for(let i=0;i<9;i++) put(gr,gBox,mask,(i-4)*.022,.0,.015,.008,.02,.006);
+  put(H,lathe('mjhatb',[[.1,0],[.14,.03],[.13,.06],[0,.07]],24),red,0,.08,0); for(let i=0;i<3;i++){const a=(i-1)*1.1; const tl=chain(H,Math.sin(a)*.09,.13,0,a,4,.07,.035,i%2?blk:red,i%2?red:blk,'y'); tl[0].rotation.z=-a*1.6; tl[0].rotation.x=-.4; put(tl[3],gSph,gold,0,-.08,0,.03); (u.tentacles=u.tentacles||[]).push(tl);}
+  // strings from the bar to the head, hands and knees
+  const sP=[[0,.75,0],[-.5,.05,.2],[.5,.05,.2],[-.12,-.6,.05],[.12,-.6,.05]]; sP.forEach((p,i)=>{const top=[(i-2)*.12,2.3-.85,(i%2?.15:-.15)]; put(T,taper('mjstr'+i,[top,[(top[0]+p[0])/2,(top[1]+p[1])/2,(top[2]+p[2])/2],p],.003,.003,4,4),str).castShadow=false;});
+  u.orbit=[0,1,2,3].map(i=>put(B,gSph,i%2?pk:gl,0,1,0,.05));
+  u.anim=(u,b)=>{u.bar.rotation.z=Math.sin(time*1.4)*.12; u.bar.rotation.x=Math.cos(time*1.1)*.08;};};
+/* ---------- The Phantasm Dragon: a dragon made of mist and memory ---------- */
+BOSS2.phantasmdragon=(R,B,u)=>{u.float=true; u.legs=[]; u.arms=[]; const mist=NOV(M('#9ae8ff',{roughness:.3,transparent:true,opacity:.55,emissive:new THREE.Color('#4a8ac8'),emissiveIntensity:.8,side:THREE.DoubleSide})), mist2=NOV(M('#c45aff',{roughness:.3,transparent:true,opacity:.45,emissive:new THREE.Color('#7a2ac8'),emissiveIntensity:.8,side:THREE.DoubleSide})), bone=NOV(M('#e0e0ff',{roughness:.3,emissive:new THREE.Color('#8a8ad8'),emissiveIntensity:.4})), gl=glow('#e0f8ff',3);
+  const T=grp(B,0,1.0,0); u.torso=T; put(T,blob(2600,.12),mist,0,0,-.1,.32,.28,.5);
+  // the skeleton shows through the mist
+  put(T,taper('pdsp',[[0,.1,.45],[0,.15,0],[0,.08,-.5]],.035,.025,16,8),bone); for(let i=0;i<5;i++) for(const s of [-1,1]) put(T,taper('pdrb'+i,[[0,.12,0],[s*.22,0,0],[s*.16,-.18,0]],.014,.008,10,6),bone,0,0,.25-i*.12);
+  u.core=put(T,gSph,gl,0,.0,.15,.08);
+  // great tattered wings
+  u.bigWings=[]; for(const sx of [-1,1]){const w=grp(T,sx*.18,.18,0); w.userData.sx=sx; u.bigWings.push(w); const tips=[[sx*.3,.5,-.1],[sx*.75,.6,-.2],[sx*1.1,.3,-.25],[sx*1.15,-.05,-.2],[sx*.9,-.3,-.1],[sx*.5,-.35,0]];
+    tips.forEach((tp,i)=>put(w,taper('pdwb'+sx+i,[[0,0,0],[tp[0]*.5,tp[1]*.5+.1,tp[2]*.5],tp],.025,.006,12,6),bone)); put(w,membraneGeo('pdmem'+sx,tips,.35),mist2);}
+  // neck and skull head
+  u.wyrm=[]; let p=grp(T,0,.12,.42); for(let i=0;i<4;i++){const sg=grp(p,0,i?.07:0,i?.1:0); put(sg,blob(2610+i,.08),mist,0,0,.05,.1-i*.01,.09-i*.01,.1); u.wyrm.push(sg); p=sg;}
+  const H=grp(p,0,.06,.14); u.head=H; put(H,blob(2620,.06),bone,0,0,.04,.1,.08,.15); put(H,taper('pdsn',[[0,0,0],[0,-.01,.1],[0,-.03,.16]],.06,.035,12,10,.8),bone,0,-.02,.14);
+  for(const s of [-1,1]){put(H,gSph,M('#000000'),s*.055,.03,.1,.03,.025,.03); eye(H,s*.055,.03,.12,.016,'#e0f8ff',4); horn(H,'pdh'+s,[s*.06,.06,0],[s*.4,.5,-.8],.24,[s*.1,-.1,0],.02,bone); horn(H,'pdh2'+s,[s*.08,.0,0],[s*.9,-.1,-.5],.12,[0,.2,0],.012,bone);}
+  u.jaw=grp(H,0,-.05,.05); put(u.jaw,blob(2621,.08),bone,0,-.01,.1,.07,.025,.12); fangs(u.jaw,bone,6,.09,.01,.18,.03,1,.4,.007); fangs(H,bone,6,.1,-.06,.2,.03,-1,.4,.007);
+  // a trailing tail of mist
+  u.ribbons=[]; for(let i=0;i<4;i++) u.ribbons.push(chain(T,(i-1.5)*.08,-.05,-.55,Math.PI,5,.12,.07,i%2?mist:mist2,null,'z'));
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,gSph,i%2?gl:mist2,0,1,0,.05));};
+/* ---------- The Clay Titan: a giant left unfinished, still wet, still being shaped ---------- */
+BOSS2.claytitan=(R,B,u)=>{const clay=M('#9a6a44',{roughness:.75}), clay2=M('#7a5236',{roughness:.8}), fired=M('#c86a3a',{roughness:.6}), gold=glow('#ffc43a',2.6), tool=NOV(M('#4a3a2a',{roughness:.7})), metal=NOV(M('#a8a8b0',{metalness:.45,roughness:.3})), print=M('#5a3a24',{roughness:.9});
+  u.legs=[leg(B,-.3,.6,0,{m:clay,m2:clay2,r:.17,key:'ctl',toes:0,seed:2700}),leg(B,.3,.6,0,{m:clay,m2:clay2,r:.17,key:'ctl',toes:0,seed:2701})];
+  const T=grp(B,0,.6,0); u.torso=T; T.rotation.x=.24;
+  put(T,blob(2702,.18,1.3),clay,0,.46,0,.58,.52,.42); put(T,blob(2703,.16),clay2,0,.14,.04,.44,.26,.34); put(T,blob(2704,.2),clay,-.1,.72,-.06,.4,.2,.3);
+  // handprints pressed into the clay and glowing kiln cracks
+  for(let i=0;i<6;i++){const a=(i/5-.5)*2.2; put(T,gSph,print,Math.sin(a)*.54,.3+(i%3)*.15,Math.cos(a)*.38,.07,.09,.02).lookAt(new THREE.Vector3(Math.sin(a)*3,.3,Math.cos(a)*3));}
+  for(let i=0;i<7;i++){const a=(i/6-.5)*2.4, pts=[]; for(let k=0;k<4;k++) pts.push([Math.sin(a)*.57+Math.sin(k*2+i)*.03,.18+k*.15,Math.cos(a)*.41]); put(T,taper('ctcrk'+i,pts,.012,.005,12,6),gold).castShadow=false;}
+  put(T,blob(2705,.15),fired,.25,.58,.25,.2,.16,.12);
+  // sculpting tools still stuck in it
+  for(const [x,y,z,rx,rz] of [[-.3,.6,-.3,-.6,.3],[.2,.85,-.2,-.9,-.3],[.45,.4,-.2,-.4,-.6]]){const g=grp(T,x,y,z,rx,0,rz); put(g,gCyl,tool,0,.15,0,.014,.3,.014); put(g,leafGeo('cttool',.12,.04,0,1),metal,0,.3,0);}
+  // one arm finished, the other a dripping stump of clay
+  const aR=arm(T,.62,.62,0,{side:1,m:clay,m2:clay2,sh:clay,r:.14,l1:.38,l2:.4,key:'cta',seed:2710}); claw(aR.userData.hand,'ctc',clay,clay2,4,.2,.07,.8,.5);
+  const aL=grp(T,-.62,.62,0); put(aL,blob(2711,.25),clay,0,-.12,0,.2,.26,.2); put(aL,blob(2712,.3),clay2,0,-.38,.04,.14,.2,.14); for(let k=0;k<4;k++) put(aL,taper('ctdrip'+k,[[0,0,0],[0,-.06,0],[0,-.14-k*.03,0]],.03,.008,8,6),clay2,(k-1.5)*.05,-.52,.04);
+  u.arms=[aL,aR]; u.armsFwd=.2;
+  // a faceless head with two finger-poked holes for eyes
+  const H=grp(T,0,.88,.22); u.head=H; put(H,blob(2720,.12),clay,0,0,0,.2,.22,.2); for(const s of [-1,1]){put(H,gSph,M('#1a0e06'),s*.07,.03,.16,.035,.04,.03); eye(H,s*.07,.03,.17,.018,'#ffc43a',3.8);}
+  put(H,gBox,M('#1a0e06'),0,-.09,.17,.1,.015,.02); put(H,blob(2721,.3),clay2,.1,.18,-.04,.1,.06,.08);
+  u.orbit=[0,1,2,3].map(i=>put(B,blob(2730+i,.3),clay2,0,1,0,.06));};
+/* ---------- The Worldsmith Automaton: a four-armed brass maker with a tiny sun in its chest ---------- */
+BOSS2.worldsmith=(R,B,u)=>{const brass=NOV(M('#c8963a',{metalness:.45,roughness:.28})), brass2=NOV(M('#8a6a2a',{metalness:.45,roughness:.35})), iron=NOV(M('#3a3a42',{metalness:.4,roughness:.4})), glass=NOV(M('#e8f4ff',{roughness:0,transparent:true,opacity:.35})), sun=glow('#ffd86a',3), cy=glow('#7ad8ff',2.6);
+  const L=s=>{const g=grp(B,s*.24,.62,0); put(g,gSph,brass2,0,0,0,.1); put(g,gCyl,iron,0,-.18,0,.06,.3,.06); put(g,gCyl,brass,s*.05,-.2,.03,.02,.34,.02); put(g,gSph,brass2,0,-.34,0,.075); put(g,gCyl,iron,0,-.48,.02,.055,.24,.055); put(g,gBox,brass2,0,-.6,.06,.16,.04,.24); return g;}; u.legs=[L(-1),L(1)];
+  const T=grp(B,0,.66,0); u.torso=T;
+  put(T,lathe('wstorso',[[.18,0],[.26,.06],[.3,.26],[.3,.46],[.24,.6],[0,.62]],12),brass,0,0,0,1,1,.85);
+  // the glass dome over a caged sun
+  put(T,gSph,glass,0,.34,.2,.14); u.core=put(T,gSph,sun,0,.34,.2,.07); for(let i=0;i<4;i++) put(T,thinTor(),brass2,0,.34,.2,.14,.14,.3).rotation.set(0,i*Math.PI/4,0);
+  // gears turning on the shoulders and back
+  u.gears=[]; for(const [x,y,z,r] of [[-.32,.52,0,.12],[.32,.52,0,.12],[0,.42,-.28,.16],[-.14,.62,-.24,.08]]){const g=grp(T,x,y,z,0,x?Math.PI/2:0,0); put(g,lathe('wsgear'+r,[[r*.6,-.02],[r*.8,-.02],[r*.8,.02],[r*.6,.02]],12),brass2,0,0,0,1,1,1,Math.PI/2,0,0); for(let k=0;k<10;k++){const a=k/10*TAU; put(g,gBox,brass,Math.cos(a)*r*.9,Math.sin(a)*r*.9,0,r*.25,r*.25,.035).rotation.z=a;} u.gears.push(g);}
+  for(const [x,h] of [[-.12,.3],[.12,.24]]){put(T,gCyl,iron,x,.6+h/2,-.18,.035,h,.035); put(T,gSph,glow('#ff7a1a',2),x,.62+h,-.18,.03);}
+  // four arms: two big, two small with tools
+  const aL=arm(T,-.38,.5,0,{side:-1,m:iron,m2:brass,sh:brass2,r:.06,l1:.32,l2:.32,key:'wsa',seed:2800}), aR=arm(T,.38,.5,0,{side:1,m:iron,m2:brass,sh:brass2,r:.06,l1:.32,l2:.32,key:'wsa',seed:2801}); u.arms=[aL,aR];
+  claw(aL.userData.hand,'wsc',brass2,iron,3,.12,.03,.8,.4); const hm=grp(aR.userData.hand,0,0,.02); claw(aR.userData.hand,'wsc',brass2,iron,3,.1,.03,.8,1); put(hm,gCyl,iron,0,0,.15,.015,.3,.015).rotation.x=Math.PI/2; put(hm,gBox,brass,0,0,.32,.12,.08,.08);
+  u.smallArms=[]; for(const s of [-1,1]){const a=arm(T,s*.26,.22,.12,{side:s,m:iron,m2:brass2,r:.03,l1:.18,l2:.18,key:'wssa',seed:2802}); a.rotation.z=s*.3; const h=a.userData.hand; if(s<0){put(h,gCyl,iron,0,-.04,0,.012,.12,.012); put(h,thinTor(),brass,0,-.12,0,.03,.03,.5);} else {for(const t of [-1,1]) put(h,taper('wscal',[[0,0,0],[t*.03,-.06,0],[t*.01,-.14,0]],.008,.003,8,4),brass);} u.smallArms.push(a);}
+  // a lantern head with a single lens eye
+  const H=grp(T,0,.76,.04); u.head=H; put(H,lathe('wshead',[[0,-.1],[.11,-.08],[.12,.06],[.08,.12],[0,.14]],8),brass); put(H,gCyl,iron,0,.0,.11,.06,.04,.06).rotation.x=Math.PI/2; eye(H,0,0,.135,.035,'#7ad8ff',3.4); put(H,thinTor(),brass2,0,0,.13,.06,.06,.4);
+  put(H,gCyl,iron,0,.18,0,.012,.1,.012); put(H,gSph,glow('#ffd86a',2.4),0,.24,0,.025);
+  u.orbit=[0,1,2,3].map(i=>{const g=grp(B,0,1,0); put(g,lathe('wsmini',[[.03,-.01],[.05,-.01],[.05,.01],[.03,.01]],10),brass,0,0,0,1,1,1,Math.PI/2,0,0); return g;});
+  u.anim=(u,b)=>{u.gears.forEach((g,i)=>g.children.forEach(c=>{}));u.gears.forEach((g,i)=>{g.rotation.z=time*(i%2?1.4:-1.1);});};};
+/* ---------- The Storm Leviathan: a whale of cloud and thunder swimming through the sky ---------- */
+BOSS2.stormleviathan=(R,B,u)=>{u.float=true; u.legs=[]; u.arms=[]; const hide=M('#3a4660',{roughness:.45}), hide2=M('#26304a',{roughness:.5}), belly=M('#a8b8d0',{roughness:.5}), cloud=NOV(M('#d8e0f0',{roughness:1})), cloud2=NOV(M('#8a94a8',{roughness:1})), bolt_=glow('#9fe8ff',3), gold=glow('#ffc43a',2.6), fin=NOV(M('#4a5a7a',{roughness:.4,side:THREE.DoubleSide}));
+  const BD=grp(B,0,1.05,0); u.whale=BD; put(BD,blob(2900,.05),hide,0,0,0,.5,.42,.95); put(BD,blob(2901,.06),belly,0,-.18,.1,.4,.25,.8);
+  for(let i=0;i<8;i++) put(BD,gBox,hide2,0,-.25,.6-i*.12,.36-Math.abs(i-3)*.03,.012,.02);
+  // a cloud bank and lightning on its back
+  for(let i=0;i<10;i++){const z=.55-i*.13; put(BD,blob(2910+i,.25),i%2?cloud:cloud2,Math.sin(i*1.7)*.12,.38+Math.cos(i)*.05,z,.18+(i%3)*.04,.12,.18);}
+  u.bolts=[]; for(let i=0;i<4;i++){const b2=put(BD,taper('slbolt'+i,[[0,0,0],[.05,.12,.02],[-.03,.22,0],[.04,.36,.02]],.012,.004,12,5),bolt_,Math.sin(i*2)*.12,.45,.4-i*.25); b2.castShadow=false; u.bolts.push(b2);}
+  // head: huge baleen mouth, golden eyes
+  put(BD,blob(2920,.05),hide,0,.02,.82,.42,.34,.3); for(let i=0;i<14;i++) put(BD,gBox,cloud2,(i/13-.5)*.6,-.1,.98-Math.abs(i/13-.5)*.2,.012,.12,.012);
+  for(const s of [-1,1]){put(BD,gSph,M('#05080c'),s*.32,.12,.78,.06); eye(BD,s*.33,.12,.82,.035,'#ffc43a',3.6);}
+  for(let i=0;i<5;i++) put(BD,gCone,hide2,0,.42-i*.01,.6-i*.12,.03,.1,.03).rotation.x=-.4;
+  u.fins=[]; for(const s of [-1,1]){const f=grp(BD,s*.46,-.12,.3); put(f,leafGeo('slfin',.6,.24,.1,1.1),fin,0,0,0,1,1,1,0,s*1.4,-s*1.3); u.fins.push(f);}
+  u.tail=grp(BD,0,.05,-.9); put(u.tail,taper('sltail',[[0,0,0],[0,.04,-.3],[0,.08,-.55]],.3,.08,16,12,.7),hide); put(u.tail,leafGeo('sltf',.6,.5,0,1.3),fin,0,.1,-.55,1,1,1,-Math.PI/2,0,0).rotation.set(-Math.PI/2,Math.PI/2,0);
+  u.tentacles=[]; for(let i=0;i<6;i++){const a=(i/5-.5)*1.6; u.tentacles.push(chain(BD,Math.sin(a)*.3,-.35,.6-Math.abs(a)*.1,0,5,.12,.03,hide2,bolt_,'y'));}
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,blob(2930+i,.3),i%2?cloud:cloud2,0,1,0,.08,.05,.08));
+  u.anim=(u,b)=>{u.bolts.forEach(x=>x.visible=Math.random()<.3); u.whale.rotation.z=Math.sin(time*.8)*.06; u.whale.rotation.x=Math.sin(time*.6)*.04;};};
 
 /*BOSS2-END*/
 function buildBoss(b){
@@ -4256,7 +4527,8 @@ const NODES=[];
     for(let li=0;li<n;li++){let x,y;
       if(bi<5){const a=(B.ang+[-9,7,-7,8,-4,0][li])*Math.PI/180, rr=[.78,.69,.6,.51,.43,.34][li]; x=cx0+Math.cos(a)*rr*400; y=cy0+Math.sin(a)*rr*260;}
       else if(bi===6){[x,y]=[[832,62],[872,40],[920,42],[962,66],[968,112],[930,138],[880,136],[910,92]][li];}
-      else if(bi>=23){const C7=CORE_POS(bi); [x,y]=C7.nodes[li];}
+      else if(bi>=23&&bi<28){const C7=CORE_POS(bi); [x,y]=C7.nodes[li];}
+      else if(bi>=28){[x,y]=[[[420,230],[465,170],[525,130],[595,175],[545,85]],[[740,230],[785,170],[845,130],[915,175],[865,85]],[[740,545],[785,485],[845,445],[915,490],[865,395]],[[420,555],[465,495],[525,455],[595,500],[545,405]]][(bi-28)%4][li];}
       else if(bi>=7){[x,y]=({10:[[400,240],[480,150],[600,110],[740,140],[870,230],[850,420],[640,400]],11:[[420,230],[465,170],[525,130],[595,175],[545,85]],12:[[740,230],[785,170],[845,130],[915,175],[865,85]],13:[[740,545],[785,485],[845,445],[915,490],[865,395]],14:[[420,555],[465,495],[525,455],[595,500],[545,405]],15:[[420,230],[465,170],[525,130],[595,175],[545,85]],16:[[740,230],[785,170],[845,130],[915,175],[865,85]],17:[[740,545],[785,485],[845,445],[915,490],[865,395]],18:[[420,555],[465,495],[525,455],[595,500],[545,405]],19:[[420,230],[465,170],[525,130],[595,175],[545,85]],20:[[740,230],[785,170],[845,130],[915,175],[865,85]],21:[[740,545],[785,485],[845,445],[915,490],[865,395]],22:[[420,555],[465,495],[525,455],[595,500],[545,405]],7:[[300,250],[340,170],[412,132],[486,176],[424,70]],8:[[680,330],[740,262],[812,232],[886,282],[800,150]],9:[[400,530],[490,578],[600,575],[700,530],[560,480]]})[bi][li];}
       else {const pos=[[150,.2],[210,.2],[270,.2],[330,.2],[30,.2],[0,0]][li]; const a=pos[0]*Math.PI/180; x=cx0+Math.cos(a)*pos[1]*400; y=cy0+Math.sin(a)*pos[1]*260;}
       NODES.push({bi,li,x,y,boss:li===n-1});}});})();
@@ -4285,7 +4557,7 @@ const worldOf=bi=>BIOMES[bi].world||1;
 const outerOpen=()=>SAVE&&(SAVE.won||Object.keys(SAVE.cleared).some(k=>+k.split('-')[0]>=7));
 const WORLD_NAME={1:'Isle of Six Crowns',2:'Outer Isles',3:'The Deep Dark',4:'Shift Dimension',5:'The Forge',6:'The Void',7:'Core of Creations'};
 const anyIn=min=>Object.keys(SAVE.cleared).some(k=>+k.split('-')[0]>=min);
-function worldOpen(w){if(SAVE&&SAVE.adminAll) return true; if(!SAVE) return w===1; if(w===1) return true; if(w===2) return outerOpen(); if(w===3) return !!SAVE.cleared['9-4']||anyIn(10); if(w>=4&&w<=6) return !!SAVE.portalOpen||!!SAVE.cleared['10-6']||anyIn(11); if(w===7) return !!(SAVE.cleared['14-4']&&SAVE.cleared['18-4']&&SAVE.cleared['22-4'])||anyIn(23); return false;}
+function worldOpen(w){if(SAVE&&SAVE.adminAll) return true; if(!SAVE) return w===1; if(w>=8&&w<=10) return legendWorldOpen(w); if(w===1) return true; if(w===2) return outerOpen(); if(w===3) return !!SAVE.cleared['9-4']||anyIn(10); if(w>=4&&w<=6) return !!SAVE.portalOpen||!!SAVE.cleared['10-6']||anyIn(11); if(w===7) return !!(SAVE.cleared['14-4']&&SAVE.cleared['18-4']&&SAVE.cleared['22-4'])||anyIn(23); return false;}
 function islandNoise(x,y,cx,cy,rx,ry,seed){const dx=(x-cx)/rx,dy=(y-cy)/ry,a=Math.atan2(dy,dx),r=Math.hypot(dx,dy),e=.86+.07*Math.sin(a*3+seed)+.04*Math.sin(a*7+seed*2)+.02*Math.sin(a*13+seed); return {r,e};}
 function drawWorld3(){const g=isleCv.getContext('2d'),S=5;
   for(let y=0;y<640;y+=S) for(let x=0;x<1000;x+=S){const h=hash(x,y); let col=h<.03?'#0a1418':'#05090c'; const I=islandNoise(x,y,640,330,330,285,3);
@@ -4344,16 +4616,16 @@ function drawWorld2(){const g=isleCv.getContext('2d'),S=5;
   drawnWorld=2;}
 const levelKey=(bi,li)=>bi+'-'+li;
 function unlocked(bi,li){if(bi===6&&!EVENT_ACTIVE()) return false; if(SAVE&&SAVE.adminAll) return true; if(SAVE.cleared[levelKey(bi,li)]) return true; if(li>0) return !!SAVE.cleared[levelKey(bi,li-1)];
-  if(bi===7) return !!SAVE.won; if(bi===11||bi===15||bi===19) return worldOpen(4); if(bi===23) return worldOpen(7); if(bi>7) return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];
+  if(bi===7) return !!SAVE.won; if(bi===11||bi===15||bi===19) return worldOpen(4); if(bi===23) return worldOpen(7); if(bi===28) return worldOpen(8); if(bi===32) return worldOpen(9); if(bi===36) return worldOpen(10); if(bi>7) return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];
   if(bi===6) return true;
   if(bi===0) return true; if(bi===5){for(let b=0;b<5;b++) if(!SAVE.cleared[levelKey(b,BIOMES[b].levels.length)]) return false; return true;} return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];}
 function openMap(){if(!MP.peer) setTimeout(initMP,100); renderPartyHud(); mode='map'; showOnly('mapScr'); while(mapWorld>1&&!worldOpen(mapWorld)) mapWorld--; renderDiff();
-  if(drawnWorld!==mapWorld){if(mapWorld===2) drawWorld2(); else if(mapWorld===3) drawWorld3(); else if(mapWorld===4) drawWorld4(); else if(mapWorld===5||mapWorld===6) drawDim(mapWorld); else if(mapWorld===7) drawWorld7(); else {drawIsle(); drawnWorld=1;}} calcStats();
-  {const wb=$('#mapWorldBtn'), bk=$('#mapWorldBack'); const nextW=mapWorld<3&&worldOpen(mapWorld+1)?mapWorld+1:mapWorld===3&&worldOpen(7)?7:0, backW=mapWorld===2||mapWorld===3?mapWorld-1:mapWorld===7?3:0;
-    wb.hidden=!nextW; if(nextW) wb.textContent=(nextW===2?'Outer Isles':nextW===7?'Core of Creations':'The Deep Dark')+' →'; wb.classList.toggle('next',!!nextW&&!anyIn(nextW===2?7:nextW===7?23:10));
-    bk.hidden=!backW; if(backW) bk.textContent='← '+(backW===1?'Isle of Six Crowns':backW===3?'The Deep Dark':'Outer Isles');
-    $('#mapScr').classList.toggle('w1',mapWorld===1); $('#mapScr').classList.toggle('w2',mapWorld===2); $('#mapScr').classList.toggle('w3',mapWorld===3); $('#mapScr').classList.toggle('w4',mapWorld===4); $('#mapScr').classList.toggle('w5',mapWorld===5); $('#mapScr').classList.toggle('w6',mapWorld===6); $('#mapScr').classList.toggle('w7',mapWorld===7); $('#mapScr').classList.toggle('hasworld',!wb.hidden||!bk.hidden);
-    $('#mapScr h2').textContent={1:'The Isle',2:'The Outer Isles',3:'The Deep Dark',4:'The Shift Dimension',5:'The Forge',6:'The Void',7:'The Core of Creations'}[mapWorld];}
+  if(drawnWorld!==mapWorld){if(mapWorld===2) drawWorld2(); else if(mapWorld===3) drawWorld3(); else if(mapWorld===4) drawWorld4(); else if(mapWorld===5||mapWorld===6||mapWorld>=8) drawDim(mapWorld); else if(mapWorld===7) drawWorld7(); else {drawIsle(); drawnWorld=1;}} calcStats();
+  {const wb=$('#mapWorldBtn'), bk=$('#mapWorldBack'); const nextW=mapWorld<3&&worldOpen(mapWorld+1)?mapWorld+1:mapWorld===3&&worldOpen(7)?7:mapWorld===7&&worldOpen(8)?8:(mapWorld===8||mapWorld===9)&&worldOpen(mapWorld+1)?mapWorld+1:0, backW=mapWorld===2||mapWorld===3?mapWorld-1:mapWorld===7?3:mapWorld>=8?mapWorld-1:0;
+    wb.hidden=!nextW; if(nextW) wb.textContent=(nextW===2?'Outer Isles':nextW===7?'Core of Creations':nextW>=8?WORLD_NAME[nextW]:'The Deep Dark')+' →'; wb.classList.toggle('next',!!nextW&&!anyIn({2:7,7:23,3:10,8:28,9:32,10:36}[nextW]||10));
+    bk.hidden=!backW; if(backW) bk.textContent='← '+(backW===1?'Isle of Six Crowns':backW===3?'The Deep Dark':backW>=7?WORLD_NAME[backW]:'Outer Isles');
+    $('#mapScr').classList.toggle('w1',mapWorld===1); $('#mapScr').classList.toggle('w2',mapWorld===2); $('#mapScr').classList.toggle('w3',mapWorld===3); $('#mapScr').classList.toggle('w4',mapWorld===4); $('#mapScr').classList.toggle('w5',mapWorld===5); $('#mapScr').classList.toggle('w6',mapWorld===6); $('#mapScr').classList.toggle('w7',mapWorld===7); for(const w of [8,9,10]) $('#mapScr').classList.toggle('w'+w,mapWorld===w); $('#mapScr').classList.toggle('hasworld',!wb.hidden||!bk.hidden);
+    $('#mapScr h2').textContent={1:'The Isle',2:'The Outer Isles',3:'The Deep Dark',4:'The Shift Dimension',5:'The Forge',6:'The Void',7:'The Core of Creations',8:'The Enchanted Fields',9:'The Illusion Fortress',10:'Creators Cataclysm'}[mapWorld];}
   $('#mapPower').textContent=ST.power; $('#mapShards').textContent=SAVE.shards; $('#mapShardIco').src=iconURL('shard','#7fe0c8','#e8fff8');
   const box=$('#nodes'); box.innerHTML='';
   BIOMES.forEach((B,bi)=>{if(bi===6&&!EVENT_ACTIVE()) return; if(worldOf(bi)!==mapWorld) return; if(B.lab){const d=document.createElement('div'); d.className='biome-label'; d.style.left=B.lab[0]/10+'%'; d.style.top=B.lab[1]/6.4+'%'; d.textContent=B.name; box.appendChild(d); return;} const a=B.ang*Math.PI/180, rr=bi<5?.74:0; let lx=500+Math.cos(a)*rr*400, ly=322+Math.sin(a)*rr*260+(bi===5?-95:0); if(bi===6){lx=905; ly=166;}
@@ -4387,8 +4659,8 @@ function selectNode(n,el,silent){selNode=n; document.querySelectorAll('.node.sel
   if(un&&n.li===0&&SAVE.intros&&SAVE.intros[n.bi]){const ib=document.createElement('button'); ib.className='btn small'; ib.textContent='Enter with region intro'; ib.onclick=()=>startLevel(n.bi,0,true); p.appendChild(ib);}
   if(un){const g=$('#goBtn'); if(MP.party&&MP.party.members.length>1&&MP.role!=='host'){g.disabled=true; g.textContent='Party leader picks the level';} else if(MP.party&&MP.party.members.length>1) g.textContent=`Enter with party (${MP.party.members.length})`; g.onclick=()=>playLevel(n.bi,n.li); if(!silent) g.focus();}}
 $('#mapMenu').onclick=toMenu;
-$('#mapWorldBtn').onclick=()=>{mapWorld=mapWorld===3?7:Math.min(3,mapWorld+1); selNode=null; openMap();};
-$('#mapWorldBack').onclick=()=>{mapWorld=mapWorld===7?3:Math.max(1,mapWorld-1); selNode=null; openMap();};
+$('#mapWorldBtn').onclick=()=>{mapWorld=mapWorld===3?7:mapWorld>=7?mapWorld+1:Math.min(3,mapWorld+1); selNode=null; openMap();};
+$('#mapWorldBack').onclick=()=>{mapWorld=mapWorld===7?3:mapWorld>=8?mapWorld-1:Math.max(1,mapWorld-1); selNode=null; openMap();};
 $('#mapInv').onclick=()=>openInv();
 $('#mapDiff').onclick=()=>{const o=['easy','normal','hard']; SAVE.diff=o[(o.indexOf(SAVE.diff||'normal')+1)%3]; renderDiff(); persist(); toast('Difficulty: '+DF().name+(SAVE.diff==='easy'?' · monsters hit softer and move slower':SAVE.diff==='hard'?' · monsters hit harder and move faster':' · normal'));};
 $('#mapShop').onclick=()=>openShop(); $('#mapFriends').onclick=()=>openFriends(); $('#btnFriends').onclick=()=>openFriends(); $('#friendsClose').onclick=()=>closeFriends(); $('#shopClose').onclick=()=>closeShop();
@@ -4491,7 +4763,7 @@ $('#pInv').onclick=()=>{$('#pause').hidden=true; mode='play'; openInv();};
 $('#pQuit').onclick=()=>{$('#pause').hidden=true; persist(); openMap();};
 function showResult(kind){persist(); mode='result'; $('#result').hidden=false; const B=BIOMES[run.bi]; if(run.guest&&kind!=='dead') setTimeout(()=>toast('You played this as a guest. Your loot is kept, but finish the earlier islands to unlock it for yourself.','#5fb3ff'),400);
   const t=Math.round(run.time), mm=Math.floor(t/60), ss=String(t%60).padStart(2,'0');
-  if(kind==='clear'){$('#resTitle').textContent=L.boss?'Crown claimed':'Level cleared'; $('#resSub').textContent=L.boss?`${B.name} is free. ${run.bi===27?'The Shapeless One is still at last. The Core of Creations is whole again, and every world is safe.':run.bi===18?'The Forge falls quiet. Every fire is out and every hammer is still.':run.bi===22?'The Void is sealed. Even the Endless has an ending.':run.bi===14?'The Shift Dimension is saved. Every land, every sea and every song is free.':run.bi===10?'The great portal is open. Choose the Shift, the Forge or the Void on the map.':run.bi===9?'The Outer Isles are safe. Press → on the map to descend into the Deep Dark.':run.bi>=7?BIOMES[run.bi+1].name+' is now open.':run.bi===6?'Hollowshade Isle is yours. Happy Halloween!':run.bi<4?BIOMES[run.bi+1].name+' is now open.':'The Hollow Spire is now open.'}`:`${L.name} · ${B.name}`;}
+  if(kind==='clear'){$('#resTitle').textContent=L.boss?'Crown claimed':'Level cleared'; $('#resSub').textContent=L.boss?`${B.name} is free. ${run.bi===39?'The three legends are stopped. Every crystal is silent and every world is safe. You are the true legend.':run.bi===35?'The Grand Magician is stopped. Press → on the map to reach Creators Cataclysm and face the Supreme Creator.':run.bi===31?'The Omega Enchanter is stopped. Press → on the map to reach the Illusion Fortress.':run.bi>=28?BIOMES[run.bi+1].name+' is now open.':run.bi===27?'The Shapeless One is still at last. The Core of Creations is whole again, and every world is safe.':run.bi===18?'The Forge falls quiet. Every fire is out and every hammer is still.':run.bi===22?'The Void is sealed. Even the Endless has an ending.':run.bi===14?'The Shift Dimension is saved. Every land, every sea and every song is free.':run.bi===10?'The great portal is open. Choose the Shift, the Forge or the Void on the map.':run.bi===9?'The Outer Isles are safe. Press → on the map to descend into the Deep Dark.':run.bi>=7?BIOMES[run.bi+1].name+' is now open.':run.bi===6?'Hollowshade Isle is yours. Happy Halloween!':run.bi<4?BIOMES[run.bi+1].name+' is now open.':'The Hollow Spire is now open.'}`:`${L.name} · ${B.name}`;}
   else if(kind==='victory'){$('#resTitle').textContent='The isle is saved'; $('#resSub').textContent='All six crowns are free. A new map has opened: press the → button at the bottom right of the map to sail to the Outer Isles.';}
   else {$('#resTitle').textContent='You fell'; $('#resSub').textContent='Loot you picked up is kept. Try equipping stronger gear or roll through telegraphed rings.';}
   $('#resStats').innerHTML=`<dt>Time</dt><dd>${mm}:${ss}</dd><dt>Enemies defeated</dt><dd>${run.kills}</dd><dt>Items found</dt><dd>${run.items}</dd><dt>Shards collected</dt><dd>${run.shards}</dd>`;
@@ -4586,7 +4858,7 @@ cEl.addEventListener('click',e=>{if(e.target.closest('#cSkip')) return; cineAdva
 $('#cSkip').addEventListener('click',e=>{e.stopPropagation(); endCine();});
 function heroShot(text,dur=3.4){const px=P.x*S,pz=P.y*S; return {dur,speaker:profileName()||'You',text,enter(){P.face=Math.PI/2;},cam:dolly([px+.6,1.9,pz+2.6,px,1.0,pz],[px+.2,7.5,pz+6,px,.5,pz])};}
 function biomeCine(bi){const st=STORY[bi],B=BIOMES[bi],px=P.x*S,pz=P.y*S;
-  const shots=[{dur:4.6,title:B.name,sub:bi<5?`Region ${bi+1} of 6`:bi===6?'Halloween event · until October 31':bi>=23?`The Core of Creations · Core ${bi-22} of 5`:bi>=11?`${WORLD_NAME[BIOMES[bi].world]} · Region ${bi-(bi>=19?18:bi>=15?14:10)} of 4`:bi===10?'Beneath the world':bi>=7?`The Outer Isles · Region ${bi-6} of 3`:'The final region',text:st.lines[0],cam:orbit(px,pz,12,13,-.4,.8,0)}];
+  const shots=[{dur:4.6,title:B.name,sub:bi<5?`Region ${bi+1} of 6`:bi===6?'Halloween event · until October 31':bi>=28?`${WORLD_NAME[BIOMES[bi].world]} · Region ${(bi-28)%4+1} of 4`:bi>=23?`The Core of Creations · Core ${bi-22} of 5`:bi>=11?`${WORLD_NAME[BIOMES[bi].world]} · Region ${bi-(bi>=19?18:bi>=15?14:10)} of 4`:bi===10?'Beneath the world':bi>=7?`The Outer Isles · Region ${bi-6} of 3`:'The final region',text:st.lines[0],cam:orbit(px,pz,12,13,-.4,.8,0)}];
   let tgt=null,bd=1e9; for(const e of ents){const d=dist(e,P); if(d>150&&d<bd){bd=d;tgt=e;}}
   if(tgt){const ex=tgt.x*S,ez=tgt.y*S; shots.push({dur:4.4,text:st.lines[1],label:`${tgt.name} · ${ROLE[tgt.type][0]}`,enter(){tgt.face=Math.PI/2;},cam:dolly([ex+3,3.4,ez+4.6,ex,.7,ez],[ex+1,1.7,ez+2.6,ex,.8,ez])});}
   else shots.push({dur:4.4,text:st.lines[1],cam:orbit(px,pz,8,6,1,2,0)});
@@ -4636,7 +4908,7 @@ const BOSS_FX={bramble:{c:['#7fb04f','#c9ff6a','#4a6b2a'],a:['ring','burst']},su
 function fxTick(b,heavy){const F=BOSS_FX[b.id]||BOSS_FX.bramble; let acc=0;
   return (t,dt)=>{acc-=dt; if(acc>0) return; acc=heavy?.22:.4; for(const a of F.a){if(a==='spiral'||a==='rain'||a==='souls'||a==='shift'||a==='pages') CFX[a](b,F.c,t); else if(Math.random()<(heavy?.6:.35)) CFX[a](b,F.c,t);}};}
 // Entrance: summoning circle → the boss rises out of it → roar → it leaps and slams down → shows its power → taunt.
-function bossCine(b){if(b.id==='sculkmonstrosity') return monstrosityIntro(b); if(b.id==='corruptedsinger') return singerIntro(b); if(ENTRANCE[b.id]&&!b._oldIntro) return uniqueIntro(b);
+function bossCine(b){if(LEGENDS[b.id]) return legendBossIntro(b); if(LEGEND_OF_WORLD[worldOf(L.bi)]) return legendSummonIntro(b,LEGEND_OF_WORLD[worldOf(L.bi)]); if(b.id==='sculkmonstrosity') return monstrosityIntro(b); if(b.id==='corruptedsinger') return singerIntro(b); if(ENTRANCE[b.id]&&!b._oldIntro) return uniqueIntro(b);
   const s=BOSS_STORY[b.id]||{ep:'',stir:'Something stirs.',taunt:'...'},bx=b.x*S,bz=b.y*S,px=P.x*S,pz=P.y*S,dx=px-bx,dz=pz-bz,dl=Math.hypot(dx,dz)||1,ux=dx/dl,uz=dz/dl,sc=b.r/13*.85,fa=Math.atan2(uz,ux);
   const F=BOSS_FX[b.id]||BOSS_FX.bramble; let circ=null, leap=null;
   const shots=[
@@ -4679,7 +4951,7 @@ function transformCine(b){const bx=b.x*S,bz=b.y*S,sc=b.r/13; const dx=P.x-b.x,dz
    {dur:2.0,fast:true,speaker:'The Sovereign Unbound',text:'You thought the mask was me?',enter(){b.roar=1.6; CFX.burst(b,F.c);},tick:fxTick(b,false),cam:dolly([bx+ux*5*sc,2.2*sc,bz+uz*5*sc,bx,1.6*sc,bz],[bx+ux*3.2*sc,1.8*sc,bz+uz*3.2*sc,bx,1.7*sc,bz])},
    {dur:2.4,fast:true,speaker:'The Sovereign Unbound',text:'I am what remains when an island loses all of its kings.',enter(){shake(10); CFX.ring(b,F.c);},tick:fxTick(b,true),cam:k=>{const a=fa-.4+k*.9,r=lerp(3.4*sc,7*sc,k); return [bx+Math.cos(a)*r,lerp(1*sc,4.5*sc,k),bz+Math.sin(a)*r,bx,1.6*sc,bz];}}];}
 const BOSS_FALL={bramble:['No... my roots... my beautiful garden...','The thorns are falling away. The meadow can breathe again.'],sultan:['The sand... slips through my fingers...','Every grain is free now. Even the ones he swallowed.'],witch:['My pot... my lovely bubbling pot... gone cold...','The fen is going quiet. No more humming in the dark.'],warden:['Passed... someone finally... passed...','The ice is cracking. The pass is open.'],golem:['THE FORGE... GROWS... COLD...','Its heart is just a cinder now.'],sov2:['Six crowns... and still... not enough...',''],pumpking:['The candles... are going out... one... by... one...','Happy Halloween, your majesty.'],stormsentinel:['The sky... no longer answers...','The clouds are parting. Sunlight.'],mossback:['Mmmm... sleep... long... sleep...','Rest well, old giant. The shrine is quiet again.'],lanternmaw:['My light... my pretty little light...','No more following strange lights into the water.'],echotyrant:['The echoes... fall... silent...','The portal is still humming. Something is waiting on the other side.'],sculkmonstrosity:['More... I needed... more...','The veins stopped pulsing. It finally has enough.'],monarch:['My throne... my claws... my kingdom...','The Clawed King bows at last.'],harmonizer:['The song... ends... out of... tune...','The meadow is silent. It almost sounds peaceful.'],foundrycolossus:['The fire... inside me... is out...','The furnace doors are closing for good.'],brimstonewyrm:['Ssso... cold... ssso very... cold...','The wastes are cooling. The coils are still.'],ironwarlord:['My armour... was supposed to... hold...','The drums have stopped. The citadel is free.'],forgeking:['Every blade I made... and none... could stop you...','The anvil is quiet. The Molten Throne is empty.'],hollowwatcher:['I watched... everything... except this...','The eye is closing. The dark is just dark again.'],riftweaver:['My threads... unravel... all of them...','The paths are straight again.'],nullbloom:['Shh... let me... wilt... quietly...','The pale flowers are turning away. One by one.'],endlessone:['Even the end... has an end...','The stars are coming back.'],ancienttome:['So many pages... and none told me... how this ends...','The last page is turning. Its story is over.'],godofdestruction:['Broken... I am the one... broken...','Nothing left to break. The ground is still.'],radiantseraph:['My light... grows dim... guard... the core...','Six wings fold, one by one. The light softens.'],blightmother:['My children... my beautiful infection...','The poison is drying up. The marsh is clearing.'],forms3:['Every shape... and none of them... was enough...','No more forms. No more changing. It is over.'],corruptedsinger:['The last note... finally... breaks...','Silence. Real silence.']};
-function defeatCine(b,final){if(!final&&b.id==='sculkmonstrosity') return monstrosityDeath(b); if(!final&&b.id==='corruptedsinger') return singerDeath(b);
+function defeatCine(b,final){if(LEGENDS[b.id]) return legendDeathCine(b); if(!final&&b.id==='sculkmonstrosity') return monstrosityDeath(b); if(!final&&b.id==='corruptedsinger') return singerDeath(b);
   const D=BOSSES[b.id]||{}, s=BOSS_STORY[b.id]||{}, F=BOSS_FX[b.id]||BOSS_FX.bramble, fl=BOSS_FALL[b.id]||['No... this cannot be...','It is over.'], sc=Math.max(.8,b.r/13*.85);
   const bx=b.x*S,bz=b.y*S, fa=Math.atan2(P.y-b.y,P.x-b.x), nm=(b.name||D.name||'The guardian').replace(/ · .*/,'');
   const souls=(n,sp)=>{for(let i=0;i<n;i++){const a=Math.random()*TAU, r=rand(0,b.r*1.6); FXP(b.x+Math.cos(a)*r,b.y+Math.sin(a)*r,rand(10,b.r*2),Math.cos(a)*rand(10,40),Math.sin(a)*rand(10,40),rand(sp*.6,sp),F.c[i%F.c.length],rand(1,1.8),rand(4,8));}};
@@ -5485,9 +5757,13 @@ const MOODS={
  forms:{sc:['whole','lydian','dim','minor'],root:[50,57],styles:['synth','orchestral','rock','piano']},
  holy:{sc:['lydian','major'],root:[55,62],styles:['organ','choir','orchestral']},
  hallow:{sc:['harm','minor'],root:[50,57],styles:['organ','rock','folk']},
- sculk:{sc:['phrygian','dim','minor'],root:[45,52],styles:['ambient','choir','organ']}};
+ sculk:{sc:['phrygian','dim','minor'],root:[45,52],styles:['ambient','choir','organ']},
+ enchanted:{sc:['lydian','major','dorian'],root:[55,62],styles:['folk','orchestral','piano','choir']},
+ illusion:{sc:['whole','dim','harm','minor'],root:[50,57],styles:['organ','jazz','synth','choir']},
+ cataclysm:{sc:['phrygian','minor','harm'],root:[48,55],styles:['metal','rock','choir','orchestral']}};
 const BIOME_MOOD={meadow:'nature',desert:'desert',swamp:'swamp',frost:'frost',volcano:'fire',spire:'royal',hallow:'hallow',tempest:'storm',temple:'nature',reef:'water',deepdark:'dark',sculk:'sculk',monarch:'royal',harmony:'nature',singers:'sculk',
- cinder:'fire',brimstone:'fire',citadel:'royal',throne:'fire',expanse:'void',rift:'void',nullgarden:'void',edge:'void',knowledge:'knowledge',destruction:'fire',immunity:'holy',infection:'infect',forms:'forms',enchanted:'nature',illusion:'void',cataclysm:'storm'};
+ cinder:'fire',brimstone:'fire',citadel:'royal',throne:'fire',expanse:'void',rift:'void',nullgarden:'void',edge:'void',knowledge:'knowledge',destruction:'fire',immunity:'holy',infection:'infect',forms:'forms',enchanted:'enchanted',illusion:'illusion',cataclysm:'cataclysm',
+ glimmer:'enchanted',moonwell:'enchanted',starpetal:'enchanted',enchspire:'enchanted',mirror:'illusion',falsedoors:'illusion',phantomkeep:'illusion',magistage:'illusion',unmade:'cataclysm',worldforge:'cataclysm',shatteredsky:'cataclysm',creatorthrone:'cataclysm'};
 function moodOf(bi){const B=BIOMES[bi]||{}; return BIOME_MOOD[B.id]||'nature';}
 // Each style is a band: a lead voice, a harmony part, a bass, an arpeggio/counter part and a drum kit.
 const STYLES={
@@ -5736,6 +6012,225 @@ document.addEventListener('click',e=>{if(e.target.closest('.btn')) sfx('ui');},t
   updChests=wrapF(updChests,()=>L?L.chests.filter(c=>c.open).length:0,(n)=>{if(L&&L.chests.filter(c=>c.open).length>n) sfx('chest');});
   for(const k in ACT){const A=ACT[k], s0=A.start; A.start=function(b){try{if(!(SIG[b.id]&&SIG[b.id][0]===k)) sfx('act',b,k);}catch(e){} if(s0) return s0.apply(this,arguments);};}})();
 
+/*LEGENDS-START*/
+/* ================= v4.4: The Three Legends ================= */
+const LEGENDS={omegaenchanter:{col:'#2affa0',col2:'#c8ffe0',world:8,name:'The Omega Enchanter',short:'Omega Enchanter',crystal:'emerald',sid:'ocean1'},
+  grandmagician:{col:'#c45aff',col2:'#f0c8ff',world:9,name:'The Grand Magician',short:'Grand Magician',crystal:'amethyst',sid:'samurai1'},
+  supremecreator:{col:'#ffc43a',col2:'#fff2c0',world:10,name:'The Supreme Creator',short:'Supreme Creator',crystal:'gold',sid:'solar1'}};
+const LEGEND_OF_WORLD={8:'omegaenchanter',9:'grandmagician',10:'supremecreator'};
+Object.assign(WORLD_NAME,{8:'Enchanted Fields',9:'Illusion Fortress',10:'Creators Cataclysm'});
+Object.assign(B3,{
+ glimmer:{void:0x08140e,sky:0xd8ffe8,gnd:0x2a4a2a,sun:0xf0fff0,hi:.85,si:1.0,rock:0x5a7a5a,top:0x6aa86a,tree:'bigflower',floorDeco:['flower','tuft','flower','mushroom'],fl:[0x3a6a3a,0x427442,0x4a7a42]},
+ moonwell:{void:0x040c10,sky:0x9ab8d8,gnd:0x12222a,sun:0xc8e0ff,hi:.72,si:.75,rock:0x2a3a40,top:0x3a6a6a,tree:'willow',floorDeco:['mushroom','tuft','puddle'],fl:[0x2a4a4a,0x2e5252,0x264444],pool:0x1a3a5a,fogN:12,fogF:34},
+ starpetal:{void:0x0c1008,sky:0xffe8f8,gnd:0x3a4a2a,sun:0xfff4e0,hi:.85,si:1.0,rock:0x6a7a5a,top:0x8ab05a,tree:'bigflower',floorDeco:['flower','flower','tuft'],fl:[0x4a5a3a,0x526242,0x5a6a42]},
+ enchspire:{void:0x020a08,sky:0x7ad8b8,gnd:0x0a1a16,sun:0xc8fff0,hi:.8,si:.8,rock:0x1a3a32,top:0x2a5a4a,tree:'crystal',floorDeco:['rune','starD','pebble'],fl:[0x2a3a3a,0x304242,0x263434],pool:0x0a3a2a,fogN:11,fogF:32},
+ mirror:{void:0x06040c,sky:0xd8d0ff,gnd:0x16121e,sun:0xf0e8ff,hi:.85,si:.9,rock:0x5a5478,top:0x8a84b0,tree:'riftcrystal',floorDeco:['shardD','starD','pebble'],fl:[0x3a3448,0x423c52,0x342e40]},
+ falsedoors:{void:0x0a0406,sky:0xffb8d8,gnd:0x1e100a,sun:0xffd8c0,hi:.75,si:.85,rock:0x4a3020,top:0x7a4a30,tree:'bookshelf',floorDeco:['candleD','scrollD','pebble'],fl:[0x4a3a2a,0x523e2e,0x443424]},
+ phantomkeep:{void:0x020208,sky:0x8a8ab8,gnd:0x0a0a14,sun:0xc8d8ff,hi:.7,si:.65,rock:0x24243a,top:0x3a3a5a,tree:'deadtree',floorDeco:['grave','boneD','pebble'],fl:[0x2a2a3a,0x303042,0x262634],pool:0x10102a,fogN:9,fogF:28},
+ magistage:{void:0x0a0206,sky:0xff9ab8,gnd:0x1e0408,sun:0xffc8d8,hi:.8,si:.9,rock:0x3a0e18,top:0x6a1a2a,tree:'royalbanner',floorDeco:['candleD','pebble','starD'],fl:[0x4a1a24,0x521e2a,0x44161e]},
+ unmade:{void:0x140c06,sky:0xffe8c0,gnd:0x5a4028,sun:0xfff0d0,hi:.9,si:1.05,rock:0xa07850,top:0xc8a070,tree:'brokenpillar',floorDeco:['rubbleD','pebble','crackD'],fl:[0x8a6a4a,0x927252,0x806246]},
+ worldforge:{void:0x0c0806,sky:0xffc890,gnd:0x1e1a16,sun:0xffd8a0,hi:.8,si:.95,rock:0x3a3430,top:0x6a5a3a,tree:'forgepillar',floorDeco:['emberD','pebble','emberD'],fl:[0x3a3430,0x423a36,0x36302c],pool:0xff7a1a,fogN:12,fogF:34},
+ shatteredsky:{void:0x1a2236,sky:0xc8d8f0,gnd:0x2a3448,sun:0xffffff,hi:.85,si:.9,rock:0x6a7488,top:0xa8b4c8,tree:'stormpillar',floorDeco:['pebble','shardD','pebble'],fl:[0x5a6270,0x626a78,0x566070]},
+ creatorthrone:{void:0x0c0802,sky:0xfff0c0,gnd:0x2a2010,sun:0xfff4d8,hi:.9,si:1.0,rock:0x8a7040,top:0xd8b050,tree:'lightspire',floorDeco:['featherD','starD','featherD'],fl:[0x5a4a2a,0x62522e,0x544426]}});
+Object.assign(FEAT,{glimmer:{melee:'husk',ranged:'hooded',lunge:'wolf',bomb:'beetle',caster:'hat',brute:'golem'},moonwell:{melee:'husk',ranged:'hooded',lunge:'leech',bomb:'bloat',caster:'hood',brute:'troll'},
+ starpetal:{melee:'knight',ranged:'skeleton',lunge:'spider',bomb:'beetle',caster:'hat',brute:'golem'},enchspire:{melee:'knight',ranged:'hooded',lunge:'hound',bomb:'mite',caster:'hood',brute:'golem'},
+ mirror:{melee:'knight',ranged:'skeleton',lunge:'shade',bomb:'mite',caster:'hood',brute:'golem'},falsedoors:{melee:'husk',ranged:'hooded',lunge:'spider',bomb:'bloat',caster:'hat',brute:'ogre'},
+ phantomkeep:{melee:'shade',ranged:'skeleton',lunge:'wolf',bomb:'mite',caster:'hood',brute:'ogre'},magistage:{melee:'knight',ranged:'hooded',lunge:'hound',bomb:'bloat',caster:'hat',brute:'golem'},
+ unmade:{melee:'husk',ranged:'skeleton',lunge:'hound',bomb:'beetle',caster:'hood',brute:'golem'},worldforge:{melee:'knight',ranged:'hooded',lunge:'spider',bomb:'mite',caster:'hat',brute:'guard'},
+ shatteredsky:{melee:'knight',ranged:'hooded',lunge:'wolf',bomb:'mite',caster:'hood',brute:'golem'},creatorthrone:{melee:'knight',ranged:'skeleton',lunge:'hound',bomb:'mite',caster:'hood',brute:'guard'}});
+Object.assign(STORY,{
+ 28:{lines:['Enchanted Fields. Every flower here hums with a spell that was never cast.','The Omega Enchanter has woken the meadow. The beasts of the glades answer to it now.'],hero:'One legend at a time. Starting here.'},
+ 29:{lines:['Moonwell Marsh. The water shows the moon even at noon.','Something with more than one head is circling the well.'],hero:'More heads, more targets.'},
+ 30:{lines:['Starpetal Grove. The petals fall upward and the stones remember old words.','The runes are waking up, and so is the thing that carries them.'],hero:'Let the stones talk. I came to fight.'},
+ 31:{lines:["The Enchanter's Spire. Every step is a glyph, and every glyph is watching.",'At the top, the Omega Enchanter waits with the emerald crystal burning in its chest.'],hero:'You were an adventurer once. I will remind you.'},
+ 32:{lines:['The Illusion Fortress. Nothing here is where it looks. Not even you.','The Mirror Knight guards the ramparts, and every mirror is one of its eyes.'],hero:'Which one of you is real? I will hit all of them.'},
+ 33:{lines:['The Hall of False Doors. Some open onto stairs. Some open onto nothing.','Somewhere a jester is laughing, and the doors laugh with it.'],hero:'I never liked jokes I did not get.'},
+ 34:{lines:['Phantom Keep. The soldiers here died long ago and never stopped standing guard.','Above the keep, a dragon made of mist and memory is waiting.'],hero:'A ghost dragon. Of course.'},
+ 35:{lines:["The Magician's Stage. The curtain is up. The audience is made of shadows.",'The Grand Magician is about to perform his greatest trick: making you disappear.'],hero:'Show is over, Magician.'},
+ 36:{lines:['Creators Cataclysm. The world here is unfinished, and the clay is still wet.','Something enormous was shaped from this land and left to walk before it was done.'],hero:'An unfinished world. Let us finish this instead.'},
+ 37:{lines:['The Forge of Worlds. Every gear turns to build something new.','The Worldsmith is assembling a world of its own, and it needs your parts.'],hero:'Not today, machine.'},
+ 38:{lines:['The Shattered Sky. Islands drift between thunderclouds.','A leviathan swims through the storm, and the lightning follows it.'],hero:'Keep your footing. Keep your head.'},
+ 39:{lines:['The Throne of Creation. Here the first light was made.','The Supreme Creator sits on the throne with the gold crystal in its chest. This is where it ends.'],hero:'Three legends. This is the last one.'}});
+Object.assign(BOSS_STORY,{
+ thornstag:{ep:'Beast of the Spellbloom',stir:'Bells ring in the grass. Hoofbeats circle you, getting closer.',taunt:'The meadow is mine to guard. Your bones will feed its flowers.'},
+ moonhydra:{ep:'Guardian of the Moonwell',stir:'The well overflows. Three shapes rise beneath the silver water.',taunt:'Three heads. Three hungers. One small hero.'},
+ runecolossus:{ep:'Keeper of the Old Words',stir:'The stones of the grove lift into the air and lock together, rune by rune.',taunt:'EVERY RUNE ON ME IS A NAME. YOURS IS NEXT.'},
+ omegaenchanter:{ep:'Legend of the Emerald Crystal',stir:'The glyphs on the floor ignite. The air bends around a single figure.',taunt:'I was an adventurer like you. Then I found something better than adventure.'},
+ mirrorknight:{ep:'Warden of the Ramparts',stir:'Every mirror on the wall turns toward you. A knight steps out of all of them at once.',taunt:'Strike me, and you strike yourself.'},
+ maskedjester:{ep:'Keeper of the False Doors',stir:'A drumroll from nowhere. Strings drop from the dark ceiling.',taunt:'Pick a door, any door! Ha! Every one of them is me!'},
+ phantasmdragon:{ep:'Ghost of the Keep',stir:'The fog thickens and glows. Wings unfold that are not quite there.',taunt:'I died here a thousand years ago. Join me.'},
+ grandmagician:{ep:'Legend of the Amethyst Crystal',stir:'A spotlight snaps on. A top hat spins down from the dark and lands on its owner.',taunt:'For my final trick, I will make a hero vanish. Forever.'},
+ claytitan:{ep:'The Unfinished Giant',stir:'The ground heaves. A hand of wet clay reaches out of the plains.',taunt:'I. AM. NOT. FINISHED.'},
+ worldsmith:{ep:'Maker of Machines',stir:'Gears grind. Pistons fire. The whole forge starts to assemble something.',taunt:'Measuring. Calculating. You will make an excellent spare part.'},
+ stormleviathan:{ep:'Swimmer of the Storm',stir:'The clouds part. A shape the size of an island swims through the sky.',taunt:'The sky is my sea. You are drowning in it.'},
+ supremecreator:{ep:'Legend of the Gold Crystal',stir:'Light pours from the throne. Every star in the sky turns toward it.',taunt:'I made this world in a day. I can unmake you in a moment.'}});
+Object.assign(BOSS_FX,{thornstag:{c:['#2affa0','#c8ffe0','#7ab04a'],a:['ring','burst']},moonhydra:{c:['#c8e8ff','#7affc8','#ffffff'],a:['spiral','ring']},runecolossus:{c:['#2affa0','#ffe86a','#8a8a7a'],a:['quake','ring']},
+ omegaenchanter:{c:['#2affa0','#c8ffe0','#ffffff'],a:['spiral','burst']},mirrorknight:{c:['#e0d8ff','#c45aff','#9ae8ff'],a:['ring','burst']},maskedjester:{c:['#ff6aa8','#ffd36a','#c45aff'],a:['burst','spiral']},
+ phantasmdragon:{c:['#9ae8ff','#c45aff','#e0e0ff'],a:['spiral','souls']},grandmagician:{c:['#c45aff','#f0c8ff','#ffd36a'],a:['spiral','bolts']},claytitan:{c:['#ffc43a','#c8a070','#ffffff'],a:['quake','debris']},
+ worldsmith:{c:['#ffc43a','#ff7a1a','#7ad8ff'],a:['rain','quake']},stormleviathan:{c:['#9fe8ff','#ffffff','#ffc43a'],a:['bolts','ring']},supremecreator:{c:['#ffc43a','#ffffff','#ff7a3a'],a:['lightwalls','ring']}});
+Object.assign(BOSS_FALL,{thornstag:['The meadow... it was so quiet before...','The stag lies down in the flowers. The spell on the glade breaks.'],moonhydra:['Three... heads... none... enough...','The Moonwell clears. You can see the real moon in it again.'],
+ runecolossus:['THE WORDS... ARE... FORGETTING ME...','The runes go dark one by one, and the stones fall still.'],omegaenchanter:['No... the crystal was mine... it promised me forever...','The emerald crystal falls silent. One legend is stopped.'],
+ mirrorknight:['You... broke... every... reflection...','The mirrors crack. For a moment you see a hundred of yourself, then just one.'],maskedjester:['The joke... was... on... me...','The strings go slack. The doors fall quiet.'],
+ phantasmdragon:['At last... I can rest...','The mist settles. The keep is only stone again.'],grandmagician:['Impossible... no one... sees through my tricks...','The amethyst crystal falls silent. Two legends stopped. One remains.'],
+ claytitan:['I... was never... finished...','The clay cracks and dries. The plains are quiet.'],worldsmith:['Error... error... cannot... rebuild...','The gears stop turning, one after another.'],
+ stormleviathan:['The storm... is... calm...','The clouds roll back. Sunlight touches the floating isles.'],supremecreator:['I made... everything... how could I... lose...','The gold crystal falls silent. The three legends are stopped.']});
+Object.assign(SIG,{thornstag:['stampede','Crystal Antler Stampede'],moonhydra:['torrent','Three-Headed Torrent'],runecolossus:['runecircle','Circle of Runes'],omegaenchanter:['omegaspell','Omega Enchantment'],
+ mirrorknight:['mirrorhall','Hall of Mirrors'],maskedjester:['jugglefinale',"Juggler's Finale"],phantasmdragon:['phantombreath','Phantom Breath'],grandmagician:['grandillusion','The Grand Illusion'],
+ claytitan:['unmaking','Unmaking Slam'],worldsmith:['assembly','Assembly Line'],stormleviathan:['skyfall',"Leviathan's Storm"],supremecreator:['genesis','Genesis']});
+Object.assign(SIGPAT,{stampede:'cross',torrent:'spiral',runecircle:'ring',omegaspell:'spiral',mirrorhall:'ring',jugglefinale:'lob',phantombreath:'cone',grandillusion:'dark',unmaking:'ring',assembly:'rows',skyfall:'bolts',genesis:'orbit'});
+Object.assign(ENTRANCE,{thornstag:'charge',moonhydra:'emerge',runecolossus:'assemble',omegaenchanter:'teleport',mirrorknight:'teleport',maskedjester:'descend',phantasmdragon:'assemble',grandmagician:'teleport',claytitan:'erupt',worldsmith:'awaken',stormleviathan:'descend',supremecreator:'descend'});
+Object.assign(DEATH,{thornstag:'dissolve',moonhydra:'sink',runecolossus:'shatter',mirrorknight:'shatter',maskedjester:'topple',phantasmdragon:'dissolve',claytitan:'melt',worldsmith:'explode',stormleviathan:'dissolve'});
+Object.assign(BOSS_LOOT,{
+ thornstag:{w:['spear','Antler of the Glade',['Critical','Swift','Leeching','Frostbite']],a:['Spellbloom Hide',['Fleet','Vital','Renewing','Sturdy'],'#2a4a2a'],r:['gale','Hoofbeat Charm']},
+ moonhydra:{w:['daggers','Fangs of the Moonwell',['Leeching','Critical','Swift','Frostbite']],a:['Moonscale Mail',['Sturdy','Vital','Renewing','Fleet'],'#1e3a44'],r:['frost','Moonwell Pearl']},
+ runecolossus:{w:['hammer','Runeforged Maul',['Thundering','Critical','Executioner','Burning']],a:['Plate of Old Words',['Sturdy','Vital','Renewing','Fleet'],'#4a5048'],r:['ward','Speaking Stone']},
+ omegaenchanter:{w:['sword','Omega Edge',['Critical','Leeching','Swift','Thundering','Burning']],a:['Emerald Legend Robes',['Sturdy','Vital','Renewing','Fleet'],'#0e2a24'],r:['storm','Emerald Crystal Shard']},
+ mirrorknight:{w:['sword','Reflection Blade',['Critical','Swift','Leeching','Thundering']],a:['Mirrorplate',['Sturdy','Vital','Renewing','Fleet'],'#4a4468'],r:['blades','Shard of Reflection']},
+ maskedjester:{w:['daggers',"Jester's Grin",['Critical','Swift','Burning','Leeching']],a:['Motley of Tricks',['Fleet','Vital','Renewing','Sturdy'],'#3a1a2a'],r:['meteor','Juggling Orb']},
+ phantasmdragon:{w:['axe','Phantom Wing',['Executioner','Frostbite','Critical','Leeching']],a:['Ghostscale',['Sturdy','Vital','Renewing','Fleet'],'#1e1e3a'],r:['frost','Breath of the Keep']},
+ grandmagician:{w:['spear',"Magician's Wand",['Critical','Thundering','Leeching','Swift','Frostbite']],a:['Amethyst Legend Tailcoat',['Sturdy','Vital','Renewing','Fleet'],'#2a0e30'],r:['lightning','Amethyst Crystal Shard']},
+ claytitan:{w:['hammer','Sculptor of Mountains',['Thundering','Executioner','Critical','Sturdy']],a:['Unfired Armor',['Sturdy','Vital','Renewing','Fleet'],'#7a5a3a'],r:['ward','Kiln Heart']},
+ worldsmith:{w:['axe','Gearcutter',['Critical','Burning','Thundering','Executioner']],a:['Clockwork Harness',['Sturdy','Vital','Renewing','Fleet'],'#5a4a2a'],r:['blades','Spinning Cog']},
+ stormleviathan:{w:['spear','Leviathan Harpoon',['Thundering','Critical','Swift','Leeching']],a:['Stormhide',['Fleet','Vital','Renewing','Sturdy'],'#3a4660'],r:['lightning','Eye of the Storm']},
+ supremecreator:{w:['hammer','Hammer of First Light',['Critical','Thundering','Executioner','Burning','Leeching']],a:['Gold Legend Armor',['Sturdy','Vital','Renewing','Fleet'],'#4a3a1a'],r:['meteor','Gold Crystal Shard']}});
+// ---- twelve new signature moves ----
+Object.assign(ACT,{
+ stampede:{dur:2.6,start(b){b.a.n=0;},tick(b,dt,t,pt){for(const w of [.35,1.05,1.75]) if(cross(pt,t,w)){const a=angTo(b,P), d=Math.min(330,dist(b,P)+90); hazLine(b.x,b.y,a,8,d/8,30,.05,.02,12*b.dm,'#2affa0'); const nx=b.x+Math.cos(a)*d, ny=b.y+Math.sin(a)*d; for(let k=0;k<10;k++) puff(lerp(b.x,nx,k/10),lerp(b.y,ny,k/10),'#7affc8',3,80,.5,6); tp(b,nx,ny)||tp(b,lerp(b.x,nx,.6),lerp(b.y,ny,.6)); b.face=a; shake(6); radial(b,10,200,8*b.dm,'#2affa0');}}},
+ torrent:{dur:2.6,tick(b,dt,t,pt){[.2,.7,1.2,1.7,2.2].forEach((w,i)=>{if(cross(pt,t,w)){const base=angTo(b,P); for(const h of [-.5,0,.5]) spread({x:b.x+Math.cos(base+h*2)*30,y:b.y+Math.sin(base+h*2)*30,r:b.r},5,.14,250,8*b.dm,i%2?'#c8e8ff':'#7affc8'); haz(P.x+rand(-60,60),P.y+rand(-60,60),52,.8,9*b.dm,'#7ab8ff',{persist:4,slow:true});}});}},
+ runecircle:{dur:2.4,start(b){const cx=P.x,cy=P.y,g=Math.random()*TAU; for(const [n,R,d] of [[18,210,.6],[13,140,1.0],[8,70,1.4]]) for(let i=0;i<n;i++){const a=g+i/n*TAU; if(i===0||i===1) continue; haz(cx+Math.cos(a)*R,cy+Math.sin(a)*R,34,d,13*b.dm,'#2affa0');}},tick(b,dt,t,pt){if(cross(pt,t,1.6)) radial(b,20,220,9*b.dm,'#ffe86a');}},
+ omegaspell:{dur:3.2,start(b){b.a.acc=0; b.a.spin=Math.random()*TAU;},tick(b,dt,t,pt){b.a.acc+=dt; while(b.a.acc>.08){b.a.acc-=.08; b.a.spin+=.21; for(let k=0;k<4;k++) shoot(b.x,b.y-b.r*.6,b.a.spin+k*TAU/4,165,8*b.dm,k%2?'#2affa0':'#c8ffe0',{r:7});}
+   for(const w of [.8,1.8,2.8]) if(cross(pt,t,w)){for(let i=0;i<8;i++){const a=i/8*TAU; haz(P.x+Math.cos(a)*90,P.y+Math.sin(a)*90,30,.7,11*b.dm,'#2affa0');} haz(P.x,P.y,40,.9,13*b.dm,'#ffffff');}}},
+ mirrorhall:{dur:2.6,tick(b,dt,t,pt){[.3,1.0,1.7].forEach((w,wi)=>{if(cross(pt,t,w)){const g=Math.random()*TAU; for(let i=0;i<6;i++){const a=g+i/6*TAU, mx=P.x+Math.cos(a)*260, my=P.y+Math.sin(a)*260; for(let k=0;k<8;k++) FXP(mx,my,k*12,0,0,160,'#e0d8ff',.6,7); shoot(mx,my,a+Math.PI,240,9*b.dm,wi%2?'#c45aff':'#e0d8ff',{r:7});}}});}},
+ jugglefinale:{dur:2.8,tick(b,dt,t,pt){for(let i=0;i<9;i++) if(cross(pt,t,.2+i*.25)){const a=i*1.3+Math.random(), r=rand(40,170), tx=P.x+Math.cos(a)*r, ty=P.y+Math.sin(a)*r; lob(b,tx,ty,i%2?'#ff6aa8':'#ffd36a'); haz(tx,ty,58,.75,13*b.dm,i%2?'#ff6aa8':'#ffd36a');}}},
+ phantombreath:{dur:2.6,start(b){b.a.base=angTo(b,P)-.9; b.a.acc=0;},tick(b,dt,t){b.a.acc+=dt; while(b.a.acc>.05){b.a.acc-=.05; const a=b.a.base+Math.min(1,t/2.2)*1.8; b.face=a; shoot(b.x,b.y-b.r*.6,a+rand(-.08,.08),260,8*b.dm,Math.random()<.5?'#9ae8ff':'#c45aff',{r:8,slow:true});}}},
+ grandillusion:{dur:3.0,start(b){b.a.x0=b.x; b.a.y0=b.y;},tick(b,dt,t,pt){[.3,1.1,1.9].forEach((w,i)=>{if(cross(pt,t,w)){const a=Math.random()*TAU; puff(b.x,b.y,'#c45aff',20,180,.5,7); tp(b,P.x+Math.cos(a)*170,P.y+Math.sin(a)*170); flashT=.2; flashCol='#c45aff'; radial(b,14,190,8*b.dm,i%2?'#ffd36a':'#c45aff',Math.random()); haz(P.x,P.y,60,.8,13*b.dm,'#c45aff');}});
+   if(cross(pt,t,2.6)) for(let i=0;i<16;i++) haz(P.x+rand(-240,240),P.y+rand(-200,200),40,.5+i*.04,11*b.dm,'#f0c8ff');}},
+ unmaking:{dur:2.6,tick(b,dt,t,pt){[.4,1.1,1.8].forEach((w,i)=>{if(cross(pt,t,w)){shake(12); const n=14+i*6, R=90+i*90; for(let k=0;k<n;k++){const a=k/n*TAU+i*.3; haz(b.x+Math.cos(a)*R,b.y+Math.sin(a)*R,40,.35,14*b.dm,'#ffc43a');} puff(b.x,b.y,'#c8a070',30,260,.8,8);}});}},
+ assembly:{dur:3.0,tick(b,dt,t,pt){for(let row=0;row<5;row++) if(cross(pt,t,.3+row*.45)){const vert=row%2, off=(row-2)*70; for(let k=-5;k<=5;k++){const x=vert?P.x+off:P.x+k*55, y=vert?P.y+k*55:P.y+off; haz(x,y,30,.55,12*b.dm,row%2?'#ffc43a':'#ff7a1a');}}}},
+ skyfall:{dur:3.0,tick(b,dt,t,pt){for(let i=0;i<12;i++) if(cross(pt,t,.15+i*.22)){const x=P.x+rand(-50,50), y=P.y+rand(-50,50); haz(x,y,48,.55,14*b.dm,'#9fe8ff'); setTimeout(()=>{try{bolt({x,y}); flashT=.08; flashCol='#e8f8ff';}catch(e){}},500);}}},
+ genesis:{dur:3.6,start(b){b.a.acc=0; b.a.spin=0;},tick(b,dt,t,pt){b.a.acc+=dt; while(b.a.acc>.12){b.a.acc-=.12; b.a.spin+=.25; for(let k=0;k<6;k++) shoot(b.x,b.y-b.r*.6,b.a.spin+k*TAU/6,150,8*b.dm,k%2?'#ffc43a':'#ffffff',{r:7});}
+   if(cross(pt,t,.9)){const g=Math.random()*TAU; for(let i=0;i<16;i++){const a=g+i/16*TAU; if(i<2) continue; haz(P.x+Math.cos(a)*160,P.y+Math.sin(a)*160,32,.7,13*b.dm,'#ffc43a');}}
+   if(cross(pt,t,2.0)) for(let k=-4;k<=4;k++) haz(P.x+k*55,P.y,30,.6,12*b.dm,'#ff7a3a'); if(cross(pt,t,2.8)) for(let i=0;i<10;i++) haz(P.x+rand(-200,200),P.y+rand(-180,180),44,.6+i*.05,13*b.dm,'#ffffff');}}});
+// ---- maps for the three legend worlds ----
+Object.assign(DIMS,{
+ 8:{bis:[28,29,30,31],bg:(y,h)=>h>.992?'#c8ffe0':h>.985?'#2affa0':(y<320?'#04160e':'#02100a'),swirl:'#0a2a1a',rim:['#3a6a4a','#2a5a3a'],halo:'#0a2a1e',accent:{28:['#ffe86a',.94],29:['#c8e8ff',.95],30:['#ffb8e8',.93],31:['#2affa0',.95]},ring:['#2affa0','#c8ffe0'],core:'#02140c'},
+ 9:{bis:[32,33,34,35],bg:(y,h)=>h>.992?'#f0c8ff':h>.985?'#c45aff':(y<320?'#0e0414':'#08020e'),swirl:'#1e0a2a',rim:['#5a3a6a','#4a2a5a'],halo:'#1a0a24',accent:{32:['#e0d8ff',.94],33:['#ff6aa8',.95],34:['#9ae8ff',.94],35:['#c45aff',.95]},ring:['#c45aff','#f0c8ff'],core:'#0a0210'},
+ 10:{bis:[36,37,38,39],bg:(y,h)=>h>.992?'#fff2c0':h>.985?'#ffc43a':(y<320?'#140e04':'#0e0902'),swirl:'#2a1e08',rim:['#8a6a3a','#6a5028'],halo:'#2a1e0a',accent:{36:['#ffc43a',.95],37:['#ff7a1a',.94],38:['#9fe8ff',.94],39:['#ffffff',.95]},ring:['#ffc43a','#fff2c0'],core:'#140e02'}});
+const legendWorldOpen=w=>{if(!SAVE) return false; if(SAVE.adminAll) return true; if(w===8) return !!(SAVE.legends||SAVE.cleared['27-4']); if(w===9) return !!SAVE.cleared['31-4']; if(w===10) return !!SAVE.cleared['35-4']; return false;};
+/* ---- props: crystals, a portal, the three adventurers ---- */
+function makeCrystalProp(col,size=.35){bossTex(); const g=new THREE.Group(), c=new THREE.Color(col);
+  const m=new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:1.4,roughness:.1,metalness:.2,flatShading:true}); const core=new THREE.Mesh(crystal(4242,6),m); core.scale.set(size*.55,size*1.4,size*.55); core.position.y=size*.7; g.add(core);
+  for(let i=0;i<3;i++){const s=new THREE.Mesh(crystal(4243+i,5),m); const a=i/3*TAU; s.scale.set(size*.25,size*.6,size*.25); s.position.set(Math.cos(a)*size*.28,size*.35,Math.sin(a)*size*.28); s.rotation.set(Math.sin(a)*.5,0,Math.cos(a)*.5); g.add(s);}
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:c,transparent:true,opacity:.85,depthWrite:false,blending:THREE.AdditiveBlending})); sp.scale.set(size*4,size*4,1); sp.position.y=size*.7; g.add(sp);
+  g.userData={core,mat:m,glow:sp}; return g;}
+function makePortalProp(col){bossTex(); const g=new THREE.Group(), c=new THREE.Color(col); const mats=[];
+  const mk=(geo,op,add=true)=>{const m=new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:op,depthWrite:false,blending:add?THREE.AdditiveBlending:THREE.NormalBlending,side:THREE.DoubleSide}); mats.push(m); return new THREE.Mesh(geo,m);};
+  const ring=new THREE.Mesh(gTor,new THREE.MeshStandardMaterial({color:0x1a1020,emissive:c,emissiveIntensity:1.6,roughness:.3})); ring.scale.set(1,1,1.2); g.add(ring);
+  const disc=mk(gCircle,.85,false); disc.material.color=new THREE.Color('#05020a'); g.add(disc); const swirl=mk(gCircle,.6); swirl.material.map=runeTex(); swirl.position.z=.01; g.add(swirl);
+  const glowS=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:c,transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending})); glowS.scale.set(4.5,4.5,1); g.add(glowS);
+  g.userData={swirl,ring,update(t){swirl.rotation.z=-t*2.4; ring.rotation.z=t*.6;}}; return g;}
+function legendModel(id){const R=buildBoss({id,r:15}); CUR=null; return R;}
+function evilFace(m,col){const u=m.userData, H=u.head; if(!H) return; for(const s of [-1,1]){const e=new THREE.Mesh(gSph,new THREE.MeshBasicMaterial({color:new THREE.Color(col)})); e.scale.set(.034,.02,.02); e.position.set(s*.065,.02,.16); H.add(e); const br=new THREE.Mesh(gBox,new THREE.MeshBasicMaterial({color:0x080406})); br.scale.set(.09,.022,.03); br.position.set(s*.065,.07,.16); br.rotation.z=s*-.45; H.add(br);}
+  const shade=new THREE.Mesh(gSph,new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.35,depthWrite:false})); shade.scale.set(.18,.19,.18); H.add(shade);}
+// ---- the cutscene after the Shapeless One: three adventurers, three crystals, three legends ----
+function legendsOriginCine(b){const bx=b.x, by=b.y; let dx=P.x-bx, dy=P.y-by; const dl=Math.hypot(dx,dy)||1; const ux=dx/dl, uy=dy/dl, px=-uy, py=ux; const W=(x,y)=>[x*S,y*S];
+  const ORDER=['grandmagician','supremecreator','omegaenchanter'], OFF=[-70,0,70];  // left, middle, right as seen from the arena
+  const crys=[], heroes=[], legs=[]; let portal=null, pt=0;
+  const cpos=i=>({x:bx+px*OFF[i]+ux*10,y:by+py*OFF[i]+uy*10}), stand=i=>({x:cpos(i).x+ux*34,y:cpos(i).y+uy*34}), start=i=>({x:bx+ux*(dl+260)+px*OFF[i]*1.3,y:by+uy*(dl+260)+py*OFF[i]*1.3});
+  const faceTo=(o,x,y)=>Math.atan2(y-o.y,x-o.x);
+  const setup=()=>{if(crys.length) return; P.hideT=9999; ORDER.forEach((id,i)=>{const L0=LEGENDS[id]; const c=makeCrystalProp(L0.col); const q=cpos(i); c.position.set(q.x*S,3,q.y*S); c.userData.vy=0; c.userData.x=q.x; c.userData.y=q.y; propAdd(c); crys.push(c);
+      const h=buildPlayer(L0.sid); CUR=null; if(h.userData.aura) h.userData.aura.visible=false; if(h.userData.ring) h.userData.ring.visible=false; const s0=start(i); h.userData.p={x:s0.x,y:s0.y,face:0,walk:0}; h.position.set(s0.x*S,0,s0.y*S); h.visible=false; propAdd(h); heroes.push(h);
+      const lg=legendModel(id); lg.visible=false; propAdd(lg); legs.push(lg);});};
+  const walkTo=(h,tx,ty,spd,dt)=>{const p=h.userData.p, d=Math.hypot(tx-p.x,ty-p.y); let mv=false; if(d>3){const st=Math.min(d,spd*dt); p.x+=(tx-p.x)/d*st; p.y+=(ty-p.y)/d*st; p.face=Math.atan2(ty-p.y,tx-p.x); p.walk+=dt*11; mv=true;} h.position.set(p.x*S,0,p.y*S); h.rotation.y=yawOf(p.face); animLimbs(h,p.walk,mv); return mv;};
+  const idle=(h,face)=>{const p=h.userData.p; if(face!=null) p.face=face; h.position.set(p.x*S,0,p.y*S); h.rotation.y=yawOf(p.face); animLimbs(h,p.walk,false);};
+  const crystalFall=dt=>crys.forEach(c=>{if(c.userData.held) return; const u=c.userData; if(c.position.y>.02||u.vy){u.vy-=9*dt; c.position.y+=u.vy*dt; if(c.position.y<.02){c.position.y=.02; u.vy=Math.abs(u.vy)>1?-u.vy*.35:0;}} c.rotation.y+=dt*1.2; u.core.material.emissiveIntensity=1.2+.5*Math.sin(time*4);});
+  const mid=()=>{const q=stand(1); return {x:q.x,y:q.y};};
+  const camOn=(x,y,ex,ey,h,ly)=>[ex*S,h,ey*S,x*S,ly,y*S];
+  const shots=[
+   {dur:3.2,text:'Where the Shapeless One fell, three crystals drop to the ground, humming in the silence.',enter(){collectAllLoot(); setup(); flashT=.4; flashCol='#ffffff'; crys.forEach((c,i)=>{c.position.y=2.6+i*.4;});},tick(t,dt){crystalFall(dt); if(Math.random()<.3) crys.forEach((c,i)=>FXP(c.userData.x+rand(-10,10),c.userData.y+rand(-10,10),rand(5,30),0,0,60,LEGENDS[ORDER[i]].col,.6,5));},
+    cam:k=>{const q=mid(); return camOn(bx,by,bx+ux*90-px*110*(1-k*.4),by+uy*90-py*110*(1-k*.4),lerp(1.2,.8,k),.3);}},
+   {dur:3.6,speaker:'Adventurer',text:'Where is it?! We came all this way for the Shapeless One!',enter(){heroes.forEach(h=>h.visible=true);},tick(t,dt){crystalFall(dt); heroes.forEach((h,i)=>{const q=stand(i), s0=start(i); const tx=lerp(s0.x,q.x,.62), ty=lerp(s0.y,q.y,.62); walkTo(h,tx,ty,150,dt);});},
+    cam:k=>{const s=start(1), q=stand(1), cx=lerp(s.x,q.x,.4), cy=lerp(s.y,q.y,.4); return camOn(cx,cy,cx-ux*150+px*170,cy-uy*150+py*170,lerp(2.6,1.8,k),.8);}},
+   {dur:2.8,speaker:'Adventurer',text:'Someone beat us to it... wait. Look over there.',tick(t,dt){crystalFall(dt); heroes.forEach((h,i)=>{const p=h.userData.p; p.face=faceTo(p,cpos(i).x,cpos(i).y)+Math.sin(t*3+i)*.5*(1-Math.min(1,t/1.6)); idle(h);});},
+    cam:k=>{const p=heroes[1].userData.p; return camOn(p.x,p.y,p.x-ux*60+px*30,p.y-uy*60+py*30,1.25,1.05);}},
+   {dur:2.6,text:'Each of them walks to a crystal.',tick(t,dt){crystalFall(dt); heroes.forEach((h,i)=>{const q=stand(i); walkTo(h,q.x,q.y,120,dt);});},
+    cam:k=>{const q=mid(); return camOn(q.x,q.y,q.x+ux*20+px*220,q.y+uy*20+py*220,lerp(1.4,2.2,k),.6);}},
+   {dur:2.6,speaker:'Adventurer',text:'Mine.',enter(){crys.forEach((c,i)=>{c.userData.held=true;});},tick(t,dt){heroes.forEach((h,i)=>{const p=h.userData.p; idle(h,faceTo(p,cpos(i).x,cpos(i).y)); const k=Math.min(1,t/1.2); h.userData.arms[1].rotation.x=-k*1.2; const c=crys[i]; c.position.set(lerp(c.userData.x,p.x,k*.6)*S,lerp(.02,.75,k),lerp(c.userData.y,p.y,k*.6)*S); c.scale.setScalar(1-k*.35);});},
+    cam:k=>{const p=heroes[2].userData.p; return camOn(p.x,p.y,p.x-ux*50-px*40,p.y-uy*50-py*40,lerp(.9,1.1,k),.8);}},
+   {dur:2.6,text:'Their eyes change. Something cold looks out of their faces.',enter(){heroes.forEach((h,i)=>evilFace(h,LEGENDS[ORDER[i]].col)); flashT=.3; flashCol='#300010'; shake(5);},tick(t,dt){heroes.forEach((h,i)=>{const p=h.userData.p; idle(h,faceTo(p,bx-ux*400,by-uy*400)); h.userData.arms[1].rotation.x=-1.2; const c=crys[i]; c.position.set((p.x-ux*14)*S,.75,(p.y-uy*14)*S);}); if(Math.random()<.2) shake(2);},
+    cam:k=>{const p=heroes[1].userData.p; return camOn(p.x,p.y,p.x-ux*42,p.y-uy*42,1.15,1.1);}},
+   {dur:3.4,speaker:'The three',text:'With this power... nothing can stop us.',enter(){shake(8);},tick(t,dt){heroes.forEach((h,i)=>{const p=h.userData.p, L0=LEGENDS[ORDER[i]]; idle(h,faceTo(p,bx-ux*400,by-uy*400)); const k=Math.min(1,t/1); h.userData.arms[0].rotation.x=-2.9*k; h.userData.arms[1].rotation.x=-2.9*k; const c=crys[i];
+      const up=Math.min(1,t/1.2); c.position.set((p.x-ux*6)*S,lerp(.75,1.85,up),(p.y-uy*6)*S); if(t>1.4){const a2=Math.min(1,(t-1.4)/1.8); c.position.y=lerp(1.85,.8,a2); c.scale.setScalar(.65*(1-a2*.85)+.05); for(let q=0;q<3;q++) homeP(p.x+rand(-30,30),p.y+rand(-30,30),rand(10,90),p.x,p.y,40,q?L0.col:'#ffffff',rand(.4,.8),rand(4,7)); if(Math.random()<.15) shake(4);}});},
+    cam:k=>{const q=mid(); return camOn(q.x,q.y,q.x-ux*200,q.y-uy*200,lerp(.8,1.6,k),1.2);}},
+   {dur:2.2,text:'The crystals sink into their chests. The power tears them apart and builds them again.',enter(){flashT=.9; flashCol='#ffffff'; shake(18); heroes.forEach((h,i)=>{h.visible=false; crys[i].visible=false; const p=h.userData.p, lg=legs[i]; lg.visible=true; lg.userData.p={x:p.x,y:p.y,face:faceTo(p,bx-ux*400,by-uy*400),walk:0}; lg.position.set(p.x*S,0,p.y*S); lg.rotation.y=yawOf(lg.userData.p.face); for(let q=0;q<40;q++){const a=Math.random()*TAU; FXP(p.x,p.y,30,Math.cos(a)*rand(80,300),Math.sin(a)*rand(80,300),rand(80,300),LEGENDS[ORDER[i]].col,1,7);}});},
+    tick(t,dt){legs.forEach(lg=>propAnim2(lg));},cam:k=>{const q=mid(); return camOn(q.x,q.y,q.x-ux*240,q.y-uy*240,lerp(2.4,1.4,k),1.1);}},
+   ...[2,0,1].map(i=>({dur:2.4,title:LEGENDS[ORDER[i]].name,sub:'Legend of the '+LEGENDS[ORDER[i]].crystal+' crystal',enter(){flashT=.25; flashCol=LEGENDS[ORDER[i]].col; shake(6);},tick(t,dt){legs.forEach(lg=>propAnim2(lg)); const p=legs[i].userData.p; if(Math.random()<.5) FXP(p.x+rand(-20,20),p.y+rand(-20,20),rand(10,80),0,0,90,LEGENDS[ORDER[i]].col,.7,6);},
+    cam:k=>{const p=legs[i].userData.p; const a=Math.atan2(-uy,-ux)+(.5-k)*.7; return [ (p.x+Math.cos(a)*55)*S,lerp(.9,1.3,k),(p.y+Math.sin(a)*55)*S,p.x*S,1.0,p.y*S];}})),
+   {dur:3.0,speaker:'The Supreme Creator',text:'Every world for the taking. Magician, open the way.',tick(t,dt){legs.forEach(lg=>propAnim2(lg));},cam:k=>{const p=legs[1].userData.p; return [(p.x-ux*70+px*20)*S,1.3,(p.y-uy*70+py*20)*S,p.x*S,1.1,p.y*S];}},
+   {dur:3.2,speaker:'The Grand Magician',text:'With pleasure.',enter(){const p=legs[0].userData.p; portal=makePortalProp(LEGENDS.grandmagician.col); const qx=bx+ux*0-px*0, qy=by; portal.position.set(qx*S,1.3,qy*S); portal.rotation.y=Math.atan2(ux,uy); portal.scale.setScalar(.01); propAdd(portal); pt=0; shake(6); flashT=.3; flashCol='#c45aff';},
+    tick(t,dt){pt+=dt; legs.forEach(lg=>propAnim2(lg)); const k=easeOut(Math.min(1,t/1.4)); portal.scale.setScalar(.01+k*1.05); portal.userData.update(pt); const g=legs[0].userData.p; if(Math.random()<.7) homeP(g.x,g.y,60,bx,by,60,Math.random()<.5?'#c45aff':'#f0c8ff',.5,6); legs[0].userData.armsUp=Math.min(1,t);},
+    cam:k=>{return [(bx+ux*150+px*90)*S,lerp(1.6,1.2,k),(by+uy*150+py*90)*S,bx*S,1.2,by*S];}},
+   {dur:3.6,text:'One by one, the three legends step through the portal.',tick(t,dt){pt+=dt; portal.userData.update(pt); legs.forEach((lg,i)=>{const p=lg.userData.p; const go=t>i*.8; if(lg.visible&&go){const d=Math.hypot(bx-p.x,by-p.y); if(d>8){const st=Math.min(d,120*dt); p.x+=(bx-p.x)/d*st; p.y+=(by-p.y)/d*st; p.face=Math.atan2(by-p.y,bx-p.x); p.walk+=dt*10;} else {lg.visible=false; flashT=.15; flashCol=LEGENDS[ORDER[i]].col; puff(bx,by,LEGENDS[ORDER[i]].col,16,160,.5,6);}} propAnim2(lg,go&&lg.visible);});},
+    cam:k=>[(bx+ux*200-px*80)*S,1.5,(by+uy*200-py*80)*S,bx*S,1.1,by*S]},
+   {dur:2.2,text:'The portal snaps shut behind them.',tick(t,dt){pt+=dt; portal.userData.update(pt); const k=Math.min(1,t/.8); portal.scale.setScalar(Math.max(.001,1.06*(1-easeInOut(k)))); if(t>.8&&!portal.userData.shut){portal.userData.shut=1; portal.visible=false; flashT=.5; flashCol='#ffffff'; shake(14); puff(bx,by,'#c45aff',40,260,.8,7);}},
+    cam:k=>[(bx+ux*150)*S,1.3,(by+uy*150)*S,bx*S,1.2,by*S]}];
+  shots.cleanup=()=>{propClear(); P.hideT=0;};
+  return shots;}
+// a lighter animator for the legend props in cutscenes
+function propAnim2(R,moving){const u=R.userData, p=u.p; if(p){R.position.set(p.x*S,0,p.y*S); R.rotation.y=yawOf(p.face); animLimbs(R,p.walk,!!moving);} if(u.armsUp) u.arms.forEach(a=>a.rotation.x=-2.6*u.armsUp); animBoss(R,{noAura:true,hidden:false,x:p?p.x:0,y:p?p.y:0,r:15}); if(u.anim) u.anim(u,{}); if(u.float&&u.body) u.body.position.y=.25+Math.sin(time*2)*.12; if(u.orbit) u.orbit.forEach((o,i)=>{const a=time*1.6+i*TAU/u.orbit.length; o.position.set(Math.cos(a)*.75,1.0+Math.sin(time*3+i)*.12,Math.sin(a)*.75);}); if(u.mega) u.mega.g.visible=false; if(u.auraFx){const A=u.auraFx; A.disc.visible=A.ring.visible=A.ring2.visible=A.glow.visible=A.glow2.visible=false; A.light.intensity=0;}}
+// ---- black screen: Stop the 3 great legends! ----
+function collectAllLoot(){for(const o of loot){if(o.gone) continue; if(o.kind==='shard'){SAVE.shards+=o.amt; run.shards+=o.amt;} else if(o.kind==='arrows') SAVE.arrows=Math.min(arrowCap(),SAVE.arrows+o.amt); else if(o.kind==='item'){SAVE.inv.push(o.item); run.items++; if(o.item.cid){SAVE.found=SAVE.found||{}; SAVE.found[o.item.cid]=1;}} o.gone=true;} loot=[]; refreshSlots(); persist();}
+function legendsCard(){collectAllLoot(); if(!run.guest){SAVE.cleared[L.bi+'-'+L.li]=true; SAVE.legends=1;} run.done=true; persist(); mode='result';
+  let el=document.getElementById('legCard'); if(!el){el=document.createElement('div'); el.id='legCard'; document.body.appendChild(el);} el.style.background='#000'; {el.innerHTML='<h1>Stop the 3 great legends!</h1><p>The Omega Enchanter, the Grand Magician and the Supreme Creator have escaped into new worlds.</p><button id="legGo" class="btn gold worldbtn next" aria-label="Go to the Enchanted Fields">Enchanted Fields →</button>';}
+  el.hidden=false; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in'); $('#hud').hidden=true; if(typeof sfx==='function') sfx('win');
+  $('#legGo').onclick=()=>{el.hidden=true; mapWorld=8; selNode=null; openMap();};}
+// ---- after a legend falls: its crystal is yours, and an arrow leads to the next legend ----
+function legendDoneCard(b){const Lg=LEGENDS[b.id], nextW=Lg.world<10?Lg.world+1:0; collectAllLoot(); if(!run.guest){SAVE.cleared[L.bi+'-'+L.li]=true; SAVE.legendCrystals=SAVE.legendCrystals||{}; SAVE.legendCrystals[b.id]=1;} run.done=true; persist(); mode='result';
+  let el=document.getElementById('legCard'); if(!el){el=document.createElement('div'); el.id='legCard'; document.body.appendChild(el);}
+  const nm=nextW?WORLD_NAME[nextW]:'';
+  el.innerHTML=nextW?`<h1>${Lg.name} is stopped!</h1><p>The ${Lg.crystal} crystal is yours. ${nextW===9?'The Grand Magician is hiding in the Illusion Fortress.':'The Supreme Creator waits in Creators Cataclysm.'}</p><button id="legGo" class="btn gold worldbtn next" aria-label="Go to ${nm}">${nm} →</button>`
+   :`<h1>The 3 great legends are stopped!</h1><p>The emerald, amethyst and gold crystals are yours. Every world is safe again, thanks to you.</p><button id="legGo" class="btn gold worldbtn next" aria-label="Back to the map">Back to the map →</button>`;
+  el.style.background=nextW?'rgba(0,0,0,.9)':'#000'; el.hidden=false; el.classList.remove('in'); void el.offsetWidth; el.classList.add('in'); $('#hud').hidden=true; if(typeof sfx==='function') sfx('win');
+  $('#legGo').onclick=()=>{el.hidden=true; mapWorld=nextW||10; selNode=null; openMap();};}
+// ---- every boss on the legend islands is summoned by its legend ----
+function legendSummonIntro(b,lid){const Lg=LEGENDS[lid], F=BOSS_FX[b.id]||BOSS_FX.bramble, base=uniqueIntro(b), fa=Math.atan2(P.y-b.y,P.x-b.x), ux=Math.cos(fa), uy=Math.sin(fa), sc=b.r/13*.85;
+  const lx=b.x+ux*b.r*2.2-uy*60, ly=b.y+uy*b.r*2.2+ux*60; let lg=null, circ=null;
+  const LINES={thornstag:'Beast of the glade, the Enchanter calls you. Wake!',moonhydra:'Rise from the well, all three of you. We have a guest.',runecolossus:'Old stones, remember your shape. Stand and crush.',mirrorknight:'Reflections, take a body. Guard my fortress.',
+    maskedjester:'Places, everyone! The show must go on!',phantasmdragon:'Come back from the dead, old dragon. I have a use for you.',claytitan:'Unfinished? Good. Finish them instead.',worldsmith:'Build, machine. Build me a hero-shaped hole.',stormleviathan:'Swim, leviathan. Drown this one in thunder.'};
+  const pre=[
+   {dur:2.6,speaker:Lg.name,text:'You followed us. How brave. How foolish.',enter(){b.cineHide=true; b.rise=0; lg=legendModel(lid); lg.userData.p={x:lx,y:ly,face:Math.atan2(P.y-ly,P.x-lx),walk:0}; propAdd(lg); flashT=.35; flashCol=Lg.col; shake(6); puff(lx,ly,Lg.col,30,220,.6,7);},
+    tick(t,dt){propAnim2(lg); if(Math.random()<.4) FXP(lx+rand(-20,20),ly+rand(-20,20),rand(10,70),0,0,70,Lg.col,.6,6);},
+    cam:k=>[(lx+Math.cos(fa)*110*(1-k*.15)+Math.cos(fa+1.5)*40)*S,lerp(1.2,1.4,k),(ly+Math.sin(fa)*110*(1-k*.15)+Math.sin(fa+1.5)*40)*S,lx*S,1.05,ly*S]},
+   {dur:3.0,speaker:Lg.name,text:LINES[b.id]||'Rise, and destroy them.',enter(){circ=summonCircle(b.x,b.y,Lg.col); lg.userData.armsUp=0;},tick(t,dt){circ.update(t,dt); lg.userData.armsUp=Math.min(1,t*1.5); propAnim2(lg);
+      for(let q=0;q<3;q++) homeP(lx+rand(-8,8),ly+rand(-8,8),70,b.x+rand(-b.r,b.r),b.y+rand(-b.r,b.r),5,q?Lg.col:'#ffffff',rand(.5,.8),rand(5,8)); if(t>1.6){if(b.cineHide){b.cineHide=false; flashT=.4; flashCol=Lg.col; shake(14); CFX.ring(b,F.c);} b.rise=Math.min(1,b.rise+dt*1.2);}},
+    cam:k=>{const cx=(lx+b.x)/2, cy=(ly+b.y)/2; return [(cx+Math.cos(fa)*b.r*6+Math.cos(fa+1.4)*80)*S,lerp(2*sc,2.6*sc,k),(cy+Math.sin(fa)*b.r*6+Math.sin(fa+1.4)*80)*S,cx*S,1*sc,cy*S];}},
+   {dur:1.6,speaker:Lg.name,text:'Do not disappoint me.',enter(){b.cineHide=false; b.rise=1;},tick(t,dt){lg.userData.armsUp=Math.max(0,1-t*2); propAnim2(lg); if(t>.9&&lg.visible){lg.visible=false; flashT=.3; flashCol=Lg.col; puff(lx,ly,Lg.col,30,240,.6,7);} if(circ) circ.update(3+t,dt);},
+    cam:k=>{const cx=(lx+b.x)/2, cy=(ly+b.y)/2; return [(cx+Math.cos(fa)*b.r*7+Math.cos(fa-1.3)*b.r*4)*S,2.4*sc,(cy+Math.sin(fa)*b.r*7+Math.sin(fa-1.3)*b.r*4)*S,cx*S,1.1*sc,cy*S];}}];
+  const shots=pre.concat(base.slice(1)); shots.cleanup=()=>{if(circ){circ.remove(); circ=null;} if(base.cleanup) base.cleanup(); propClear(); b.cineHide=false; b.rise=1;};
+  return shots;}
+// ---- a legend stepping out of its own portal to fight ----
+function legendBossIntro(b){const Lg=LEGENDS[b.id], base=uniqueIntro(b), fa=Math.atan2(P.y-b.y,P.x-b.x); let portal=null, pt=0;
+  const pre={dur:3.0,text:'A portal tears open in the air. A legend steps through.',enter(){b.cineHide=true; portal=makePortalProp(Lg.col); portal.position.set(b.x*S,1.3,b.y*S); portal.rotation.y=Math.PI/2-fa; portal.scale.setScalar(.01); propAdd(portal); shake(6);},
+    tick(t,dt){pt+=dt; const k=easeOut(Math.min(1,t/1.2)); portal.scale.setScalar(.01+k*1.1*(t>2.2?Math.max(0,1-(t-2.2)/.7):1)); portal.userData.update(pt); if(t>1.6&&b.cineHide){b.cineHide=false; flashT=.4; flashCol=Lg.col; shake(10);} if(Math.random()<.6) FXP(b.x+rand(-30,30),b.y+rand(-30,30),rand(20,100),0,0,60,Lg.col,.6,6);},
+    cam:k=>[(b.x+Math.cos(fa)*140)*S,lerp(1.4,1.1,k),(b.y+Math.sin(fa)*140)*S,b.x*S,1.2,b.y*S]};
+  const shots=[pre].concat(base.slice(1)); shots.cleanup=()=>{if(base.cleanup) base.cleanup(); propClear(); b.cineHide=false;}; return shots;}
+// ---- a legend's death: it floats up, crystal light bursts out of it, and only the crystal is left ----
+function legendDeathCine(b){const Lg=LEGENDS[b.id], fl=BOSS_FALL[b.id]||['No...','It is over.'], fa=Math.atan2(P.y-b.y,P.x-b.x), bx=b.x, by=b.y; let cr=null;
+  const shots=[
+   {dur:2.6,fast:true,speaker:b.name,text:fl[0],enter(){collectAllLoot(); b.fallCine=true; b.deadAt=null; b.roar=1.2; b.a=null; b.flash=0; b.hidden=false; b.cineHide=false; b.jy=0; flashT=.3; flashCol='#ffffff'; shake(8);},tick(t,dt){b.flash=Math.max(0,(b.flash||0)-dt); b.spin=Math.sin(t*13)*.1; if(Math.random()<.3) FXP(bx+rand(-15,15),by+rand(-15,15),rand(10,60),0,0,80,Lg.col,.7,6);},
+    cam:k=>[(bx+Math.cos(fa+.4)*80)*S,1.2,(by+Math.sin(fa+.4)*80)*S,bx*S,1.1,by*S]},
+   {dur:3.2,text:'It rises into the air. Crystal light pours out through every crack.',enter(){b.roar=0; b.spin=0;},tick(t,dt){b.jy=easeInOut(Math.min(1,t/2.6))*2.4; b.spin=t*t*2; b.flash=Math.sin(t*(10+t*20))>0?.06:0; for(let q=0;q<4;q++){const a=Math.random()*TAU; FXP(bx,by,b.jy/S*.9+20,Math.cos(a)*rand(80,260),Math.sin(a)*rand(80,260),rand(-60,160),q%2?Lg.col:'#ffffff',.9,rand(5,9));} if(Math.random()<.25) shake(5);},
+    cam:k=>[(bx+Math.cos(fa)*150)*S,lerp(1.2,1.6,k),(by+Math.sin(fa)*150)*S,bx*S,lerp(1.2,3.3,k),by*S]},
+   {dur:2.2,text:'—and bursts.',enter(){b.cineHide=true; flashT=1; flashCol='#ffffff'; shake(24); shock(bx,by,b.r*14,Lg.col,1); for(let i=0;i<120;i++){const a=Math.random()*TAU, sp=rand(150,700); FXP(bx,by,2.4/S,Math.cos(a)*sp,Math.sin(a)*sp,rand(-200,500),[Lg.col,'#ffffff',Lg.col2][i%3],rand(1,1.8),rand(6,12));}
+      cr=makeCrystalProp(Lg.col,.5); cr.position.set(bx*S,2.4,by*S); propAdd(cr);},tick(t,dt){cr.rotation.y+=dt*2; cr.position.y=lerp(2.4,1.1,easeInOut(Math.min(1,t/2)));},
+    cam:k=>[(bx+Math.cos(fa-.3)*200)*S,1.6,(by+Math.sin(fa-.3)*200)*S,bx*S,1.8,by*S]},
+   {dur:2.8,title:Lg.name+' is stopped',sub:'Only the '+Lg.crystal+' crystal remains',tick(t,dt){cr.rotation.y+=dt*1.2; cr.position.y=1.1+Math.sin(t*2)*.08; if(Math.random()<.5) FXP(bx+rand(-12,12),by+rand(-12,12),rand(30,60),0,0,40,Lg.col,.8,5);},
+    cam:k=>{const a=fa+k*.8; return [(bx+Math.cos(a)*70)*S,1.3,(by+Math.sin(a)*70)*S,bx*S,1.1,by*S];}}];
+  if(fl[1]) shots.push(heroShot(fl[1],2.8));
+  shots.cleanup=()=>{propClear(); b.cineHide=false; b.jy=0; b.spin=0; b.deadAt=time-3;};
+  return shots;}
+
+/*LEGENDS-END*/
 const hot=window.claude?.hot; if(hot&&hot.ready) hot.ready(start); else start(hot?.data??{});
 })();
 </script>
