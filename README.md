@@ -128,3 +128,11 @@ The Sculk Monstrosity and the Corrupted Singer have their own story cutscenes: t
 ## 👾 168 unique monsters
 
 Every monster in every region now has its own design: 17 different body types (walkers, hulking brutes, golems, four-legged beasts, insects, serpents, crabs, mantises, birds, walking plants, totems, slimes, jellies, floating mages, flame wisps, tripods and walking bombs) combined with their own heads, backs, weapons and tails. No two of the 168 monsters share a design, and each one is shaped to fit its name.
+
+## 🎵 Music and sound
+
+Every level and every boss has its own looping music, composed live by the game, so no two places sound the same (162 different tracks). The main menu has a heroic theme. Every swing, arrow, roll, potion, artifact, hit, pickup, chest and monster has a sound, and every boss has its own roar and attack sounds. Turn music and effects up or down with the Sound button on the main menu or in the pause menu.
+
+## ⚔️ Equip best
+
+The Equip best button in your pack puts on your strongest weapon, armor and artifacts in one tap. Bosses now have five times as much health.

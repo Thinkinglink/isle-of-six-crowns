@@ -63,6 +63,12 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #adminPanel .admRow{display:flex;flex-direction:column;gap:6px;color:#e8dcc0;font-size:14px}
 #adminPanel select{padding:8px;background:#221c14;color:#f0e6d0;border:1px solid #6a5a3a;border-radius:6px;font-size:14px}
 #adminPanel .admRow3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#volPanel{position:fixed;inset:0;z-index:62;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+#volPanel[hidden]{display:none}
+#volPanel .volBox{background:#15120e;border:2px solid #c9a066;border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px;width:min(340px,100%)}
+#volPanel h3{margin:0;color:#ffd36a;font-family:'Space Mono',monospace}
+#volPanel label{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#e8dcc0}
+#volPanel input[type=range]{flex:1;accent-color:#ffd36a}
 #menu h1{font-size:clamp(36px,min(9.5vw,10.5vh),112px);line-height:.88;color:var(--crown);text-shadow:0 5px 0 var(--crown-d),0 11px 0 rgba(0,0,0,.45);margin:6px 0 18px}
 .crowns{display:flex;gap:8px;align-items:center;margin-bottom:26px;color:var(--mute);font-size:14px;flex-wrap:wrap}
 .pip{width:24px;height:17px;background:#2b4650;clip-path:polygon(0 100%,0 22%,25% 56%,50% 0,75% 56%,100% 22%,100% 100%)}
@@ -528,6 +534,7 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
         <div class="invtools" id="invTools">
           <button class="fchip" data-f="all">All</button><button class="fchip" data-f="weapon">Weapons</button><button class="fchip" data-f="armor">Armor</button><button class="fchip" data-f="artifact">Artifacts</button>
           <label class="sortl" for="invSort">Sort</label><select id="invSort"><option value="new">Newest</option><option value="power">Power</option><option value="rarity">Rarity</option></select>
+          <button class="btn small gold" id="equipBest">Equip best</button>
           <button class="btn small danger" id="salvCommon">Salvage all common</button>
         </div>
         <div id="bagGrid"></div></div>
@@ -1119,7 +1126,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='3.9.1', SAVE_VERSION=6;
+const APP_VERSION='4.0.0', SAVE_VERSION=6;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1241,7 +1248,7 @@ function makeEnemy(type,x,y,summoned){
     state:'chase',t:0,cd:rand(.5,2),flash:0,stun:0,burn:0,kx:0,ky:0,alert:!!summoned,face:Math.PI/2,walk:Math.random()*6,summoned:!!summoned,hx:x,hy:y};}
 function spawnEnemy(type,x,y,summoned){const e=makeEnemy(type,x,y,summoned); if(blocked(x,y,e.r)) return null; ents.push(e); return e;}
 function spawnBoss(id){const D=BOSSES[id],bi=L.bi,tr=L.tier;
-  boss={id,bi,isBoss:true,x:L.bossAt.x,y:L.bossAt.y,r:D.r,max:Math.round(D.hp*(1+.6*tr)*DF().hp),dm:(1+.45*tr)*DF().dmg,spd:D.spd*DF().spd,c1:D.c1,c2:D.c2,name:D.name,acts:D.acts,a:null,cd:1.4,flash:0,awake:false,face:Math.PI/2,walk:0,hidden:false,inv:false,burn:0,stun:0,trans:0,dead:false,form:1};
+  boss={id,bi,isBoss:true,x:L.bossAt.x,y:L.bossAt.y,r:D.r,max:Math.round(D.hp*5*(1+.6*tr)*DF().hp),dm:(1+.45*tr)*DF().dmg,spd:D.spd*DF().spd,c1:D.c1,c2:D.c2,name:D.name,acts:D.acts,a:null,cd:1.4,flash:0,awake:false,face:Math.PI/2,walk:0,hidden:false,inv:false,burn:0,stun:0,trans:0,dead:false,form:1};
   boss.hp=boss.max;}
 
 /* ---------------- player actions ---------------- */
@@ -1497,7 +1504,7 @@ function bossDown(b,fromNet){
   else if(b.id==='echotyrant') startCine(defeatCine(b),()=>{L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T,big:true,cine:true}; banner('The Echo Tyrant falls','Collect your loot, then enter the great portal');});
   else startCine(defeatCine(b),()=>{banner('Guardian defeated','Collect your loot, then enter the portal'); L.exit={x:(L.arena.x+L.arena.w/2)*T,y:(L.arena.y+L.arena.h/2)*T};});
 }
-function finishTransform(){const D=BOSSES.sov2,b=boss; Object.assign(b,{id:'sov2',name:D.name,r:D.r,spd:D.spd,c1:D.c1,c2:D.c2,acts:D.acts,max:Math.round(D.hp*(1+.6*5))*(L.mpN||1),inv:false,cd:1.2,form:2,last:null});
+function finishTransform(){const D=BOSSES.sov2,b=boss; Object.assign(b,{id:'sov2',name:D.name,r:D.r,spd:D.spd,c1:D.c1,c2:D.c2,acts:D.acts,max:Math.round(D.hp*5*(1+.6*5)*DF().hp)*(L.mpN||1),inv:false,cd:1.2,form:2,last:null});
   b.hp=b.max; L.form2=true; b.face=angTo(b,P); startCine(transformCine(b),()=>{radial(b,24,200,8*b.dm,'#d48cff'); shake(8);}); if(MP.role==='host'&&MP.inGame) bcast({t:'cine',k:'trans'});}
 
 /* ---------------- enemy AI ---------------- */
@@ -1644,9 +1651,9 @@ function updLoot(dt){
   for(const o of loot){o.t+=dt; if(o.vz||o.z>0){o.z+=o.vz*dt; o.vz-=500*dt; moveCirc({x:o.x,y:o.y,r:4},0,0); const nx=o.x+o.vx*dt,ny=o.y+o.vy*dt; if(!solid(nx,ny)){o.x=nx;o.y=ny;} if(o.z<=0){o.z=0;o.vz=0;o.vx=o.vy=0;}}
     if(P.dead||o.t<.4) continue; const d=Math.hypot(P.x-o.x,P.y-o.y);
     if(o.kind!=='item'&&d<90){o.x+=(P.x-o.x)*dt*8; o.y+=(P.y-o.y)*dt*8;}
-    if(d<24){ if(o.kind==='shard'){const a=o.amt*(Math.random()<.1*upLv('for')?2:1); SAVE.shards+=a; run.shards+=a; o.gone=true;}
+    if(d<24){ if(o.kind==='shard'){const a=o.amt*(Math.random()<.1*upLv('for')?2:1); SAVE.shards+=a; run.shards+=a; o.gone=true; sfx('shard');}
       else if(o.kind==='arrows'){SAVE.arrows=Math.min(arrowCap(),SAVE.arrows+o.amt); o.gone=true; toast('+'+o.amt+' arrows');}
-      else if(o.kind==='item'){ {SAVE.inv.push(o.item); run.items++; if(o.item.cid){SAVE.found=SAVE.found||{}; if(!SAVE.found[o.item.cid]){SAVE.found[o.item.cid]=1; setTimeout(()=>toast('New Codex entry','#c9a6ff'),300);}} o.gone=true; toast(o.item.name,RAR[o.item.rar].col); persist();}}
+      else if(o.kind==='item'){ {SAVE.inv.push(o.item); run.items++; sfx('loot',o.item.rar); if(o.item.cid){SAVE.found=SAVE.found||{}; if(!SAVE.found[o.item.cid]){SAVE.found[o.item.cid]=1; setTimeout(()=>toast('New Codex entry','#c9a6ff'),300);}} o.gone=true; toast(o.item.name,RAR[o.item.rar].col); persist();}}
       if(o.gone) refreshSlots(); } }
   loot=loot.filter(o=>!o.gone);
 }
@@ -2545,7 +2552,7 @@ function tintSetup(R){const u=R.userData, pure=new THREE.Color('#f6efff'), gold=
   u.tintMats=u.mats.map(m=>{const em=m.userData.e0&&m.userData.e0.getHex()!==0&&!m.userData.vein; return {m,c0:m.color.clone(),cp:em?gold.clone():m.color.clone().lerp(pure,.72),e0:m.userData.e0.clone(),ep:(em||m.userData.vein)?gold.clone():m.userData.e0.clone()};});}
 function setPurity(u,k){for(const t of u.tintMats){t.m.color.copy(t.c0).lerp(t.cp,k); t.m.userData.e0.copy(t.e0).lerp(t.ep,k); if(!u.fl) t.m.emissive.copy(t.m.userData.e0);}}
 // Extra life on every boss: breathing, head tracking, footstep dust, vein pulse, power-down and healing
-function bossExtra(m,b){const u=m.userData; if(u.mand) u.mand.forEach((g,i)=>g.rotation.y=(i?-1:1)*(.15+.25*Math.max(0,Math.sin(time*3.2))));
+function bossExtra(m,b){const u=m.userData; if(b.roar>0&&!b._roaring&&!b.hidden&&!b.cineHide&&b.id){b._roaring=1; if(typeof sfx==='function') sfx('roar',b);} if(!(b.roar>0)) b._roaring=0; if(u.mand) u.mand.forEach((g,i)=>g.rotation.y=(i?-1:1)*(.15+.25*Math.max(0,Math.sin(time*3.2))));
   if(u.bud){const o=.25+.35*(.5+.5*Math.sin(time*1.6))+(b.a?.25:0); u.bud.forEach(pv=>pv.rotation.x=-o);}
   if(u.leafWings) u.leafWings.forEach((pv,i)=>{pv.rotation.z=pv.userData.sd*(Math.sin(time*2.4+i)*.25); pv.rotation.y=pv.userData.sd*.3;});
   if(u.pipes) u.pipes.forEach((t,i)=>{const k=.5+.5*Math.sin(time*5-i*.7); t.scale.setScalar(.032*(1+k*.6));}); if(u.mega){updMega(u.mega,b); const k=u.mega.k, F=u.auraFx; if(F&&k<1){F.disc.material.opacity*=k; F.ring.material.opacity*=k; F.ring2.material.opacity*=k; F.glow.material.opacity*=k*k; F.glow2.material.opacity*=k*k; F.light.intensity*=k;}} const pd=b.powerDown||0, pk=b.purity||0;
@@ -3023,7 +3030,7 @@ function syncEnemy(e){const m=ensure(e,()=>buildEnemy(e),e.ally?'al'+e.mk:'e'+L.
    if(fl>0){sx*=1+.12*fl; sy*=1-.1*fl; lean-=.3*fl;}
    if(e.dieAt){const k=Math.min(1,(time-e.dieAt)/.45); lean=0; m.rotation.z=easeOut(k)*Math.PI/2*(e.dieDir||1); const f=1-Math.max(0,(time-e.dieAt-.45)/.4); sx*=Math.max(.01,f); sy*=Math.max(.01,f); m.position.y=-.15*k;}
    m.scale.set(b0*sx,b0*sy,b0*sx); if(u.body) u.body.rotation.x=lean;}
-  const w=e.state==='wind';
+  const w=e.state==='wind'; if(w&&!u._w&&!e.ally&&typeof sfx==='function') sfx('ewind',e); u._w=w;
   if(u.arms.length===2){ if(u.ranged){u.arms[0].rotation.x=-1.45; u.arms[1].rotation.x=w?-1.6:-.9; u.arms[1].rotation.z=w?.4:0;}
     else if(u.caster){u.arms[1].rotation.x=w?-2.6:-.35;}
     else if(e.ai==='melee'){ if(w){u.arms[0].rotation.x=u.arms[1].rotation.x=-2.7;} else if(e.state==='rec'){u.arms[0].rotation.x=u.arms[1].rotation.x=-.9;} } }
@@ -3588,6 +3595,13 @@ $('#invSort').onchange=e=>{invSort=e.target.value; renderInv();};
 $('#salvCommon').onclick=()=>{const b=$('#salvCommon'); const cs=SAVE.inv.filter(it=>it.rar==='common'); if(!cs.length) return;
   if(!b.dataset.armed){b.dataset.armed='1'; b.textContent=`Click again to salvage ${cs.length}`; setTimeout(()=>{delete b.dataset.armed; renderInv();},5000); return;}
   delete b.dataset.armed; let got=0; for(const it of cs) got+=Math.round(it.pow/4*RAR.common.m); SAVE.inv=SAVE.inv.filter(it=>it.rar!=='common'); SAVE.shards+=got; if(invSel&&invSel.where==='bag'&&!SAVE.inv.find(x=>x.id===invSel.id)) invSel=null; persist(); renderInv(); if(P) refreshSlots();};
+$('#equipBest').onclick=()=>{const E=SAVE.eq, pool=SAVE.inv, slots=['a1','a2','a3','a4','a5','a6','a7','a8']; let n=0;
+  for(const sl of ['weapon','armor']){let best=E[sl]; for(const it of pool) if(it.slot===sl&&(!best||it.pow>best.pow)) best=it; if(best&&best!==E[sl]){pool.splice(pool.indexOf(best),1); if(E[sl]) pool.push(E[sl]); E[sl]=best; n++;}}
+  const arts=slots.map(k=>E[k]).filter(Boolean).concat(pool.filter(it=>it.slot==='artifact')).sort((a,b)=>b.pow-a.pow), keep=arts.slice(0,8);
+  const before=slots.map(k=>E[k]&&E[k].id).join();
+  SAVE.inv=pool.filter(it=>it.slot!=='artifact'||!keep.includes(it)); for(const k of slots) if(E[k]&&!keep.includes(E[k])) SAVE.inv.push(E[k]);
+  slots.forEach((k,i)=>E[k]=keep[i]||null); if(slots.map(k=>E[k]&&E[k].id).join()!==before) n++;
+  invSel=null; calcStats(); persist(); renderInv(); if(P) refreshSlots(); toast(n?'Equipped your best gear':'You already have your best gear on','#ffd36a');};
 const CODEX_TABS=[['sword','Swords'],['usword','Unique swords'],['weapon','Weapons'],['uweapon','Unique weapons'],['armor','Armor'],['uarmor','Unique armor'],['art','Artifacts'],['uart','Unique artifacts']];
 let codexTab='sword';
 function foundCount(k){const f=SAVE.found||{}; return CAT[k].filter(e=>f[e.cid]).length;}
@@ -4612,6 +4626,181 @@ setInterval(()=>{if(mode==='play'||mode==='map') persist();},5000);
 addEventListener('beforeunload',()=>persist());
 window.__isle={persist:()=>{persist(); if(ANDROID&&SAVE){try{IsleAndroid.saveGame(JSON.stringify(SAVE));}catch(e){}}}};
 try{window.claude?.hot?.snapshot?.(snapshot);}catch(e){}
+/* ================= sound: a unique looping score for every level and boss, a heroic menu theme, and effects for every move ================= */
+const AU={ctx:null,vol:{music:.6,sfx:.8},want:null,song:null,step:0,next:0,last:{}};
+try{const v=JSON.parse(localStorage.getItem('isle6c-vol')||'null'); if(v) Object.assign(AU.vol,v);}catch(e){}
+function auSave(){try{localStorage.setItem('isle6c-vol',JSON.stringify(AU.vol));}catch(e){}}
+function strHash(s){let h=2166136261; for(let i=0;i<s.length;i++){h^=s.charCodeAt(i); h=Math.imul(h,16777619);} return h>>>0;}
+function auInit(){if(AU.ctx){if(AU.ctx.state==='suspended') AU.ctx.resume(); return;} const C=window.AudioContext||window.webkitAudioContext; if(!C) return; let c; try{c=new C();}catch(e){return;} AU.ctx=c;
+  const comp=c.createDynamicsCompressor(); comp.threshold.value=-16; comp.knee.value=12; comp.ratio.value=4; comp.connect(c.destination);
+  AU.mus=c.createGain(); AU.sfx=c.createGain(); AU.mus.connect(comp); AU.sfx.connect(comp);
+  const len=Math.floor(c.sampleRate*2.4), ir=c.createBuffer(2,len,c.sampleRate); for(let ch=0;ch<2;ch++){const d=ir.getChannelData(ch); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2.8);}
+  AU.rev=c.createConvolver(); AU.rev.buffer=ir; AU.revIn=c.createGain(); AU.revIn.gain.value=.55; AU.revIn.connect(AU.rev); AU.rev.connect(comp);
+  const nb=c.createBuffer(1,c.sampleRate*2,c.sampleRate), nd=nb.getChannelData(0); for(let i=0;i<nd.length;i++) nd[i]=Math.random()*2-1; AU.noise=nb;
+  AU.dist={}; auApplyVol(); setInterval(auTick,25);}
+['pointerdown','keydown','touchstart'].forEach(ev=>addEventListener(ev,auInit,{passive:true}));
+document.addEventListener('visibilitychange',()=>{if(!AU.ctx) return; if(document.hidden) AU.ctx.suspend(); else AU.ctx.resume();});
+function auApplyVol(){if(!AU.ctx) return; const t=AU.ctx.currentTime; AU.mus.gain.setTargetAtTime(AU.vol.music*AU.vol.music*2.6,t,.05); AU.sfx.gain.setTargetAtTime(AU.vol.sfx*AU.vol.sfx*1.6,t,.05);}
+function distCurve(k){if(AU.dist[k]) return AU.dist[k]; const n=1024, cu=new Float32Array(n); for(let i=0;i<n;i++){const x=i/n*2-1; cu[i]=(1+k)*x/(1+k*Math.abs(x));} return AU.dist[k]=cu;}
+function crushCurve(steps){const k='c'+steps; if(AU.dist[k]) return AU.dist[k]; const n=1024, cu=new Float32Array(n); for(let i=0;i<n;i++){const x=i/n*2-1; cu[i]=Math.round(x*steps)/steps;} return AU.dist[k]=cu;}
+// one synth voice
+function vox(dest,o){const c=AU.ctx, t=o.t, osc=c.createOscillator(), g=c.createGain(); osc.type=o.type||'sine'; osc.frequency.setValueAtTime(Math.max(20,o.f),t);
+  if(o.f2) osc.frequency.exponentialRampToValueAtTime(Math.max(20,o.f2),t+(o.glide||o.d)); if(o.det) osc.detune.value=o.det;
+  let node=osc; if(o.lp){const fl=c.createBiquadFilter(); fl.type=o.ftype||'lowpass'; fl.frequency.setValueAtTime(o.lp,t); if(o.lp2) fl.frequency.exponentialRampToValueAtTime(o.lp2,t+o.d+(o.r||.1)); fl.Q.value=o.q||.8; node.connect(fl); node=fl;}
+  if(o.dist){const ws=c.createWaveShaper(); ws.curve=o.crush?crushCurve(o.crush):distCurve(o.dist); node.connect(ws); node=ws;}
+  if(o.vib){const l=c.createOscillator(), lg=c.createGain(); l.frequency.value=o.vib; lg.gain.value=o.vibA||8; l.connect(lg); lg.connect(osc.detune); l.start(t); l.stop(t+o.d+(o.r||.1)+.1);}
+  const a=o.a||.008, r=o.r||.1, v=o.v||.2, d=Math.max(a,o.d); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+a); if(o.sus!=null) g.gain.linearRampToValueAtTime(v*o.sus,t+d); else g.gain.setValueAtTime(v,t+d); g.gain.exponentialRampToValueAtTime(.0001,t+d+r);
+  node.connect(g); g.connect(dest); if(o.rev){const s=c.createGain(); s.gain.value=o.rev; g.connect(s); s.connect(AU.revIn);} osc.start(t); osc.stop(t+d+r+.05); return osc;}
+function nz(dest,o){const c=AU.ctx,t=o.t,src=c.createBufferSource(); src.buffer=AU.noise; src.loop=true; const f=c.createBiquadFilter(); f.type=o.ft||'bandpass'; f.frequency.setValueAtTime(o.f||1000,t);
+  if(o.f2) f.frequency.exponentialRampToValueAtTime(Math.max(20,o.f2),t+o.d); f.Q.value=o.q||1; const g=c.createGain(), v=o.v||.2; g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v,t+(o.a||.004)); g.gain.exponentialRampToValueAtTime(.0001,t+o.d);
+  src.connect(f); let node=f; if(o.dist){const ws=c.createWaveShaper(); ws.curve=distCurve(o.dist); f.connect(ws); node=ws;} node.connect(g); g.connect(dest); if(o.rev){const s=c.createGain(); s.gain.value=o.rev; g.connect(s); s.connect(AU.revIn);} src.start(t,Math.random()); src.stop(t+o.d+.05);}
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+/* ---- the composer ---- */
+const SCALES={major:[0,2,4,5,7,9,11],minor:[0,2,3,5,7,8,10],dorian:[0,2,3,5,7,9,10],phrygian:[0,1,3,5,7,8,10],harm:[0,2,3,5,7,8,11],lydian:[0,2,4,6,7,9,11],mixo:[0,2,4,5,7,9,10],whole:[0,2,4,6,8,10],dim:[0,2,3,5,6,8,9,11],hijaz:[0,1,4,5,7,8,10]};
+const MOODS={
+ nature:{sc:['major','mixo','dorian','lydian'],bpm:[92,118],lead:['triangle','square'],bass:'triangle',drum:'light',arp:.6,pad:.5,root:[60,67]},
+ desert:{sc:['hijaz','harm','phrygian'],bpm:[96,116],lead:['square','sawtooth'],bass:'square',drum:'tribal',arp:.4,pad:.4,root:[57,64]},
+ swamp:{sc:['dorian','minor','phrygian'],bpm:[76,96],lead:['triangle','sine'],bass:'sine',drum:'light',arp:.3,pad:.7,root:[55,62]},
+ frost:{sc:['lydian','major','dorian'],bpm:[70,92],lead:['sine','triangle'],bass:'sine',drum:'sparse',arp:.8,pad:.8,root:[62,69],bell:1},
+ fire:{sc:['phrygian','harm','hijaz'],bpm:[112,140],lead:['sawtooth','square'],bass:'sawtooth',drum:'heavy',arp:.5,pad:.4,root:[52,59]},
+ dark:{sc:['minor','phrygian','dim'],bpm:[62,86],lead:['sine','triangle'],bass:'sine',drum:'heart',arp:.3,pad:.9,root:[50,57]},
+ void:{sc:['whole','dim','lydian'],bpm:[64,90],lead:['sine','triangle'],bass:'sine',drum:'sparse',arp:.7,pad:.9,root:[53,60],bell:1},
+ royal:{sc:['major','mixo','lydian'],bpm:[92,112],lead:['sawtooth','square'],bass:'triangle',drum:'march',arp:.3,pad:.6,root:[58,65]},
+ storm:{sc:['minor','dorian'],bpm:[122,146],lead:['sawtooth','square'],bass:'sawtooth',drum:'heavy',arp:.7,pad:.5,root:[52,59]},
+ water:{sc:['dorian','lydian','mixo'],bpm:[78,100],lead:['triangle','sine'],bass:'sine',drum:'light',arp:.8,pad:.7,root:[57,64]},
+ knowledge:{sc:['dorian','minor','harm'],bpm:[84,104],lead:['square','triangle'],bass:'triangle',drum:'sparse',arp:.8,pad:.5,root:[57,64]},
+ infect:{sc:['dim','phrygian','harm'],bpm:[84,104],lead:['sawtooth','square'],bass:'square',drum:'tribal',arp:.4,pad:.7,root:[50,57]},
+ forms:{sc:['whole','lydian','dim'],bpm:[96,122],lead:['triangle','sawtooth'],bass:'triangle',drum:'light',arp:.9,pad:.6,root:[55,62]},
+ holy:{sc:['lydian','major'],bpm:[80,98],lead:['sine','triangle'],bass:'sine',drum:'sparse',arp:.6,pad:.9,root:[60,67],bell:1},
+ hallow:{sc:['harm','minor'],bpm:[100,122],lead:['square','triangle'],bass:'square',drum:'tribal',arp:.5,pad:.5,root:[55,62]},
+ sculk:{sc:['phrygian','dim','minor'],bpm:[66,88],lead:['sine','sawtooth'],bass:'sawtooth',drum:'heart',arp:.4,pad:.9,root:[48,55]}};
+const BIOME_MOOD={meadow:'nature',desert:'desert',swamp:'swamp',frost:'frost',volcano:'fire',spire:'royal',hallow:'hallow',tempest:'storm',temple:'nature',reef:'water',deepdark:'dark',sculk:'sculk',monarch:'royal',harmony:'nature',singers:'sculk',
+ cinder:'fire',brimstone:'fire',citadel:'royal',throne:'fire',expanse:'void',rift:'void',nullgarden:'void',edge:'void',knowledge:'knowledge',destruction:'fire',immunity:'holy',infection:'infect',forms:'forms',enchanted:'nature',illusion:'void',cataclysm:'storm'};
+function moodOf(bi){const B=BIOMES[bi]||{}; return BIOME_MOOD[B.id]||'nature';}
+function makeSong(key){const r=srand(strHash(key)), pick=a=>a[Math.floor(r()*a.length)], rint2=(a,b)=>a+Math.floor(r()*(b-a+1));
+  let mood, boss=key.startsWith('boss:'), menu=key==='menu';
+  if(menu) mood={sc:['major'],bpm:[106,106],lead:['sawtooth'],bass:'sawtooth',drum:'march',arp:.5,pad:1,root:[62,62],heroic:1};
+  else {const bi=+key.split(':')[boss?2:1]; mood=Object.assign({},MOODS[moodOf(bi)]||MOODS.nature);}
+  const S={key,boss,menu}; S.scale=SCALES[pick(mood.sc)]; if(boss&&!menu) S.scale=SCALES[pick(['harm','phrygian','minor','dim','hijaz'])];
+  S.bpm=rint2(mood.bpm[0],mood.bpm[1])+(boss?18:0); S.root=rint2(mood.root[0],mood.root[1]); S.stepDur=60/S.bpm/4; S.bars=menu?16:pick([8,8,12,16]); S.len=S.bars*16;
+  S.lead=pick(mood.lead); S.bassType=mood.bass; S.drum=boss?pick(['heavy','tribal','heavy']):mood.drum; S.bell=!!mood.bell; S.heroic=!!mood.heroic; S.lp=rint2(1400,3600);
+  const N=S.scale.length, deg=d=>S.root+S.scale[((d%N)+N)%N]+12*Math.floor(d/N);
+  const PROGS=menu?[[0,4,5,3],[0,3,4,4],[5,3,0,4],[0,4,5,3]]:boss?[[0,0,5,6],[0,3,5,4],[0,1,0,6],[0,5,3,4]]:[[0,5,3,4],[0,3,4,0],[0,6,5,6],[0,2,3,4],[0,4,5,3],[5,3,0,4],[0,3,0,4],[0,1,3,4]];
+  const pa=pick(PROGS), pb=pick(PROGS); S.prog=[]; for(let b=0;b<S.bars;b++) S.prog.push((b<S.bars/2?pa:pb)[b%4]);
+  // rhythm banks
+  const pat=s=>s.split('').map(ch=>ch==='x'?1:ch==='o'?.6:0);
+  const KICK={light:['x.......x.......','x.......x...x...'],heavy:['x..x..x...x.x...','x.x...x.x..x..x.'],tribal:['x..x..x.x..x....','x...x.x...x..x..'],sparse:['x...............','x.......o.......'],heart:['x..x............','x..x....x..x....'],march:['x.......x.......','x...x...x...x...']};
+  const SNARE={light:['....x.......x...'],heavy:['....x.......x..o','....x..o....x...'],tribal:['......x.....x.x.','....o...x...o...'],sparse:['................','........o.......'],heart:['................'],march:['....x.oo....x.xo','..o.x...o.o.x.oo']};
+  const HAT={light:['..x...x...x...x.','x.x.x.x.x.x.x.x.'],heavy:['xoxoxoxoxoxoxoxo','x.xox.xox.xox.xo'],tribal:['x.o.x.o.x.o.x.o.'],sparse:['........x.......','....x.......x...'],heart:['................'],march:['x.x.x.x.x.x.x.x.']};
+  S.kick=pat(pick(KICK[S.drum])); S.snare=pat(pick(SNARE[S.drum])); S.hat=pat(pick(HAT[S.drum])); S.tom=S.drum==='tribal'||S.drum==='march'||menu;
+  S.bassPat=pat(pick(boss?['x.x.x.x.x.x.x.x.','x..xx..xx..xx..x','xxx.xxx.xxx.xxx.']:menu?['x...x...x...x...','x..x..x.x...x...']:['x.......x.......','x...x...x...x...','x..x..x.x...x...','x.....x.x.......']));
+  S.arpOn=r()<mood.arp||boss; S.arpPat=pat(pick(['x.x.x.x.x.x.x.x.','xxxxxxxxxxxxxxxx','x..x..x.x..x..x.','x.xx.xx.x.xx.xx.'])); S.arpShape=pick([[0,2,4,7],[0,4,2,4],[0,2,4,2],[4,2,0,2],[0,4,7,4]]); S.padOn=r()<mood.pad||menu;
+  // melody: phrases built on chord tones, answered in the second half
+  S.mel=new Array(S.len).fill(null); const motif=[]; {let d=pick([4,2,0,7]); const rhythm=pat(pick(menu?['x...x.x.x...x...','x.....x.x.x.x...','x...x...x.x.x...']:['x.x...x.x...x...','x...x.x...x.x...','x..x..x...x.x...','x.....x...x.....','xx..x.x.x...x...']));
+    for(let i=0;i<32;i++){if(rhythm[i%16]){const step=menu&&i%16===0?pick([0,4,7]):pick([-2,-1,-1,1,1,2,0,3,-3]); d=Math.max(-2,Math.min(11,d+step)); motif.push({i,d});}}}
+  for(let b=0;b<S.bars;b+=2){const var2=(b/2)%2===1, off=S.prog[b]; motif.forEach((m,k)=>{let d=m.d+(var2&&k%3===2?pick([1,-1,2]):0)+(var2&&b>=S.bars/2?2:0); const i=b*16+m.i; if(i<S.len){const nx=motif[k+1], dur=(nx?nx.i-m.i:6)*S.stepDur; S.mel[i]={n:deg(d+off)+12,d:Math.min(dur*.92,S.stepDur*8)};}});}
+  S.deg=deg; S.vol={lead:menu?.2:.16,bass:.2,pad:.09,arp:.075,kick:.7,snare:.32,hat:.09}; if(S.lead==='sawtooth'||S.lead==='square'){S.vol.lead*=.75;} return S;}
+function playStep(S,i,t,bus){const st=i%16, bar=Math.floor(i/16), ch=S.prog[bar], deg=S.deg, sd=S.stepDur, v=S.vol;
+  if(S.kick[st]){vox(bus,{t,type:'sine',f:S.menu?110:140,f2:42,glide:.12,d:.05,r:.18,v:v.kick*S.kick[st]}); if(S.menu) nz(bus,{t,ft:'lowpass',f:400,d:.25,v:.12});}
+  if(S.snare[st]){nz(bus,{t,ft:'bandpass',f:S.menu?1800:2200,q:.7,d:S.menu?.12:.16,v:v.snare*S.snare[st],rev:.2}); vox(bus,{t,type:'triangle',f:220,f2:150,d:.03,r:.06,v:.08*S.snare[st]});}
+  if(S.hat[st]) nz(bus,{t,ft:'highpass',f:7000,d:S.hat[st]>.8?.05:.03,v:v.hat*S.hat[st]});
+  if(S.tom&&st===14&&bar%4===3){for(let k=0;k<3;k++) vox(bus,{t:t+k*sd*.66,type:'sine',f:180-k*35,f2:70,d:.08,r:.2,v:.22,rev:.25});}
+  if(S.bassPat[st]){const n=deg(ch)-24+(st%8===6&&!S.boss?7:0); vox(bus,{t,type:S.bassType,f:mtof(n),d:sd*(S.boss?1.6:3.2),r:.08,v:v.bass*(S.bassType==='sawtooth'||S.bassType==='square'?.6:1),lp:S.bassType==='sine'?0:500});}
+  if(S.padOn&&st===0){for(const k of [0,2,4]){const n=deg(ch+k)-(S.menu?0:12); for(const dt of [-7,7]) vox(bus,{t,type:S.menu?'sawtooth':'triangle',f:mtof(n),det:dt,d:sd*15,a:sd*3,r:sd*4,v:v.pad*(S.menu?.6:1),lp:S.menu?1600:1100,rev:.5});}
+    if(S.menu&&bar%2===0) vox(bus,{t,type:'sawtooth',f:mtof(deg(ch)-12),d:sd*7,a:.06,r:.3,v:.07,lp:900,rev:.4});}
+  if(S.arpOn&&S.arpPat[st]){const n=deg(ch+S.arpShape[st%S.arpShape.length])+(S.bell?12:0); vox(bus,{t,type:S.bell?'sine':'triangle',f:mtof(n),d:sd*.6,r:S.bell?.6:.12,v:v.arp*(S.bell?1.2:1),rev:S.bell?.6:.25});
+    if(S.bell) vox(bus,{t,type:'sine',f:mtof(n)*2.76,d:.02,r:.3,v:v.arp*.3});}
+  const m=S.mel[i]; if(m){const f=mtof(m.n); vox(bus,{t,type:S.lead,f,d:m.d,a:S.heroic?.03:.012,r:.18,v:v.lead,lp:S.lead==='sine'?0:S.lp,vib:5.5,vibA:m.d>.3?12:4,rev:.35,sus:S.heroic?.85:.7});
+    if(S.heroic) vox(bus,{t,type:'square',f:f/2,d:m.d,a:.03,r:.15,v:v.lead*.35,lp:1200});}}
+function musicWant(){if(!$('#menu').hidden||!$('#mapScr').hidden||!L||L.menu) return 'menu'; if(boss&&boss.awake&&!boss.dead) return 'boss:'+boss.id+':'+L.bi; return 'lvl:'+L.bi+':'+L.li;}
+function auTick(){const c=AU.ctx; if(!c||c.state!=='running') return; const want=musicWant();
+  if(want!==AU.want){AU.want=want; if(AU.bus){const ob=AU.bus; ob.gain.setTargetAtTime(0,c.currentTime,.35); setTimeout(()=>{try{ob.disconnect();}catch(e){}},2500);}
+    AU.song=makeSong(want); AU.bus=c.createGain(); AU.bus.gain.setValueAtTime(0,c.currentTime); AU.bus.gain.linearRampToValueAtTime(1,c.currentTime+1.2); AU.bus.connect(AU.mus); AU.step=0; AU.next=c.currentTime+.08;}
+  const S=AU.song; if(!S) return; if(AU.next<c.currentTime-.5) AU.next=c.currentTime+.05;
+  while(AU.next<c.currentTime+.18){try{playStep(S,AU.step,AU.next,AU.bus);}catch(e){} AU.step=(AU.step+1)%S.len; AU.next+=S.stepDur;}}
+/* ---- sound effects ---- */
+function sfx(name,a,b){const c=AU.ctx; if(!c||c.state!=='running'||AU.vol.sfx<=0) return; const now=c.currentTime, gap={eshot:.07,ehit:.04,hit:.03,boom:.12,ewind:.09,shard:.05,haz:.15,cine:.3,ui:.05,ehurt:.05}[name]||0;
+  const lk=name+(a&&a.id!=null&&name!=='roar'?'':''); if(gap&&AU.last[lk]&&now-AU.last[lk]<gap) return; AU.last[lk]=now; const t=now+.005, D=AU.sfx; try{SFX[name]&&SFX[name](D,t,a,b);}catch(e){}}
+function monVoice(e){const sp=(typeof monSpec==='function'&&L&&!e.feat&&!e.ally)?monSpec(L.bi,e.type):null, seed=strHash((sp?sp.name:e.type)+L.bi), r=srand(seed); return {plan:sp?sp.plan:'biped',p:.7+r()*.8,r};}
+const SFX={
+ swing(D,t){nz(D,{t,ft:'bandpass',f:900,f2:3200,q:1.2,d:.14,v:.32}); nz(D,{t,ft:'lowpass',f:500,f2:200,d:.12,v:.12});},
+ hit(D,t,e,crit){vox(D,{t,type:'sine',f:170,f2:55,d:.06,r:.08,v:.5}); nz(D,{t,ft:'bandpass',f:1500,q:.8,d:.07,v:.3}); if(crit){vox(D,{t,type:'triangle',f:1100,f2:1700,d:.05,r:.15,v:.18,rev:.3});}},
+ bow(D,t){vox(D,{t,type:'triangle',f:260,f2:120,d:.08,r:.1,v:.28}); nz(D,{t,ft:'highpass',f:3000,d:.08,v:.12});},
+ roll(D,t){nz(D,{t,ft:'lowpass',f:900,f2:180,d:.28,v:.25});},
+ hurt(D,t){vox(D,{t,type:'square',f:230,f2:120,d:.1,r:.08,v:.16,lp:900}); nz(D,{t,ft:'bandpass',f:700,d:.1,v:.2});},
+ pdeath(D,t){[0,1,2,3].forEach(k=>vox(D,{t:t+k*.16,type:'triangle',f:[392,330,262,196][k],d:.14,r:.3,v:.2,rev:.4}));},
+ potion(D,t){for(let k=0;k<6;k++) vox(D,{t:t+k*.06,type:'sine',f:300+Math.random()*500,f2:700+Math.random()*500,d:.04,r:.05,v:.14});},
+ art(D,t){[0,4,7,12,16].forEach((s,k)=>vox(D,{t:t+k*.04,type:'triangle',f:mtof(72+s),d:.08,r:.35,v:.12,rev:.6}));},
+ loot(D,t,rar){const seq=rar==='unique'?[72,76,79,84,88]:rar==='rare'?[74,78,81]:[79,84]; seq.forEach((n,k)=>vox(D,{t:t+k*.07,type:'square',f:mtof(n),d:.06,r:.2,v:.08,lp:3000,rev:.4}));},
+ shard(D,t){vox(D,{t,type:'sine',f:1800+Math.random()*600,d:.03,r:.15,v:.1,rev:.3});},
+ chest(D,t){vox(D,{t,type:'sawtooth',f:110,f2:80,d:.25,r:.1,v:.1,lp:600}); [79,83,86,91].forEach((n,k)=>vox(D,{t:t+.2+k*.06,type:'triangle',f:mtof(n),d:.06,r:.4,v:.12,rev:.5}));},
+ enchant(D,t){for(let k=0;k<8;k++) vox(D,{t:t+k*.05,type:'sine',f:mtof(76+[0,3,7,10,12,15,19,24][k]),d:.1,r:.5,v:.1,rev:.7}); nz(D,{t,ft:'highpass',f:5000,d:.8,v:.05,rev:.5});},
+ win(D,t){[60,64,67,72,76,79,84].forEach((n,k)=>vox(D,{t:t+k*.08,type:'square',f:mtof(n),d:.1,r:.4,v:.09,lp:2500,rev:.5})); vox(D,{t:t+.6,type:'sawtooth',f:mtof(72),d:.8,a:.05,r:.8,v:.08,lp:2000,rev:.6});},
+ ui(D,t){vox(D,{t,type:'triangle',f:880,f2:1320,d:.02,r:.05,v:.07});},
+ cine(D,t){nz(D,{t,ft:'bandpass',f:300,f2:1400,q:.6,d:.5,v:.06,rev:.4});},
+ eshot(D,t){vox(D,{t,type:'square',f:780+Math.random()*200,f2:260,d:.07,r:.05,v:.05,lp:2400});},
+ ewind(D,t,e){const m=monVoice(e); if(m.plan==='blob'||m.plan==='jelly') vox(D,{t,type:'sine',f:180*m.p,f2:420*m.p,d:.15,r:.1,v:.12,vib:18,vibA:60});
+   else if(m.plan==='insect'||m.plan==='crab'||m.plan==='mantis') for(let k=0;k<4;k++) vox(D,{t:t+k*.035,type:'square',f:900*m.p,d:.015,r:.02,v:.05,lp:3000});
+   else if(m.plan==='bird') vox(D,{t,type:'triangle',f:1400*m.p,f2:2200*m.p,d:.08,r:.06,v:.07});
+   else if(m.plan==='wisp'||m.plan==='floater') vox(D,{t,type:'sine',f:500*m.p,f2:350*m.p,d:.25,r:.2,v:.07,vib:7,vibA:40,rev:.5});
+   else if(m.plan==='serpent') nz(D,{t,ft:'highpass',f:4000,d:.25,v:.08});
+   else {vox(D,{t,type:'sawtooth',f:120*m.p,f2:90*m.p,d:.18,r:.1,v:.08,lp:700,dist:4}); nz(D,{t,ft:'bandpass',f:400*m.p,d:.18,v:.06});}},
+ ehit(D,t,e){const m=monVoice(e); vox(D,{t,type:'sine',f:150,f2:60,d:.05,r:.06,v:.35}); vox(D,{t,type:m.plan==='golem'||m.plan==='totem'?'square':'triangle',f:320*m.p,f2:200*m.p,d:.06,r:.06,v:.08,lp:1600}); nz(D,{t,ft:'bandpass',f:1300,d:.05,v:.18});},
+ edeath(D,t,e){const m=monVoice(e); if(m.plan==='golem'||m.plan==='totem'){nz(D,{t,ft:'lowpass',f:700,f2:120,d:.5,v:.3}); vox(D,{t,type:'sine',f:90,f2:40,d:.2,r:.3,v:.3});}
+   else if(m.plan==='blob'||m.plan==='jelly'||m.plan==='sac'){vox(D,{t,type:'sine',f:400*m.p,f2:90,d:.18,r:.1,v:.2,vib:20,vibA:80}); nz(D,{t,ft:'lowpass',f:800,d:.2,v:.15});}
+   else if(m.plan==='wisp'||m.plan==='floater') [0,1,2].forEach(k=>vox(D,{t:t+k*.05,type:'sine',f:700*m.p-k*120,f2:200,d:.2,r:.4,v:.08,rev:.7}));
+   else {vox(D,{t,type:'sawtooth',f:300*m.p,f2:70*m.p,d:.25,r:.15,v:.1,lp:1200,dist:3}); nz(D,{t,ft:'bandpass',f:800*m.p,f2:200,d:.3,v:.12});}},
+ bhurt(D,t){vox(D,{t,type:'sine',f:110,f2:45,d:.08,r:.12,v:.45}); nz(D,{t,ft:'lowpass',f:900,d:.1,v:.22});},
+ boom(D,t,a){const k=Math.min(1.6,(a||8)/10); nz(D,{t,ft:'lowpass',f:900,f2:90,d:.55*k,v:.45*k,rev:.3}); vox(D,{t,type:'sine',f:90,f2:32,d:.25*k,r:.35,v:.5*k});},
+ haz(D,t){vox(D,{t,type:'sine',f:300,f2:600,d:.12,r:.05,v:.03});},
+ sig(D,t,b){nz(D,{t,ft:'bandpass',f:200,f2:4000,q:1.5,d:.9,v:.18,rev:.5}); for(let k=0;k<3;k++) vox(D,{t:t+.05*k,type:'sawtooth',f:mtof(40+k*7),f2:mtof(52+k*7),d:.8,r:.4,v:.08,lp:1800,rev:.6}); vox(D,{t:t+.85,type:'sine',f:70,f2:30,d:.2,r:.5,v:.5}); nz(D,{t:t+.85,ft:'lowpass',f:1200,f2:100,d:.6,v:.35});},
+ act(D,t,b,n){const cat=/slam|quake|smash|hammer|earth|split|stone|crucible|fissure|world/.test(n)?'slam':/summon|brood/.test(n)?'summon':/charge|combo|lure|execution|coil|burrow/.test(n)?'rush':/beam|gaze|echo|requiem|nova|tidal/.test(n)?'wave':/rain|meteor|storm|strikes|thunder|bolts|judg|star|icicle|aval/.test(n)?'rain':'cast';
+   const r=srand(strHash(b.id+n)), p=.7+r()*.6;
+   if(cat==='slam'){vox(D,{t,type:'sawtooth',f:60*p,f2:160*p,d:.35,r:.05,v:.08,lp:600});}
+   else if(cat==='summon'){[0,3,7].forEach(s=>vox(D,{t,type:'sawtooth',f:mtof(45+s)*p,d:.9,a:.3,r:.6,v:.05,lp:900,rev:.7,vib:5}));}
+   else if(cat==='rush'){nz(D,{t,ft:'lowpass',f:300,f2:1200,d:.5,v:.18}); vox(D,{t,type:'sawtooth',f:70*p,f2:140*p,d:.45,r:.1,v:.08,lp:700,dist:5});}
+   else if(cat==='wave'){vox(D,{t,type:'sine',f:180*p,f2:90*p,d:.8,r:.3,v:.12,vib:6,vibA:30,rev:.6}); vox(D,{t,type:'sawtooth',f:360*p,d:.6,r:.3,v:.03,lp:1200,rev:.6});}
+   else if(cat==='rain'){nz(D,{t,ft:'highpass',f:2000,f2:6000,d:.6,v:.06,rev:.4}); vox(D,{t,type:'triangle',f:900*p,f2:2400*p,d:.4,r:.2,v:.05,rev:.5});}
+   else {for(let k=0;k<4;k++) vox(D,{t:t+k*.05,type:'triangle',f:mtof(60+k*5)*p,d:.08,r:.3,v:.06,rev:.6}); nz(D,{t,ft:'bandpass',f:2500,d:.3,v:.05,rev:.4});}},
+ roar(D,t,b){const id=b.id, r=srand(strHash(id+'roar')), dur=1.4+r()*.9, base=45+r()*70, layers=2+Math.floor(r()*3), dist=8+r()*30;
+   if(id==='sculkmonstrosity'){ // a huge, loud, chaotic corrupted roar
+     const c=AU.ctx; for(let k=0;k<7;k++){const o=vox(D,{t,type:k%2?'sawtooth':'square',f:38+k*9,d:2.6,a:.08,r:.9,v:.075,lp:1400,lp2:300,dist:40,det:(k-3)*35,vib:9+k,vibA:120}); for(let s=0;s<40;s++) o.frequency.setValueAtTime((38+k*9)*(.6+Math.random()*1.2),t+s*.065);}
+     vox(D,{t,type:'sine',f:34,f2:24,d:2.6,a:.05,r:1,v:.55}); nz(D,{t,ft:'bandpass',f:600,f2:180,q:.6,d:2.8,v:.45,dist:20,rev:.4}); nz(D,{t:t+.2,ft:'highpass',f:3500,f2:1500,d:1.6,v:.12,rev:.6});
+     vox(D,{t,type:'square',f:220,f2:55,d:2.2,r:.6,v:.05,crush:3,dist:1,lp:2000}); return;}
+   for(let k=0;k<layers;k++) vox(D,{t,type:k%2?'square':'sawtooth',f:base*(1+k*.5),f2:base*(.55+r()*.3),glide:dur,d:dur,a:.08+r()*.1,r:.5,v:.08,lp:900+r()*1500,lp2:250,dist,det:(k-1)*20,vib:6+r()*8,vibA:40+r()*80,rev:.3});
+   nz(D,{t,ft:'bandpass',f:500+r()*700,f2:150,q:.7,d:dur+.3,v:.3,dist:6,rev:.4}); vox(D,{t,type:'sine',f:base*.6,f2:base*.35,d:dur,a:.05,r:.5,v:.35});},
+ bdeath(D,t,b){SFX.boom(D,t,20); [0,4,7,12].forEach((s,k)=>vox(D,{t:t+.5+k*.03,type:'sawtooth',f:mtof(48+s),d:2.2,a:.4,r:1.6,v:.05,lp:1500,rev:.8}));},
+ gate(D,t){vox(D,{t,type:'sawtooth',f:70,f2:55,d:.9,a:.05,r:.3,v:.12,lp:500}); nz(D,{t,ft:'lowpass',f:500,f2:150,d:1,v:.25}); [72,79,84].forEach((n,k)=>vox(D,{t:t+.8+k*.08,type:'triangle',f:mtof(n),d:.1,r:.5,v:.12,rev:.6}));},
+ key(D,t){[84,88,91,96].forEach((n,k)=>vox(D,{t:t+k*.06,type:'sine',f:mtof(n),d:.08,r:.4,v:.12,rev:.6}));}};
+/* ---- volume panel ---- */
+(function(){const p=document.createElement('div'); p.id='volPanel'; p.hidden=true;
+  p.innerHTML=`<div class="volBox"><h3>Sound</h3><label>Music <input type="range" min="0" max="100" id="volMus"></label><label>Effects <input type="range" min="0" max="100" id="volSfx"></label><button class="btn small" id="volClose">Done</button></div>`; document.body.appendChild(p);
+  const sync=()=>{$('#volMus').value=Math.round(AU.vol.music*100); $('#volSfx').value=Math.round(AU.vol.sfx*100);}; sync();
+  $('#volMus').oninput=e=>{AU.vol.music=e.target.value/100; auApplyVol(); auSave();}; $('#volSfx').oninput=e=>{AU.vol.sfx=e.target.value/100; auApplyVol(); auSave(); sfx('ui');};
+  $('#volClose').onclick=()=>{p.hidden=true;}; p.addEventListener('click',e=>{if(e.target===p) p.hidden=true;}); ['keydown','keyup'].forEach(t=>p.addEventListener(t,e=>e.stopPropagation()));
+  window.openVol=()=>{auInit(); sync(); p.hidden=false;};
+  const mb=document.querySelector('#menu .menu-btns'); if(mb){const b=document.createElement('button'); b.className='btn'; b.id='btnSound'; b.textContent='Sound'; b.onclick=openVol; mb.appendChild(b);}
+  const pr=$('#pGfx'); if(pr){const b=document.createElement('button'); b.className='btn'; b.id='pSound'; b.textContent='Sound'; b.onclick=openVol; pr.after(b);}})();
+document.addEventListener('click',e=>{if(e.target.closest('.btn')) sfx('ui');},true);
+/* ---- hooks: every move, hit and boss action makes a sound ---- */
+(function(){const wrapF=(o,pre,post)=>function(...args){let st; try{st=pre&&pre(...args);}catch(e){} const r=o.apply(this,args); try{post&&post(st,...args);}catch(e){} return r;};
+  melee=wrapF(melee,()=>P&&P.atk,(a0)=>{if(P&&P.atk>a0) sfx('swing');});
+  fireBow=wrapF(fireBow,()=>SAVE.arrows,(n)=>{if(SAVE.arrows<n) sfx('bow');});
+  roll=wrapF(roll,()=>P&&P.roll,(r0)=>{if(P&&P.roll>r0) sfx('roll');});
+  potion=wrapF(potion,()=>P&&P.pot,(p0)=>{if(P&&P.pot>p0) sfx('potion');});
+  useArt=wrapF(useArt,(slot)=>P&&P.acd[slot],(c0,slot)=>{if(P&&P.acd[slot]>c0) sfx('art');});
+  hurtP=wrapF(hurtP,()=>P&&!P.ally&&!P.remote?P.hp:null,(h0)=>{if(h0!=null&&P&&P.hp<h0) sfx(P.dead?'pdeath':'hurt');});
+  hurtE=wrapF(hurtE,(e)=>e?e.hp:0,(h0,e,d,o)=>{if(!e||!(e.hp<h0)) return; if(e===boss||e.isBoss) sfx('bhurt'); else if(e.hp<=0) sfx('edeath',e); else sfx(o&&o.melee?'hit':'ehit',e);});
+  shoot=wrapF(shoot,null,()=>sfx('eshot'));
+  shake=wrapF(shake,null,(_,a)=>{if(a>=8) sfx('boom',a);});
+  sigCallout=wrapF(sigCallout,null,(_,b)=>sfx('sig',b));
+  bossDown=wrapF(bossDown,(b)=>b&&b.dead,(was,b)=>{if(b&&b.dead&&!was) sfx('bdeath',b);});
+  enterShot=wrapF(enterShot,null,()=>sfx('cine'));
+  completeLevel=wrapF(completeLevel,null,()=>sfx('win'));
+  enchantItem=wrapF(enchantItem,null,()=>sfx('enchant'));
+  updChests=wrapF(updChests,()=>L?L.chests.filter(c=>c.open).length:0,(n)=>{if(L&&L.chests.filter(c=>c.open).length>n) sfx('chest');});
+  for(const k in ACT){const A=ACT[k], s0=A.start; A.start=function(b){try{if(!(SIG[b.id]&&SIG[b.id][0]===k)) sfx('act',b,k);}catch(e){} if(s0) return s0.apply(this,arguments);};}})();
+
 const hot=window.claude?.hot; if(hot&&hot.ready) hot.ready(start); else start(hot?.data??{});
 })();
 </script>
