@@ -55,6 +55,16 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #sigCall{position:fixed;left:50%;top:13%;transform:translateX(-50%);font:700 clamp(18px,3.2vw,30px)/1.1 'Space Mono',monospace;letter-spacing:.06em;text-transform:uppercase;text-shadow:0 0 14px currentColor,0 2px 0 #000;pointer-events:none;opacity:0;z-index:30;white-space:nowrap}
 #sigCall.show{animation:sigIn 1.7s ease-out forwards}
 @keyframes sigIn{0%{opacity:0;transform:translateX(-50%) scale(1.5)}12%{opacity:1;transform:translateX(-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-10px)}}
+#stPanel{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:16px}
+#stPanel[hidden]{display:none}
+.stBox{width:min(520px,100%);display:flex;flex-direction:column;gap:10px;background:#15120e;border:2px solid #c9a066;border-radius:10px;padding:18px;max-height:calc(100vh - 32px);overflow:auto}
+.stBox h3{margin:0;font-family:var(--display);color:#f0c050}
+.stp{margin:0;color:#c8d8d4;font-size:14px;line-height:1.45}
+.strow{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 12px;border:2px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03)}
+.strow.mine{border-color:#d8a840}
+.strow b{display:block;font-size:15px}
+.strow small{display:block;color:#9fb0ac;font-size:12.5px;margin-top:2px}
+.strow .btn{flex:none}
 #muteAll{position:absolute;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));z-index:4;display:flex;align-items:center;gap:8px;padding:8px 12px;font:inherit;font-size:14px;color:#f3e6c4;background:rgba(7,17,22,.82);border:3px solid var(--rim);box-shadow:inset 0 0 0 2px var(--edge);cursor:pointer}
 #muteAll svg{width:22px;height:22px;fill:currentColor}
 #muteAll.off{color:#ff8a6a}
@@ -1212,7 +1222,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='4.6.1', SAVE_VERSION=7;
+const APP_VERSION='4.6.2', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -6075,6 +6085,20 @@ const SFX={
   window.openVol=()=>{auInit(); sync(); p.hidden=false;};
   const mb=document.querySelector('#menu .menu-btns'); if(mb){const b=document.createElement('button'); b.className='btn'; b.id='btnSound'; b.textContent='Sound'; b.onclick=openVol; mb.appendChild(b);}
   const pr=$('#pGfx'); if(pr){const b=document.createElement('button'); b.className='btn'; b.id='pSound'; b.textContent='Sound'; b.onclick=openVol; pr.after(b);}
+  // Download soundtrack: offers the soundtrack app made for this device, plus the others
+  {const GH='https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/', WEB='https://thinkinglink.github.io/isle-of-six-crowns/soundtrack/';
+   const OPTS={win:['Windows','Six-Crowns-Soundtrack-Setup.exe',GH+'Six-Crowns-Soundtrack-Setup.exe','Run it. If Windows warns you, choose More info, then Run anyway.'],
+     mac:['Mac','Six-Crowns-Soundtrack.dmg',GH+'Six-Crowns-Soundtrack.dmg','Open it and drag the app into Applications. The first time, right-click it and choose Open.'],
+     android:['Android and Chromebook','Six-Crowns-Soundtrack.apk',GH+'Six-Crowns-Soundtrack.apk','Open the file and tap Install.'],
+     web:['iPhone, iPad and any browser','Soundtrack web app',WEB,'Open it, then use Share, Add to Home Screen (or Install) to keep it as an app.']};
+   const ua=navigator.userAgent||''; const os=typeof NL_OS!=='undefined'?NL_OS:'';
+   const mine=window.IsleAndroid?'android':os==='Windows'?'win':os==='Darwin'?'mac':/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1)?'web':/Android/.test(ua)?'android':/CrOS/.test(ua)?'web':/Windows/.test(ua)?'win':/Macintosh/.test(ua)?'mac':'web';
+   const openLink=u=>{try{if(window.IsleAndroid&&IsleAndroid.openUrl) IsleAndroid.openUrl(u); else if(DESK.on) Neutralino.os.open(u); else window.open(u,'_blank');}catch(e){try{location.href=u;}catch(_){}}};
+   const sp=document.createElement('div'); sp.id='stPanel'; sp.hidden=true; const order=[mine,...Object.keys(OPTS).filter(k=>k!==mine)];
+   sp.innerHTML=`<div class="volBox stBox"><h3>Download the soundtrack</h3><p class="stp">Every piece of music from the game in its own app: every level theme, every boss battle and the main theme. It updates itself when new music comes out.</p>`+order.map((k,i)=>`<div class="strow${i?'':' mine'}"><div><b>${OPTS[k][0]}${i?'':' · recommended for this device'}</b><small>${OPTS[k][3]}</small></div><button class="btn small${i?'':' gold'}" data-st="${k}">${k==='web'?'Open':'Download'}</button></div>`).join('')+`<button class="btn small" id="stClose">Close</button></div>`;
+   document.body.appendChild(sp); sp.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{openLink(OPTS[b.dataset.st][2]); b.textContent=b.dataset.st==='web'?'Opened':'Downloading…';});
+   $('#stClose').onclick=()=>{sp.hidden=true;}; sp.addEventListener('click',e=>{if(e.target===sp) sp.hidden=true;}); ['keydown','keyup'].forEach(t=>sp.addEventListener(t,e=>e.stopPropagation()));
+   const mb2=document.querySelector('#menu .menu-btns'); if(mb2){const b=document.createElement('button'); b.className='btn'; b.id='btnSoundtrack'; b.textContent='Download soundtrack'; b.onclick=()=>{sp.hidden=false; const f=sp.querySelector('.mine button'); if(f) f.focus();}; mb2.appendChild(b);}}
   // one tap in the top right of the main menu turns all music and sound effects off (and back on)
   const menu=$('#menu'); if(menu){const m=document.createElement('button'); m.id='muteAll'; m.type='button';
     const ico=on=>on?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
@@ -6449,14 +6473,25 @@ function legendSummonIntro(b,lid){const Lg=LEGENDS[lid], F=BOSS_FX[b.id]||BOSS_F
   const lx=b.x+ux*b.r*2.2-uy*60, ly=b.y+uy*b.r*2.2+ux*60; let lg=null, circ=null;
   const LINES={thornstag:'Beast of the glade, the Enchanter calls you. Wake!',moonhydra:'Rise from the well, all three of you. We have a guest.',runecolossus:'Old stones, remember your shape. Stand and crush.',mirrorknight:'Reflections, take a body. Guard my fortress.',
     maskedjester:'Places, everyone! The show must go on!',phantasmdragon:'Come back from the dead, old dragon. I have a use for you.',claytitan:'Unfinished? Good. Finish them instead.',worldsmith:'Build, machine. Build me a hero-shaped hole.',stormleviathan:'Swim, leviathan. Drown this one in thunder.'};
+  // every summon has its own lines, in the voice of the legend doing the summoning
+  const TALK={thornstag:['A little adventurer, wandering into my meadow. The flowers told me you were coming.','Rest now. The glade will keep you forever.'],
+    moonhydra:['You crossed the marsh in the dark? The moon saw every step, and so did I.','Drown slowly. The well is very deep.'],
+    runecolossus:['You keep walking toward me, step after step. The old stones have noticed.','Every rune here is a grave. Choose yours.'],
+    mirrorknight:['Ah, my audience has arrived! Is that the real you, or one of my reflections?','Mind the glass. It cuts both ways.'],
+    maskedjester:['Welcome, welcome! Front row seats, just for you. Tonight, you are the punchline.','Laugh, little hero. Nobody else will.'],
+    phantasmdragon:['For my next trick, I bring back something that should have stayed dead.','Ta-da! Now, try not to vanish too quickly.'],
+    claytitan:['You stand in my unfinished world, small one. I have not decided what you will become yet.','Be reshaped, or be crushed. Either one suits me.'],
+    worldsmith:['Every world I forge needs a few broken pieces. You will do nicely.','Take them apart, gear by gear.'],
+    stormleviathan:['The sky itself bends to me. Did you think the storm would protect you?','Let the thunder finish what I started.']};
+  const tk=TALK[b.id]||['You followed us. How brave. How foolish.','Do not disappoint me.'];
   const pre=[
-   {dur:2.6,speaker:Lg.name,text:'You followed us. How brave. How foolish.',enter(){b.cineHide=true; b.rise=0; lg=legendModel(lid); lg.userData.p={x:lx,y:ly,face:Math.atan2(P.y-ly,P.x-lx),walk:0}; propAdd(lg); flashT=.35; flashCol=Lg.col; shake(6); puff(lx,ly,Lg.col,30,220,.6,7);},
+   {dur:2.6,speaker:Lg.name,text:tk[0],enter(){b.cineHide=true; b.rise=0; lg=legendModel(lid); lg.userData.p={x:lx,y:ly,face:Math.atan2(P.y-ly,P.x-lx),walk:0}; propAdd(lg); flashT=.35; flashCol=Lg.col; shake(6); puff(lx,ly,Lg.col,30,220,.6,7);},
     tick(t,dt){propAnim2(lg); if(Math.random()<.4) FXP(lx+rand(-20,20),ly+rand(-20,20),rand(10,70),0,0,70,Lg.col,.6,6);},
     cam:k=>[(lx+Math.cos(fa)*110*(1-k*.15)+Math.cos(fa+1.5)*40)*S,lerp(1.2,1.4,k),(ly+Math.sin(fa)*110*(1-k*.15)+Math.sin(fa+1.5)*40)*S,lx*S,1.05,ly*S]},
    {dur:3.0,speaker:Lg.name,text:LINES[b.id]||'Rise, and destroy them.',enter(){circ=summonCircle(b.x,b.y,Lg.col); lg.userData.armsUp=0;},tick(t,dt){circ.update(t,dt); lg.userData.armsUp=Math.min(1,t*1.5); propAnim2(lg);
       for(let q=0;q<3;q++) homeP(lx+rand(-8,8),ly+rand(-8,8),70,b.x+rand(-b.r,b.r),b.y+rand(-b.r,b.r),5,q?Lg.col:'#ffffff',rand(.5,.8),rand(5,8)); if(t>1.6){if(b.cineHide){b.cineHide=false; flashT=.4; flashCol=Lg.col; shake(14); CFX.ring(b,F.c);} b.rise=Math.min(1,b.rise+dt*1.2);}},
     cam:k=>{const cx=(lx+b.x)/2, cy=(ly+b.y)/2; return [(cx+Math.cos(fa)*b.r*6+Math.cos(fa+1.4)*80)*S,lerp(2*sc,2.6*sc,k),(cy+Math.sin(fa)*b.r*6+Math.sin(fa+1.4)*80)*S,cx*S,1*sc,cy*S];}},
-   {dur:1.6,speaker:Lg.name,text:'Do not disappoint me.',enter(){b.cineHide=false; b.rise=1;},tick(t,dt){lg.userData.armsUp=Math.max(0,1-t*2); propAnim2(lg); if(t>.9&&lg.visible){lg.visible=false; flashT=.3; flashCol=Lg.col; puff(lx,ly,Lg.col,30,240,.6,7);} if(circ) circ.update(3+t,dt);},
+   {dur:1.6,speaker:Lg.name,text:tk[1],enter(){b.cineHide=false; b.rise=1;},tick(t,dt){lg.userData.armsUp=Math.max(0,1-t*2); propAnim2(lg); if(t>.9&&lg.visible){lg.visible=false; flashT=.3; flashCol=Lg.col; puff(lx,ly,Lg.col,30,240,.6,7);} if(circ) circ.update(3+t,dt);},
     cam:k=>{const cx=(lx+b.x)/2, cy=(ly+b.y)/2; return [(cx+Math.cos(fa)*b.r*7+Math.cos(fa-1.3)*b.r*4)*S,2.4*sc,(cy+Math.sin(fa)*b.r*7+Math.sin(fa-1.3)*b.r*4)*S,cx*S,1.1*sc,cy*S];}}];
   const shots=pre.concat(base.slice(1)); shots.cleanup=()=>{if(circ){circ.remove(); circ=null;} if(base.cleanup) base.cleanup(); propClear(); b.cineHide=false; b.rise=1;};
   return shots;}

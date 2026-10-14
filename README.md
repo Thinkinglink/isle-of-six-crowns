@@ -24,6 +24,8 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 - **Smoother animation everywhere:** characters ease into and out of walking, with a bobbing stride, weight shifts and a gentle idle sway. Monsters climb out of the ground when they appear, raise their weapons before they strike and swing through the hit. Bosses wind up every attack: slams raise both arms and smash down, charges lean in, casts lift the arms high, ranged attacks thrust forward, breath attacks rear back first, and roars build up instead of snapping.
 - **More cinematic cutscenes:** the camera glides between nearby shots and dips through black on cuts, with a slight handheld drift, a vignette and richer color. Titles sweep in with a gold underline, and subtitles slide up.
 - **The Deep Dark is moodier again:** half as bright as in 4.5, so it stays dark but you can still see where you're going.
+- **Download soundtrack button** on the main menu: it offers the soundtrack app for your device (Windows, Mac, Android and Chromebook, or the iPhone/iPad web app).
+- **The three legends speak for themselves:** each of the nine bosses on the legend islands is summoned with its own lines, in the voice of the Omega Enchanter, the Grand Magician or the Supreme Creator.
 - **Sound off means silence:** the Sound off button now silences everything, including echoes and effects, until you turn it back on.
 
 ## 🏰 Version 4.5
