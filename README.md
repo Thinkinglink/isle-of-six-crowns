@@ -158,3 +158,18 @@ Levels are now about twice as large, with more rooms and more monsters. Each lev
 The music now uses real-sounding instruments in place of thin beeps: piano, strings, choir, brass, French horn, flute, fiddle, tin whistle, harp, electric guitar, electric piano, saxophone, pipe organ, marimba, kalimba and bells, over rock, metal, orchestral, taiko, marching, folk, jazz brush and electronic drum kits. Every track is played in its own style (rock, metal, orchestral, epic choir, piano, folk, jazz, ambient, tribal, march, synthwave or cathedral organ), with an intro, a main theme, a contrasting part and a big finish. Every melody stays in its instrument's comfortable range, so nothing squeaks.
 
 Eighteen bosses have been rebuilt from scratch, with sculpted bodies, horns, claws, armour, cloth and glowing details. Each keeps its theme but is bigger and scarier: the Bramble King, Sand Sultan Ashkar, Mother Murk, the Rime Warden, the Cinderheart Colossus, the Pumpkin King, the Hollow Sovereign and the Sovereign Unbound, Thunderhead, the Mossback Behemoth, Lanternmaw, the Echo Tyrant, the Monarch, the Harmonizer, the Corrupted Singer, the Foundry Colossus, the Brimstone Wyrm and the Iron Warlord. The rest follow in the next update.
+
+## 👹 Every boss redesigned
+
+The last twelve bosses have been rebuilt too, so every boss except the Sculk Monstrosity now has a new, scarier, sculpted design:
+
+- **The Forge King:** a titan smith with a molten beard and an anvil hammer.
+- **The Hollow Watcher:** a giant lidded eye ringed with teeth and smaller eyes, trailing tentacles.
+- **The Rift Weaver:** an armoured spider with a crystal abdomen spinning threads of light.
+- **The Null Bloom:** a vast pale flower with a void at its heart.
+- **The Endless One:** a robed colossus whose robe is a sky of stars.
+- **The Ancient Tome:** a grimoire with page-edge teeth and a watching eye in its spine.
+- **The God of Destruction:** a four-armed obsidian titan holding a shattered world.
+- **The Radiant Seraph:** six wings full of watching eyes around a faceless knight of light.
+- **The Blight Mother:** a swollen brood-sac on spider legs with a withered queen growing from it.
+- **The Shapeless One:** a body of hovering stone blocks, then a winged elemental of flame, then a living constellation with a galaxy in its chest.

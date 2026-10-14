@@ -1128,7 +1128,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='4.2.0', SAVE_VERSION=7;
+const APP_VERSION='4.3.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -2619,6 +2619,240 @@ BOSS2.ironwarlord=(R,B,u)=>{const iron=NOV(M('#4a4a54',{metalness:.45,roughness:
   put(H,gBox,gl,0,.02,.155,.15,.012,.01); put(H,gBox,gl,0,-.04,.165,.02,.08,.01); put(H,taper('iwcrest',[[0,.18,.1],[0,.26,-.04],[0,.22,-.24]],.04,.004,14,6,.3),gold);
   for(const s of [-1,1]) ridgeHorn(H,'iwh'+s,[s*.13,.06,0],[s*1,.25,.2],.38,[0,.8,-.4],.045,iron2,gold);
   u.orbit=[0,1,2,3].map(i=>put(B,gOct,i%2?gl:iron,0,1,0,.04,.07,.04));};
+
+function hairTor(){return kg('hairtor',()=>new THREE.TorusGeometry(1,.012,6,96));}
+/* ---------- The Forge King: a molten-bearded titan smith with an anvil for a hammer ---------- */
+BOSS2.forgeking=(R,B,u)=>{const skin=M('#3a2018',{roughness:.7}), skin2=M('#24140e',{roughness:.75}), iron=NOV(M('#3a3a42',{metalness:.45,roughness:.35})), iron2=NOV(M('#1e1e24',{metalness:.4,roughness:.45})), leather=M('#4a2e1a',{roughness:.85,side:THREE.DoubleSide}), gold=NOV(M('#e0a83a',{metalness:.5,roughness:.25})), mol=glow('#ffb030',2.8), mol2=glow('#ff5a14',2.6);
+  u.legs=[leg(B,-.24,.62,0,{m:skin,m2:iron2,sh:skin2,r:.13,key:'fkl',toes:0,seed:1000}),leg(B,.24,.62,0,{m:skin,m2:iron2,sh:skin2,r:.13,key:'fkl',toes:0,seed:1001})];
+  for(const l of u.legs){put(l,lathe('fkboot',[[.1,0],[.14,.04],[.15,.2],[.12,.26]],24),iron2,0,-.6,.02); put(l,gBox,iron2,0,-.6,.1,.2,.06,.3);}
+  const T=grp(B,0,.62,0); u.torso=T; T.rotation.x=.18;
+  // a hulking scarred torso with lava running through cracks in the skin
+  put(T,blob(1002,.12),skin,0,.44,0,.5,.48,.36); put(T,blob(1003,.1),skin2,0,.15,.04,.38,.24,.3); for(const s of [-1,1]) put(T,blob(1004+s,.14),skin,s*.2,.58,.16,.2,.15,.14);
+  for(let i=0;i<8;i++){const a=(i/7-.5)*2, pts=[]; for(let k=0;k<5;k++) pts.push([Math.sin(a)*.47+Math.sin(k*2+i)*.02,.1+k*.14,Math.cos(a)*.34]); put(T,taper('fkcrk'+i,pts,.012,.006,16,6),mol2,0,0,0).castShadow=false;}
+  // smith's apron and chain
+  put(T,capeGeo('fkapron',.5,.62,.4,.15,.18,81),leather,0,.32,.3).rotation.x=-.05; put(T,gBand,leather,0,.12,0,.39,.06,.31); put(T,gBox,gold,0,.12,.3,.08,.06,.02);
+  u.core=put(T,gSph,mol,0,.5,.32,.06); put(T,thinTor(),iron,0,.5,.31,.09,.09,.6);
+  for(const s of [-1,1]){const p=grp(T,s*.42,.68,0,0,0,-s*.2); put(p,gCap,iron,0,0,0,.2,.12,.2); put(p,gCap,iron2,0,-.04,0,.17,.1,.17); for(let k=0;k<4;k++) put(p,gSphL,gold,Math.sin(k*1.6)*.15,.02,Math.cos(k*1.6)*.15,.018);}
+  const aL=arm(T,-.52,.62,0,{side:-1,m:skin,m2:skin2,sh:skin,r:.105,l1:.36,l2:.38,key:'fka',seed:1010}), aR=arm(T,.52,.62,0,{side:1,m:skin,m2:skin2,sh:skin,r:.105,l1:.36,l2:.38,key:'fka',seed:1011}); u.arms=[aL,aR];
+  for(const a of [aL,aR]){put(a,lathe('fkbrac',[[.1,0],[.12,.03],[.12,.18],[.1,.2]],24),iron,0,-.64,.12); for(let k=0;k<3;k++) put(a,thinTor(),gold,0,-.5-k*.06,.12,.12,.12,.4).rotation.x=Math.PI/2; claw(a.userData.hand,'fkc',skin,iron2,4,.14,.045,.8,.5);}
+  // the anvil hammer
+  const hm=grp(aR.userData.hand,0,-.02,.06); put(hm,gCyl,iron2,0,0,.25,.028,.7,.028).rotation.x=Math.PI/2; const hd=grp(hm,0,0,.62); hd.scale.setScalar(.75); put(hd,gBox,iron,0,0,0,.22,.36,.2); put(hd,gBox,iron2,0,.2,0,.26,.06,.24); put(hd,gCone,iron,0,-.28,0,.08,.22,.1).rotation.x=Math.PI; for(const s of [-1,1]) put(hd,gBox,mol,s*.115,0,0,.01,.28,.16).castShadow=false;
+  put(hm,gSph,gold,0,0,-.1,.04);
+  // head: brutal face, eyes of white heat, a beard of flowing molten metal and a crown that is a burning forge
+  const H=grp(T,0,.86,.16); u.head=H; put(H,blob(1020,.08),skin,0,0,0,.17,.18,.17); put(H,blob(1021,.12),skin2,0,.08,.08,.17,.06,.12);
+  for(const s of [-1,1]){put(H,gSph,M('#0a0402'),s*.065,.03,.14,.04,.03,.025); eye(H,s*.065,.03,.155,.02,'#fff0b0',3.6);}
+  for(let i=0;i<9;i++){const x=(i-4)*.035, l=.18+Math.cos((i-4)/4*1.4)*.14; put(H,taper('fkbeard'+(i%3),[[0,0,0],[.01,-l*.4,.04],[-.01,-l*.8,.02],[0,-l,-.02]],.03,.006,16,8),i%2?mol:mol2,x,-.07,.12).castShadow=false;}
+  const cr=grp(H,0,.15,0); u.crown=cr; put(cr,lathe('fkcrown',[[.14,0],[.17,.03],[.17,.12],[.19,.14],[.15,.14]],40),iron2); for(let i=0;i<6;i++){const a=i/6*TAU; put(cr,gBox,iron,Math.sin(a)*.16,.18,Math.cos(a)*.16,.07,.1,.05).rotation.y=a;}
+  u.flames=[]; for(let i=0;i<6;i++){const a=i/6*TAU+.5; const f=put(cr,gCone,i%2?mol:mol2,Math.sin(a)*.12,.26,Math.cos(a)*.12,.035,.2,.035); f.castShadow=false; u.flames.push(f);} put(cr,gSph,mol,0,.12,0,.1,.04,.1);
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,shard(1030+i,.4),i%2?mol:iron2,0,1,0,.05));};
+/* ---------- The Hollow Watcher: an enormous lidded eye in a nest of tentacles and smaller eyes ---------- */
+BOSS2.hollowwatcher=(R,B,u)=>{u.float=true; u.legs=[]; u.arms=[]; const flesh=M('#2a1638',{roughness:.5}), flesh2=M('#180c22',{roughness:.6}), lid=M('#3a2450',{roughness:.45}), white=NOV(M('#ece4f0',{roughness:.2})), vein=NOV(M('#b03050',{roughness:.4})), tooth=NOV(M('#e8e0d0',{roughness:.3})), vio=glow('#d8b0ff',2.8);
+  const E=grp(B,0,1.05,0); u.head=E;
+  // the socket: a lumpy mass of flesh ringed with teeth
+  put(E,blob(1100,.12),flesh,0,0,-.1,.62,.6,.52); put(E,blob(1101,.15),flesh2,0,-.1,-.25,.5,.45,.4);
+  for(let i=0;i<22;i++){const a=i/22*TAU; put(E,gCone,tooth,Math.cos(a)*.47,Math.sin(a)*.47,.28,.025,.1+((i*5)%3)*.03,.025).rotation.set(0,0,a-Math.PI/2).constructor;} 
+  for(let i=0;i<22;i++){const a=i/22*TAU, t=E.children[E.children.length-22+i]; t.rotation.set(Math.PI/2*.7,0,0); t.position.set(Math.cos(a)*.47,Math.sin(a)*.47,.3); t.lookAt(new THREE.Vector3(Math.cos(a)*.2,Math.sin(a)*.2,.8)); t.rotateX(Math.PI/2);}
+  // the great eye: veined white, a burning iris and a slit pupil
+  const ball=grp(E,0,0,.16); put(ball,gSph,white,0,0,0,.42); for(let i=0;i<10;i++){const a=i/10*TAU, pts=[]; for(let k=0;k<5;k++){const r=.42-k*.05; const aa=a+Math.sin(k*1.7+i)*.2; pts.push([Math.cos(aa)*Math.sin(.4+k*.18)*.4,Math.sin(aa)*Math.sin(.4+k*.18)*.4,Math.cos(.4+k*.18)*.4]);} }
+  for(let i=0;i<12;i++){const a=i/12*TAU; put(ball,taper('hwv'+(i%4),[[0,0,0],[.04,.01,0],[.09,.03,0],[.13,.02,0]],.006,.002,10,5),vein,Math.cos(a)*.27,Math.sin(a)*.27,.29,1,1,1,0,0,a);}
+  u.core=put(ball,gSph,vio,0,0,.37,.19,.19,.08); put(ball,thinTor(),NOV(M('#3a1a5a')),0,0,.38,.19,.19,.5); put(ball,gSph,NOV(M('#000000')),0,0,.44,.04,.14,.02);
+  // heavy chitin lids
+  const lt=grp(E,0,0,.05); put(lt,gCap,lid,0,0,0,.5,.44,.48).rotation.x=-.95; const lb=grp(E,0,0,.05); put(lb,gCap,lid,0,0,0,.5,.4,.48).rotation.x=Math.PI+1.0; u.lids=[lt,lb];
+  for(let i=0;i<9;i++){const a=(i/8-.5)*2; put(lt,gCone,M('#120818'),Math.sin(a)*.4,.18-Math.abs(a)*.05,.28,.012,.12,.012).rotation.x=1.9;}
+  // dozens of smaller eyes in the flesh
+  u.spots=[]; for(let i=0;i<14;i++){const a=i*2.4, r=.38+((i*7)%3)*.06, y=Math.sin(a)*r*.9, x=Math.cos(a)*r; if(Math.abs(x)<.3&&Math.abs(y)<.3) continue; put(E,gSph,white,x,y,.2+((i%3)*.03),.05); u.spots.push(put(E,gSph,vio,x,y,.24+((i%3)*.03),.025,.025,.012));}
+  // tentacles hanging beneath
+  u.tentacles=[]; for(let i=0;i<8;i++){const a=i/8*TAU; u.tentacles.push(chain(E,Math.cos(a)*.3,-.35,Math.sin(a)*.25-.1,a,6,.14,.06,flesh,lid,'y'));}
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=grp(B,0,1,0); put(g,gSph,white,0,0,0,.05); put(g,gSph,vio,0,0,.04,.025,.025,.012); return g;});
+  u.anim=(u,b)=>{const bl=Math.pow(Math.max(0,Math.sin(time*.7)),40); u.lids[0].rotation.x=bl*.45; u.lids[1].rotation.x=-bl*.5; u.core.material.emissiveIntensity=2.4+Math.sin(time*4)*.8;};};
+/* ---------- The Rift Weaver: an armoured spider spinning threads of light from a crystal abdomen ---------- */
+BOSS2.riftweaver=(R,B,u)=>{u.legType='crawl'; const shell=NOV(M('#3a3060',{roughness:.3,metalness:.35})), shell2=M('#1e1838',{roughness:.45}), cry=NOV(M('#7af0ff',{roughness:.08,metalness:.2,emissive:new THREE.Color('#2ab0d0'),emissiveIntensity:1.1})), vio=glow('#b48cff',2.6), cy=glow('#9af8ff',3), fang=NOV(M('#e0e8f0',{roughness:.3}));
+  u.legs=[]; for(let i=0;i<4;i++) for(const s of [-1,1]){const pv=grp(B,s*.14,.5,.22-i*.15); pv.userData.ph=i+(s>0?2:0); const sp=(1.5-i)*.35; const a=[s*.05,0,0], kk=[s*.45,.38,sp*.5], an=[s*.85,.05,sp*.9], ft=[s*1.0,-.5,sp*1.1];
+    put(pv,taper('rwl1'+i+s,[a,[s*.25,.25,sp*.2],kk],.05,.035,14,8),shell); put(pv,gSph,cry,kk[0],kk[1],kk[2],.04); put(pv,taper('rwl2'+i+s,[kk,[s*.68,.3,sp*.75],an],.035,.025,14,8),shell2); put(pv,taper('rwl3'+i+s,[an,[s*.95,-.2,sp*1.0],ft],.025,.004,14,6),shell); u.legs.push(pv);}
+  // cephalothorax and the rift-crystal abdomen
+  put(B,blob(1200,.1),shell,0,.55,.12,.3,.2,.32); put(B,blob(1201,.12),shell2,0,.5,.12,.26,.16,.28);
+  const AB=grp(B,0,.7,-.45); put(AB,blob(1202,.06),shell2,0,0,0,.4,.36,.5); for(let i=0;i<9;i++){const c=put(AB,crystal(1210+i,6),cry,Math.sin(i*2.1)*.22,.2+Math.cos(i*1.3)*.1,Math.cos(i*2.1)*.3,.06,.24+(i%3)*.06,.06); c.rotation.set(Math.cos(i*2.1)*.7,0,-Math.sin(i*2.1)*.7);}
+  for(let i=0;i<5;i++) put(AB,gTor,shell,0,0,-.2+i*.1,.4-Math.abs(i-2)*.04,.36-Math.abs(i-2)*.04,.2).rotation.y=0;
+  u.core=put(AB,gSph,cy,0,-.05,-.48,.08);
+  // threads of light trailing from the spinnerets
+  for(let i=0;i<5;i++){put(AB,taper('rwthr'+i,[[0,-.05,-.48],[(i-2)*.1,-.3,-.7],[(i-2)*.2,-.68,-.9]],.006,.003,14,4),cy,0,0,0).castShadow=false;}
+  // head: a cluster of eyes over long crystal fangs
+  const H=grp(B,0,.58,.42); u.head=H; put(H,blob(1220,.08),shell,0,0,0,.18,.14,.16);
+  for(const [x,y,s] of [[-.05,.06,.035],[.05,.06,.035],[-.11,.03,.025],[.11,.03,.025],[-.03,.11,.02],[.03,.11,.02],[-.08,.1,.015],[.08,.1,.015]]) eye(H,x,y,.14,s,'#b48cff',3,s>.03);
+  u.mand=[]; for(const s of [-1,1]){const md=grp(H,s*.06,-.06,.1); put(md,taper('rwmd',[[0,0,0],[s*.03,-.08,.06],[-s*.02,-.2,.08]],.03,.004,14,8),fang); u.mand.push(md);}
+  put(H,taper('rwpp',[[0,0,0],[0,-.05,.1],[0,-.02,.18]],.015,.006,10,6),shell2,-.1,-.04,.08); put(H,taper('rwpp',[[0,0,0],[0,-.05,.1],[0,-.02,.18]],.015,.006,10,6),shell2,.1,-.04,.08);
+  // broken path shards hovering around
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,shard(1230+i,.5),i%2?cry:vio,0,1,0,.06,.02,.08));};
+/* ---------- The Null Bloom: a vast pale flower with a void at its heart ---------- */
+BOSS2.nullbloom=(R,B,u)=>{u.legs=[]; u.arms=[]; const stem=M('#8a8498',{roughness:.6}), stem2=M('#5a5470',{roughness:.65}), pet=NOV(M('#ece6f4',{roughness:.4,side:THREE.DoubleSide})), pet2=NOV(M('#c8bcd8',{roughness:.45,side:THREE.DoubleSide})), voidM=NOV(M('#030106',{roughness:1})), vio=glow('#7a3ad0',2.8), vio2=glow('#c8a0ff',2.6), thorn=NOV(M('#2a2438',{roughness:.5}));
+  // roots and thorned vines crawling across the floor
+  for(let i=0;i<10;i++){const a=i/10*TAU; put(B,taper('nbr'+(i%3),[[0,.1,0],[Math.sin(a)*.25,.05,Math.cos(a)*.25],[Math.sin(a+.3)*.55,.02,Math.cos(a+.3)*.55],[Math.sin(a+.5)*.75,.01,Math.cos(a+.5)*.75]],.06,.01,20,8),i%2?stem:stem2);}
+  u.vines=[]; for(let i=0;i<5;i++){const a=i/5*TAU+.3, g=grp(B,Math.sin(a)*.32,.1,Math.cos(a)*.32); const pts=[[0,0,0],[Math.sin(a)*.1,.3,Math.cos(a)*.1],[Math.sin(a)*.05,.55,Math.cos(a)*.15],[Math.sin(a)*.18,.7,Math.cos(a)*.1]]; put(g,taper('nbv'+i,pts,.03,.008,24,8),stem2);
+    for(let k=1;k<4;k++) put(g,gCone,thorn,pts[k][0]*1.1,pts[k][1],pts[k][2]*1.1,.012,.06,.012).rotation.set(1,a,0); put(g,leafGeo('nbleaf',.24,.1,.08,1),pet2,pts[3][0],pts[3][1],pts[3][2],1,1,1,.4,a,.4); u.vines.push(g);}
+  // the stem rises and bows forward under the weight of the bloom
+  const st=[[0,0,0],[.04,.4,-.02],[0,.85,.06],[0,1.12,.22]]; put(B,taper('nbstem',st,.15,.09,30,14),stem); for(let i=0;i<6;i++){const k=i/5; put(B,leafGeo('nbsl',.4,.16,.1,1),i%2?pet2:pet,Math.sin(i*2)*.12,.2+k*.7,Math.cos(i*2)*.12,1,1,1,-.8,i*2,0);}
+  const H=grp(B,0,1.2,.28,-.15,0,0); u.head=H; put(H,blob(1300,.08),stem2,0,0,-.08,.26,.26,.16);
+  // the void centre with a single violet pupil
+  put(H,gSph,voidM,0,0,.05,.24,.24,.14); u.core=put(H,gSph,vio,0,0,.17,.1,.1,.04); put(H,gSph,M('#ffffff'),0,0,.2,.025,.025,.01); put(H,thinTor(),vio2,0,0,.15,.22,.22,.3);
+  for(let i=0;i<12;i++){const a=i/12*TAU; put(H,taper('nbst2',[[0,0,0],[0,0,.06],[0,0,.12]],.006,.004,8,4),vio2,Math.cos(a)*.12,Math.sin(a)*.12,.1,1,1,1,0,0,0).lookAt(new THREE.Vector3(Math.cos(a)*.6,Math.sin(a)*.6,1));}
+  // two rings of huge drooping petals that slowly turn
+  u.petals=grp(H,0,0,0); for(let ring=0;ring<2;ring++) for(let i=0;i<8;i++){const a=i/8*TAU+ring*.4; const pv=grp(u.petals,0,0,-.02*ring,0,0,a); const p=put(pv,leafGeo('nbpet'+ring,.6-ring*.12,.32-ring*.06,.3,1.1,.006),ring?pet2:pet,0,.16,0); p.rotation.x=-.5-ring*.35;}
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=grp(B,0,1,0); put(g,leafGeo('nbmini',.1,.06,.02,1),i%2?pet:pet2,0,0,0); return g;});};
+/* ---------- The Endless One: a robed colossus of night, its body a sky of dying stars ---------- */
+function starTex(){return canvasTex('starsky',256,(d,r)=>{d.fillStyle='#05030a'; d.fillRect(0,0,256,256); for(let i=0;i<6;i++){const g=d.createRadialGradient(r()*256,r()*256,0,r()*256,r()*256,60+r()*60); g.addColorStop(0,`rgba(${90+r()*80|0},40,${140+r()*100|0},.35)`); g.addColorStop(1,'rgba(0,0,0,0)'); d.fillStyle=g; d.fillRect(0,0,256,256);}
+  for(let i=0;i<500;i++){const v=r(); d.fillStyle=v<.7?'rgba(255,255,255,.7)':v<.85?'#c8b8ff':'#ffd8a0'; const s=r()<.93?1:2; d.fillRect(r()*256,r()*256,s,s);}});}
+BOSS2.endlessone=(R,B,u)=>{u.float=true; u.legs=[]; bossTex(); const sky=starTex(); sky.wrapS=sky.wrapT=THREE.RepeatWrapping; const robe=NOV(new THREE.MeshStandardMaterial({color:0xffffff,map:sky,emissive:new THREE.Color('#ffffff'),emissiveMap:sky,emissiveIntensity:.55,roughness:.8,side:THREE.DoubleSide})); u.mats.push(robe); robe.userData.e0=robe.emissive.clone(); robe.userData.ei=.55;
+  const robe2=M('#0a0614',{roughness:.7,side:THREE.DoubleSide}), bone=NOV(M('#1a1428',{roughness:.4})), star=glow('#ffffff',3), vio=glow('#b48cff',2.4);
+  put(B,robeGeo('eo1',.3,.66,1.55,12,.1,.4,91),robe,0,.85,0); put(B,robeGeo('eo2',.32,.5,.9,10,.12,.55,92),robe2,0,1.18,0);
+  const T=grp(B,0,1.5,0); u.torso=T; put(T,capeGeo('eomantle',.9,1.1,.8,.4,.35,93),robe,0,.28,-.08); put(T,lathe('eosh',[[.1,.3],[.34,.2],[.4,.1],[.3,.05]],40),robe2,0,0,0);
+  // the hood and the face that is only two stars
+  const H=grp(T,0,.36,.02); u.head=H; put(H,lathe('eohood',[[0,.26],[.12,.24],[.2,.12],[.21,-.06],[.17,-.14],[.1,-.12]],36),robe2,0,0,-.02,1,1,1.05); put(H,gSph,M('#000000'),0,-.02,.08,.15,.16,.11);
+  eye(H,-.055,0,.17,.02,'#ffffff',4); eye(H,.055,0,.17,.02,'#ffffff',4);
+  for(let i=0;i<7;i++){const a=(i/6-.5)*2; put(H,taper('eoc',[[0,0,0],[0,.1,-.02],[0,.2,-.06]],.02,.002,10,6),star,Math.sin(a)*.18,.18+Math.cos(a)*.05,-.04).rotation.z=-a*.6;}
+  // long arms of starless bone with claws of light
+  const aL=arm(T,-.32,.16,0,{side:-1,m:robe2,m2:bone,sh:robe,r:.05,l1:.42,l2:.46,out:.1,key:'eoa',seed:1400}), aR=arm(T,.32,.16,0,{side:1,m:robe2,m2:bone,sh:robe,r:.05,l1:.42,l2:.46,out:.1,key:'eoa',seed:1401}); u.arms=[aL,aR]; u.armsFwd=.4;
+  for(const a of [aL,aR]) claw(a.userData.hand,'eoc',bone,star,4,.26,.03,1,.9);
+  // galaxies wheeling around it
+  u.rings=[]; const rv=NOV(M('#7a5ab0',{emissive:new THREE.Color('#6a4aa0'),emissiveIntensity:.7})), dstar=NOV(M('#ffffff',{emissive:new THREE.Color('#d8d0ff'),emissiveIntensity:.9})); for(let i=0;i<2;i++){const r=put(B,hairTor(),rv,0,1.2,0,.9+i*.22,.9+i*.22,1); u.rings.push(r); for(let k=0;k<10;k++){const a=k/10*TAU; put(r,gSphL,dstar,Math.cos(a),Math.sin(a),0,.025/(.9+i*.22));}}
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,gOct,i%2?star:vio,0,1,0,.03,.06,.03));
+  u.anim=(u,b)=>{sky.offset.y=(time*.01)%1;};};
+/* ---------- The Ancient Tome: a grimoire that reads you back, all teeth and burning script ---------- */
+function pageTex(){return canvasTex('pagetx',256,(d,r)=>{d.fillStyle='#eadcb8'; d.fillRect(0,0,256,256); const g=d.createRadialGradient(128,128,40,128,128,180); g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,'rgba(90,60,20,.45)'); d.fillStyle=g; d.fillRect(0,0,256,256);
+  d.fillStyle='rgba(60,30,10,.85)'; for(let y=20;y<240;y+=13){let x=16; while(x<236){const w=4+r()*16; d.fillRect(x,y,w,2+(r()<.3?1:0)); if(r()<.2) d.fillRect(x+w/2,y-3,1.5,4); x+=w+3+r()*4;}}
+  d.strokeStyle='rgba(140,20,10,.8)'; d.lineWidth=2; d.beginPath(); d.arc(190,70,26,0,TAU); d.stroke(); for(let i=0;i<6;i++){const a=i/6*TAU; d.beginPath(); d.moveTo(190,70); d.lineTo(190+Math.cos(a)*26,70+Math.sin(a)*26); d.stroke();}});}
+BOSS2.ancienttome=(R,B,u)=>{u.float=true; u.legs=[]; u.arms=[]; bossTex(); const lea=M('#4a2416',{roughness:.6}), lea2=M('#2e160c',{roughness:.7}), gold=NOV(M('#d8b050',{metalness:.5,roughness:.25})), ptx=pageTex(), page=NOV(new THREE.MeshStandardMaterial({color:0xffffff,map:ptx,roughness:.85,side:THREE.DoubleSide})), rune=glow('#ffd36a',2.6), rune2=glow('#7ab0ff',2.4), tooth=NOV(M('#e8dcc0',{roughness:.35})), ink=NOV(M('#0a0610',{roughness:.3}));
+  u.mats.push(page); page.userData.e0=page.emissive.clone(); page.userData.ei=0;
+  const book=grp(B,0,1.05,0,-.55,0,0); u.book=book;
+  put(book,gBox,lea2,0,0,-.05,.18,1.05,.14); for(let i=0;i<5;i++) put(book,thinTor(),gold,0,-.4+i*.2,-.1,.1,.1,.5).rotation.y=Math.PI/2;
+  u.covers=[]; for(const sd of [-1,1]){const cv=grp(book); cv.userData.sd=sd; u.covers.push(cv);
+    put(cv,gBox,sd<0?lea:lea2,sd*.42,0,-.06,.84,1.08,.05); for(const [cx2,cy2] of [[.76,.48],[.76,-.48],[.08,.48],[.08,-.48]]) put(cv,gCone,gold,sd*cx2,cy2,-.1,.05,.08,.05).rotation.x=-Math.PI/2;
+    put(cv,gBox,page,sd*.4,0,.02,.76,.96,.1); put(cv,gPlane,page,sd*.4,0,.072,.74,.94,1);
+    // page-edge teeth along the open gutter
+    for(let k=0;k<9;k++) put(cv,gCone,tooth,sd*.05,-.4+k*.1,.1,.025,.08,.02).rotation.z=-sd*Math.PI/2;
+    for(let r2=0;r2<6;r2++){const gm=put(cv,gBox,(r2%2)?rune:rune2,sd*(.2+(r2%3)*.18),.32-r2*.12,.08,.1,.02,.005); gm.castShadow=false;}}
+  u.covers[0].rotation.y=.25; u.covers[1].rotation.y=-.25;
+  u.flip=[]; for(let i=0;i<5;i++){const pg=grp(book); put(pg,gPlane,page,.37,0,.09,.72,.92,1); pg.userData.ph=i/5; u.flip.push(pg);}
+  // the eye in the spine, watching and turning
+  const ey=grp(book,0,0,.3); put(ey,thinTor(),gold,0,0,0,.24,.24,.6); for(let i=0;i<8;i++){const a=i/8*TAU; put(ey,gCone,gold,Math.cos(a)*.27,Math.sin(a)*.27,0,.02,.07,.02).rotation.z=a-Math.PI/2;} put(ey,gSph,NOV(M('#efe6d0',{roughness:.2})),0,0,0,.16,.16,.08); u.core=put(ey,gSph,rune,0,0,.05,.09,.09,.04); put(ey,gSph,ink,0,0,.08,.02,.07,.02); u.sigil=ey;
+  // quill-and-chain tendrils that drip ink
+  u.tentacles=[]; for(const sx of [-.42,.42]) u.tentacles.push(chain(B,sx,.62,0,0,6,.09,.03,gold,ink,'y'));
+  for(const sx of [-.42,.42]){const q=u.tentacles[sx<0?0:1][5]; put(q,leafGeo('atquill',.22,.05,.02,1),NOV(M('#f0ece0',{side:THREE.DoubleSide})),0,-.06,0,1,1,1,Math.PI,0,0);}
+  u.rings=[]; for(let i=0;i<2;i++){const r=put(B,hairTor(),i?rune2:rune,0,1.05,0,1.0+i*.18,1.0+i*.18,1); r.rotation.x=Math.PI/2+i*.4; u.rings.push(r);}
+  // floating candles
+  u.orbit=[0,1,2,3,4,5].map(i=>{const q=grp(B,0,1,0); put(q,gCyl,NOV(M('#efe6d0')),0,0,0,.025,.12,.025); put(q,gCone,rune,0,.09,0,.015,.05,.015); return q;});
+  {const pl=new THREE.PointLight(0xffd890,1.6,7); pl.position.y=1.2; B.add(pl);}};
+
+/* ---------- The God of Destruction: a four-armed obsidian titan holding a broken world ---------- */
+BOSS2.godofdestruction=(R,B,u)=>{const ob=M('#1a1214',{roughness:.45,metalness:.2}), ob2=M('#2a1c1c',{roughness:.7}), mag=glow('#ff3a1a',2.6), mag2=glow('#ffb03a',2.8), bone=NOV(M('#d8c8b0',{roughness:.45})), chainM=NOV(M('#3a3438',{metalness:.45,roughness:.4}));
+  u.legs=[leg(B,-.27,.62,0,{m:ob,m2:ob2,sh:ob,r:.15,key:'gdl',toes:3,nail:bone,dig:1,foot:.22,seed:1500}),leg(B,.27,.62,0,{m:ob,m2:ob2,sh:ob,r:.15,key:'gdl',toes:3,nail:bone,dig:1,foot:.22,seed:1501})];
+  for(const l of u.legs){put(l,thinTor(),chainM,0,-.5,.0,.14,.14,.5).rotation.x=Math.PI/2; u.ribbons=u.ribbons||[]; u.ribbons.push(chain(l,.1,-.5,0,0,3,.06,.015,chainM,chainM,'y'));}
+  const T=grp(B,0,.62,0); u.torso=T; T.rotation.x=.2;
+  put(T,blob(1502,.14),ob,0,.46,0,.54,.5,.38); put(T,blob(1503,.12),ob2,0,.16,.03,.4,.26,.3); for(const s of [-1,1]) put(T,blob(1504+s,.16),ob,s*.24,.62,.18,.22,.16,.14);
+  // the chest split open on a molten core
+  put(T,shard(1506,.4),M('#0a0404'),0,.45,.3,.12,.2,.06); u.core=put(T,gOct,mag2,0,.45,.32,.07,.15,.03);
+  for(let i=0;i<10;i++){const a=(i/9-.5)*2.4, pts=[]; for(let k=0;k<5;k++) pts.push([Math.sin(a)*.5+Math.sin(k*1.9+i)*.03,.12+k*.13,Math.cos(a)*.37]); put(T,taper('gdc'+i,pts,.014,.006,16,6),i%2?mag:mag2).castShadow=false;}
+  // shoulders of jagged rock and horn
+  for(const s of [-1,1]){for(let k=0;k<5;k++){const sp=put(T,taper('gdss'+k,[[0,0,0],[s*.05,.12,0],[s*.12,.28+k*.04,-.06]],.05,.003,12,8),k%2?bone:ob2,s*(.34+k*.05),.66,-.12+k*.06); sp.rotation.z=-s*.2;}}
+  // tail
+  u.tail=grp(T,0,.08,-.32); put(u.tail,taper('gdtail',[[0,0,0],[0,-.15,-.25],[0,-.4,-.5],[.06,-.55,-.8]],.12,.01,24,12),ob2); for(let k=0;k<5;k++) put(u.tail,gCone,bone,0,-.08-k*.1,-.15-k*.13,.025,.09,.025).rotation.x=-1;
+  // four arms: two great fists below, two raised hands holding a shattered world
+  const aL=arm(T,-.56,.6,0,{side:-1,m:ob,m2:ob2,sh:ob,r:.12,l1:.38,l2:.4,key:'gda',seed:1510}), aR=arm(T,.56,.6,0,{side:1,m:ob,m2:ob2,sh:ob,r:.12,l1:.38,l2:.4,key:'gda',seed:1511}); u.arms=[aL,aR];
+  for(const a of [aL,aR]){claw(a.userData.hand,'gdc',ob,bone,4,.16,.055,.8,.5); put(a,thinTor(),mag,0,-.66,.12,.12,.12,.5).rotation.x=Math.PI/2;}
+  u.smallArms=[]; const ORB=grp(T,0,1.35,.15); for(const s of [-1,1]){const a=arm(T,s*.4,.74,-.05,{side:s,m:ob2,m2:ob,r:.07,l1:.3,l2:.3,key:'gdsa',seed:1515}); a.rotation.set(-2.6,0,s*.35); claw(a.userData.hand,'gdsc',ob,bone,4,.1,.03,.9,.6); u.smallArms.push(a);}
+  put(ORB,shard(1520,.25,2),M('#3a5a3a',{roughness:.8}),0,0,0,.2); put(ORB,gSph,mag2,0,0,0,.12); for(let i=0;i<6;i++){const a=i/6*TAU; put(ORB,shard(1521+i,.4),M('#4a3a2a'),Math.cos(a)*.26,Math.sin(i)*.1,Math.sin(a)*.26,.06);} u.worldOrb=ORB;
+  // head: a horned, skull-like face with a molten maw and a crown of floating broken stone
+  const H=grp(T,0,.9,.16); u.head=H; put(H,blob(1530,.1),ob,0,0,0,.2,.19,.2); put(H,blob(1531,.15),ob2,0,.09,.06,.21,.07,.15);
+  for(const s of [-1,1]){put(H,gSph,M('#050202'),s*.075,.03,.16,.045,.03,.025); eye(H,s*.075,.03,.18,.024,'#ff6a3a',3.8); ridgeHorn(H,'gdh'+s,[s*.16,.1,0],[s*1,.6,-.2],.5,[s*-.3,.6,-.2],.07,ob2,mag);}
+  u.jaw=grp(H,0,-.1,.06); put(u.jaw,blob(1532,.12),ob2,0,-.03,.08,.15,.05,.12); fangs(u.jaw,bone,8,.22,.0,.18,.05,1,.3,.012); fangs(H,bone,8,.22,-.1,.2,.05,-1,.3,.012); put(u.jaw,gSph,mag2,0,0,.08,.1,.02,.08).castShadow=false;
+  u.crownRocks=[]; for(let i=0;i<8;i++){const a=i/8*TAU; const r=put(H,shard(1540+i,.5),i%2?ob:ob2,Math.sin(a)*.24,.3+Math.cos(i*1.3)*.04,Math.cos(a)*.24,.05,.08,.05); u.crownRocks.push(r);} 
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,shard(1550+i,.4),i%2?mag:ob,0,1,0,.07));
+  u.anim=(u,b)=>{u.worldOrb.rotation.y=time*.6; u.worldOrb.position.y=1.35+Math.sin(time*1.5)*.04; u.crownRocks.forEach((r,i)=>{r.position.y=.3+Math.sin(time*2+i)*.04; r.rotation.y=time*(.5+i*.1);});};};
+/* ---------- The Radiant Seraph: six wings full of watching eyes around a faceless knight of light ---------- */
+BOSS2.radiantseraph=(R,B,u)=>{u.float=true; u.legs=[]; const white=NOV(M('#f8f2e4',{roughness:.35})), gold=NOV(M('#e8c050',{metalness:.5,roughness:.22})), feath=NOV(M('#fffaf0',{roughness:.5,side:THREE.DoubleSide})), feath2=NOV(M('#e8dcc0',{roughness:.55,side:THREE.DoubleSide})), wht=glow('#fff2b0',3), lite=glow('#ffe890',2.4), iris=glow('#ffd040',3.2);
+  put(B,robeGeo('rs1',.22,.48,1.05,14,.08,.35,101),white,0,.62,0); put(B,robeGeo('rs2',.24,.4,.7,10,.06,.3,102),gold,0,.86,0,1.02,1,1.02);
+  const T=grp(B,0,1.12,0); u.torso=T; put(T,lathe('rsbody',[[.14,-.05],[.22,.05],[.25,.25],[.22,.38],[.12,.44],[0,.46]],40),white,0,0,0,1,1,.8); for(let i=0;i<3;i++) put(T,gBand,gold,0,.06+i*.14,0,.235-Math.abs(i-1)*.01,.02,.19);
+  u.core=put(T,gOct,wht,0,.22,.19,.06,.1,.03);
+  for(const s of [-1,1]){const p=grp(T,s*.26,.38,0,0,0,-s*.3); put(p,gCap,gold,0,0,0,.15,.1,.15); put(p,gCap,white,0,-.03,0,.13,.08,.13); for(let k=0;k<3;k++) put(p,leafGeo('rspf',.18,.06,.02,1),gold,s*.05,0,-.08+k*.08,1,1,1,0,0,-s*1.3);}
+  // six wings, in three pairs, each feather carrying an open eye
+  u.bigWings=[]; for(let pr=0;pr<3;pr++) for(const sx of [-1,1]){const tilt=grp(T,sx*.06,.4-pr*.14,-.16,0,0,sx*(pr===0?-.6:pr===1?-.1:.45)); const w=grp(tilt); w.userData.sx=sx; u.bigWings.push(w); const len=1.15-pr*.18;
+    put(w,taper('rswb'+pr+sx,[[0,0,0],[sx*len*.4,.05,-.04],[sx*len,.12,-.1]],.03,.01,16,8),gold);
+    for(let k=0;k<9;k++){const t=k/8, x=sx*len*(.12+t*.88), fl=.35+t*.4; const f=put(w,leafGeo('rsfe'+pr,1,.2,.04,1),k%2?feath:feath2,x,.1*t,-.06*t,fl,fl,fl,0,0,sx*(Math.PI*.95-t*.55)); if(k%2===0){const e=grp(w,x+sx*Math.sin(t*.5)*fl*.4,.1*t-fl*.45,-.04*t); put(e,gSph,white,0,0,0,.035,.025,.015); put(e,gSph,iris,0,0,.012,.016,.016,.008); put(e,gSph,M('#000000'),0,0,.018,.006,.012,.004);}}}
+  // faceless helm with a cross of light and a triple halo
+  const H=grp(T,0,.58,.02); u.head=H; put(H,lathe('rshelm',[[0,-.12],[.11,-.11],[.13,0],[.12,.1],[.07,.15],[0,.16]],40),gold); put(H,gBox,wht,0,.0,.12,.14,.02,.03); put(H,gBox,wht,0,-.02,.125,.025,.14,.03);
+  for(let i=0;i<5;i++){const a=(i/4-.5)*1.4; put(H,leafGeo('rshc',.18,.04,.02,1),gold,Math.sin(a)*.1,.12,-.04,1,1,1,0,0,-a);}
+  u.halo=grp(H,0,.08,-.16); put(u.halo,thinTor(),wht,0,0,0,.3,.3,.5); put(u.halo,thinTor(),lite,0,0,0,.4,.4,.3); for(let i=0;i<16;i++){const a=i/16*TAU; put(u.halo,gCone,gold,Math.cos(a)*.35,Math.sin(a)*.35,0,.014,.07,.014).rotation.z=a-Math.PI/2;}
+  // arms holding a spear of light
+  const aL=arm(T,-.3,.34,0,{side:-1,m:white,m2:gold,sh:gold,r:.045,l1:.32,l2:.32,key:'rsa',seed:1600}), aR=arm(T,.3,.34,0,{side:1,m:white,m2:gold,sh:gold,r:.045,l1:.32,l2:.32,key:'rsa',seed:1601}); u.arms=[aL,aR]; u.armsFwd=.5;
+  claw(aL.userData.hand,'rsc',gold,gold,4,.1,.02,.9,.4); const sp=grp(aR.userData.hand,0,0,.03); claw(aR.userData.hand,'rsc',gold,gold,4,.08,.02,.8,1); put(sp,gCyl,gold,0,0,0,.016,1.4,.016).rotation.x=Math.PI/2; put(sp,crystal(1610,4),wht,0,0,.8,.05,.3,.03).rotation.x=Math.PI/2; put(sp,gTor,gold,0,0,.62,.05,.05,.05);
+  u.orbit=[0,1,2,3,4,5].map(i=>{const g=grp(B,0,1,0); put(g,gSph,white,0,0,0,.05,.035,.02); put(g,gSph,iris,0,0,.015,.022,.022,.01); return g;});};
+/* ---------- The Blight Mother: a swollen brood-sac with a withered queen growing out of it ---------- */
+BOSS2.blightmother=(R,B,u)=>{u.legs=[]; u.arms=[]; const skin=M('#5a6a3a',{roughness:.45}), skin2=M('#3a4a24',{roughness:.55}), flesh=M('#8a6a5a',{roughness:.5}), bone=NOV(M('#d8d0b0',{roughness:.5})), gl=glow('#9aff3a',2.6), gl2=glow('#d8ff6a',2.2), fung=NOV(M('#c8c090',{roughness:.8,side:THREE.DoubleSide}));
+  // spindly legs holding the sac off the ground
+  for(let i=0;i<6;i++){const a=i/6*TAU+.5, pts=[[Math.sin(a)*.4,.6,Math.cos(a)*.4],[Math.sin(a)*.75,.75,Math.cos(a)*.75],[Math.sin(a)*1.0,.3,Math.cos(a)*1.0],[Math.sin(a)*1.08,0,Math.cos(a)*1.08]]; put(B,taper('bmleg'+i,pts,.05,.012,20,8),skin2);}
+  const BL=grp(B,0,0,0); u.bloat=BL;
+  put(BL,blob(1700,.1),skin,0,.95,-.1,.72,.6,.75); put(BL,blob(1701,.12),flesh,0,.8,-.05,.6,.4,.62);
+  // pustules and the nozzles it sprays from
+  u.spots=[]; u.nozzles=[]; for(let i=0;i<18;i++){const a=i*2.4, y=.7+((i*5)%7)*.06, rr=.62-Math.abs(y-.95)*.5; const x=Math.sin(a)*rr, z=Math.cos(a)*rr-.1; put(BL,gSph,skin2,x,y,z,.07); const p=put(BL,gSph,i%3?gl:gl2,x*1.06,y,z*1.06+(z>0?.01:0),.045); u.spots.push(p); if(i%4===0){const n=put(BL,gCyl,gl2,x*1.12,y+.02,z*1.12,.025,.06,.025); n.lookAt(new THREE.Vector3(x*3,y,z*3)); n.rotateX(Math.PI/2); u.nozzles.push(n);}}
+  // translucent egg sacs hanging underneath
+  for(let i=0;i<5;i++){const a=i/5*TAU; const e=put(BL,gSph,NOV(M('#b8e070',{roughness:.2,transparent:true,opacity:.7,emissive:new THREE.Color('#5a8a1a'),emissiveIntensity:.6})),Math.sin(a)*.32,.38,Math.cos(a)*.32-.1,.1,.14,.1); e.castShadow=false;}
+  // the withered queen emerging from the top of the sac
+  const T=grp(BL,0,1.4,.25); u.torso=T; T.rotation.x=.25; put(T,taper('bmtorso',[[0,-.2,0],[0,0,.02],[0,.25,0]],.14,.1,16,12),flesh); for(let i=0;i<4;i++) for(const s of [-1,1]) put(T,taper('bmrb'+i,[[0,0,-.05],[s*.12,-.01,.03],[s*.06,-.02,.1]],.012,.006,10,6),bone,0,-.05+i*.07,0);
+  const H=grp(T,0,.36,.04); u.head=H; put(H,blob(1702,.08),flesh,0,0,0,.11,.13,.11); put(H,capeGeo('bmveil',.32,.34,.9,.3,.35,103),fung,0,.12,-.02); u.core=eye(H,-.04,.02,.1,.018,'#9aff3a',3.4); eye(H,.045,.025,.1,.012,'#9aff3a',3.4); eye(H,0,.07,.09,.01,'#d8ff6a',3);
+  u.jaw=grp(H,0,-.06,.06); put(u.jaw,gSph,M('#050a02'),0,-.02,.02,.05,.04,.02); fangs(u.jaw,bone,6,.07,.0,.04,.025,1,.3,.006);
+  for(const s of [-1,1]){const a=arm(T,s*.14,.2,0,{side:s,m:flesh,m2:skin2,r:.03,l1:.3,l2:.34,out:.12,key:'bma',seed:1710}); a.rotation.set(-.6,0,s*.5); claw(a.userData.hand,'bmc',flesh,bone,4,.16,.016,1.1,.9);}
+  // tentacles writhing from the sac
+  u.tentacles=[]; for(let i=0;i<6;i++){const a=i/6*TAU+.2; u.tentacles.push(chain(BL,Math.sin(a)*.6,.7,Math.cos(a)*.6-.1,a,5,.12,.05,skin2,skin,'y'));}
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,gSph,i%2?gl:skin2,0,1,0,.05));};
+/* ---------- The Shapeless One, Form of Stone: a body of hovering geometry that keeps rearranging ---------- */
+BOSS2.forms1=(R,B,u)=>{const st=M('#6a7a8a',{roughness:.55}), st2=M('#4a5866',{roughness:.6}), st3=NOV(M('#8a96a2',{roughness:.4,metalness:.2})), cA=glow('#7af0ff',2.6), cB=glow('#b48cff',2.4), cC=glow('#ffd36a',2.2);
+  const G=[gBox,gOct,gIco,gCyl,gCone,gSph,gPrism]; u.blocks=[];
+  const blk=(p,x,y,z,s,i)=>{const m=put(p,G[i%G.length],i%3?st:i%2?st2:st3,x,y,z,s,s*(i%2?1.2:.9),s); m.rotation.set(i,i*1.7,i*.3); m.userData.o=[x,y,z,i]; u.blocks.push(m); return m;};
+  const L=s=>{const g=grp(B,s*.22,.62,0); for(let k=0;k<4;k++) blk(g,0,-.08-k*.15,k===3?.06:0,.11-k*.005,k+(s>0?7:0)); put(g,gSph,cA,0,-.3,0,.03).castShadow=false; return g;}; u.legs=[L(-1),L(1)];
+  const T=grp(B,0,.66,0); u.torso=T; T.rotation.x=.1;
+  for(let i=0;i<14;i++){const a=i/14*TAU, y=.1+(i%4)*.16, r=.22+(i%3)*.06; blk(T,Math.sin(a)*r,y,Math.cos(a)*r*.8,.12+(i%3)*.03,i+20);} blk(T,0,.35,0,.3,0);
+  u.core=put(T,gOct,cA,0,.38,.3,.09,.14,.05);
+  // glowing seams: thin rods of light between the blocks
+  for(let i=0;i<8;i++){const a=i/8*TAU; put(T,taper('f1sm'+i,[[0,.05,0],[Math.sin(a)*.2,.35,Math.cos(a)*.15],[Math.sin(a)*.12,.65,Math.cos(a)*.1]],.008,.004,12,4),i%3?cA:cB).castShadow=false;}
+  const A=s=>{const g=grp(T,s*.48,.6,0); for(let k=0;k<5;k++) blk(g,s*.02*k,-.06-k*.14,.02*k,.1+(k===4?.06:0),k+40+(s>0?5:0)); put(g,gSph,cB,0,-.28,0,.03).castShadow=false; g.userData.hand=grp(g,0,-.66,.08); return g;}; u.arms=[A(-1),A(1)];
+  const H=grp(T,0,.86,.08); u.head=H; blk(H,0,0,0,.17,0); put(H,gBox,M('#020306'),0,.0,.1,.16,.04,.04); eye(H,-.05,.0,.12,.02,'#7af0ff',3.6); eye(H,.05,.0,.12,.02,'#7af0ff',3.6);
+  for(let i=0;i<4;i++) blk(H,Math.sin(i*1.6)*.2,.18+(i%2)*.04,Math.cos(i*1.6)*.12-.05,.05,i+60);
+  u.orbit=[0,1,2,3].map(i=>put(B,gOct,[cA,cB,cC,cA][i],0,1,0,.06,.14,.06));
+  u.anim=(u,b)=>{u.blocks.forEach((m,i)=>{const o=m.userData.o; m.position.set(o[0]+Math.sin(time*1.3+i)*.012,o[1]+Math.sin(time*1.7+i*1.3)*.02,o[2]+Math.cos(time*1.1+i)*.012); m.rotation.y+=.004*((i%3)-1);});};};
+/* ---------- Form of Flame: a burning winged elemental around a sun-hot core ---------- */
+BOSS2.forms2=(R,B,u)=>{u.float=true; u.legs=[]; const core=glow('#ffa030',2.8), fl=glow('#ff5a1a',2.6), fl2=glow('#ffd84a',2.8), dark=M('#2a0a04',{roughness:.5}), ash=M('#3a1a10',{roughness:.8});
+  const T=grp(B,0,.9,0); u.torso=T; u.core=put(T,gSph,core,0,.25,.05,.2,.24,.18); put(T,blob(1800,.2),dark,0,.25,-.02,.24,.28,.2);
+  // the body is a column of flame tongues
+  u.flames=[]; for(let i=0;i<22;i++){const a=i/22*TAU*2.3, y=-.5+i*.045, r=.22-Math.abs(y-.1)*.18; const f=put(T,gCone,i%3?fl:fl2,Math.sin(a)*r,y,Math.cos(a)*r,.07,.32,.07); f.rotation.set(Math.cos(a)*.3,0,-Math.sin(a)*.3); f.castShadow=false; u.flames.push(f);}
+  for(let i=0;i<7;i++){const a=i/7*TAU; put(T,shard(1810+i,.5),ash,Math.sin(a)*.24,.25+Math.cos(i*2)*.15,Math.cos(a)*.2,.07);}
+  // flame wings
+  u.bigWings=[]; for(const sx of [-1,1]){const w=grp(T,sx*.12,.4,-.12); w.userData.sx=sx; u.bigWings.push(w); for(let k=0;k<6;k++){const f=put(w,leafGeo('f2w',.4+k*.06,.12,.06,1),k%2?fl:fl2,sx*(.1+k*.09),.04*k,-.02*k,1,1,1,0,0,sx*(Math.PI*.6-k*.18)); f.castShadow=false;}}
+  // molten mask and horns of fire
+  const H=grp(T,0,.62,.04); u.head=H; put(H,blob(1820,.08),dark,0,0,0,.14,.16,.13); put(H,lathe('f2mask',[[0,-.12],[.09,-.1],[.12,0],[.1,.1],[0,.13]],28),ash,0,0,.03,1,1,.7);
+  eye(H,-.045,.02,.12,.02,'#fff0a0',3.8); eye(H,.045,.02,.12,.02,'#fff0a0',3.8); put(H,gBox,fl2,0,-.06,.12,.06,.012,.01);
+  for(const s of [-1,1]){const f=put(H,taper('f2h'+s,[[s*.08,.08,0],[s*.2,.24,-.04],[s*.18,.42,-.12]],.04,.003,14,8),fl2); f.castShadow=false; u.flames.push(f);}
+  const aL=arm(T,-.28,.42,0,{side:-1,m:dark,m2:fl,sh:ash,r:.05,l1:.32,l2:.32,key:'f2a',seed:1830}), aR=arm(T,.28,.42,0,{side:1,m:dark,m2:fl,sh:ash,r:.05,l1:.32,l2:.32,key:'f2a',seed:1831}); u.arms=[aL,aR]; u.armsFwd=.5;
+  for(const a of [aL,aR]){claw(a.userData.hand,'f2c',dark,fl2,4,.14,.025,1,.6); const f=put(a.userData.hand,gCone,fl2,0,.05,.04,.06,.24,.06); f.castShadow=false; u.flames.push(f);}
+  u.orbit=[0,1,2,3,4,5].map(i=>put(B,gCone,i%2?fl:fl2,0,1,0,.04,.12,.04));};
+/* ---------- Form of Stars: a constellation given a body, wheeling galaxies at its heart ---------- */
+BOSS2.forms3=(R,B,u)=>{u.float=true; u.legs=[]; const star=glow('#ffffff',3), vio=glow('#b48cff',2.6), cy=glow('#7af0ff',2.6), neb=NOV(M('#140e22',{roughness:.3,transparent:true,opacity:.55})), line=NOV(M('#c8b8ff',{emissive:new THREE.Color('#9a7aff'),emissiveIntensity:1.4}));
+  const T=grp(B,0,.92,0); u.torso=T;
+  // a dark translucent body shell
+  put(B,robeGeo('f3r',.18,.42,.9,10,.08,.4,111),neb,0,.55,0); put(T,blob(1900,.08),neb,0,.25,0,.28,.34,.22);
+  // constellation lines joining star points into a figure
+  const P={hd:[0,.68,.04],nk:[0,.5,0],sh0:[-.28,.42,0],sh1:[.28,.42,0],ch:[0,.25,.12],hp0:[-.15,-.05,0],hp1:[.15,-.05,0],kn0:[-.2,-.35,.05],kn1:[.2,-.35,.05]};
+  const LN=[['hd','nk'],['nk','sh0'],['nk','sh1'],['nk','ch'],['ch','hp0'],['ch','hp1'],['hp0','kn0'],['hp1','kn1'],['sh0','ch'],['sh1','ch'],['hp0','hp1']];
+  for(const [a,b] of LN){const A=P[a],Bq=P[b]; put(T,taper('f3l'+a+b,[A,[(A[0]+Bq[0])/2,(A[1]+Bq[1])/2,(A[2]+Bq[2])/2],Bq],.008,.008,6,4),line).castShadow=false;}
+  for(const k in P){const p=P[k]; put(T,gSph,k==='ch'?vio:star,p[0],p[1],p[2],k==='ch'?.05:.028).castShadow=false;}
+  u.core=put(T,gOct,star,0,.25,.16,.1,.16,.05);
+  // a spiral galaxy in the chest
+  const gx=grp(T,0,.25,.12); for(let i=0;i<60;i++){const t=i/60, a=t*TAU*2.2+(i%2)*Math.PI, r=.03+t*.2; put(gx,gSphL,i%5?star:i%2?vio:cy,Math.cos(a)*r,Math.sin(a)*r*.4,Math.sin(a)*r*.2,.006+(1-t)*.01).castShadow=false;} u.galaxy=gx;
+  const H=grp(T,0,.68,.04); u.head=H; put(H,gSph,neb,0,0,0,.12,.14,.12); eye(H,-.04,.01,.1,.018,'#ffffff',4); eye(H,.04,.01,.1,.018,'#ffffff',4);
+  for(let i=0;i<9;i++){const a=(i/8-.5)*2.2; put(H,taper('f3cr',[[0,0,0],[0,.08,0],[0,.18,-.02]],.012,.002,8,4),i%2?vio:star,Math.sin(a)*.13,.1+Math.cos(a)*.03,-.02).rotation.z=-a*.7;}
+  const aL=arm(T,-.3,.42,0,{side:-1,m:neb,m2:neb,r:.035,l1:.32,l2:.34,key:'f3a',seed:1910}), aR=arm(T,.3,.42,0,{side:1,m:neb,m2:neb,r:.035,l1:.32,l2:.34,key:'f3a',seed:1911}); u.arms=[aL,aR]; u.armsFwd=.4;
+  for(const a of [aL,aR]){const e=a.userData.elbow; put(a,gSph,star,e[0],e[1],e[2],.025); claw(a.userData.hand,'f3c',neb,star,4,.12,.02,1,.6); put(a.userData.hand,gSph,cy,0,0,0,.03);}
+  const rvio=NOV(M('#7a5ab0',{emissive:new THREE.Color('#7a5ab0'),emissiveIntensity:.7})), rcy=NOV(M('#4ab0c0',{emissive:new THREE.Color('#3a90a0'),emissiveIntensity:.7})), dst=NOV(M('#ffffff',{emissive:new THREE.Color('#d8d0ff'),emissiveIntensity:.9})); u.rings=[]; for(let i=0;i<3;i++){const r=put(B,hairTor(),i===1?rcy:rvio,0,1.1,0,.75+i*.18,.75+i*.18,1); u.rings.push(r); for(let k=0;k<8;k++){const a=k/8*TAU; put(r,gSphL,dst,Math.cos(a),Math.sin(a),0,.02/(.75+i*.18));}}
+  u.orbit=[0,1,2,3,4,5,6,7].map(i=>put(B,gOct,[star,vio,cy][i%3],0,1,0,.04,.09,.04));
+  u.anim=(u,b)=>{u.galaxy.rotation.z=time*.8;};};
 
 /*BOSS2-END*/
 function buildBoss(b){
