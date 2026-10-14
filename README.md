@@ -19,6 +19,16 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🗝️ Version 4.8: Dungeons mode
+
+Open **Game modes** (top right of the main menu) and pick **Dungeons**.
+
+- **One huge dungeon:** 20 rooms that snake through the dark, with a puzzle every few rooms. Pull the levers in the order the rune pillar shows, stand on all four pressure plates before their glow fades, survive the ambush waves, or lead a key golem to its gate.
+- **Rescue the prisoner in 5 minutes.** They are locked in a cage in the very last room.
+- **Fall or run out of time, and you become a prisoner.** You wake up in a cell in **the Prison Below**. Break the cracked wall, then run an obstacle course: jump over pits, red lasers and spinning bars, ride moving platforms, and pull levers to free the other prisoners, who follow you out. **Warden Ironjaw** walks your exact path right behind you. If he catches you, you go back to the last checkpoint flag. In the prison, the Roll button becomes **Jump**.
+- **Rewards** for rescuing or escaping: diamonds and gear for your Adventure pack.
+- **A new map every time:** finishing a dungeon (by rescue or escape) reshapes the whole thing.
+
 ## 👑 Version 4.7
 
 - **Game modes button** in the top right of the main menu: pick Adventure, **Infinite Bosses**, or see what's coming next (Dungeons in the next update, then Legends).

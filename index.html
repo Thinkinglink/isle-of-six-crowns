@@ -89,6 +89,8 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 .modecard .mico{font-size:26px}.modecard b{font-size:17px;color:#ffd36a}.modecard .md{font-size:13px;line-height:1.4;color:#c8d8d4}
 .modecard .msub{font-size:12.5px;color:#9fe0a0}.modecard .mtag{font-size:12px;color:#ffb070}
 .modecard.soon{opacity:.62}
+#dunHud{position:absolute;left:50%;top:max(64px,calc(env(safe-area-inset-top) + 56px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;padding:6px 14px;background:rgba(7,17,22,.8);border:2px solid #8a6ad8;color:#f3e6c4;pointer-events:none;z-index:3;text-align:center}
+#dunHud b{font-size:22px;color:#c8b0ff;font-variant-numeric:tabular-nums}#dunHud span{font-size:12px}#dunHud.low b{color:#ff8a6a}#dunHud.prison{border-color:#ff8a6a}#dunHud.prison b{font-size:18px;color:#ffd36a}#dunHud[hidden]{display:none}
 #gauntHud{position:absolute;left:50%;top:max(64px,calc(env(safe-area-inset-top) + 56px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;padding:6px 14px;background:rgba(7,17,22,.8);border:2px solid #d8a840;color:#f3e6c4;pointer-events:none;z-index:3}
 #gauntHud b{font-size:22px;color:#ffd36a;font-variant-numeric:tabular-nums}#gauntHud span{font-size:12px}
 #gauntHud.low b{color:#ff8a6a}
@@ -1251,7 +1253,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='4.7.0', SAVE_VERSION=7;
+const APP_VERSION='4.8.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1376,8 +1378,8 @@ function ftext(x,y,s,col,big){texts.push({x,y,s,col,life:.8,big});}
 
 function startLevel(bi,li,forceIntro,seed){
   const B=BIOMES[bi], isBoss=li===B.levels.length; if(seed==null) seed=(Math.random()*1e9)|0;
-  calcStats(); const TH=themeFor(isBoss?null:B.levels[li],bi,isBoss); L=withSeed(seed,()=>genLevel(bi,isBoss,TH.layout)); L.theme=TH; L.amb=TH.amb||null; L.seed=seed; L.mpN=MP.inGame&&MP.party?MP.party.members.length:1; MP.others.clear(); MP.bossTgt=null; L.bi=bi; L.li=li; L.tier=tierOf(bi,li); L.boss=isBoss; L.seen=new Uint8Array(L.w*L.h); L.form2=false;
-  L.name=isBoss?BOSSES[B.boss].name.replace(/^The /,'')+"'s Lair":B.levels[li];
+  calcStats(); const TH=GEN_THEME||themeFor(isBoss?null:B.levels[li],bi,isBoss); L=withSeed(seed,()=>GEN_OVERRIDE?GEN_OVERRIDE():genLevel(bi,isBoss,TH.layout)); L.theme=TH; L.amb=TH.amb||null; L.seed=seed; L.mpN=MP.inGame&&MP.party?MP.party.members.length:1; MP.others.clear(); MP.bossTgt=null; L.bi=bi; L.li=li; L.tier=tierOf(bi,li); L.boss=isBoss; L.seen=new Uint8Array(L.w*L.h); L.form2=false;
+  L.name=isBoss?BOSSES[B.boss].name.replace(/^The /,'')+"'s Lair":B.levels[li]; if(GEN_NAME) L.name=GEN_NAME;
   P={x:L.start.x,y:L.start.y,r:13,hp:ST.maxhp,face:-Math.PI/2,atk:0,swing:0,roll:0,rollCd:0,rdx:0,rdy:0,iframe:0,flash:0,bow:0,pot:0,acd:{a1:0,a2:0,a3:0,a4:0,a5:0,a6:0,a7:0,a8:0},slow:0,ward:0,gale:0,walk:0,dead:false,regenAcc:0,air:AIR_MAX};
   L.water=!!B.water; L.pods=L.water?(L.rooms||[]).map(p=>({x:p.x,y:p.y,pod:true})):[]; $('#airBar').hidden=!L.water;
   ents=[];projs=[];hazards=[];parts=[];texts=[];loot=[];boss=null;amb=[];allies=[];dying=[];shocks.length=0;
@@ -1421,7 +1423,7 @@ function melee(useMouse){if(P.dead||P.atk>0||P.roll>0) return; P.face=attackFace
 function fireBow(useMouse){if(P.dead||P.bow>0||P.roll>0) return; if(SAVE.arrows<=0){toast('Out of arrows','#e2504a'); P.bow=.6; return;}
   P.face=attackFace(useMouse); P.bow=.5; SAVE.arrows--; const dmg=Math.round(5+ST.dmg*.6);
   projs.push({x:P.x+Math.cos(P.face)*16,y:P.y-12+Math.sin(P.face)*16,vx:Math.cos(P.face)*640,vy:Math.sin(P.face)*640,dmg,r:5,col:'#f0dfa8',own:'p',life:1.4,arrow:true}); refreshSlots();}
-function roll(){if(P.dead||P.roll>0||P.rollCd>0) return; P.landT=0; setTimeout(()=>{if(P) P.landT=.12;},280); let dx=0,dy=0; const m=moveVec(); dx=m.x;dy=m.y; if(!dx&&!dy){dx=Math.cos(P.face);dy=Math.sin(P.face);} const l=Math.hypot(dx,dy); P.rdx=dx/l;P.rdy=dy/l; P.roll=.28; P.rollCd=1.0; puff(P.x,P.y,'#cbbf9f',6,80,.4,3);}
+function roll(){if(DUN&&DUN.phase==='prison'){dunJump(); return;} if(P.dead||P.roll>0||P.rollCd>0) return; P.landT=0; setTimeout(()=>{if(P) P.landT=.12;},280); let dx=0,dy=0; const m=moveVec(); dx=m.x;dy=m.y; if(!dx&&!dy){dx=Math.cos(P.face);dy=Math.sin(P.face);} const l=Math.hypot(dx,dy); P.rdx=dx/l;P.rdy=dy/l; P.roll=.28; P.rollCd=1.0; puff(P.x,P.y,'#cbbf9f',6,80,.4,3);}
 function potion(){if(P.dead||P.pot>0) return; if(P.hp>=ST.maxhp){toast('Health is full'); return;} const h=Math.round(ST.maxhp*(.5+.1*upLv('pot'))); P.hp=Math.min(ST.maxhp,P.hp+h); P.pot=18-2*upLv('pot'); P.drinkT=.6; ftext(P.x,P.y-40,'+'+h,'#8fd06a',true); puff(P.x,P.y-10,'#ff6a7a',14,90,.7,4);}
 function bolt(e){for(let i=0;i<16;i++) parts.push({x:e.x+rand(-5,5),y:e.y,z:i*16,vx:0,vy:0,vz:30,life:.32,max:.32,col:i%3?'#fff6a0':'#ffffff',sz:6}); puff(e.x,e.y,'#fff6a0',8,140,.4,4);}
 function chainLightning(src,dmg){targets().filter(t=>t!==src&&t.hp>0&&dist(t,src)<210).sort((a,b)=>dist(a,src)-dist(b,src)).slice(0,2).forEach(t=>{hurtE(t,dmg,{}); bolt(t);});}
@@ -1726,7 +1728,7 @@ function update(dt){
   if(MP.inGame) mpTick(dt);
   if(mode==='cutscene'){updCine(dt); return;}
   if(mode!=='play'&&!(MP.inGame&&(mode==='pause'||mode==='inv'))) return;
-  run.time+=dt; if(GAUNT) gauntTick(dt);
+  run.time+=dt; if(GAUNT) gauntTick(dt); if(DUN) dunTick(dt);
   shakeT=Math.max(0,shakeT-dt); if(shakeT<=0) shakeA=0; flashT=Math.max(0,flashT-dt);
   updPlayer(dt); mpRespawn(dt);
   const coopHost=MP.role==='host'&&MP.inGame, coopClient=MP.role==='client'&&MP.inGame;
@@ -1798,7 +1800,7 @@ function updPlayer(dt){
   if(P.blades>0){P.blades-=dt; P.bladeT=(P.bladeT||0)+dt; if(P.bladeT>.25){P.bladeT=0; for(const e of targets()) if(dist(e,P)<82+e.r) hurtE(e,Math.max(1,Math.round(6*P.bladePow)),{});}}
   if(P.roll>0){P.roll-=dt; moveCirc(P,P.rdx*480*dt,P.rdy*480*dt); P.walk+=dt*20; if(Math.random()<.5) puff(P.x,P.y,'#cbbf9f',1,40,.3,3); return;}
   const m=moveVec(); const l=Math.hypot(m.x,m.y); MP.lastMove=l>0;
-  if(l>0){const sp=ST.spd*(P.slow>0?.55:1)*(P.gale>0?1.6:1)*(P.atk>ST.rate*.5?.6:1); moveCirc(P,m.x/l*sp*dt*Math.min(1,l),m.y/l*sp*dt*Math.min(1,l)); P.walk+=dt*10; if(P.swing<=0){const want=Math.atan2(m.y,m.x); P.face+=angDiff(P.face,want)*Math.min(1,dt*18);}}
+  if(l>0){const sp=ST.spd*(P.jumpT>0?1.3:1)*(P.slow>0?.55:1)*(P.gale>0?1.6:1)*(P.atk>ST.rate*.5?.6:1); moveCirc(P,m.x/l*sp*dt*Math.min(1,l),m.y/l*sp*dt*Math.min(1,l)); P.walk+=dt*10; if(P.swing<=0){const want=Math.atan2(m.y,m.x); P.face+=angDiff(P.face,want)*Math.min(1,dt*18);}}
   if(mouse.l||keys['j']||touchAtk) melee(mouse.l);
   if(mouse.r||keys['k']||touchBow) fireBow(mouse.r);
 }
@@ -1841,7 +1843,7 @@ function crestLv(){return Math.min(20,(SAVE&&SAVE.gBest)||0);}
 function startGauntlet(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;}
   if(MP.party&&MP.party.members.length>1){toast('Infinite Bosses is played solo. Leave the party to start it.','#ffd36a'); return;}
   const list=gauntList(); if(!list.length){toast('Beat at least one island boss in Adventure first. Every boss you beat joins Infinite Bosses.','#ffd36a'); return;}
-  GAUNT={list,i:0,left:G_START,beaten:0,names:[],over:false,granted:false,wait:0,t:0};
+  if(DUN) dunQuit(); GAUNT={list,i:0,left:G_START,beaten:0,names:[],over:false,granted:false,wait:0,t:0};
   $('#modesPanel')&&($('#modesPanel').hidden=true); gauntLoad(0);
   setTimeout(()=>banner('Infinite Bosses',`${list.length} boss${list.length>1?'es':''} · ${Math.round(G_START/60)} minutes · +${G_BONUS}s for every boss`),300);}
 function gauntLoad(i){if(!GAUNT) return; const prev=P&&P.hp>0&&i>0?P.hp/ST.maxhp:1; GAUNT.i=i; GAUNT.wait=0; const bi=GAUNT.list[i], B=BIOMES[bi];
@@ -1876,20 +1878,252 @@ function gauntQuit(){if(!GAUNT) return; if(!GAUNT.over) gauntGrant(); GAUNT=null
 const MODES=[
  {id:'adv',n:'Adventure',d:'The main story: sail the islands, beat the bosses, free the crowns.',ico:'⚔️'},
  {id:'gaunt',n:'Infinite Bosses',d:'Every boss you have beaten, one after another. Beat as many as you can before the clock runs out to win diamonds, gear and a Boss Hunter crest for Adventure.',ico:'👑'},
- {id:'dun',n:'Dungeons',d:'One huge puzzle dungeon. Reach the prisoner in 5 minutes or become the prisoner and break out.',ico:'🗝️',soon:true},
+ {id:'dun',n:'Dungeons',d:'One huge puzzle dungeon. Reach the prisoner in 5 minutes, or become a prisoner yourself: break out of your cell, free the others and escape the Warden. The map changes every time you finish.',ico:'🗝️'},
  {id:'leg',n:'Legends',d:'Lead armies against the tribes of the six lands and face the one who took the three crystals.',ico:'🛡️',soon:true}];
 function openModes(){let p=$('#modesPanel'); if(!p){p=document.createElement('div'); p.id='modesPanel'; p.className='stpanel'; p.setAttribute('role','dialog'); p.setAttribute('aria-modal','true'); p.setAttribute('aria-labelledby','modesTitle'); document.body.appendChild(p);
     p.addEventListener('click',e=>{if(e.target===p) p.hidden=true;}); ['keydown','keyup'].forEach(t=>p.addEventListener(t,e=>{e.stopPropagation(); if(e.key==='Escape') p.hidden=true;}));}
   const nb=gauntList().length;
-  p.innerHTML=`<div class="stBox modesbox"><h2 id="modesTitle">Game modes</h2><div class="modegrid">${MODES.map(m=>{const sub=m.id==='gaunt'?(SAVE?(nb?`${nb} boss${nb>1?'es':''} ready · best run ${SAVE.gBest||0} · crest +${crestLv()}%`:'Beat an island boss to unlock'):'Start an expedition first'):m.id==='adv'?(SAVE?'Continue your expedition':'Start a new expedition'):'';
+  p.innerHTML=`<div class="stBox modesbox"><h2 id="modesTitle">Game modes</h2><div class="modegrid">${MODES.map(m=>{const sub=m.id==='dun'?(SAVE?`${(SAVE.dun&&SAVE.dun.wins)||0} rescues · ${(SAVE.dun&&SAVE.dun.escapes)||0} escapes`:'Start an expedition first'):m.id==='gaunt'?(SAVE?(nb?`${nb} boss${nb>1?'es':''} ready · best run ${SAVE.gBest||0} · crest +${crestLv()}%`:'Beat an island boss to unlock'):'Start an expedition first'):m.id==='adv'?(SAVE?'Continue your expedition':'Start a new expedition'):'';
     return `<button class="modecard${m.soon?' soon':''}" data-mode="${m.id}" ${m.soon?'aria-disabled="true"':''}><span class="mico" aria-hidden="true">${m.ico}</span><b>${m.n}</b><span class="md">${m.d}</span>${m.soon?`<span class="mtag">${m.id==='dun'?'Coming in the next update':'Coming soon'}</span>`:sub?`<span class="msub">${sub}</span>`:''}</button>`;}).join('')}</div><button class="btn small" id="modesClose">Close</button></div>`;
   p.querySelector('#modesClose').onclick=()=>{p.hidden=true;};
   p.querySelectorAll('.modecard').forEach(b=>b.onclick=()=>{const id=b.dataset.mode;
     if(id==='adv'){p.hidden=true; if(SAVE) openMap(); else $('#btnNew').click(); return;}
     if(id==='gaunt'){if(!SAVE||!gauntList().length){startGauntlet(); return;} p.hidden=true; startGauntlet(); return;}
-    toast(id==='dun'?'Dungeons mode is coming in the next update!':'Legends mode is coming soon!','#ffd36a');});
+    if(id==='dun'){p.hidden=true; startDungeon(); return;}
+    toast('Legends mode is coming soon!','#ffd36a');});
   p.hidden=false; const f=p.querySelector('.modecard'); if(f) f.focus();}
 /*GAUNT-END*/
+/*DUN-START*/
+/* ================= v4.8: Dungeons mode =================
+   One very long puzzle dungeon. Reach the prisoner in 5 minutes. If you fall or the time runs out, you are dragged to the
+   cells below: break out, free the other prisoners and escape while the Warden chases you. Finishing either way reshapes the map. */
+let DUN=null, GEN_OVERRIDE=null, GEN_THEME=null, GEN_NAME=null;
+const DUN_TIME=300;
+const DUN_NAMES=['Bram the baker','Ola Fennick','Sir Pellam','Wren the mapmaker','Old Tobbin','Mira Ashgrove','Captain Dace','Juniper Vale','Hesk the smith','Lady Corrow','Pip Marlow','Brother Aldous','Tamsin Reed','Garrick Holt'];
+const DUN_ADJ=['Sunken','Forgotten','Howling','Gilded','Drowned','Shattered','Silent','Crimson','Hollow','Thorned','Endless','Whispering'], DUN_NOUN=['Oubliette','Catacombs','Vaults','Deepkeep','Labyrinth','Undercroft','Warrens','Halls','Crypts','Dungeon'];
+const PUZ_COL={red:'#ff4a4a',blue:'#4aa8ff',green:'#5aff7a',gold:'#ffd34a'}, PUZ_NAME={red:'Red',blue:'Blue',green:'Green',gold:'Gold'};
+const PRISON_ENV={void:0x020203,sky:0x4a4a5a,gnd:0x16161c,sun:0xffd0a0,hi:.62,si:.72,rock:0x3c3c44,top:0x2c2c34,tree:'deadtree',floorDeco:['pebble'],fl:[0x4e4e56,0x56565e,0x46464e],fogN:16,fogF:40};
+const shuffleA=a=>{for(let i=a.length-1;i>0;i--){const j=(Math.random()*(i+1))|0; [a[i],a[j]]=[a[j],a[i]];} return a;};
+function dunSave(){SAVE.dun=SAVE.dun||{seed:(Math.random()*1e9)|0,wins:0,escapes:0,best:0}; return SAVE.dun;}
+function dunBiome(seed){const ok=[]; for(let bi=0;bi<BIOMES.length;bi++){const B=BIOMES[bi]; if(!B||B.water||bi===6||!B.levels||B.levels.length<2) continue; if(bi===0||unlocked(bi,1)) ok.push(bi);} if(!ok.length) ok.push(0); return ok[seed%ok.length];}
+function dunName(seed){return 'The '+DUN_ADJ[seed%DUN_ADJ.length]+' '+DUN_NOUN[((seed/13)|0)%DUN_NOUN.length];}
+
+/* ---- the dungeon: 20 rooms snaking upward, a puzzle every third room, the prisoner in the last ---- */
+function genDungeon(){const CW=22,NC=5,NR=4,w=NC*CW+4,h=NR*CW+4,g=new Uint8Array(w*h).fill(1),order=[];
+  for(let r=NR-1;r>=0;r--){const cols=[...Array(NC).keys()]; if((NR-1-r)%2) cols.reverse(); for(const c of cols){const rw=rint(9,14),rh=rint(8,12),rx=2+c*CW+rint(1,CW-rw-1),ry=2+r*CW+rint(1,CW-rh-1); order.push({x:rx,y:ry,w:rw,h:rh,cx:rx+(rw>>1),cy:ry+(rh>>1)});}}
+  order.forEach(r=>carve(g,w,r.x,r.y,r.w,r.h));
+  for(let i=1;i<order.length;i++){const a=order[i-1],b=order[i]; const x0=Math.min(a.cx,b.cx),x1=Math.max(a.cx,b.cx); carve(g,w,x0-1,a.cy-1,x1-x0+3,3); const y0=Math.min(a.cy,b.cy),y1=Math.max(a.cy,b.cy); carve(g,w,b.cx-1,y0-1,3,y1-y0+3);}
+  const n=order.length, s=order[0], e=order[n-1], gates=[], keys=[], puz=[], skip={};
+  const ringOf=r=>{const t=[]; for(let x=r.x-1;x<=r.x+r.w;x++) for(let y=r.y-1;y<=r.y+r.h;y++){if(x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h) continue; if(x<1||y<1||x>=w-1||y>=h-1) continue; if(!g[y*w+x]) t.push({x,y});} return t;};
+  const reach=closed=>{const blk=new Set(); closed.forEach(t=>t.forEach(c=>blk.add(c.y*w+c.x))); const seen=new Uint8Array(w*h), q=[s.cy*w+s.cx]; seen[q[0]]=1; while(q.length){const i=q.pop(), x=i%w, y=(i/w)|0; for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){const j=(y+dy)*w+x+dx; if(!seen[j]&&!g[j]&&!blk.has(j)){seen[j]=1; q.push(j);}}} return seen;};
+  const mkGate=tiles=>{let sx=0,sy=0; tiles.forEach(c=>{sx+=c.x;sy+=c.y;}); const G={tiles:tiles.map(c=>({x:c.x,y:c.y,h:tiles.some(d=>d.y===c.y&&Math.abs(d.x-c.x)===1)})),open:false,x:(sx/tiles.length+.5)*T,y:(sy/tiles.length+.5)*T};
+    let bj=0,bd=1e9; G.tiles.forEach((c,i)=>{const d=Math.hypot((c.x+.5)*T-G.x,(c.y+.5)*T-G.y); if(d<bd){bd=d;bj=i;}}); G.tiles[bj].lock=true; gates.push(G); return gates.length-1;};
+  const types=shuffleA(['levers','plates','arena','key','levers','plates','arena']); let ti=0;
+  const closed=[];
+  for(let k=2;k<n-2;k+=3){const r=order[k], nx=order[k+1], pv=order[k-1];
+    const ring=ringOf(r).filter(t=>Math.hypot(t.x-nx.cx,t.y-nx.cy)<Math.hypot(t.x-pv.cx,t.y-pv.cy));
+    if(!ring.length||ring.length>14) continue; const seen=reach([ring]); if(seen[nx.cy*w+nx.cx]||!seen[r.cy*w+r.cx]) continue;
+    closed.push(ring); const gi=mkGate(ring), type=types[ti++%types.length], P0={type,gate:gi,room:{x:r.x,y:r.y,w:r.w,h:r.h},done:false,hinted:false}; skip[k]=1;
+    const cn=[[r.x+1.5,r.y+1.5],[r.x+r.w-1.5,r.y+1.5],[r.x+1.5,r.y+r.h-1.5],[r.x+r.w-1.5,r.y+r.h-1.5]].map(([x,y])=>({x:x*T,y:y*T}));
+    if(type==='levers'){const cols=shuffleA(['red','blue','green','gold']).slice(0,3); P0.levers=shuffleA(cn.slice()).slice(0,3).map((p,i)=>({x:p.x,y:p.y,col:cols[i],pulled:false,cool:0})); P0.order=shuffleA(cols.slice()); P0.prog=0; P0.pillar={x:(r.cx+.5)*T,y:(r.cy+.5)*T,order:P0.order};}
+    else if(type==='plates'){P0.plates=cn.map(p=>({x:p.x,y:p.y,lit:0}));}
+    else if(type==='arena'){P0.wave=0; P0.live=[];}
+    else if(type==='key'){keys.push({x:(r.cx+.5)*T,y:(r.cy+.5)*T,gate:gi,state:'idle',walk:0,face:Math.PI/2,r:12});}
+    puz.push(P0);}
+  const inRoom=r=>({x:(r.x+1+Math.random()*(r.w-2))*T,y:(r.y+1+Math.random()*(r.h-2))*T});
+  const spawns=[]; order.forEach((r,i)=>{if(i===0) return; const pz=puz.find(p=>p.room.x===r.x&&p.room.y===r.y); if(pz&&pz.type!=='key') return; const c=i===n-1?4:rint(1,3); for(let q=0;q<c;q++) spawns.push(inRoom(r));});
+  const chests=shuffleA(order.slice(1,-1).filter((r,i)=>!skip[i+1])).slice(0,4).map(r=>({x:(r.x+1.5)*T,y:(r.y+r.h-1.5)*T,open:false}));
+  const prisoner={x:(e.cx+.5)*T,y:(e.y+2.2)*T,rescued:false};
+  return {w,h,g,start:{x:(s.cx+.5)*T,y:(s.cy+.5)*T},exit:null,chests,spawns,bossAt:null,gates,keys,rooms:order.map(r=>({x:(r.cx+.5)*T,y:(r.y+1.5)*T})),
+    rects:order.filter((r,i)=>i>0&&i<n-1&&!skip[i]).map(r=>({x:r.x,y:r.y,w:r.w,h:r.h})),dun:{puz,prisoner,last:{x:e.x,y:e.y,w:e.w,h:e.h}}};}
+
+/* ---- the prison: a tall obstacle course built from hand-made segments in a random order ---- */
+const PW=21, pRow=s=>'####'+s+'####';
+const PSEG={
+ cell:['####.............####','####......K......####','####.............####','######.#BBBBB########','######.#.....########','######.C..S..########','########.....########','#####################'],
+ exit:['#####################','#########.X.#########','#########...#########','#########EEE#########','####.............####','####.....g.......####','####......K......####'],
+ cells2:['####.............####','#..b.............b..#','#p.b..L.......L..b.p#','####.............####','####....g...g....####','####......K......####'],
+ cells1:['####.............####','####.....$.......####','#..b.............####','#p.b.....L.......####','####.............####','####ooo.......ooo####','####......K......####'],
+ gaps1:[pRow('.............'),pRow('.............'),pRow('ooooooooooooo'),pRow('ooooooooooooo'),pRow('..ooo...ooo..'),pRow('ooooooooooooo'),pRow('ooooooooooooo'),pRow('ooo...ooo...o'),pRow('ooooooooooooo'),pRow('ooooooooooooo'),pRow('.............'),pRow('......K......')],
+ gaps2:[pRow('.............'),pRow('ooooooooooooo'),pRow('oooo...oooooo'),pRow('ooooooooooooo'),pRow('ooooooo...ooo'),pRow('ooooooooooooo'),pRow('oooo...oooooo'),pRow('ooooooooooooo'),pRow('ooooooo...ooo'),pRow('ooooooooooooo'),pRow('.............'),pRow('......K......')],
+ lasers1:[pRow('.............'),pRow('ZZZZZZZZZZZZZ'),pRow('.............'),pRow('....$........'),pRow('ZZZZZZZZZZZZZ'),pRow('.............'),pRow('.........g...'),pRow('ZZZZZZZZZZZZZ'),pRow('.............'),pRow('......K......')],
+ lasers2:[pRow('.............'),pRow('ZZZZZZZZZZZZZ'),pRow('.............'),pRow('ooooo...ooooo'),pRow('ooooo...ooooo'),pRow('.............'),pRow('ZZZZZZZZZZZZZ'),pRow('.............'),pRow('......K......')],
+ sweep:[pRow('.............'),pRow('.............'),pRow('.....$.......'),pRow('.............'),pRow('.............'),pRow('.............'),pRow('......W......'),pRow('.............'),pRow('.............'),pRow('.............'),pRow('.........$...'),pRow('.............'),pRow('.............'),pRow('......K......')],
+ plats:[pRow('.............'),pRow('.............'),pRow('mmmmmmmmmmmmm'),pRow('mmmmmmmmmmmmm'),pRow('ooooooooooooo'),pRow('mmmmmmmmmmmmm'),pRow('mmmmmmmmmmmmm'),pRow('.............'),pRow('......K......')],
+ guards:[pRow('.............'),pRow('..#.....#....'),pRow('..#..g..#..$.'),pRow('.....#.......'),pRow('.g...#....#..'),pRow('..........#..'),pRow('......K......')]};
+function genPrison(){const pool=shuffleA(['gaps1','gaps2','lasers1','lasers2','sweep','plats','guards']).slice(0,5); const mids=shuffleA(pool.concat(['cells2','cells1']));
+  const rows=[...PSEG.exit]; for(const k of mids) rows.push(...PSEG[k]); rows.push(...PSEG.cell);
+  const w=PW,h=rows.length,g=new Uint8Array(w*h).fill(1),pit=new Uint8Array(w*h),lane=new Uint8Array(w*h);
+  const O={cks:[],levers:[],pris:[],lasers:[],sweeps:[],lanes:[],spawns:[],coins:[],start:null,crack:null,escape:null}; const groups={B:[],b:[],E:[]};
+  for(let y=0;y<h;y++){const row=(rows[y]+'#'.repeat(w)).slice(0,w); for(let x=0;x<w;x++){const c=row[x]; if(c==='#') continue; g[y*w+x]=0; const px=(x+.5)*T, py=(y+.5)*T;
+    if(c==='o'){pit[y*w+x]=1;} else if(c==='m'){pit[y*w+x]=1; lane[y*w+x]=1;} else if(c==='K') O.cks.push({x:px,y:py,on:false}); else if(c==='L') O.levers.push({x:px,y:py,pulled:false});
+    else if(c==='p') O.pris.push({x:px,y:py,state:'caged'}); else if(c==='W') O.sweeps.push({x:px,y:py,a:Math.random()*TAU,sp:(Math.random()<.5?-1:1)*1.35,len:5.4*T}); else if(c==='S') O.start={x:px,y:py};
+    else if(c==='C') O.crack={tx:x,ty:y,x:px,y:py,hp:3}; else if(c==='X') O.escape={x:px,y:py}; else if(c==='g') O.spawns.push({x:px,y:py}); else if(c==='$') O.coins.push({x:px,y:py});
+    else if(c==='B'||c==='b'||c==='E') groups[c].push({x,y});}
+    let z0=-1; for(let x=0;x<=w;x++){const on=x<w&&row[x]==='Z'; if(on&&z0<0) z0=x; if(!on&&z0>=0){O.lasers.push({y:(y+.5)*T,x0:z0*T,x1:x*T}); z0=-1;}}}
+  O.lasers.forEach((l,i)=>{l.low=i%2===0; l.ph=i*.9;});
+  for(let y=0;y<h;y++) if(lane[y*w+4]&&!lane[(y-1)*w+4]){let y2=y; while(y2+1<h&&lane[(y2+1)*w+4]) y2++; let x0=4,x1=w-5; O.lanes.push({y0:y,y1:y2,x0:x0*T,x1:(x1+1)*T,pw:3*T,pos:Math.random(),dir:Math.random()<.5?-1:1,sp:2.2*T,x:0});}
+  const gates=[], comp=list=>{const left=list.slice(), out=[]; while(left.length){const a=left.shift(), grp=[a]; for(let i=0;i<grp.length;i++){for(let j=left.length-1;j>=0;j--){const b=left[j]; if(Math.abs(b.x-grp[i].x)+Math.abs(b.y-grp[i].y)===1){grp.push(b); left.splice(j,1);}}} out.push(grp);} return out;};
+  const mkGate=tiles=>{let sx=0,sy=0; tiles.forEach(c=>{sx+=c.x;sy+=c.y;}); const G={tiles:tiles.map(c=>({x:c.x,y:c.y,h:tiles.some(d=>d.y===c.y&&Math.abs(d.x-c.x)===1)})),open:false,x:(sx/tiles.length+.5)*T,y:(sy/tiles.length+.5)*T}; G.tiles[(G.tiles.length/2)|0].lock=true; gates.push(G); return gates.length-1;};
+  O.cellGate=comp(groups.B).map(mkGate)[0]; O.exitGate=comp(groups.E).map(mkGate)[0]; const bars=comp(groups.b).map(mkGate);
+  const near=(p,list)=>{let bi=list[0],bd=1e9; for(const gi of list){const d=Math.hypot(gates[gi].x-p.x,gates[gi].y-p.y); if(d<bd){bd=d;bi=gi;}} return bi;};
+  O.levers.forEach(l=>l.gate=near(l,bars)); O.pris.forEach(p=>{p.gate=near(p,bars); p.name=choice(DUN_NAMES); {const sk=SKINS.filter(s=>s.rar==='common'||s.rar==='rare'); p.skin=choice(sk.length?sk:SKINS).id;}});
+  O.cks.sort((a,b)=>b.y-a.y);
+  return {w,h,g,start:O.start,exit:null,chests:[],spawns:O.spawns,bossAt:null,gates,keys:[],rooms:[],rects:[],envOv:PRISON_ENV,pit,lane,prison:O};}
+
+/* ---- starting, failing and finishing ---- */
+function startDungeon(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;}
+  if(MP.party&&MP.party.members.length>1){toast('Dungeons is played solo. Leave the party to start it.','#ffd36a'); return;}
+  const D=dunSave(), seed=D.seed, bi=dunBiome(seed); GAUNT=null;
+  DUN={phase:'dungeon',left:DUN_TIME,seed,bi,name:dunName(seed),over:false,t:0,lastAtk:0,prisoner:null}; $('#modesPanel')&&($('#modesPanel').hidden=true);
+  GEN_OVERRIDE=genDungeon; GEN_NAME=DUN.name; try{startLevel(bi,1,false,seed);} finally{GEN_OVERRIDE=null; GEN_NAME=null;}
+  run.dun=true; DUN.puz=L.dun.puz; DUN.prisoner=Object.assign(L.dun.prisoner,{name:DUN_NAMES[seed%DUN_NAMES.length],skin:(SKINS[(seed>>3)%SKINS.length]||SKINS[0]).id});
+  $('#lvlName').innerHTML=`<small>Dungeons · rescue the prisoner</small>${DUN.name}`; dunHud();
+  const pr=DUN.prisoner, px=pr.x*S, pz=pr.y*S;
+  startCine([{dur:3.6,title:DUN.name,sub:'Dungeons · 5 minutes',text:`${pr.name} is locked in a cage at the very bottom of this dungeon.`,cam:dolly([px+3.2,3,pz+4.4,px,.8,pz],[px+1.4,1.8,pz+2.6,px,.9,pz])},
+    {dur:3.2,speaker:pr.name,text:'Help! Is anyone there? Please, get me out of here!',cam:orbit(px,pz,2.6,1.6,1.2,1.8,.9)},
+    heroShot('Five minutes. Puzzles, monsters, locked doors. Let\'s go.',3)],()=>banner(DUN.name,'Reach the prisoner before the time runs out'));}
+function dunCaptured(why){if(!DUN||DUN.phase!=='dungeon'||DUN.capturing) return; DUN.capturing=true; run.endT=0; run.done=true; const px=P.x*S,pz=P.y*S;
+  startCine([{dur:3.6,title:'Captured!',sub:why==='time'?'The torches burned out':'You were overpowered',text:'The jailers drag you down to the cells below the dungeon...',cam:orbit(px,pz,6,6,-.3,.5,.5)}],()=>startPrison());}
+function startPrison(){if(!DUN) return; DUN.phase='prison'; DUN.capturing=false; DUN.freed=0; DUN.trail=[]; DUN.t=0;
+  GEN_OVERRIDE=genPrison; GEN_NAME='The Prison Below'; GEN_THEME={wall:[['brazier',.05]],scatter:[],plat:[],name:''}; try{startLevel(DUN.bi,1,false,(DUN.seed^0x5bd1e995)>>>0);} finally{GEN_OVERRIDE=null; GEN_NAME=null; GEN_THEME=null;}
+  run.dun=true; const O=L.prison; DUN.O=O; DUN.total=O.pris.length; DUN.cp={x:O.start.x,y:O.start.y}; DUN.trail=[{x:P.x,y:P.y}];
+  if(O.crack){addBlock(O.crack.tx,O.crack.ty,'rock',0); }
+  for(const c of O.coins) dropLoot(c.x,c.y,{kind:'shard',amt:3});
+  const cg=L.gates[O.cellGate]; DUN.wd={x:cg?cg.x:O.start.x,y:(cg?cg.y:O.start.y)-T*1.6,idx:0,stun:0,active:false,face:Math.PI/2,walk:0,wake:-1};
+  buildPits(); $('#lvlName').innerHTML=`<small>Dungeons · escape</small>The Prison Below`; dunHud();
+  const wx=DUN.wd.x*S, wz=DUN.wd.y*S;
+  startCine([{dur:3.6,speaker:'Warden Ironjaw',text:'Another one for my cells. Sit tight, little hero. Nobody escapes the Prison Below.',enter(){DUN.wd.face=Math.PI/2;},cam:dolly([wx+2.4,2.2,wz-3,wx,1.2,wz],[wx+1.2,1.6,wz-2,wx,1.4,wz])},
+    {dur:3.2,speaker:'Warden Ironjaw',text:'And if you do get out... I will be right behind you.',cam:orbit(wx,wz,3.4,2.4,-1.9,-1.3,1.2)},
+    heroShot('That wall on the left looks cracked. And there are other prisoners down here...',3.4)],()=>{banner('Break out','Hit the cracked wall, free the prisoners, escape'); toast('Tip: in the prison, Roll (Space) becomes Jump. Jump over pits, lasers and spinning bars.','#ffd36a');});}
+function dunReward(kind){const tier=L?L.tier:0, r={shards:0,items:[]};
+  if(kind==='rescue'){r.shards=150+Math.round(DUN.left*1.2); r.items.push(randomItem(tier,2),randomItem(tier,1));}
+  else {r.shards=60+30*(DUN.freed||0); r.items.push(randomItem(tier,DUN.freed>=DUN.total?2:1)); if(DUN.freed>=DUN.total) r.items.push(randomItem(tier,1));}
+  return r;}
+function dunEnd(kind){if(!DUN||DUN.over) return; DUN.over=true; const D=dunSave(), r=dunReward(kind);
+  SAVE.shards+=r.shards; for(const it of r.items) if(it) SAVE.inv.push(it); if(kind==='rescue'){D.wins++; D.best=Math.max(D.best||0,Math.round(DUN.left));} else D.escapes++;
+  D.seed=(Math.random()*1e9)|0; persist(); mode='result'; $('#result').hidden=false; dunHud();
+  $('#resTitle').textContent=kind==='rescue'?'Prisoner rescued!':'You escaped!';
+  $('#resSub').textContent=(kind==='rescue'?`${DUN.prisoner.name} is free, with ${Math.floor(DUN.left/60)}:${String(Math.floor(DUN.left%60)).padStart(2,'0')} to spare.`:`You broke out of the Prison Below with ${DUN.freed} of ${DUN.total} prisoners.`)+' Your rewards are in your pack. The dungeon has shifted: next time the whole map will be different.';
+  $('#resStats').innerHTML=`<dt>Dungeon</dt><dd>${esc(DUN.name)}</dd><dt>Rescues</dt><dd>${D.wins}</dd><dt>Escapes</dt><dd>${D.escapes}</dd><dt>Diamonds won</dt><dd>${r.shards}</dd><dt>Gear won</dt><dd>${r.items.filter(Boolean).map(i=>esc(i.name)).join(', ')||'none'}</dd>`;
+  $('#resRetry').hidden=false; $('#resRetry').textContent='Next dungeon'; $('#resMap').focus(); if(typeof sfx==='function') sfx('win');}
+function dunQuit(){if(!DUN) return; DUN=null; dunHud(); const rr=$('#resRetry'); if(rr) rr.textContent='Retry';}
+function dunHud(){let el=$('#dunHud'); if(!el){el=document.createElement('div'); el.id='dunHud'; el.setAttribute('role','status'); $('#hud').appendChild(el);}
+  if(!DUN){el.hidden=true; return;} el.hidden=false;
+  if(DUN.phase==='dungeon'){const s=Math.max(0,Math.ceil(DUN.left)), mm=Math.floor(s/60), ss=String(s%60).padStart(2,'0'), done=(DUN.puz||[]).filter(p=>p.done).length;
+    el.className=s<=30?'low':''; el.innerHTML=`<b>${mm}:${ss}</b><span>Puzzles solved ${done}/${(DUN.puz||[]).length} · find ${esc(DUN.prisoner?DUN.prisoner.name:'the prisoner')}</span>`;}
+  else {el.className='prison'; el.innerHTML=`<b>Prisoners ${DUN.freed||0}/${DUN.total||0}</b><span>${DUN.wd&&DUN.wd.active?'The Warden is coming! Keep moving':'Break out of your cell'}</span>`;}}
+
+/* ---- jumping (the prison turns Roll into Jump) ---- */
+function dunJump(){if(!P||P.dead||P.jumpT>0||P.rollCd>0||P.falling>0) return; P.jumpT=P.jumpMax=.62; P.rollCd=.72; puff(P.x,P.y,'#cbbf9f',6,70,.35,3); if(typeof sfx==='function') sfx('roll');}
+const pitAt=(x,y)=>{if(!L||!L.pit) return 0; const tx=Math.floor(x/T),ty=Math.floor(y/T); if(tx<0||ty<0||tx>=L.w||ty>=L.h) return 0; return L.pit[ty*L.w+tx]?(L.lane[ty*L.w+tx]?2:1):0;};
+function buildPits(){if(!R3||!levelGroup||!L.pit) return; const pos=[],col=[],W=L.w,H=L.h, isP=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&L.pit[y*W+x]&&!L.g[y*W+x];
+  const cv=(x,y)=>{let edge=0; for(const [dx,dy] of [[0,0],[-1,0],[0,-1],[-1,-1]]) if(!isP(x+dx,y+dy)) edge=1; return edge?[.09,.08,.1]:[0,0,.004];};
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++) if(isP(x,y)){const a=cv(x,y),b=cv(x,y+1),c=cv(x+1,y),d=cv(x+1,y+1); pos.push(x,.05,y, x,.05,y+1, x+1,.05,y, x+1,.05,y, x,.05,y+1, x+1,.05,y+1); for(const k of [a,b,c,c,b,d]) col.push(...k);}
+  if(!pos.length) return; const geo=new THREE.BufferGeometry(); geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3)); geo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+  const me=new THREE.Mesh(geo,new THREE.MeshBasicMaterial({vertexColors:true,fog:false})); levelGroup.add(me);
+  // little glowing emitters at both ends of every laser
+  const em=new THREE.MeshStandardMaterial({color:0x3a3a44,emissive:new THREE.Color('#ff3030'),emissiveIntensity:.5,roughness:.5,metalness:.5});
+  for(const l of L.prison.lasers) for(const ex of [l.x0,l.x1]){const b=new THREE.Mesh(gBox,em); b.position.set(ex*S,l.low?.18:.5,l.y*S); b.scale.set(.16,l.low?.36:1,.3); levelGroup.add(b);}}
+
+/* ---- per-frame logic ---- */
+function dunTick(dt){if(!DUN||DUN.over) return; DUN.t+=dt; const swing=P.atk>DUN.lastAtk+.01; DUN.lastAtk=P.atk;
+  if(P.jumpT>0){P.jumpT-=dt; const k=clamp(1-P.jumpT/P.jumpMax,0,1); P.jz=Math.sin(Math.PI*k)*1.05; if(P.jumpT<=0){P.jumpT=0; P.jz=0; P.landT=.12; puff(P.x,P.y,'#b8ad94',6,70,.3,3);}}
+  DUN.hudT=(DUN.hudT||0)-dt; if(DUN.hudT<=0){DUN.hudT=.25; dunHud();}
+  if(DUN.phase==='dungeon') dunTickDungeon(dt,swing); else dunTickPrison(dt,swing);}
+function puzSolve(p){if(p.done) return; p.done=true; openGate(p.gate); banner('Puzzle solved','The way forward is open'); if(typeof sfx==='function') sfx('win'); dunHud();}
+function dunTickDungeon(dt,swing){
+  if(P.dead){dunCaptured('dead'); return;}
+  DUN.left-=dt; if(DUN.left<=0){DUN.left=0; dunHud(); dunCaptured('time'); return;}
+  if(DUN.left<=60&&!DUN.warn1){DUN.warn1=true; toast('One minute left!','#ff8a6a');}
+  const tx=P.x/T, ty=P.y/T;
+  for(const p of DUN.puz){if(p.done) continue; const r=p.room, inside=tx>r.x&&tx<r.x+r.w&&ty>r.y&&ty<r.y+r.h;
+    if(inside&&!p.hinted){p.hinted=true; toast(p.type==='levers'?`Pull the levers in the order the rune pillar shows: ${p.order.map(c=>PUZ_NAME[c]).join(', then ')}.`:p.type==='plates'?'Stand on all four pressure plates before their glow fades.':p.type==='arena'?'The room is sealed! Defeat every wave of monsters.':'A key golem! Lead it to the locked gate.','#ffd36a');}
+    if(p.type==='levers'){for(const lv of p.levers){lv.cool=Math.max(0,lv.cool-dt); const d=Math.hypot(lv.x-P.x,lv.y-P.y); if(lv.lock&&d>70) lv.lock=false;
+        if(!lv.pulled&&!lv.lock&&lv.cool<=0&&d<40){lv.pulled=true; lv.lock=true; if(typeof sfx==='function') sfx('gate'); puff(lv.x,lv.y,PUZ_COL[lv.col],12,90,.5,4);
+          if(lv.col===p.order[p.prog]){p.prog++; ftext(lv.x,lv.y-30,p.prog+'/'+p.order.length,PUZ_COL[lv.col],true); if(p.prog>=p.order.length) puzSolve(p);}
+          else {toast('Wrong order! The levers reset and something stirs...','#ff8a6a'); p.prog=0; setTimeout(()=>{if(!DUN) return; for(const l2 of p.levers){l2.pulled=false; l2.cool=.8;}},700); for(let q=0;q<2;q++){const a=Math.random()*TAU; spawnEnemy(pickType(L.tier),P.x+Math.cos(a)*120,P.y+Math.sin(a)*120,true);} shake(5);}}}}
+    else if(p.type==='plates'){let all=true; for(const pl of p.plates){if(Math.hypot(pl.x-P.x,pl.y-P.y)<30){if(pl.lit<=0&&typeof sfx==='function') sfx('ui'); pl.lit=10;} else pl.lit=Math.max(0,pl.lit-dt); if(pl.lit<=0) all=false;} if(all) puzSolve(p);}
+    else if(p.type==='arena'){if(!p.wave&&inside){p.wave=1; p.live=dunWave(r,4); banner('Ambush!','Defeat every monster');}
+      else if(p.wave){p.live=p.live.filter(e=>e.hp>0); if(!p.live.length){if(p.wave<2){p.wave++; p.live=dunWave(r,4,true); toast('Another wave is coming!','#ff8a6a');} else puzSolve(p);}}}
+    else if(p.type==='key'){const G=L.gates[p.gate]; if(G&&G.open) puzSolve(p);}}
+  const pr=DUN.prisoner; if(pr&&!pr.rescued&&Math.hypot(pr.x-P.x,pr.y-P.y)<80){pr.rescued=true; dunRescue();}}
+function dunWave(r,n,big){const out=[]; for(let q=0;q<n;q++){for(let t=0;t<20;t++){const x=(r.x+1+Math.random()*(r.w-2))*T, y=(r.y+1+Math.random()*(r.h-2))*T; if(Math.hypot(x-P.x,y-P.y)<110) continue; const e=spawnEnemy(big&&q===0?'brute':pickType(L.tier),x,y,true); if(e){out.push(e); puff(x,y,'#b06aff',12,120,.5,5); break;}}} return out;}
+function dunRescue(){const pr=DUN.prisoner, px=pr.x*S, pz=pr.y*S; collectAllLoot(); ents.forEach(e=>{if(e.hp>0){e.hp=0; puff(e.x,e.y-e.r,e.c1,8,100,.5,4);}}); ents=[];
+  startCine([{dur:3.4,speaker:pr.name,text:'You came for me! I thought nobody would ever find this place.',enter(){pr.open=true; shake(4);},cam:dolly([px+2.6,2.2,pz+3.4,px,.9,pz],[px+1.2,1.4,pz+2.2,px,1,pz])},
+    {dur:3.4,title:'Prisoner rescued',sub:DUN.name,text:'Together you climb back up into the daylight.',cam:orbit(px,pz,5,4,.4,1.4,.7)}],()=>dunEnd('rescue'));}
+function dunRespawn(why){const cp=DUN.cp; P.x=cp.x; P.y=cp.y; P.jz=0; P.jumpT=0; P.falling=0; P.roll=0; P.iframe=1.2; P.hp=Math.max(1,Math.round(P.hp-ST.maxhp*.1)); DUN.trail=[{x:cp.x,y:cp.y}];
+  if(DUN.wd.active){DUN.wd.x=cp.x; DUN.wd.y=cp.y+T*6; DUN.wd.idx=0; DUN.wd.stun=2.4;} for(const p of DUN.O.pris) if(p.state==='free'){p.x=cp.x+rand(-20,20); p.y=cp.y+rand(10,30);}
+  puff(P.x,P.y-10,'#ffd36a',16,120,.6,5); if(why) toast(why,'#ff8a6a');}
+function dunTickPrison(dt,swing){const O=DUN.O, wd=DUN.wd;
+  if(P.dead){P.dead=false; run.endT=0; P.hp=ST.maxhp; dunRespawn('You were knocked out and wake up at the last checkpoint.'); return;}
+  if(P.falling>0){P.falling-=dt; P.x=P.fx; P.y=P.fy; P.jz=-(.6-P.falling)*3; if(P.falling<=0) dunRespawn('You fell! Back to the last checkpoint.'); return;}
+  // trail for the freed prisoners and the Warden
+  {const lt=DUN.trail[DUN.trail.length-1]; if(!lt||Math.hypot(lt.x-P.x,lt.y-P.y)>10){DUN.trail.push({x:P.x,y:P.y}); if(DUN.trail.length>4000) DUN.trail.splice(0,1000), wd.idx=Math.max(0,wd.idx-1000);}}
+  // the cracked wall: three hits and it crumbles
+  if(O.crack&&O.crack.hp>0&&swing&&Math.hypot(O.crack.x-P.x,O.crack.y-P.y)<72){O.crack.hp--; shake(4); puff(O.crack.x,O.crack.y,'#9a9488',14,140,.5,5); if(typeof sfx==='function') sfx('hit');
+    if(O.crack.hp<=0){const bk=(L.blocks||[]).find(b=>b.tx===O.crack.tx&&b.ty===O.crack.ty); if(bk) breakBlock(bk); else L.g[O.crack.ty*L.w+O.crack.tx]=0; banner('The wall gives way!','Crawl through the gap'); wd.wake=1.8;}
+    else ftext(O.crack.x,O.crack.y-30,'Crack! '+(3-O.crack.hp)+'/3','#ffd36a',true);}
+  if(wd.wake>0){wd.wake-=dt; if(wd.wake<=0){wd.active=true; DUN.trail=[{x:P.x,y:P.y}]; wd.idx=0; banner('The Warden heard you!','RUN! Do not let him catch you'); shake(6); if(typeof sfx==='function') sfx('roar'); dunHud();}}
+  // checkpoints
+  for(const c of O.cks) if(!c.on&&Math.hypot(c.x-P.x,c.y-P.y)<44&&P.y<DUN.cp.y+T){O.cks.forEach(k=>{if(k.y>c.y) k.on=true;}); c.on=true; DUN.cp={x:c.x,y:c.y}; ftext(c.x,c.y-40,'Checkpoint','#7aff8a',true); if(typeof sfx==='function') sfx('ui');}
+  // moving platforms
+  for(const ln of O.lanes){const span=ln.x1-ln.x0-ln.pw; ln.pos+=ln.dir*ln.sp*dt/Math.max(1,span); if(ln.pos>1){ln.pos=1; ln.dir=-1;} if(ln.pos<0){ln.pos=0; ln.dir=1;} const nx=ln.x0+span*ln.pos; ln.dx=nx-(ln.x||nx); ln.x=nx;}
+  // pits: land on a pit (and not on a platform) and you fall
+  if(!(P.jumpT>0)&&P.roll<=0){const pa=pitAt(P.x,P.y); if(pa){let safe=false; if(pa===2){const ty=Math.floor(P.y/T); for(const ln of O.lanes) if(ty>=ln.y0&&ty<=ln.y1&&P.x>ln.x-6&&P.x<ln.x+ln.pw+6){safe=true; P.x+=ln.dx||0; break;}}
+    if(!safe){P.falling=.6; P.fx=P.x; P.fy=P.y; puff(P.x,P.y,'#222',10,60,.5,4); if(typeof sfx==='function') sfx('hurt'); return;}}}
+  // lasers and spinning bars
+  const zap=msg=>{if(P.iframe>0) return; flashT=.25; flashCol='#ff4040'; shake(5); puff(P.x,P.y-12,'#ff4a4a',16,140,.5,4); dunRespawn(msg);};
+  for(const l of O.lasers){const on=l.low||((DUN.t+l.ph)%2.6)<1.3; l.on=on; l.warn=!l.low&&((DUN.t+l.ph)%2.6)>2.2; if(!on) continue; if(Math.abs(P.y-l.y)<12&&P.x>l.x0&&P.x<l.x1&&!(l.low&&(P.jz||0)>.25)){zap(l.low?'Zapped! Jump over the low red lasers.':'Zapped! Wait for the laser to switch off.'); return;}}
+  for(const sw of O.sweeps){sw.a+=sw.sp*dt; const cx=Math.cos(sw.a), cy=Math.sin(sw.a), rx=P.x-sw.x, ry=P.y-sw.y, along=clamp(rx*cx+ry*cy,-sw.len,sw.len), d=Math.hypot(rx-along*cx,ry-along*cy); if(d<16&&(P.jz||0)<.3){zap('Smacked by the spinning bar! Jump over it.'); return;}}
+  // levers open the cells, and freed prisoners follow you
+  for(const lv of O.levers) if(!lv.pulled&&Math.hypot(lv.x-P.x,lv.y-P.y)<40){lv.pulled=true; openGate(lv.gate); for(const p of O.pris) if(p.gate===lv.gate&&p.state==='caged'){p.state='free'; DUN.freed++; ftext(p.x,p.y-40,'Freed!','#7aff8a',true); setTimeout(()=>toast(`${p.name}: "Thank you! I'm right behind you!"`,'#7aff8a'),400);} dunHud();
+    if(DUN.freed>=DUN.total&&!L.gates[O.exitGate].open){openGate(O.exitGate); banner('Every prisoner is free','The great door at the top is open');}}
+  {const tr=DUN.trail; let i=0; for(const p of O.pris){if(p.state!=='free') continue; i++; const t=tr[Math.max(0,tr.length-1-i*5)]||P; const dx=t.x-p.x, dy=t.y-p.y, d=Math.hypot(dx,dy); if(d>420){p.x=t.x; p.y=t.y+20; continue;} p.moving=d>6; if(d>6){const k=Math.min(1,dt*7); p.x+=dx*k; p.y+=dy*k; p.face=Math.atan2(dy,dx); p.walk=(p.walk||0)+dt*10;}}}
+  // the Warden walks your exact path, a little slower than you
+  if(wd.active){if(wd.stun>0) wd.stun-=dt; else {const tr=DUN.trail; let budget=ST.spd*.8*dt; while(budget>0&&wd.idx<tr.length){const t=tr[wd.idx], dx=t.x-wd.x, dy=t.y-wd.y, d=Math.hypot(dx,dy); if(d<=budget){wd.x=t.x; wd.y=t.y; budget-=d; wd.idx++;} else {wd.x+=dx/d*budget; wd.y+=dy/d*budget; wd.face=Math.atan2(dy,dx); budget=0;}} wd.walk+=dt*7; wd.moving=true;
+      if(Math.hypot(wd.x-P.x,wd.y-P.y)<34&&P.iframe<=0){shake(8); dunRespawn('The Warden caught you! Back to the last checkpoint.');}}}
+  if(O.escape&&Math.hypot(O.escape.x-P.x,O.escape.y-P.y)<44&&!DUN.escaping){DUN.escaping=true; const px=P.x*S,pz=P.y*S; run.done=true;
+    startCine([{dur:3.6,title:'You escaped!',sub:'The Prison Below',text:DUN.freed?`${DUN.freed} prisoner${DUN.freed>1?'s':''} escaped with you.`:'You slipped out alone.',cam:orbit(px,pz,5,4,-.4,.6,.7)}],()=>dunEnd('escape'));}}
+
+/* ---- models ---- */
+function buildLeverM(col){const R=model(),B=R.userData.body; const st=M('#5a5650',{roughness:.9,flatShading:true}), wd=M('#6a4a2a',{roughness:.8}), cap=glow(col,1.2);
+  add(B,gBox,st,0,.12,0,.34,.24,.26); const h=new THREE.Group(); h.position.set(0,.24,0); B.add(h); add(h,gCyl,wd,0,.22,0,.035,.44,.035); add(h,gSph,cap,0,.46,0,.08); R.userData.handle=h; CUR=null; return R;}
+function buildPlateM(){const R=model(),B=R.userData.body; add(B,gBox,M('#4a4844',{roughness:.9}),0,.02,0,.86,.05,.86); const t=add(B,gBox,M('#6a6a70',{roughness:.6,emissive:new THREE.Color('#ffd36a'),emissiveIntensity:0}),0,.05,0,.7,.03,.7); R.userData.top=t; CUR=null; return R;}
+function buildPillarM(order){const R=model(),B=R.userData.body; const st=M('#6a6660',{roughness:.9,flatShading:true});
+  add(B,gBox,st,0,.7,0,.5,1.4,.5); add(B,gBox,st,0,.05,0,.7,.1,.7); order.forEach((c,i)=>{const o=add(B,gSph,glow(c==='gold'?'#ffd34a':PUZ_COL[c],1.6),(i-(order.length-1)/2)*.22,1.6,0,.09); o.userData.i=i;});
+  for(let i=0;i<order.length;i++) add(B,gBox,glow(PUZ_COL[order[i]],.8),0,1.2-i*.32,.26,.18,.16,.02); CUR=null; return R;}
+function buildCageM(){const R=model(),B=R.userData.body; const ir=M('#3a3a40',{metalness:.7,roughness:.4}); add(B,gCyl,ir,0,.03,0,.62,.06,.62); add(B,gCyl,ir,0,1.42,0,.62,.06,.62);
+  for(let i=0;i<12;i++){const a=i/12*TAU; add(B,gCyl,ir,Math.cos(a)*.58,.72,Math.sin(a)*.58,.025,1.4,.025);} add(B,gCyl,ir,0,1.7,0,.02,.5,.02); CUR=null; return R;}
+function buildFlagM(){const R=model(),B=R.userData.body; add(B,gCyl,M('#5a4a3a'),0,.6,0,.03,1.2,.03); const f=add(B,gBox,M('#888',{emissive:new THREE.Color('#7aff8a'),emissiveIntensity:0}),.2,1.0,0,.38,.24,.02); R.userData.flag=f; CUR=null; return R;}
+function buildLaserM(len,low){const R=model(),B=R.userData.body; const m=new THREE.MeshBasicMaterial({color:0xff3030,transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending,fog:false});
+  const b=new THREE.Mesh(gCyl,m); b.rotation.z=Math.PI/2; b.scale.set(.035,len,.035); b.position.y=low?.18:.5; B.add(b); const b2=new THREE.Mesh(gCyl,m.clone()); b2.material.opacity=.25; b2.rotation.z=Math.PI/2; b2.scale.set(.1,len,.1); b2.position.y=b.position.y; B.add(b2); R.userData.beam=[b,b2]; CUR=null; return R;}
+function buildSweepM(len){const R=model(),B=R.userData.body; const ir=M('#4a4a52',{metalness:.7,roughness:.35}), red=M('#b03030',{roughness:.5});
+  add(B,gCyl,ir,0,.25,0,.18,.5,.18); const arm=new THREE.Group(); arm.position.y=.22; B.add(arm); add(arm,gBox,red,0,0,0,len*2,.12,.14); for(const s of [-1,1]) add(arm,gSph,ir,s*len,0,0,.1); R.userData.arm=arm; CUR=null; return R;}
+function buildPlatM(pw,ph){const R=model(),B=R.userData.body; add(B,gBox,M('#7a5a34',{roughness:.8}),0,-.04,0,pw,.16,ph); for(let i=0;i<3;i++) add(B,gBox,M('#5a4024',{roughness:.9}),(i-1)*pw/3,.05,0,.04,.02,ph*.96); CUR=null; return R;}
+function buildWarden(){const R=model(),B=R.userData.body; const ir=M('#3a3a44',{metalness:.6,roughness:.45,flatShading:true}), lt=M('#5a3a24',{roughness:.8}), gold=M('#d8a840',{metalness:.8,roughness:.3}), eye=glow('#ffb030',2.4);
+  R.userData.legs=[limb(B,-.14,.42,0,.4,.1,ir),limb(B,.14,.42,0,.4,.1,ir)]; add(B,gBox,ir,0,.78,0,.56,.62,.38); add(B,gBox,lt,0,.56,0,.6,.1,.42); add(B,gTor,gold,.24,.54,.16,.08,.08,.08);
+  const hd=new THREE.Group(); hd.position.y=1.24; B.add(hd); add(hd,gBox,ir,0,0,0,.36,.34,.34); add(hd,gBox,M('#1a1a20'),0,.02,.17,.26,.1,.02); add(hd,gSphL,eye,-.07,.02,.18,.035); add(hd,gSphL,eye,.07,.02,.18,.035); add(hd,gCyl,lt,0,.22,0,.26,.08,.26); add(hd,gBox,lt,0,.19,.16,.3,.03,.12); R.userData.head=hd;
+  R.userData.arms=[limb(B,-.36,1.0,0,.46,.08,ir),limb(B,.36,1.0,0,.46,.08,ir)]; R.userData.armsFwd=.3; add(R.userData.arms[1],gCyl,lt,0,-.55,.18,.04,.5,.04);
+  const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0xffb030,transparent:true,opacity:.35,depthWrite:false,blending:THREE.AdditiveBlending})); gl.position.y=1.24; gl.scale.set(1.2,1.2,1); R.add(gl);
+  applyHi(R); R.scale.setScalar(1.55); CUR=null; return R;}
+function dunSync(){if(!DUN||!L) return;
+  if(DUN.phase==='dungeon'){
+    for(const p of DUN.puz||[]){
+      if(p.levers) for(const lv of p.levers){const m=ensure(lv,()=>buildLeverM(PUZ_COL[lv.col]),'lv'+lv.col); m.position.set(lv.x*S,0,lv.y*S); const h=m.userData.handle; h.rotation.x=lerp(h.rotation.x,lv.pulled?.9:-.6,.2);}
+      if(p.plates) for(const pl of p.plates){const m=ensure(pl,buildPlateM,'pl'); m.position.set(pl.x*S,0,pl.y*S); const t=m.userData.top; t.material.emissiveIntensity=pl.lit>0?.6+.4*Math.min(1,pl.lit/2)*(pl.lit<2?Math.abs(Math.sin(time*10)):1):0; t.position.y=pl.lit>0?.035:.05;}
+      if(p.pillar){const m=ensure(p.pillar,()=>buildPillarM(p.pillar.order),'pil'); m.position.set(p.pillar.x*S,0,p.pillar.y*S); m.rotation.y=Math.sin(time*.4)*.2;}}
+    const pr=DUN.prisoner; if(pr){const c=ensure(pr.cagek||(pr.cagek={}),buildCageM,'cage'); c.position.set(pr.x*S,pr.open?Math.min(2.4,(c.position.y||0)+.04):0,pr.y*S);
+      const m=ensure(pr,()=>buildPlayer(pr.skin),'pr'+pr.skin); m.position.set(pr.x*S,0,pr.y*S); m.rotation.y=yawOf(Math.atan2(P.y-pr.y,P.x-pr.x)); animLimbs(m,0,false); const u=m.userData; if(u.arms&&u.arms[1]&&!pr.open) u.arms[1].rotation.x=-2.5+Math.sin(time*7)*.4;}}
+  else {const O=DUN.O; if(!O) return;
+    for(const c of O.cks){const m=ensure(c,buildFlagM,'flag'); m.position.set((c.x+26)*S,0,c.y*S); m.userData.flag.material.emissiveIntensity=c.on?.9:0; m.userData.flag.material.color.set(c.on?'#7aff8a':'#888888'); m.userData.flag.rotation.y=Math.sin(time*3+c.y)*.2;}
+    for(const lv of O.levers){const m=ensure(lv,()=>buildLeverM('#ffd36a'),'plv'); m.position.set(lv.x*S,0,lv.y*S); const h=m.userData.handle; h.rotation.x=lerp(h.rotation.x,lv.pulled?.9:-.6,.2);}
+    for(const l of O.lasers){const m=ensure(l,()=>buildLaserM((l.x1-l.x0)*S,l.low),'lz'+(l.low?1:0)); m.position.set((l.x0+l.x1)/2*S,0,l.y*S); const [b,b2]=m.userData.beam; const vis=l.on?1:l.warn?.25+.2*Math.sin(time*30):0; b.material.opacity=.9*vis; b2.material.opacity=.25*vis; b.visible=b2.visible=vis>0;}
+    for(const sw of O.sweeps){const m=ensure(sw,()=>buildSweepM(sw.len*S),'sw'); m.position.set(sw.x*S,0,sw.y*S); m.userData.arm.rotation.y=-sw.a;}
+    for(const ln of O.lanes){const m=ensure(ln,()=>buildPlatM(ln.pw*S,(ln.y1-ln.y0+1)*0.96),'plat'); m.position.set((ln.x+ln.pw/2)*S,.05,(ln.y0+ln.y1+1)/2);}
+    for(const p of O.pris){const m=ensure(p,()=>buildPlayer(p.skin),'pp'+p.skin); m.position.set(p.x*S,0,p.y*S); if(p.state==='free'){m.rotation.y=yawOf(p.face||-Math.PI/2); animLimbs(m,p.walk||0,!!p.moving);} else {m.rotation.y=yawOf(Math.atan2(P.y-p.y,P.x-p.x)); animLimbs(m,0,false); const u=m.userData; if(u.arms&&u.arms[1]) u.arms[1].rotation.x=-2.5+Math.sin(time*7+p.x)*.4;}}
+    const wd=DUN.wd; if(wd){const m=ensure(wd,buildWarden,'warden'); m.position.set(wd.x*S,0,wd.y*S); m.rotation.y=yawOf(wd.face); animLimbs(m,wd.walk,wd.active&&wd.stun<=0&&wd.moving); m.visible=true;}}}
+/*DUN-END*/
 
 /* ---------------- ambient ---------------- */
 function updAmb(dt){if(!L) return; const kind=L.amb||BIOMES[L.bi].amb; if(REDUCED) return;
@@ -4141,7 +4375,7 @@ function buildLevel3D(){
   if(!R3) return;
   if(levelGroup){scene.remove(levelGroup); levelGroup.traverse(o=>{if(o.geometry&&!o.geometry.userData.cached) o.geometry.dispose(); if(o.material) o.material.dispose();});}
   clearModels(); levelGroup=new THREE.Group(); scene.add(levelGroup);
-  const bio=BIOMES[L.bi],E=themedEnv(B3[bio.id],L.theme); L.env=E; applyLights(E,false);
+  const bio=BIOMES[L.bi],E=themedEnv(L.envOv||B3[bio.id],L.theme); L.env=E; applyLights(E,false);
   const W=L.w,H=L.h,G=L.g, isF=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&!G[y*W+x], isW=(x,y)=>!isF(x,y);
   const f0=new THREE.Color(E.fl[0]),f1=new THREE.Color(E.fl[1]),f2=new THREE.Color(E.fl[2]),t0=new THREE.Color(E.top);
   const noise=(x,y)=>clamp((Math.sin(x*.37+y*.21)+Math.sin(x*.13-y*.29)*1.3+Math.sin((x+y)*.71))*.22+.5+(hash(x,y)-.5)*.3,0,1);
@@ -4275,7 +4509,7 @@ const swingPivot=new THREE.Group(); swingRoot.add(swingPivot);
 const trailMk=(r0,r1,len,op)=>{const m=new THREE.Mesh(new THREE.RingGeometry(r0,r1,20,1,0,len),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide})); m.rotation.x=-Math.PI/2; m.userData.op=op; swingPivot.add(m); return m;};
 const swingTrails=[trailMk(.42,1.06,1.1,.35),trailMk(.62,1.02,.55,.7),trailMk(.9,1.04,.28,1)];
 function syncPlayer(){const sk=curSkin(); const m=ensure(P,()=>buildPlayer(sk),'p'+sk); const u=m.userData; m.visible=!P.hideT; {const dt=Math.min(.05,time-(u.lt0||time)); u.lt0=time; for(const k of ['drinkT','castT','hurtT','landT']) if(P[k]>0) P[k]-=dt;}
-  m.position.set(P.x*S,0,P.y*S); m.rotation.y=yawOf(P.face);
+  m.position.set(P.x*S,P.jz||0,P.y*S); m.rotation.y=yawOf(P.face);
   const w=SAVE.eq.weapon; if(u.wk!==w.id){u.wk=w.id; u.hand.clear(); CUR=m; const wm=weaponMesh(w.kind,RAR[w.rar].col,w.col); if(w.reach) wm.scale.z=w.reach/WEAPONS[w.kind].reach; u.hand.add(wm); CUR=null;}
   const ar=SAVE.eq.armor; if(ar&&u.ak!==ar.id&&u.skin==='default'){u.ak=ar.id; u.tunic.color.set('#2e8c8a').lerp(new THREE.Color(ar.col||ARMOR_COL[ar.bi]),.7);}
   const moving=moveVec(); const mv=(moving.x||moving.y)&&P.roll<=0; animLimbs(m,P.walk,mv);
@@ -4457,6 +4691,7 @@ function render(){
   for(const c of L.chests) syncChest(c);
   if(L.gates) for(const G of L.gates) for(const t of G.tiles) syncGate(t,G);
   if(L.keys) for(const k of L.keys) syncKey(k);
+  if(DUN) dunSync();
   for(const o of loot) syncLoot(o);
   for(const e of ents) syncEnemy(e);
   for(const a of allies) syncEnemy(a);
@@ -4815,7 +5050,7 @@ function unlocked(bi,li){if(bi===6&&!EVENT_ACTIVE()) return false; if(SAVE&&SAVE
   if(bi===7) return !!SAVE.won; if(bi===11||bi===15||bi===19) return worldOpen(4); if(bi===23) return worldOpen(7); if(bi===28) return worldOpen(8); if(bi===32) return worldOpen(9); if(bi===36) return worldOpen(10); if(bi>7) return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];
   if(bi===6) return true;
   if(bi===0) return true; if(bi===5){for(let b=0;b<5;b++) if(!SAVE.cleared[levelKey(b,BIOMES[b].levels.length)]) return false; return true;} return !!SAVE.cleared[levelKey(bi-1,BIOMES[bi-1].levels.length)];}
-function openMap(){if(GAUNT) gauntQuit();if(!MP.peer) setTimeout(initMP,100); renderPartyHud(); mode='map'; showOnly('mapScr'); while(mapWorld>1&&!worldOpen(mapWorld)) mapWorld--; renderDiff();
+function openMap(){if(GAUNT) gauntQuit(); if(DUN) dunQuit();if(!MP.peer) setTimeout(initMP,100); renderPartyHud(); mode='map'; showOnly('mapScr'); while(mapWorld>1&&!worldOpen(mapWorld)) mapWorld--; renderDiff();
   if(drawnWorld!==mapWorld){if(mapWorld===2) drawWorld2(); else if(mapWorld===3) drawWorld3(); else if(mapWorld===4) drawWorld4(); else if(mapWorld===5||mapWorld===6||mapWorld>=8) drawDim(mapWorld); else if(mapWorld===7) drawWorld7(); else {drawIsle(); drawnWorld=1;}} calcStats();
   {const wb=$('#mapWorldBtn'), bk=$('#mapWorldBack'); const nextW=mapWorld<3&&worldOpen(mapWorld+1)?mapWorld+1:mapWorld===3&&worldOpen(7)?7:mapWorld===7&&worldOpen(8)?8:(mapWorld===8||mapWorld===9)&&worldOpen(mapWorld+1)?mapWorld+1:0, backW=mapWorld===2||mapWorld===3?mapWorld-1:mapWorld===7?3:mapWorld>=8?mapWorld-1:0;
     wb.hidden=!nextW; if(nextW) wb.textContent=(nextW===2?'Outer Isles':nextW===7?'Core of Creations':nextW>=8?WORLD_NAME[nextW]:'The Deep Dark')+' →'; wb.classList.toggle('next',!!nextW&&!anyIn({2:7,7:23,3:10,8:28,9:32,10:36}[nextW]||10));
@@ -4970,15 +5205,15 @@ $('#pGfx').onclick=()=>{const o=['auto','high','medium','low']; GFX_PREF=o[(o.in
 setTimeout(renderGfxBtn,0);
 $('#pInv').onclick=()=>{$('#pause').hidden=true; mode='play'; openInv();};
 $('#pQuit').onclick=()=>{$('#pause').hidden=true; persist(); openMap();};
-function showResult(kind){if(GAUNT&&!GAUNT.over){gauntEnd(kind==='dead'?'dead':'time'); return;} persist(); mode='result'; $('#result').hidden=false; const B=BIOMES[run.bi]; if(run.guest&&kind!=='dead') setTimeout(()=>toast('You played this as a guest. Your loot is kept, but finish the earlier islands to unlock it for yourself.','#5fb3ff'),400);
+function showResult(kind){if(GAUNT&&!GAUNT.over){gauntEnd(kind==='dead'?'dead':'time'); return;} if(DUN&&!DUN.over){if(DUN.phase==='dungeon') dunCaptured('dead'); else {P.dead=false; P.hp=ST.maxhp; run.endT=0; mode='play'; dunRespawn('Back to the last checkpoint.');} return;} persist(); mode='result'; $('#result').hidden=false; const B=BIOMES[run.bi]; if(run.guest&&kind!=='dead') setTimeout(()=>toast('You played this as a guest. Your loot is kept, but finish the earlier islands to unlock it for yourself.','#5fb3ff'),400);
   const t=Math.round(run.time), mm=Math.floor(t/60), ss=String(t%60).padStart(2,'0');
   if(kind==='clear'){$('#resTitle').textContent=L.boss?'Crown claimed':'Level cleared'; $('#resSub').textContent=L.boss?`${B.name} is free. ${run.bi===39?'The three legends are stopped. Every crystal is silent and every world is safe. You are the true legend.':run.bi===35?'The Grand Magician is stopped. Press → on the map to reach Creators Cataclysm and face the Supreme Creator.':run.bi===31?'The Omega Enchanter is stopped. Press → on the map to reach the Illusion Fortress.':run.bi>=28?BIOMES[run.bi+1].name+' is now open.':run.bi===27?'The Shapeless One is still at last. The Core of Creations is whole again, and every world is safe.':run.bi===18?'The Forge falls quiet. Every fire is out and every hammer is still.':run.bi===22?'The Void is sealed. Even the Endless has an ending.':run.bi===14?'The Shift Dimension is saved. Every land, every sea and every song is free.':run.bi===10?'The great portal is open. Choose the Shift, the Forge or the Void on the map.':run.bi===9?'The Outer Isles are safe. Press → on the map to descend into the Deep Dark.':run.bi>=7?BIOMES[run.bi+1].name+' is now open.':run.bi===6?'Hollowshade Isle is yours. Happy Halloween!':run.bi<4?BIOMES[run.bi+1].name+' is now open.':'The Hollow Spire is now open.'}`:`${L.name} · ${B.name}`;}
   else if(kind==='victory'){$('#resTitle').textContent='The isle is saved'; $('#resSub').textContent='All six crowns are free. A new map has opened: press the → button at the bottom right of the map to sail to the Outer Isles.';}
   else {$('#resTitle').textContent='You fell'; $('#resSub').textContent='Loot you picked up is kept. Try equipping stronger gear or roll through telegraphed rings.';}
   $('#resStats').innerHTML=`<dt>Time</dt><dd>${mm}:${ss}</dd><dt>Enemies defeated</dt><dd>${run.kills}</dd><dt>Items found</dt><dd>${run.items}</dd><dt>Shards collected</dt><dd>${run.shards}</dd>`;
   $('#resRetry').hidden=kind==='victory'||(MP.party&&MP.party.members.length>1&&MP.role!=='host'); if(MP.inGame&&MP.role==='client') MP.inGame=false; else if(MP.inGame) MP.inGame=false; $('#resMap').focus();}
-$('#resMap').onclick=()=>{$('#result').hidden=true; if(GAUNT) gauntQuit(); if(run&&run.bi===10&&SAVE.portalOpen) mapWorld=3; openMap();};
-$('#resRetry').onclick=()=>{$('#result').hidden=true; if(GAUNT||(run&&run.gaunt)){gauntQuit(); startGauntlet(); return;} playLevel(run.bi,run.li);};
+$('#resMap').onclick=()=>{$('#result').hidden=true; if(GAUNT) gauntQuit(); if(DUN) dunQuit(); if(run&&run.bi===10&&SAVE.portalOpen) mapWorld=3; openMap();};
+$('#resRetry').onclick=()=>{$('#result').hidden=true; if(GAUNT||(run&&run.gaunt)){gauntQuit(); startGauntlet(); return;} if(DUN||(run&&run.dun)){dunQuit(); startDungeon(); return;} playLevel(run.bi,run.li);};
 
 /* ---------------- cutscenes ---------------- */
 const STORY={
