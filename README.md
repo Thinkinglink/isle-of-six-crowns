@@ -19,6 +19,20 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🛡️ Version 5.0: Legends, a game of its own
+
+Open **Game modes → Legends**. Legends now has its own title screen and plays like a whole new game. The monsters, bosses and cutscene style come from the main game.
+
+- **A behind-the-hero camera:** you see the world from just behind and above your hero. On a computer, click the game to steer the camera with your mouse (Esc lets go). Scroll to zoom, or use the arrow keys. On touch screens, drag on the right side of the screen.
+- **One open island:** six lands surround the Crown Well, each with its own colours, trees, lakes, cliffs and mountains. Each land has its own village and its horde's fortress. The Lorekeepers wait at the well.
+- **Ride your Crown Steed** with **R** to cross the island fast.
+- **Gather:** hit trees, rocks and gold veins, or press **G** to send three sprites to gather for you.
+- **Build and command:** **Z** Cobble Golem, **X** Plank Golem, **C** Mossy Golem and **V** Arrow Tower. **T** plants a rally banner and your army charges there. **Y** calls them back.
+- **Day and night:** at night a horde raids one of the villages. Ride there and drive the raiders off before dawn for a reward.
+- **Six fortresses:** the Bramble King, Sand Sultan Ashkar and Mother Murk come first. Beating all three shatters the crystal barrier around Rime, the Forge and the Hollow Spire.
+- **The finale:** the Crystal Thief and the Threefold Legend.
+- **Falling in battle** wakes you at the Crown Well with nothing lost. Your resources are saved.
+
 ## 🛡️ Version 4.9: Legends mode
 
 Open **Game modes → Legends** to reach the war table.
