@@ -19,6 +19,18 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🗺️ Version 5.6: a patchwork island, like the Minecraft Legends map
+- **Biomes are mixed across the whole island.** Instead of six slices, the island is a patchwork of about 66 provinces. Each of the six biomes (meadows, dunes, Murkfen, frost, the forge lands and the void) turns up in 10 to 12 places, never two of the same side by side. Each province still has its own areas inside it.
+- **Every horde's bases are in its own biome.** The Bog horde builds in Murkfen, the Dune horde in the desert, and so on, with its 4 bases spread across the island. The map shows the patchwork in each biome's colours.
+- No walls between lands anywhere.
+- **7 mine entrances:** one north of the Crown Well, and one beside a village in every biome. They all lead into the same giant mineshaft, and each has its own ladder back up.
+- **124 villages, each with its own well** for fast travel.
+- **70% fewer monsters** in Legends: fewer patrols, smaller spawner waves, smaller raids and fewer mine monsters.
+- **Villages get invaded:** hordes raid a village at night, and sometimes attack in broad daylight too. Drive them off for a reward.
+- **Bases grow at night:** when night falls, each base you haven't destroyed has a 30% chance to upgrade to the next level, with tougher walls, more towers and more spawners.
+- **Legend bosses:** horde leaders now wear a floating gold crown, with a glowing halo, rune rings at their feet and orbiting crystals.
+- Developer cheats: Legends infinite materials (including diamonds), Legends super speed, every weapon, armor and artifact in the Legends pack, and a "become a prisoner" button.
+
 ## ⛏️ Version 5.5: the Mineshaft and the crafting hut
 - **The Mineshaft:** walk into the mine door north of the Crown Well. It's a giant maze of tunnels and caves, easy to get lost in, and the minimap goes dark down there. It's full of stone, gold and **diamonds** 💎, and the deeper you go, the more diamonds and the tougher the monsters. Climb the ladder in the first cave to get back out.
 - **The crafting hut** east of the Crown Well: press **K** (🔨) to craft Stone, Gold and Diamond blades, Stone, Gold and Diamond armor, and artifacts. Crafted gear goes into your Legends pack.
