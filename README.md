@@ -19,6 +19,13 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🏰 Version 5.4: varied lands and horde fortresses
+- **Every land has four areas of its own**, spread evenly, each with its own ground, trees, details, lakes and hills. Examples: Bloomfield, Old Oakwood, Red Mesa, Palm Oasis, Mushroom Hollow, Glacier Shelf, Lava Rivers and Star Wastes. The area's name pops up as you walk in, and the map shows the areas in their colours.
+- Every land's lakes are different: water, oasis, swamp, ice, lava or void.
+- **Every horde builds its own kind of fortress**: square thorn palisades, round sandstone forts, crooked bog walls, eight-sided ice citadels, diamond forges and star-shaped void spires. Each has its own towers, wall tops and clutter.
+- **No more crystal barrier.** The Hordes of Rime, the Forge and the Hollow are not on the island at all until you beat the first three hordes. Then their fortresses rise.
+- **The boss crystal is only in each horde's 4th fortress.** Levels 1 to 3 have a Horde Portal to smash instead, and only the 4th fortress has the crystal beacon.
+
 ## 🗺️ Version 5.3: a 50× bigger Legends island, and account codes
 - **The Legends island is 50 times bigger.** It is now 5,600 × 5,600 steps, with about 84 villages, thousands of lakes, mountains and forests, and 45,000 trees, rocks and gold veins to gather. Each horde still has its 4 bases, now spread far apart across its land.
 - **Fast travel through wells.** Walk near a village to find its well. Then press **F** (🌀) beside any well to jump to another one. When you fall in battle, you wake at the nearest well you have found.
