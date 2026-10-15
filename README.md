@@ -19,6 +19,18 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🛡️ Version 4.9: Legends mode
+
+Open **Game modes → Legends** to reach the war table.
+
+- **Six hordes, six fortresses:** the Horde of Thorns (the Bramble King), the Dunes (Sand Sultan Ashkar) and the Bog (Mother Murk) come first. Beat all three to unlock the final three: Rime (the Rime Warden), the Forge (Cinderheart Colossus) and the Hollow.
+- **Build an army:** hit trees, rocks and gold veins to gather wood, stone and gold. Press **Z** for a Cobble Golem, **X** for a Plank Golem (archer), **C** for a Mossy Golem (heals you) and **V** for an Arrow Tower, or use the build buttons on the right of the screen.
+- **Storm the fortress:** break the gate, destroy the spawners and towers, shatter the fortress heart, then defeat the horde's leader.
+- **Every horde fights its own way:** thorny walls that hurt when you hit them, sinking sand and burrowing spawners, poison pools and a fortress that heals itself, frost towers that slow, fire towers and lava, and a void shield.
+- **Legend-powered:** every monster and boss glows with crystal light. The bosses keep their original designs, with a crystal aura and orbiting crystals.
+- **Lots of cutscenes:** a story intro, an intro for each horde, the gate falling, the heart breaking open and the boss rising, and a victory scene.
+- **The final fortress:** where the Hollow Sovereign should be, a hooded stranger waits. He turns around, absorbs the emerald, amethyst and gold crystals, and becomes **the Threefold Legend**: the three legends combined in one.
+
 ## 🗝️ Version 4.8: Dungeons mode
 
 Open **Game modes** (top right of the main menu) and pick **Dungeons**.
