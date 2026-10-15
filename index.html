@@ -1290,9 +1290,9 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='5.1.0', SAVE_VERSION=7;
+const APP_VERSION='5.2.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
-function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
+function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
   if(!s.eq.armor) s.eq.armor=mkItem('armor',0,'common'); if(!('a1' in s.eq)) s.eq.a1=null; if(!('a2' in s.eq)) s.eq.a2=null; if(!('a3' in s.eq)) s.eq.a3=null; if(!('a4' in s.eq)) s.eq.a4=null; if(!('a5' in s.eq)) s.eq.a5=null; if(!('a6' in s.eq)) s.eq.a6=null; if(!('a7' in s.eq)) s.eq.a7=null; if(!('a8' in s.eq)) s.eq.a8=null;
   s.shards=Math.max(0,+s.shards||0); s.arrows=Number.isFinite(s.arrows)?s.arrows:30; s.won=!!s.won; s.found=s.found&&typeof s.found==='object'?s.found:{};
@@ -1513,7 +1513,7 @@ function killE(e,fromNet){if(e.st){run.kills++; e.dieAt=time; e.state='dead'; dy
   if(e.summoned&&Math.random()<.6) return;
   const n=rint(1,3); for(let i=0;i<n;i++) dropLoot(e.x,e.y,{kind:'shard',amt:1});
   if(Math.random()<.22) dropLoot(e.x,e.y,{kind:'arrows',amt:rint(3,6)});
-  if(Math.random()<(e.type==='brute'?.18:.07)) dropLoot(e.x,e.y,{kind:'item',item:randomItem(L.tier)});}
+  if(Math.random()<(e.type==='brute'?.18:.07)) dropLoot(e.x,e.y,{kind:'item',item:LGMS?lgLoot(L.tier,0):randomItem(L.tier)});}
 function randomItem(bi,boost=0){const rar=rollRarity(bi,boost), r=Math.random(); if(Math.random()<(boost?.08:.025)) return makeCursed(bi);
   if(r<.4){const sw=Math.random()<.5; return rar==='unique'?(sw?mkCatItem(pickCat(CAT.usword,bi),'usword',bi,'unique'):mkCatItem(pickCat(CAT.uweapon,bi),'uweapon',bi,'unique')):(sw?mkCatItem(pickCat(CAT.sword,bi),'sword',bi,rar):mkCatItem(pickCat(CAT.weapon,bi),'weapon',bi,rar));}
   if(r<.8) return rar==='unique'?mkCatItem(pickCat(CAT.uarmor,bi),'uarmor',bi,'unique'):mkCatItem(pickCat(CAT.armor,bi),'armor',bi,rar);
@@ -6140,7 +6140,7 @@ const STS=['chase','wind','rec','dash','fuse'], STI={chase:0,wind:1,rec:2,dash:3
 const r1=v=>Math.round(v), r2=v=>Math.round(v*100)/100;
 function myState(){const w=SAVE.eq.weapon; return {x:r1(P.x),y:r1(P.y),f:r2(P.face),w:r2(P.walk%100),hp:Math.ceil(P.hp),mx:ST.maxhp,fl:(P.dead?1:0)|(P.roll>0?2:0)|(P.swing>0?4:0)|(MP.lastMove?8:0),sk:curSkin(),wk:w.kind,wc:w.col||'#d6dde2',wr:w.rar,n:myName()};}
 function buildSnap(){const b=boss; return {t:'s',
-  e:ents.filter(e=>e.hp>0).map(e=>[e.id,e.type,r1(e.x),r1(e.y),Math.ceil(e.hp),e.max,r2(e.face),STI[e.state]|0,(e.alert?1:0)|(e.flash>0?2:0)|(e.burn>0?4:0)|(e.summoned?8:0)|(e.stun>0?16:0)|(e.inv?32:0),r2(e.da||0),e.st?e.base:-1,e.bi!=null?e.bi:-1]),
+  e:ents.filter(e=>e.hp>0&&(!e.st||[P,...MP.others.values()].some(o=>Math.hypot(e.x-o.x,e.y-o.y)<3800))).map(e=>[e.id,e.type,r1(e.x),r1(e.y),Math.ceil(e.hp),e.max,r2(e.face),STI[e.state]|0,(e.alert?1:0)|(e.flash>0?2:0)|(e.burn>0?4:0)|(e.summoned?8:0)|(e.stun>0?16:0)|(e.inv?32:0),r2(e.da||0),e.st?e.base:-1,e.bi!=null?e.bi:-1]),
   b:b?{id:b.id,x:r1(b.x),y:r1(b.y),hp:Math.ceil(b.hp),max:b.max,f:r2(b.face),w:r2(b.walk%100),hd:b.hidden?1:0,aw:b.awake?1:0,dd:b.dead?1:0,fm:b.form,fl:b.flash>0?1:0,tr:r2(b.trans||0),te:b.a&&b.a.tele?1:0,an:b.a&&b.a.ang!=null?r2(b.a.ang):0,ro:b.roar>0?1:0,r:b.r,nm:b.name}:null,
   p:projs.slice(0,140).map(p=>[r1(p.x),r1(p.y),r1(p.vx),r1(p.vy),p.r,p.col,p.own==='p'?1:0,p.arrow?1:0,r2(p.life)]),
   h:hazards.map(h=>[r1(h.x),r1(h.y),r1(h.r),r2(h.t),h.delay,h.col,h.done?1:0,h.persist||0,r2(h.life),h.own==='p'?1:0]),
@@ -6990,7 +6990,13 @@ const LG_SEC=[0,1,2,3,4,5];
 const LG_COST={cobble:{stone:12},plank:{wood:12},moss:{gold:8,wood:6},tower:{stone:20,wood:10},house:{wood:30,stone:15},recruit:{gold:5}};
 const LG_ACT=[['cobble','z','🗿','Cobble Golem'],['plank','x','🏹','Plank Golem'],['moss','c','🌿','Mossy Golem'],['tower','v','🗼','Arrow Tower'],['rally','t','🚩','Rally army'],['recall','y','↩️','Recall army'],['gather','g','✨','Send sprites'],['mount','r','🐎','Ride / dismount'],['house','h','🏠','Build house'],['recruit','u','🤝','Recruit villager']];
 const RES_ICO={wood:'🪵',stone:'🪨',gold:'🪙'};
-const LG_N=150, LG_C=75;
+const LG_N=820, LG_C=410, LG_CH=32;
+const LG_LV={1:{name:'Outpost',diff:'Easy',size:[24,20],rings:1,thick:2,wallH:2.4,towers:3,spawners:2,patrol:4,cd:9,wave:1,cap:8,hp:1,dmg:1,r:110,da:.13},
+ 2:{name:'Watchfort',diff:'Medium',size:[34,28],rings:2,thick:2,wallH:3.2,towers:7,spawners:4,patrol:8,cd:7,wave:2,cap:14,hp:1.6,dmg:1.15,r:190,da:-.16},
+ 3:{name:'Bastion',diff:'Hard',size:[46,38],rings:3,thick:2,wallH:4,towers:12,spawners:6,patrol:14,cd:6,wave:3,cap:20,hp:2.4,dmg:1.3,r:268,da:.15},
+ 4:{name:'Fortress',diff:'Hardest',size:[64,52],rings:3,thick:3,wallH:5.2,towers:20,spawners:8,patrol:22,cd:4.5,wave:4,cap:28,hp:4,dmg:1.5,r:336,da:0}};
+const lgBaseName=b=>b.lv===4?b.tr.fort:(b.tr.fort.replace(/^The /,'').split(' ')[0]+' '+LG_LV[b.lv].name);
+const lgBaseKey=b=>b.tr.id+'-'+b.lv;
 function lgmInit(){if(lgmInit.done) return; lgmInit.done=true;
   Object.assign(MINIONS,{lg_cobble:{n:'Cobble Golem',feat:'golem',c1:'#8a8478',c2:'#d8c8a8',role:'melee',dmg:15,spd:150,r:15},lg_plank:{n:'Plank Golem',feat:'golem',c1:'#8a6a3a',c2:'#ffd38a',role:'ranged',dmg:10,spd:165,r:13,shot:'#ffe0a0'},lg_moss:{n:'Mossy Golem',feat:'golem',c1:'#4a7a3a',c2:'#9fe07a',role:'heal',dmg:5,spd:160,r:13,shot:'#9fe07a'},lg_militia:{n:'Villager Militia',feat:'hooded',c1:'#6a4a2a',c2:'#ffd38a',role:'ranged',dmg:9,spd:170,r:11,shot:'#ffe0a0'}});
   Object.assign(HEADH,{tower:1.3,spawner:.9,gate:.5,heart:.7}); Object.assign(ROLE,{tower:['Tower · shoots your army','#ff9a6a'],spawner:['Spawner · keeps making monsters','#ffd36a'],gate:['Fortress gate · break it down','#e8b06a'],heart:['Fortress heart','#ff6a8a']});
@@ -7005,132 +7011,118 @@ const lgFinalOpen=()=>{const B=lgBeat(); return ['thorn','dune','bog'].every(k=>
 function genLegendWorld(){const N=LG_N,w=N,h=N,cx=LG_C,cy=LG_C, g=new Uint8Array(w*h), reg=new Int8Array(w*h).fill(-1), lake=new Uint8Array(w*h), bld=new Uint8Array(w*h), fw=new Uint8Array(w*h), bar=new Int8Array(w*h).fill(-1);
   const at=(x,y)=>y*w+x, inB=(x,y)=>x>=0&&y>=0&&x<w&&y<h, secA=i=>-Math.PI+i*TAU/6;
   const secOf=(x,y)=>{const a=Math.atan2(y-cy,x-cx); return ((Math.round((a+Math.PI)/(TAU/6)))%6+6)%6;};
-  const edgeR=(x,y)=>{const a=Math.atan2(y-cy,x-cx); return 69+Math.sin(a*3)*1.6+Math.sin(a*7+1)*1.1+Math.sin(a*13)*.6;};
-  for(let y=0;y<h;y++) for(let x=0;x<w;x++){const d=Math.hypot(x-cx,y-cy); reg[at(x,y)]=d<14?-1:secOf(x,y); if(d>edgeR(x,y)||x<2||y<2||x>w-3||y>h-3) g[at(x,y)]=1;}
-  // ridges between the lands, each with two passes
+  const edgeR=a=>392+Math.sin(a*3)*5+Math.sin(a*7+1)*4+Math.sin(a*13)*2;
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){const dx=x-cx,dy=y-cy,d=Math.hypot(dx,dy); reg[at(x,y)]=d<20?-1:secOf(x,y); if(d>edgeR(Math.atan2(dy,dx))||x<2||y<2||x>w-3||y>h-3) g[at(x,y)]=1;}
+  // ridges between the lands, with passes every so often
   const passes=[];
   for(let k=0;k<6;k++){const a=secA(k)+TAU/12, ca=Math.cos(a), sa=Math.sin(a);
-    for(let r=16;r<72;r+=.35){const inPass=(r>29&&r<34)||(r>50&&r<55); for(let o=-1.2;o<=1.2;o+=.4){const x=Math.round(cx+ca*r-sa*o), y=Math.round(cy+sa*r+ca*o); if(!inB(x,y)) continue; if(inPass){passes.push({x,y,k}); continue;} g[at(x,y)]=1;}}}
-  // the final three lands are sealed by a crystal barrier
+    for(let r=24;r<400;r+=.4){const inPass=(r%70)>28&&(r%70)<36; for(let o=-1.6;o<=1.6;o+=.4){const x=Math.round(cx+ca*r-sa*o), y=Math.round(cy+sa*r+ca*o); if(!inB(x,y)) continue; if(inPass){passes.push({x,y,k}); continue;} g[at(x,y)]=1;}}}
   const sealed=s=>s>=3;
-  for(let y=0;y<h;y++) for(let x=0;x<w;x++){const d=Math.hypot(x-cx,y-cy), s=secOf(x,y); if(d>14.6&&d<16.4&&sealed(s)&&!g[at(x,y)]) bar[at(x,y)]=s;}
-  for(const p of passes){const a=secA(p.k), b=secA((p.k+1)%6); const s1=p.k, s2=(p.k+1)%6; if(sealed(s1)!==sealed(s2)&&!g[at(p.x,p.y)]) bar[at(p.x,p.y)]=sealed(s1)?s1:s2;}
-  // lakes and rocks
-  const clear=[];
-  const bases=[], villages=[];
-  for(let s=0;s<6;s++){const a=secA(s), bx=Math.round(cx+Math.cos(a)*50), by=Math.round(cy+Math.sin(a)*50); bases.push({sec:s,cx:bx,cy:by}); clear.push({x:bx,y:by,r:17});
-    const va=a+.3, vx=Math.round(cx+Math.cos(va)*31), vy=Math.round(cy+Math.sin(va)*31); villages.push({sec:s,cx:vx,cy:vy}); clear.push({x:vx,y:vy,r:7});}
-  clear.push({x:cx,y:cy,r:15});
-  const free=(x,y,m=0)=>!clear.some(c=>Math.hypot(c.x-x,c.y-y)<c.r+m);
+  for(let y=cy-24;y<=cy+24;y++) for(let x=cx-24;x<=cx+24;x++){const d=Math.hypot(x-cx,y-cy), s=secOf(x,y); if(d>20.5&&d<22.6&&sealed(s)&&!g[at(x,y)]) bar[at(x,y)]=s;}
+  for(const p of passes){const s1=p.k, s2=(p.k+1)%6; if(sealed(s1)!==sealed(s2)&&!g[at(p.x,p.y)]) bar[at(p.x,p.y)]=sealed(s1)?s1:s2;}
+  // where the fortresses and villages go
+  const clear=[{x:cx,y:cy,r:26}], bases=[], villages=[];
+  for(let s=0;s<6;s++){const a=secA(s); for(let lv=1;lv<=4;lv++){const V=LG_LV[lv], aa=a+V.da, bx=Math.round(cx+Math.cos(aa)*V.r), by=Math.round(cy+Math.sin(aa)*V.r); bases.push({sec:s,lv,cx:bx,cy:by}); clear.push({x:bx,y:by,r:Math.max(V.size[0],V.size[1])*.75+10});}
+    for(const [vr,va] of [[70,.32],[150,-.3],[230,-.05],[300,.33]]){const aa=a+va, vx=Math.round(cx+Math.cos(aa)*vr), vy=Math.round(cy+Math.sin(aa)*vr); villages.push({sec:s,cx:vx,cy:vy}); clear.push({x:vx,y:vy,r:9});}}
+  const free=(x,y,m=0)=>!clear.some(c=>Math.abs(c.x-x)<c.r+m+2&&Math.hypot(c.x-x,c.y-y)<c.r+m);
+  // lakes, mountains and rocks
   for(let s=0;s<6;s++){const a=secA(s);
-    for(let k=0;k<2;k++){for(let t=0;t<30;t++){const aa=a+rand(-.4,.4), rr=rand(22,62), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr), R=rand(2.5,4.5); if(!free(x,y,R+2)) continue;
-      for(let j=-6;j<=6;j++) for(let i=-6;i<=6;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&Math.hypot(i,j*1.2)<R+Math.sin(i*1.7+j)*.6){g[at(xx,yy)]=1; lake[at(xx,yy)]=1;}} clear.push({x,y,r:R+1}); break;}}
-    for(let k=0;k<9;k++){for(let t=0;t<20;t++){const aa=a+rand(-.45,.45), rr=rand(20,66), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!free(x,y,2)) continue; const sw=rint(1,3), sh=rint(1,2); for(let j=0;j<sh;j++) for(let i=0;i<sw;i++) if(inB(x+i,y+j)) g[at(x+i,y+j)]=1; break;}}}
-  // fortresses: 24 x 20 with the gate facing the Crown Well
-  for(const B of bases){const FW=22,FH=18, x0=B.cx-FW/2, y0=B.cy-FH/2, x1=x0+FW-1, y1=y0+FH-1; B.rect={x:x0,y:y0,w:FW,h:FH}; B.inner={x:x0+2,y:y0+2,w:FW-4,h:FH-4};
-    for(let y=y0-4;y<=y1+4;y++) for(let x=x0-4;x<=x1+4;x++) if(inB(x,y)&&bar[at(x,y)]<0){g[at(x,y)]=0; lake[at(x,y)]=0;}
-    for(let y=y0;y<=y1;y++) for(let x=x0;x<=x1;x++) if(x<x0+2||x>x1-2||y<y0+2||y>y1-2){g[at(x,y)]=1; fw[at(x,y)]=B.sec+1;}
-    const dx=cx-B.cx, dy=cy-B.cy, gt=[]; let gx,gy,out;
-    if(Math.abs(dx)>Math.abs(dy)){const xs=dx>0?[x1-1,x1]:[x0,x0+1]; for(const x of xs) for(let y=B.cy-3;y<B.cy+3;y++) gt.push({x,y}); gx=(dx>0?x1:x0+1); gy=B.cy; out={x:Math.sign(dx),y:0};}
-    else {const ys=dy>0?[y1-1,y1]:[y0,y0+1]; for(const y of ys) for(let x=B.cx-3;x<B.cx+3;x++) gt.push({x,y}); gx=B.cx; gy=(dy>0?y1:y0+1); out={x:0,y:Math.sign(dy)};}
-    for(const t of gt){g[at(t.x,t.y)]=0; fw[at(t.x,t.y)]=0;} B.gateTiles=gt; B.gate={x:gx*T,y:gy*T,horiz:out.y!==0}; B.out=out;
-    B.heart={x:B.cx*T,y:B.cy*T}; const side={x:-out.y,y:out.x};
-    B.spawners=[{x:(B.cx-out.x*5+side.x*7)*T,y:(B.cy-out.y*5+side.y*7)*T},{x:(B.cx-out.x*5-side.x*7)*T,y:(B.cy-out.y*5-side.y*7)*T},{x:(gx+out.x*11+side.x*9)*T,y:(gy+out.y*11+side.y*9)*T}];
-    B.towers=[{x:(gx+out.x*3+side.x*5)*T,y:(gy+out.y*3+side.y*5)*T},{x:(gx+out.x*3-side.x*5)*T,y:(gy+out.y*3-side.y*5)*T},{x:(gx+out.x*13-side.x*8)*T,y:(gy+out.y*13-side.y*8)*T}];
-    if(B.sec>=3){B.spawners.push({x:(gx+out.x*12-side.x*12)*T,y:(gy+out.y*12-side.y*12)*T}); B.towers.push({x:(gx+out.x*7)*T+side.x*12*T,y:(gy+out.y*7)*T+side.y*12*T});}
-    B.zones=[]; for(let k=0;k<4+B.sec;k++){const aa=Math.atan2(out.y,out.x)+rand(-1.1,1.1), rr=rand(15,22); B.zones.push({x:(B.cx+Math.cos(aa)*rr)*T,y:(B.cy+Math.sin(aa)*rr)*T,r:rand(55,85)});}}
+    for(let k=0;k<20;k++){for(let t=0;t<40;t++){const aa=a+rand(-.46,.46), rr=rand(30,370), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr), R=rand(3,9); if(!free(x,y,R+2)) continue;
+      for(let j=-11;j<=11;j++) for(let i=-11;i<=11;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&Math.hypot(i,j*1.2)<R+Math.sin(i*1.7+j)*.8){g[at(xx,yy)]=1; lake[at(xx,yy)]=1;}} clear.push({x,y,r:R+1}); break;}}
+    for(let k=0;k<12;k++){for(let t=0;t<40;t++){const aa=a+rand(-.46,.46), rr=rand(40,370), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr), R=rand(4,10); if(!free(x,y,R+3)) continue;
+      for(let j=-12;j<=12;j++) for(let i=-12;i<=12;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&Math.hypot(i*1.1,j)<R+Math.sin(i*.9+j*1.3)*1.5) g[at(xx,yy)]=1;} clear.push({x,y,r:R+1}); break;}}
+    for(let k=0;k<160;k++){for(let t=0;t<20;t++){const aa=a+rand(-.48,.48), rr=rand(28,385), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!free(x,y,2)) continue; const sw=rint(1,3), sh=rint(1,2); for(let j=0;j<sh;j++) for(let i=0;i<sw;i++) if(inB(x+i,y+j)) g[at(x+i,y+j)]=1; break;}}}
+  // fortresses: rings of walls, a gate in each ring facing the Crown Well
+  bases.forEach((B,bi)=>{const V=LG_LV[B.lv], FW=V.size[0], FH=V.size[1], x0=B.cx-(FW>>1), y0=B.cy-(FH>>1), x1=x0+FW-1, y1=y0+FH-1; B.idx=bi; B.rect={x:x0,y:y0,w:FW,h:FH};
+    for(let y=y0-10;y<=y1+10;y++) for(let x=x0-10;x<=x1+10;x++) if(inB(x,y)&&bar[at(x,y)]<0){g[at(x,y)]=0; lake[at(x,y)]=0;}
+    const dx=cx-B.cx, dy=cy-B.cy, horizSide=Math.abs(dx)>Math.abs(dy), out=horizSide?{x:Math.sign(dx),y:0}:{x:0,y:Math.sign(dy)}; B.out=out; B.rings=[]; B.gateTiles=[]; B.gates=[];
+    for(let k=0;k<V.rings;k++){const o=k*(V.thick+4), rx0=x0+o, ry0=y0+o, rx1=x1-o, ry1=y1-o, th=V.thick; if(rx1-rx0<10||ry1-ry0<8) break; B.rings.push({x0:rx0,y0:ry0,x1:rx1,y1:ry1});
+      for(let y=ry0;y<=ry1;y++) for(let x=rx0;x<=rx1;x++) if(x<rx0+th||x>rx1-th||y<ry0+th||y>ry1-th){g[at(x,y)]=1; fw[at(x,y)]=bi+1;}
+      const gt=[]; let gx,gy;
+      if(horizSide){const xs=[]; for(let q=0;q<th;q++) xs.push(dx>0?rx1-q:rx0+q); for(const x of xs) for(let y=B.cy-3;y<B.cy+3;y++) gt.push({x,y}); gx=dx>0?rx1-th/2+1:rx0+th/2; gy=B.cy;}
+      else {const ys=[]; for(let q=0;q<th;q++) ys.push(dy>0?ry1-q:ry0+q); for(const y of ys) for(let x=B.cx-3;x<B.cx+3;x++) gt.push({x,y}); gx=B.cx; gy=dy>0?ry1-th/2+1:ry0+th/2;}
+      for(const t of gt){g[at(t.x,t.y)]=0; fw[at(t.x,t.y)]=0;} B.gateTiles.push(gt); B.gates.push({x:gx*T,y:gy*T,horiz:!horizSide});}
+    B.inner=(()=>{const r=B.rings[B.rings.length-1], o=V.thick; return {x:r.x0+o,y:r.y0+o,w:r.x1-r.x0-2*o+1,h:r.y1-r.y0-2*o+1};})();
+    B.heart={x:(B.cx+.5)*T,y:(B.cy+.5)*T};
+    // tower and spawner spots, checked against the walls
+    const fl=(x,y)=>inB(Math.floor(x),Math.floor(y))&&!g[at(Math.floor(x),Math.floor(y))]&&Math.hypot(x-B.cx-.5,y-B.cy-.5)>3, side={x:-out.y,y:out.x}, R0=B.rings[0], spots=[], sp2=[];
+    const g0=B.gates[0]; spots.push([g0.x/T+out.x*3.5+side.x*5,g0.y/T+out.y*3.5+side.y*5],[g0.x/T+out.x*3.5-side.x*5,g0.y/T+out.y*3.5-side.y*5]);
+    for(const [ax,ay] of [[R0.x0-3,R0.y0-3],[R0.x1+3,R0.y0-3],[R0.x0-3,R0.y1+3],[R0.x1+3,R0.y1+3]]) spots.push([ax+.5,ay+.5]);
+    B.rings.forEach((r,k)=>{const o=V.thick+1.5; for(const [ax,ay] of [[r.x0+o,r.y0+o],[r.x1-o,r.y0+o],[r.x0+o,r.y1-o],[r.x1-o,r.y1-o]]) spots.push([ax+.5,ay+.5]); if(k>0){const gk=B.gates[k]; spots.push([gk.x/T+out.x*2.5+side.x*4,gk.y/T+out.y*2.5+side.y*4],[gk.x/T+out.x*2.5-side.x*4,gk.y/T+out.y*2.5-side.y*4]);}});
+    for(let k=0;k<16;k++){const a=k/16*TAU; spots.push([B.cx+.5+Math.cos(a)*(FW/2+4),B.cy+.5+Math.sin(a)*(FH/2+4)]);}
+    B.towers=[]; for(const [x,y] of spots){if(B.towers.length>=V.towers) break; if(fl(x,y)&&!B.towers.some(t=>Math.hypot(t.x/T-x,t.y/T-y)<2.5)) B.towers.push({x:x*T,y:y*T});}
+    const inn=B.inner; for(const [x,y] of [[inn.x+2,inn.y+2],[inn.x+inn.w-3,inn.y+2],[inn.x+2,inn.y+inn.h-3],[inn.x+inn.w-3,inn.y+inn.h-3]]) sp2.push([x+.5,y+.5]);
+    sp2.push([g0.x/T+out.x*9+side.x*8,g0.y/T+out.y*9+side.y*8],[g0.x/T+out.x*9-side.x*8,g0.y/T+out.y*9-side.y*8]);
+    B.rings.slice(0,-1).forEach((r,k)=>{const o=V.thick+2; sp2.push([r.x0+o+.5,(r.y0+r.y1)/2+.5],[r.x1-o+.5,(r.y0+r.y1)/2+.5],[(r.x0+r.x1)/2+.5,r.y0+o+.5],[(r.x0+r.x1)/2+.5,r.y1-o+.5]);});
+    for(let k=0;k<8;k++){const a=k/8*TAU+.4; sp2.push([B.cx+.5+Math.cos(a)*(FW/2+9),B.cy+.5+Math.sin(a)*(FH/2+9)]);}
+    B.spawners=[]; for(const [x,y] of sp2){if(B.spawners.length>=V.spawners) break; if(fl(x,y)&&!B.towers.some(t=>Math.hypot(t.x/T-x,t.y/T-y)<2)&&!B.spawners.some(t=>Math.hypot(t.x/T-x,t.y/T-y)<3)) B.spawners.push({x:x*T,y:y*T});}
+    B.zones=[]; for(let k=0;k<2+B.lv*2;k++){const aa=Math.atan2(out.y,out.x)+rand(-1.1,1.1), rr=Math.max(FW,FH)*.5+rand(6,14); B.zones.push({x:(B.cx+Math.cos(aa)*rr)*T,y:(B.cy+Math.sin(aa)*rr)*T,r:rand(55,95)});}});
   // villages and the hub
   const houses=[];
-  for(const V of villages){for(const [ox,oy] of [[-4,-3],[3,-3],[-4,2],[3,2]]){const x=V.cx+ox, y=V.cy+oy; for(let j=0;j<2;j++) for(let i=0;i<2;i++){g[at(x+i,y+j)]=1; bld[at(x+i,y+j)]=1;} houses.push({x:x+1,y:y+1,sec:V.sec,ry:Math.atan2(V.cy-(y+1),V.cx-(x+1))});}
-    V.x=(V.cx+.5)*T; V.y=(V.cy+.5)*T; V.name=TRIBES[V.sec].vil;}
+  for(const V of villages){for(const [ox,oy] of [[-4,-3],[3,-3],[-4,2],[3,2]]){const x=V.cx+ox, y=V.cy+oy; for(let j=-1;j<3;j++) for(let i=-1;i<3;i++) if(inB(x+i,y+j)&&!fw[at(x+i,y+j)]){g[at(x+i,y+j)]=0; lake[at(x+i,y+j)]=0;} for(let j=0;j<2;j++) for(let i=0;i<2;i++){g[at(x+i,y+j)]=1; bld[at(x+i,y+j)]=1;} houses.push({x:x+1,y:y+1,sec:V.sec,ry:Math.atan2(V.cy-(y+1),V.cx-(x+1))});}
+    V.x=(V.cx+.5)*T; V.y=(V.cy+.5)*T; V.name=TRIBES[V.sec].vil+['',' Hollow',' Ford',' Rise'][villages.filter(o=>o.sec===V.sec).indexOf(V)];}
+  for(let y=cy-18;y<=cy+18;y++) for(let x=cx-18;x<=cx+18;x++){const d=Math.hypot(x-cx,y-cy); if(d<18){g[at(x,y)]=0; lake[at(x,y)]=0;}}
   for(const [ox,oy] of [[-9,-6],[7,-6],[-9,5],[7,5]]){const x=cx+ox,y=cy+oy; for(let j=0;j<2;j++) for(let i=0;i<2;i++){g[at(x+i,y+j)]=1; bld[at(x+i,y+j)]=1;} houses.push({x:x+1,y:y+1,sec:-1,ry:Math.atan2(cy-(y+1),cx-(x+1))});}
   for(let j=-1;j<=1;j++) for(let i=-1;i<=1;i++){g[at(cx+i,cy+j)]=1; bld[at(cx+i,cy+j)]=1;}
-  // resources
-  const nodes=[]; const used=(x,y)=>nodes.some(n=>Math.abs(n.tx-x)+Math.abs(n.ty-y)<3);
-  for(let s=0;s<6;s++){const a=secA(s); let n=0; for(let t=0;t<400&&n<13;t++){const aa=a+rand(-.5,.5), rr=rand(17,64), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!inB(x,y)||g[at(x,y)]||bar[at(x,y)]>=0||!free(x,y,1)||used(x,y)) continue;
-      const kd=rr>45&&Math.random()<.4?'gold':Math.random()<.55?'wood':Math.random()<.75?'stone':'gold'; nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:kd,hp:4,max:4,regrow:0,sec:s}); n++;}}
-  for(let k=0;k<8;k++){const aa=k/8*TAU, x=Math.round(cx+Math.cos(aa)*12), y=Math.round(cy+Math.sin(aa)*12); if(!g[at(x,y)]) nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:k%3===0?'stone':k%3===1?'wood':'gold',hp:4,max:4,regrow:0,sec:-1});}
-  // keep a walkable ring around the well
-  for(let y=cy-12;y<=cy+12;y++) for(let x=cx-12;x<=cx+12;x++){const d=Math.hypot(x-cx,y-cy); if(d<12&&d>2.2&&!bld[at(x,y)]) g[at(x,y)]=0;}
+  // resources: more gold the further out you go
+  const nodes=[], ncell=new Set(), key=(x,y)=>((x>>2)<<10)|(y>>2);
+  for(let s=0;s<6;s++){const a=secA(s); let n=0; for(let t=0;t<3000&&n<150;t++){const aa=a+rand(-.5,.5), rr=rand(22,380), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!inB(x,y)||g[at(x,y)]||bar[at(x,y)]>=0||!free(x,y,1)||ncell.has(key(x,y))) continue;
+      ncell.add(key(x,y)); const kd=Math.random()<.12+rr/1200?'gold':Math.random()<.55?'wood':'stone'; nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:kd,hp:4,max:4,regrow:0,sec:s}); n++;}}
+  for(let k=0;k<10;k++){const aa=k/10*TAU, x=Math.round(cx+Math.cos(aa)*14), y=Math.round(cy+Math.sin(aa)*14); if(!g[at(x,y)]) nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:['stone','wood','gold'][k%3],hp:4,max:4,regrow:0,sec:-1});}
   return {w,h,g,start:{x:(cx+.5)*T,y:(cy+4.5)*T},exit:null,chests:[],spawns:[],bossAt:null,gates:[],keys:[],rooms:[],rects:[],
     lgWorld:{reg,lake,bld,fw,bar,bases,villages,houses,nodes,hub:{x:(cx+.5)*T,y:(cy+.5)*T}}};}
 const HUB_ENV=Object.assign({},{void:0x1a3a5a,sky:0xe8f4ff,gnd:0x3a4a2a,sun:0xfff4e0,hi:.9,si:1.05,rock:0x8a8a7a,top:0x7aaa4a,tree:'oak',floorDeco:['flower','tuft','pebble'],fl:[0x5a8a3a,0x649442,0x6a9a48]});
 const regEnv=s=>s<0?HUB_ENV:B3[BIOMES[TRIBES[s].bi].id];
-function lgmBuildWorld(){const D=L.lgWorld, W=L.w, H=L.h, G=L.g, at=(x,y)=>y*W+x, inB=(x,y)=>x>=0&&y>=0&&x<W&&y<H;
-  const floorT=(x,y)=>inB(x,y)&&(!G[at(x,y)]||D.bld[at(x,y)]||D.fw[at(x,y)]||D.bar[at(x,y)]>=0)&&!D.lake[at(x,y)];
-  const rockT=(x,y)=>inB(x,y)&&!floorT(x,y)&&!D.lake[at(x,y)];
-  const pal={}; const palOf=s=>pal[s]||(pal[s]={fl:regEnv(s).fl.map(c=>new THREE.Color(c)),top:new THREE.Color(regEnv(s).top),rock:new THREE.Color(regEnv(s).rock)});
-  const tcol=(x,y)=>{x=clamp(x,0,W-1); y=clamp(y,0,H-1); const P0=palOf(D.reg[at(x,y)]), n=hash(x*3,y*5), c=P0.fl[n<.45?0:n<.85?1:2].clone(); return c.multiplyScalar(.9+hash(x+11,y+7)*.18);};
-  const vcol=(x,y)=>{const c=new THREE.Color(0,0,0); let n=0; for(const [i,j] of [[x-1,y-1],[x,y-1],[x-1,y],[x,y]]){if(inB(i,j)&&floorT(i,j)){c.add(tcol(i,j)); n++;}} if(!n) return tcol(x,y).multiplyScalar(.7); c.multiplyScalar(1/n); let walls=0; for(const [i,j] of [[x-1,y-1],[x,y-1],[x-1,y],[x,y]]) if(rockT(i,j)) walls++; return c.multiplyScalar(1-.1*walls);};
-  const fp=[],fc=[],tp=[],tc=[], vc=new Map(), VC=(x,y)=>{const k=x*1000+y; let c=vc.get(k); if(!c){c=vcol(x,y); vc.set(k,c);} return c;};
-  for(let y=0;y<H;y++) for(let x=0;x<W;x++){
-    if(floorT(x,y)){const a=VC(x,y),b=VC(x,y+1),c=VC(x+1,y),d=VC(x+1,y+1); fp.push(x,0,y, x,0,y+1, x+1,0,y, x+1,0,y, x,0,y+1, x+1,0,y+1); for(const k of [a,b,c,c,b,d]) fc.push(k.r,k.g,k.b);}
-    else if(rockT(x,y)){const P0=palOf(D.reg[at(x,y)]), c=P0.top.clone().multiplyScalar(.82+hash(x,y)*.3); const hh=WH; tp.push(x,hh,y, x,hh,y+1, x+1,hh,y, x+1,hh,y, x,hh,y+1, x+1,hh,y+1); for(let k=0;k<6;k++) tc.push(c.r,c.g,c.b);}}
-  const mk=(P,C,rough)=>{const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(P,3)); g.setAttribute('color',new THREE.Float32BufferAttribute(C,3)); g.computeVertexNormals(); const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({vertexColors:true,roughness:rough})); m.receiveShadow=true; levelGroup.add(m); return m;};
-  mk(fp,fc,.95); mk(tp,tc,.9);
-  // cliffs, mountain spires and lakes
-  const cols=[], spires=[], wat=[];
-  for(let y=0;y<H;y++) for(let x=0;x<W;x++){
-    if(D.lake[at(x,y)]){wat.push(x,.06,y, x,.06,y+1, x+1,.06,y, x+1,.06,y, x,.06,y+1, x+1,.06,y+1); continue;}
-    if(!rockT(x,y)) continue; const P0=palOf(D.reg[at(x,y)]); const n=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>floorT(x+dx,y+dy)||(inB(x+dx,y+dy)&&D.lake[at(x+dx,y+dy)]));
-    if(n.length){for(let i=0;i<2;i++){const h1=hash(x*3+i,y*7), h2=hash(x*5+i,y*3+i); let ox=(h1-.5)*.4, oz=(h2-.5)*.4; for(const [dx,dy] of n){ox+=dx*.12; oz+=dy*.12;} const r=.4+hash(x+i,y)*.2; cols.push({x:x+.5+ox,y:WH*.5-.02,z:y+.5+oz,sx:r,sy:WH*(.96+hash(y,x+i)*.12),sz:r,ry:h1*6,c:P0.rock.clone().multiplyScalar(.7+h2*.45).getHex()});}}
-    else if(hash(x*17,y*13)>.8){const big=Math.hypot(x-LG_C,y-LG_C)>64; spires.push({x:x+.5,y:WH,z:y+.5,sx:.8+hash(x,y)*.7,sy:(big?2.2:1)*(.8+hash(y,x)*1.6),sz:.8+hash(x+3,y)*.7,ry:hash(x,y+2)*6,c:P0.rock.clone().multiplyScalar(.75+hash(x+5,y)*.35).getHex()});}}
-  inst(QT==='low'?gPrism:rockColGeo(),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.92,flatShading:true}),cols);
-  inst(gIco,new THREE.MeshStandardMaterial({color:0xffffff,roughness:.9,flatShading:true}),spires);
-  if(wat.length){const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(wat,3)); g.computeVertexNormals(); const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:0x3a8ac8,roughness:.08,metalness:.25,transparent:true,opacity:.9})); levelGroup.add(m);}
-  // trees, plants and stones by land
-  const trees={}, deco={}, near=(x,y,list,r)=>list.some(p=>Math.abs(p.x-x)<r&&Math.abs(p.y-y)<r);
-  const avoid=[...D.bases.map(B=>({x:B.cx,y:B.cy})),...D.villages.map(V=>({x:V.cx,y:V.cy})),{x:LG_C,y:LG_C}];
-  for(let y=2;y<H-2;y++) for(let x=2;x<W-2;x++){if(!floorT(x,y)||G[at(x,y)]) continue; const s=D.reg[at(x,y)], E=regEnv(s), forest=(Math.sin(x*.21+y*.13)+Math.sin(x*.07-y*.17)*1.3)*.5;
-    if(forest>.35&&hash(x*13,y*7)>.78&&!near(x,y,avoid,(s<0?0:9))&&!D.nodes.some(n=>Math.abs(n.tx-x)<2&&Math.abs(n.ty-y)<2)){(trees[E.tree]=trees[E.tree]||[]).push({x:x+.5+(hash(x,y+1)-.5)*.5,y:0,z:y+.5+(hash(x+1,y)-.5)*.5,s:.9+hash(x,y*3)*.7,ry:hash(y,x)*6});}
-    else if(hash(x*11,y*17)>.9){const kd=E.floorDeco[(hash(x,y*5)*E.floorDeco.length)|0]; (deco[kd]=deco[kd]||[]).push({x:x+.2+hash(x+9,y)*.6,y:0,z:y+.2+hash(x,y+9)*.6,s:.8+hash(x*2,y)*.6,ry:hash(x,y)*6});}}
-  for(const k in trees) if(DECOR[k]) placeDecor(k,trees[k]); for(const k in deco) if(DECOR[k]) placeDecor(k,deco[k],false);
-  // fortress walls, banners and hazard pools
+function lgmBuildWorld(){const D=L.lgWorld, W=L.w, H=L.h, at=(x,y)=>y*W+x;
+  L.lgChunks=new Map(); L.lgMats={floor:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.95}),top:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.9}),col:new THREE.MeshStandardMaterial({color:0xffffff,roughness:.92,flatShading:true}),spire:new THREE.MeshStandardMaterial({color:0xffffff,roughness:.9,flatShading:true}),water:new THREE.MeshStandardMaterial({color:0x3a8ac8,roughness:.08,metalness:.25,transparent:true,opacity:.9})};
+  for(const k in L.lgMats) L.lgMats[k].userData.keep=true;
   const mtx=new THREE.Matrix4(), q=new THREE.Quaternion();
-  for(const B of D.bases){const tr=TRIBES[B.sec]; if(lgBeat()[tr.id]) B.ruin=true; const stone=new THREE.Color('#77736c').lerp(new THREE.Color(tr.c2),.3); const tiles=[]; for(let y=B.rect.y;y<B.rect.y+B.rect.h;y++) for(let x=B.rect.x;x<B.rect.x+B.rect.w;x++) if(D.fw[at(x,y)]===B.sec+1) tiles.push([x,y]);
-    const blk=new THREE.InstancedMesh(gBox,new THREE.MeshStandardMaterial({color:stone,roughness:.85,flatShading:true}),tiles.length), cr=new THREE.InstancedMesh(gBox,new THREE.MeshStandardMaterial({color:stone.clone().multiplyScalar(.82),roughness:.9}),tiles.length); let n=0,c=0;
-    for(const [x,y] of tiles){const hgt=B.ruin?(.5+hash(x,y)*.9):2.3; mtx.compose(new THREE.Vector3(x+.5,hgt/2,y+.5),q,new THREE.Vector3(1.02,hgt,1.02)); blk.setMatrixAt(n++,mtx); const edge=D.fw[at(x,y-1)]!==B.sec+1||D.fw[at(x,y+1)]!==B.sec+1||D.fw[at(x-1,y)]!==B.sec+1||D.fw[at(x+1,y)]!==B.sec+1; if(!B.ruin&&edge&&(x+y)%2===0){mtx.compose(new THREE.Vector3(x+.5,2.6,y+.5),q,new THREE.Vector3(.5,.36,.5)); cr.setMatrixAt(c++,mtx);}}
-    blk.count=n; cr.count=c; blk.castShadow=blk.receiveShadow=true; levelGroup.add(blk); levelGroup.add(cr);
-    const banM=new THREE.MeshStandardMaterial({color:tr.col,emissive:new THREE.Color(tr.col),emissiveIntensity:.25,side:THREE.DoubleSide}), pole=new THREE.MeshStandardMaterial({color:0x3a2a1a});
-    if(!B.ruin) for(const [x,y] of [[B.rect.x+1,B.rect.y+1],[B.rect.x+B.rect.w-2,B.rect.y+1],[B.rect.x+1,B.rect.y+B.rect.h-2],[B.rect.x+B.rect.w-2,B.rect.y+B.rect.h-2]]){const p=new THREE.Mesh(gCyl,pole); p.position.set(x+.5,2.6,y+.5); p.scale.set(.06,5.2,.06); levelGroup.add(p); const f=new THREE.Mesh(gPlane,banM); f.position.set(x+.5,4.3,y+.8); f.scale.set(.8,1.5,1); levelGroup.add(f);}
+  // fortress walls (always drawn, so you can see them from far away), banners, beacons and hazard pools
+  const destroyed=lgmSave().bases||{};
+  for(const B of D.bases){const tr=TRIBES[B.sec], V=LG_LV[B.lv]; B.ruin=!!destroyed[tr.id+'-'+B.lv]||(B.lv===4&&!!lgBeat()[tr.id]);
+    const stone=new THREE.Color('#77736c').lerp(new THREE.Color(tr.c2),.3), tiles=[]; for(let y=B.rect.y;y<B.rect.y+B.rect.h;y++) for(let x=B.rect.x;x<B.rect.x+B.rect.w;x++) if(D.fw[at(x,y)]===B.idx+1) tiles.push([x,y]);
+    const blk=new THREE.InstancedMesh(gBox,new THREE.MeshStandardMaterial({color:stone,roughness:.85,flatShading:true}),Math.max(1,tiles.length)), cr=new THREE.InstancedMesh(gBox,new THREE.MeshStandardMaterial({color:stone.clone().multiplyScalar(.82),roughness:.9}),Math.max(1,tiles.length)); let n=0,c=0;
+    for(const [x,y] of tiles){const hgt=B.ruin?(.5+hash(x,y)*1.1):V.wallH*(.96+hash(x,y)*.08); mtx.compose(new THREE.Vector3(x+.5,hgt/2,y+.5),q,new THREE.Vector3(1.02,hgt,1.02)); blk.setMatrixAt(n++,mtx); const id=B.idx+1, edge=D.fw[at(x,y-1)]!==id||D.fw[at(x,y+1)]!==id||D.fw[at(x-1,y)]!==id||D.fw[at(x+1,y)]!==id; if(!B.ruin&&edge&&(x+y)%2===0){mtx.compose(new THREE.Vector3(x+.5,V.wallH+.18,y+.5),q,new THREE.Vector3(.5,.4,.5)); cr.setMatrixAt(c++,mtx);}}
+    blk.count=n; cr.count=c; blk.castShadow=blk.receiveShadow=true; levelGroup.add(blk); levelGroup.add(cr); B.meshes=[blk,cr];
+    if(B.ruin) continue;
+    const banM=new THREE.MeshStandardMaterial({color:tr.col,emissive:new THREE.Color(tr.col),emissiveIntensity:.25,side:THREE.DoubleSide}), pole=new THREE.MeshStandardMaterial({color:0x3a2a1a}), R0=B.rings[0];
+    for(const [x,y] of [[R0.x0+1,R0.y0+1],[R0.x1-1,R0.y0+1],[R0.x0+1,R0.y1-1],[R0.x1-1,R0.y1-1]]){const p=new THREE.Mesh(gCyl,pole); p.position.set(x+.5,V.wallH+1.6,y+.5); p.scale.set(.07,3.2+V.wallH,.07); levelGroup.add(p); const f=new THREE.Mesh(gPlane,banM); f.position.set(x+.5,V.wallH+2.6,y+.85); f.scale.set(.9+.15*B.lv,1.5+.25*B.lv,1); levelGroup.add(f); B.meshes.push(p,f);}
+    // a crystal beacon over the heart that shines through the haze
+    const bh=10+B.lv*6, bm=new THREE.MeshBasicMaterial({color:new THREE.Color(tr.col),transparent:true,opacity:.35,depthWrite:false,blending:THREE.AdditiveBlending,fog:false}), beam=new THREE.Mesh(gCyl,bm); beam.position.set(B.cx+.5,bh/2,B.cy+.5); beam.scale.set(.35+.12*B.lv,bh,.35+.12*B.lv); levelGroup.add(beam);
+    const top=new THREE.Mesh(gOct,new THREE.MeshBasicMaterial({color:new THREE.Color(tr.col),fog:false})); top.position.set(B.cx+.5,bh+.8,B.cy+.5); top.scale.set(.6+.2*B.lv,1.2+.3*B.lv,.6+.2*B.lv); levelGroup.add(top); B.beacon=[beam,top]; B.meshes.push(beam,top);
     const ZC={thorn:'#3a5a24',sand:'#d8b878',poison:'#7ad040',ice:'#bfe8ff',lava:'#ff6a1a',void:'#7a40c0'}[tr.zone];
-    if(!B.ruin) for(const z of B.zones){const m=new THREE.Mesh(gCircle,new THREE.MeshBasicMaterial({color:ZC,transparent:true,opacity:tr.zone==='lava'||tr.zone==='void'?.85:.6,depthWrite:false})); m.rotation.x=-Math.PI/2; m.position.set(z.x*S,.07,z.y*S); m.scale.setScalar(z.r*S); levelGroup.add(m); z.mesh=m;}}
+    for(const z of B.zones){const m=new THREE.Mesh(gCircle,new THREE.MeshBasicMaterial({color:ZC,transparent:true,opacity:tr.zone==='lava'||tr.zone==='void'?.85:.6,depthWrite:false})); m.rotation.x=-Math.PI/2; m.position.set(z.x*S,.07,z.y*S); m.scale.setScalar(z.r*S); levelGroup.add(m); z.mesh=m; B.meshes.push(m);}}
   // crystal barriers
   {const tiles=[]; for(let i=0;i<W*H;i++) if(D.bar[i]>=0) tiles.push(i); const m=new THREE.InstancedMesh(gOct,new THREE.MeshStandardMaterial({color:0xb48aff,emissive:new THREE.Color('#7a3aff'),emissiveIntensity:.8,transparent:true,opacity:.75,roughness:.1}),tiles.length||1);
     tiles.forEach((i,k)=>{const x=i%W,y=(i/W)|0; mtx.compose(new THREE.Vector3(x+.5,.9+hash(x,y)*.4,y+.5),q.setFromEuler(new THREE.Euler(0,hash(y,x)*3,0)),new THREE.Vector3(.34,.9+hash(x+1,y)*.6,.34)); m.setMatrixAt(k,mtx);}); m.count=tiles.length; levelGroup.add(m); L.lgBar=m; m.visible=!lgFinalOpen();}
-  // houses, wells and the Crown Well
-  const pyr=geo('pyr4',()=>new THREE.ConeGeometry(1,1,4)), wall=new THREE.MeshStandardMaterial({color:0xd8c8a0,roughness:.9}), beam=new THREE.MeshStandardMaterial({color:0x5a3e24,roughness:.85});
   for(const hs of D.houses) lgmHouseMesh(hs);
-  if(false) for(const hs of D.houses){const roofC=hs.sec<0?'#3a5a9a':TRIBES[hs.sec].c2, gr=new THREE.Group(); gr.position.set(hs.x,0,hs.y); gr.rotation.y=-hs.ry+Math.PI/2; levelGroup.add(gr);
-    const b=new THREE.Mesh(gBox,wall); b.position.y=.6; b.scale.set(1.7,1.2,1.7); b.castShadow=b.receiveShadow=true; gr.add(b);
-    for(const [x,z] of [[-.85,-.85],[.85,-.85],[-.85,.85],[.85,.85]]){const p=new THREE.Mesh(gBox,beam); p.position.set(x,.6,z); p.scale.set(.14,1.22,.14); gr.add(p);}
-    const r=new THREE.Mesh(pyr,new THREE.MeshStandardMaterial({color:roofC,roughness:.8,flatShading:true})); r.position.y=1.6; r.scale.set(1.5,.9,1.5); r.rotation.y=Math.PI/4; r.castShadow=true; gr.add(r);
-    const d=new THREE.Mesh(gBox,beam); d.position.set(0,.4,.86); d.scale.set(.4,.8,.04); gr.add(d);}
   const well=(x,z,big)=>{const s=big?1.6:.8, gr=new THREE.Group(); gr.position.set(x,0,z); levelGroup.add(gr); const st=new THREE.MeshStandardMaterial({color:0x9a968c,roughness:.9,flatShading:true});
     const ring=new THREE.Mesh(gCyl,st); ring.position.y=.3*s; ring.scale.set(s,.6*s,s); gr.add(ring); const wt=new THREE.Mesh(gCircle,new THREE.MeshBasicMaterial({color:big?0x7ae8ff:0x5ab8e8})); wt.rotation.x=-Math.PI/2; wt.position.y=.62*s; wt.scale.setScalar(s*.85); gr.add(wt);
     if(big){const gold=new THREE.MeshStandardMaterial({color:0xe8c050,metalness:.6,roughness:.25}); for(let i=0;i<6;i++){const a=i/6*TAU, p=new THREE.Mesh(gCyl,gold); p.position.set(Math.cos(a)*s,1.1,Math.sin(a)*s); p.scale.set(.06,1.6,.06); gr.add(p); const g2=new THREE.Mesh(gOct,new THREE.MeshStandardMaterial({color:0xffd36a,emissive:new THREE.Color('#ffb020'),emissiveIntensity:1})); g2.position.set(Math.cos(a)*s,2,Math.sin(a)*s); g2.scale.set(.12,.2,.12); gr.add(g2);}
-      const halo=new THREE.Mesh(thinTor(),gold); halo.rotation.x=Math.PI/2; halo.position.y=1.9; halo.scale.setScalar(s); gr.add(halo); const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0x9ff0ff,transparent:true,opacity:.6,depthWrite:false,blending:THREE.AdditiveBlending})); sp.position.y=1.2; sp.scale.set(4,4,1); gr.add(sp);}};
+      const halo=new THREE.Mesh(thinTor(),gold); halo.rotation.x=Math.PI/2; halo.position.y=1.9; halo.scale.setScalar(s); gr.add(halo); const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0x9ff0ff,transparent:true,opacity:.6,depthWrite:false,blending:THREE.AdditiveBlending,fog:false})); sp.position.y=1.2; sp.scale.set(4,4,1); gr.add(sp);
+      const bm=new THREE.Mesh(gCyl,new THREE.MeshBasicMaterial({color:0x9ff0ff,transparent:true,opacity:.25,depthWrite:false,blending:THREE.AdditiveBlending,fog:false})); bm.position.y=14; bm.scale.set(.5,28,.5); gr.add(bm);}};
   well(LG_C+.5,LG_C+.5,true); for(const V of D.villages) well(V.cx+.5,V.cy+.5,false);
-  // the sea around the island
-  const sea=new THREE.Mesh(gPlane,new THREE.MeshStandardMaterial({color:0x2a6a9a,roughness:.15,metalness:.2})); sea.rotation.x=-Math.PI/2; sea.scale.set(W+400,H+400,1); sea.position.set(W/2,-.2,H/2); levelGroup.add(sea);}
-
+  const sea=new THREE.Mesh(gPlane,new THREE.MeshStandardMaterial({color:0x2a6a9a,roughness:.15,metalness:.2})); sea.rotation.x=-Math.PI/2; sea.scale.set(W+2000,H+2000,1); sea.position.set(W/2,-.2,H/2); levelGroup.add(sea);
+  // the land itself is drawn in chunks around the camera
+  const sx=Math.floor(L.start.x/T/LG_CH), sy=Math.floor(L.start.y/T/LG_CH); for(let j=-2;j<=2;j++) for(let i=-2;i<=2;i++) lgmChunk(sx+i,sy+j);}
 /* ---------------- starting, the title screen and quitting ---------------- */
 function openLegends(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} const party=MP.party&&MP.party.members.length>1; if(party&&MP.role!=='host'){toast('The party leader starts Legends','#ffd36a'); return;}
-  $('#modesPanel')&&($('#modesPanel').hidden=true); if(party){MP.inGame=true; MP.others.clear();} startLegends(); if(party){const S0=lgmSave(); bcast({t:'lgev',k:'start',seed:S0.seed,beaten:S0.beaten,day:LGMS.day}); toast('Your party is joining you in Legends','#8fd06a');} lgmTitle(true);}
+  $('#modesPanel')&&($('#modesPanel').hidden=true); if(party){MP.inGame=true; MP.others.clear();} startLegends(); if(party){const S0=lgmSave(); bcast({t:'lgev',k:'start',seed:S0.seed,beaten:S0.beaten,bases:S0.bases||{},day:LGMS.day}); toast('Your party is joining you in Legends','#8fd06a');} lgmTitle(true);}
 function startLegendBattle(){openLegends();}
 function startLegends(o){o=o||{}; lgmInit(); GAUNT=null; DUN=null; const S0=lgmSave(); LG_BEAT=o.beaten||null; const CL=MP.role==='client'&&MP.inGame;
-  LGMS={res:S0.res,yaw:-Math.PI/2,pitch:.42,dist:7.6,ride:false,mount:{walk:0},sprites:[],rally:null,day:30,raid:null,region:-9,bases:[],seen:{},lastAtk:0,deadT:0,hudT:0,saveT:0,ptowers:[],cry:null,thief:null,villagers:[],lock:false,lookT:0};
+  LGMS={res:S0.res,yaw:-Math.PI/2,pitch:.34,dist:7.6,ride:false,mount:{walk:0},sprites:[],rally:null,day:30,raid:null,region:-9,bases:[],seen:{},lastAtk:0,deadT:0,hudT:0,saveT:0,ptowers:[],cry:null,thief:null,villagers:[],lock:false,lookT:0};
+  lgmGearIn();
   GEN_OVERRIDE=genLegendWorld; GEN_NAME='Legends'; GEN_THEME={wall:[],scatter:[],plat:[],name:''};
   try{startLevel(0,1,false,o.seed||S0.seed);} finally{GEN_OVERRIDE=null; GEN_NAME=null; GEN_THEME=null;}
-  run.lgm=true; L.reinf=99; L.amb='petal'; const D=L.lgWorld; LGMS.nodes=D.nodes; LGMS.D=D; ents=[];
+  run.lgm=true; L.reinf=99; L.amb='petal'; const D=L.lgWorld; LGMS.nodes=D.nodes; LGMS.D=D; ents=[]; camera.far=340; camera.updateProjectionMatrix();
   if(!lgFinalOpen()) for(let i=0;i<D.bar.length;i++) if(D.bar[i]>=0) L.g[i]=1;
-  D.bases.forEach(B=>{const tr=TRIBES[B.sec], beaten=!!lgBeat()[tr.id], base={i:B.sec,tr,B,beaten,tier:tr.bi,gate:null,heart:null,spawners:[],towers:[]}; LGMS.bases.push(base);
-    if(beaten) return; for(const t of B.gateTiles) L.g[t.y*L.w+t.x]=1; if(CL) return;
-    base.gate=mkStruct(base,'gate',B.gate.x,B.gate.y); base.heart=mkStruct(base,'heart',B.heart.x,B.heart.y,{inv:true});
-    base.spawners=B.spawners.map(p=>mkStruct(base,'spawner',p.x,p.y)); base.towers=B.towers.map(p=>mkStruct(base,'tower',p.x,p.y));
-    LG_EBI=tr.bi; LG_ETIER=tr.bi; for(let k=0;k<4+B.sec;k++){const a=Math.random()*TAU, r=rand(500,800); const m=spawnEnemy(pickType(tr.bi),B.heart.x+Math.cos(a)*r,B.heart.y+Math.sin(a)*r); if(m){m.base=B.sec;}} LG_EBI=LG_ETIER=null;});
-  // villagers and the Lorekeepers
-  const vsk=['pirate0','viking0','samurai0','solar0','ocean0','default'].filter(k=>SKIN_BY_ID[k]);
+  const destroyed=o.bases||S0.bases||{};
+  D.bases.forEach(B=>{const tr=TRIBES[B.sec], key=tr.id+'-'+B.lv, done=!!destroyed[key]||(B.lv===4&&!!lgBeat()[tr.id]), base={i:B.idx,sec:B.sec,lv:B.lv,tr,B,beaten:done,tier:tr.bi,gates:[],gate:null,heart:null,spawners:[],towers:[],active:false}; LGMS.bases.push(base);
+    if(done){for(const gt of B.gateTiles) for(const t of gt) L.g[t.y*L.w+t.x]=0; return;}
+    for(const gt of B.gateTiles) for(const t of gt) L.g[t.y*L.w+t.x]=1; if(CL) return;
+    base.gates=B.gates.map((g,k)=>mkStruct(base,'gate',g.x,g.y,{ring:k,horiz:g.horiz})); base.gate=base.gates[0]; base.heart=mkStruct(base,'heart',B.heart.x,B.heart.y,{inv:true});
+    base.spawners=B.spawners.map(p=>mkStruct(base,'spawner',p.x,p.y)); base.towers=B.towers.map(p=>mkStruct(base,'tower',p.x,p.y));});
+  const vsk=lgSkins();
   for(const V of D.villages) for(let k=0;k<2;k++) LGMS.villagers.push({x:V.x+rand(-60,60),y:V.y+rand(60,90),hx:V.x,hy:V.y+70,skin:choice(vsk),face:rand(-3,3),walk:0,t:rand(0,3),tx:null});
   ['arcane0','arcane1','arcane2'].forEach((k,i)=>{const a=-Math.PI/2+(i-1)*.9; LGMS.villagers.push({x:D.hub.x+Math.cos(a)*95,y:D.hub.y+Math.sin(a)*95,hx:0,hy:0,skin:SKIN_BY_ID[k]?k:'default',face:a+Math.PI,walk:0,still:true,lore:true});});
   if(o.day!=null) LGMS.day=o.day; if(!CL) for(const h of (S0.houses||[])) lgmPlaceHouse(h.x,h.y,false,true);
@@ -7150,13 +7142,12 @@ function lgmTitle(on){let el=$('#lgTitle'); if(!on){if(el) el.hidden=true; if(mo
   setTimeout(()=>{const b=el.querySelector('#lgPlay'); if(b) b.focus();},50);}
 function showMenuFromLegends(){cine=null; toMenu();}
 function lgmStartTip(){mode='play'; banner('The Crown Well','Six lands wait. Gather, build and rally.'); toast('Click the game to steer the camera with your mouse. R to ride, G to gather, Z/X/C/V to build, T to rally.','#ffd36a');}
-function lgmQuit(){if(!LGMS) return; lgmB({k:'quit'}); LG_BEAT=null; const S0=lgmSave(); S0.res=LGMS.res; persist(); try{if(document.pointerLockElement) document.exitPointerLock();}catch(e){} LGMS=null; lgmHud(); lgmBar(false); const t=$('#lgTitle'); if(t) t.hidden=true; const rr=$('#resRetry'); if(rr) rr.textContent='Retry';}
-function mkStruct(base,type,x,y,o){const tr=base.tr, tier=base.tier, df=DF();
-  const bs={tower:[20,700],spawner:[26,1100],gate:[52,3000],heart:[36,2600]}[type];
-  const e={id:MP.nextId++,st:true,base:base.i,type,ai:type,name:{tower:tr.name.replace(/Horde of (the )?/,'')+' Tower',spawner:'Horde Spawner',gate:tr.fort+' Gate',heart:'Heart of '+tr.fort}[type],c1:tr.c2,c2:tr.col,x,y,r:bs[0],tier,
-    hp:0,max:Math.round(bs[1]*(1+.5*tier)*df.hp),dmg:6*(1+.42*tier)*df.dmg,spd:0,state:'idle',t:0,cd:rand(.5,2),flash:0,stun:0,burn:0,kx:0,ky:0,alert:true,face:Math.PI/2,walk:0,summoned:false,hx:x,hy:y,inv:false,horiz:type==='gate'?base.B.gate.horiz:true};
+function lgmQuit(){if(!LGMS) return; lgmB({k:'quit'}); LG_BEAT=null; const S0=lgmSave(); S0.res=LGMS.res; lgmGearOut(); persist(); try{if(document.pointerLockElement) document.exitPointerLock();}catch(e){} camera.far=140; camera.updateProjectionMatrix(); LGMS=null; lgmHud(); lgmBar(false); const t=$('#lgTitle'); if(t) t.hidden=true; const rr=$('#resRetry'); if(rr) rr.textContent='Retry';}
+function mkStruct(base,type,x,y,o){const tr=base.tr, tier=base.tier, df=DF(), V=LG_LV[base.lv];
+  const bs={tower:[20,700],spawner:[26,1100],gate:[52,3000],heart:[36,2600]}[type], nm=lgBaseName(base);
+  const e={id:MP.nextId++,st:true,base:base.i,type,ai:type,name:{tower:tr.name.replace(/Horde of (the )?/,'')+' Tower',spawner:'Horde Spawner',gate:nm+' Gate',heart:'Heart of '+nm}[type],c1:tr.c2,c2:tr.col,x,y,r:bs[0],tier,
+    hp:0,max:Math.round(bs[1]*(1+.5*tier)*V.hp*df.hp),dmg:6*(1+.42*tier)*V.dmg*df.dmg,spd:0,state:'idle',t:0,cd:rand(.5,2),flash:0,stun:0,burn:0,kx:0,ky:0,alert:true,face:Math.PI/2,walk:0,summoned:false,hx:x,hy:y,inv:false,horiz:true};
   e.hp=e.max; Object.assign(e,o||{}); ents.push(e); return e;}
-
 /* ---------------- the third-person camera and controls ---------------- */
 function lgmCamActive(){return !!(LGMS&&L&&L.lgWorld&&mode!=='lgmenu');}
 function lgmCamera(sx,sz){const C=LGMS, ride=C.ride?.45:0; let dd=C.dist+(C.ride?1.6:0); {const D=C.D, cyw=Math.cos(C.yaw), syw=Math.sin(C.yaw); for(let t=.6;t<dd;t+=.3){const bx=P.x*S-cyw*t*Math.cos(C.pitch), bz=P.y*S-syw*t*Math.cos(C.pitch), tx=Math.floor(bx), tz=Math.floor(bz); if(tx<0||tz<0||tx>=L.w||tz>=L.h) break; const i=tz*L.w+tx; if(!L.g[i]||D.lake[i]) continue; const wh=D.fw[i]?2.7:D.bld[i]?2.2:D.bar[i]>=0?2:1.6; if(t*Math.sin(C.pitch)+1.2+ride<wh){dd=Math.max(1.8,t-.4); break;}}} const back=dd*Math.cos(C.pitch), up=dd*Math.sin(C.pitch)+1.2+ride, px=P.x*S, pz=P.y*S, cy=Math.cos(C.yaw), sy=Math.sin(C.yaw);
@@ -7165,7 +7156,7 @@ function lgmMove(v){if(!lgmCamActive()) return v; const f={x:Math.cos(LGMS.yaw),
 function lgmAim(){const C=LGMS, fwd=C.lock?C.yaw:(moveVec().x||moveVec().y?P.face:C.yaw); let best=null,bd=300; for(const e of targets()){const d=Math.hypot(e.x-P.x,e.y-P.y), a=Math.abs(angDiff(fwd,Math.atan2(e.y-P.y,e.x-P.x))); if(a<1.2&&d<bd){bd=d; best=e;}} return best?Math.atan2(best.y-P.y,best.x-P.x):fwd;}
 cv.addEventListener('click',()=>{if(lgmCamActive()&&mode==='play'&&!TOUCH&&cv.requestPointerLock){try{cv.requestPointerLock();}catch(e){}}});
 document.addEventListener('pointerlockchange',()=>{if(LGMS) LGMS.lock=document.pointerLockElement===cv;});
-document.addEventListener('mousemove',e=>{if(!LGMS||!LGMS.lock||mode!=='play') return; LGMS.yaw+=e.movementX*.0032; LGMS.pitch=clamp(LGMS.pitch+e.movementY*.002,.18,.95); LGMS.lookT=2;});
+document.addEventListener('mousemove',e=>{if(!LGMS||!LGMS.lock||mode!=='play') return; LGMS.yaw+=e.movementX*.0032; LGMS.pitch=clamp(LGMS.pitch+e.movementY*.002,.12,.95); LGMS.lookT=2;});
 cv.addEventListener('wheel',e=>{if(!lgmCamActive()) return; e.preventDefault(); LGMS.dist=clamp(LGMS.dist+e.deltaY*.006,4,12);},{passive:false});
 {let tid=null,lx=0,ly=0; cv.addEventListener('touchstart',e=>{if(!lgmCamActive()) return; for(const t of e.changedTouches) if(t.clientX>innerWidth*.45&&tid===null){tid=t.identifier; lx=t.clientX; ly=t.clientY;}},{passive:true});
   cv.addEventListener('touchmove',e=>{if(!lgmCamActive()||tid===null) return; for(const t of e.changedTouches) if(t.identifier===tid){LGMS.yaw+=(t.clientX-lx)*.008; LGMS.pitch=clamp(LGMS.pitch+(t.clientY-ly)*.004,.18,.95); lx=t.clientX; ly=t.clientY; LGMS.lookT=1.5;}},{passive:true});
@@ -7178,7 +7169,7 @@ function lgmRegion(force){const D=LGMS.D, tx=clamp(Math.floor(P.x/T),0,L.w-1), t
   L.amb=s<0?'petal':BIOMES[L.bi].amb; if(!force&&mode==='play'){const tr=s<0?null:TRIBES[s], beaten=tr&&lgmSave().beaten[tr.id]; banner(s<0?'The Crown Well':BIOMES[tr.bi].name,s<0?'Home of the Lorekeepers':beaten?`Freed from the ${tr.name}`:`Land of the ${tr.name}`);}}
 function lgmDayLight(){const C=LGMS, t=C.day%300, k=t<200?1:t<215?1-(t-200)/15*.7:t<285?.3:.3+(t-285)/15*.7; C.dayK=k; C.night=t>=210&&t<288;
   sun.intensity=(C.envSi||1)*(.25+.75*k); hemi.intensity=(C.envHi||.85)*.85*(.45+.55*k); const night=new THREE.Color('#0b1430'), col=(C.sky||new THREE.Color('#bfe0ff')).clone().lerp(night,1-k);
-  scene.background=col; if(scene.fog){scene.fog.color.copy(col); scene.fog.near=26; scene.fog.far=78;}}
+  scene.background=col; if(scene.fog){scene.fog.color.copy(col); scene.fog.near=QT==='low'?30:40; scene.fog.far=QT==='low'?88:118;}}
 function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.max(0,C.lookT-dt);
   // camera: keys turn it, and without the mouse lock it slowly swings behind you as you run
   if(keys['arrowleft']) C.yaw-=dt*2.2; if(keys['arrowright']) C.yaw+=dt*2.2; if(keys['arrowup']) C.pitch=clamp(C.pitch-dt,.18,.95); if(keys['arrowdown']) C.pitch=clamp(C.pitch+dt,.18,.95);
@@ -7198,9 +7189,9 @@ function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.ma
     if(swing&&Math.hypot(n.x-P.x,n.y-P.y)<78) lgmHarvest(n,1);}
   lgmSprites(dt);
   // hazards near fortresses
-  C.zt=(C.zt||0)-dt; for(const b of C.bases){if(b.beaten||Math.hypot(b.B.heart.x-P.x,b.B.heart.y-P.y)>1300) continue; for(const z of b.B.zones){if(Math.hypot(z.x-P.x,z.y-P.y)>z.r) continue; const zn=b.tr.zone; if(zn==='sand'||zn==='ice') P.slow=Math.max(P.slow,.25); else if(C.zt<=0){C.zt=.6; hurtP(Math.round((zn==='lava'?6:zn==='void'?5:3)*(1+.3*b.tier)),{});} break;}
+  C.zt=(C.zt||0)-dt; for(const b of C.bases){if(b.beaten||Math.hypot(b.B.heart.x-P.x,b.B.heart.y-P.y)>3000) continue; for(const z of b.B.zones){if(Math.hypot(z.x-P.x,z.y-P.y)>z.r) continue; const zn=b.tr.zone; if(zn==='sand'||zn==='ice') P.slow=Math.max(P.slow,.25); else if(C.zt<=0){C.zt=.6; hurtP(Math.round((zn==='lava'?6:zn==='void'?5:3)*(1+.3*b.tier)),{});} break;}
     if(b.tr.zone==='poison'&&b.spawners.some(s=>s.hp>0)) for(const e of ents) if(e.st&&e.base===b.i&&e.hp>0&&e.hp<e.max) e.hp=Math.min(e.max,e.hp+e.max*.006*dt);
-    const H=b.heart; if(!CLI&&H&&H.inv&&H.hp>0){const ok=b.gate.hp<=0&&(b.tr.zone!=='void'||b.spawners.every(s=>s.hp<=0)); if(ok){H.inv=false; lgmShieldCine(b);}}}
+    const H=b.heart; if(!CLI&&H&&H.inv&&H.hp>0){const ok=(b.gates||[]).every(g=>g.hp<=0)&&(b.lv<4||C.bases.every(o=>o.sec!==b.sec||o.lv===4||o.beaten))&&(b.tr.zone!=='void'||b.spawners.every(s=>s.hp<=0)); if(ok){H.inv=false; lgmShieldCine(b);}}}
   // player towers
   for(const t of C.ptowers){t.cd-=dt; if(t.cd>0) continue; let best=null,bd=400; for(const e of targets()){const d=Math.hypot(e.x-t.x,e.y-t.y); if(d<bd){bd=d; best=e;}} if(best){t.cd=1.1; const an=Math.atan2((best.y-best.r)-(t.y-40),best.x-t.x); projs.push({x:t.x,y:t.y-40,vx:Math.cos(an)*560,vy:Math.sin(an)*560,dmg:Math.round(9*(1+.4*L.tier)),pet:true,r:5,col:'#bfe0ff',own:'p',life:1.2,arrow:true});}}
   if(C.rally){C.rally.t-=dt; if(C.rally.t<=0) C.rally=null;}
@@ -7213,13 +7204,17 @@ function lgmSprites(dt){const C=LGMS; for(const s of C.sprites){s.t+=dt; const t
     if(d<16){if(s.state==='go') {s.state='work'; s.wt=1.4; s.n=0;} else s.done=true; continue;} const sp=360*dt; s.x+=dx/d*Math.min(d,sp); s.y+=dy/d*Math.min(d,sp);}
   C.sprites=C.sprites.filter(s=>!s.done);}
 function lgmVillagers(dt){for(const v of LGMS.villagers){if(v.still){v.face=Math.atan2(P.y-v.y,P.x-v.x); continue;} v.t-=dt; if(v.t<=0||!v.tx){v.t=rand(2,5); v.tx=v.hx+rand(-80,80); v.ty=v.hy+rand(-30,40);} const dx=v.tx-v.x, dy=v.ty-v.y, d=Math.hypot(dx,dy); v.moving=d>6; if(d>6){const sp=50*dt; v.x+=dx/d*sp; v.y+=dy/d*sp; v.face=Math.atan2(dy,dx); v.walk+=dt*8;}}}
-function lgmRaids(dt){const C=LGMS; if(C.night&&!C.raid&&!C.raidDone){const opts=C.bases.filter(b=>!b.beaten&&tribeOpen(b.i)); if(!opts.length){C.raidDone=true; return;} const b=choice(opts), V=C.D.villages[b.i];
-    C.raid={b,V,mobs:[]}; LG_EBI=b.tr.bi; LG_ETIER=b.tr.bi; for(let k=0;k<6+b.i*2;k++){const a=Math.random()*TAU, r=rand(120,260); const m=spawnEnemy(pickType(b.tr.bi),V.x+Math.cos(a)*r,V.y+Math.sin(a)*r,true); if(m){m.raid=true; m.base=b.i; C.raid.mobs.push(m); puff(m.x,m.y,b.tr.col,10,100,.5,4);}} LG_EBI=LG_ETIER=null;
-    banner(`${b.tr.name} raids ${V.name}!`,'Ride to the village and drive them off before dawn'); if(typeof sfx==='function') sfx('roar');}
-  if(C.raid){C.raid.mobs=C.raid.mobs.filter(m=>m.hp>0); if(!C.raid.mobs.length){const r={gold:20+C.raid.b.i*8,stone:15,wood:15}; for(const k in r) C.res[k]+=r[k]; banner(`${C.raid.V.name} is safe!`,`The villagers give you ${r.gold} gold, ${r.stone} stone and ${r.wood} wood`); if(typeof sfx==='function') sfx('win'); C.raid=null; C.raidDone=true;}
+function lgmRaids(dt){const C=LGMS; if(C.night&&!C.raid&&!C.raidDone){const vs=C.D.villages.filter(V=>tribeOpen(V.sec)&&!lgBeat()[TRIBES[V.sec].id]).sort((a,b)=>Math.hypot(a.x-P.x,a.y-P.y)-Math.hypot(b.x-P.x,b.y-P.y)).slice(0,3); if(!vs.length){C.raidDone=true; return;} const V=choice(vs), tr=TRIBES[V.sec], lvl=1+Math.min(3,Math.floor(Math.hypot(V.cx-LG_C,V.cy-LG_C)/100));
+    C.raid={b:{tr,i:-1},V,mobs:[]}; LG_EBI=tr.bi; LG_ETIER=tr.bi; for(let k=0;k<4+lvl*3;k++){const a=Math.random()*TAU, r=rand(120,280); const m=spawnEnemy(pickType(tr.bi),V.x+Math.cos(a)*r,V.y+Math.sin(a)*r,true); if(m){m.raid=true; m.base=null; m.tribe=V.sec; C.raid.mobs.push(m); puff(m.x,m.y,tr.col,10,100,.5,4);}} LG_EBI=LG_ETIER=null;
+    banner(`${tr.name} raids ${V.name}!`,'Ride to the village and drive them off before dawn'); if(typeof sfx==='function') sfx('roar');}
+  if(C.raid){C.raid.mobs=C.raid.mobs.filter(m=>m.hp>0); if(!C.raid.mobs.length){const r={gold:24,stone:20,wood:20}; for(const k in r) C.res[k]+=r[k]; const it=lgLoot(C.raid.b.tr.bi,1); if(it) SAVE.inv.push(it); banner(`${C.raid.V.name} is safe!`,`The villagers give you ${r.gold} gold, ${r.stone} stone, ${r.wood} wood${it?' and '+it.name:''}`); if(typeof sfx==='function') sfx('win'); C.raid=null; C.raidDone=true;}
     else if(!C.night){for(const m of C.raid.mobs){m.hp=0; puff(m.x,m.y,'#444',8,80,.5,4);} toast(`Dawn breaks. The raiders flee ${C.raid.V.name}, taking its harvest with them.`,'#ff8a6a'); C.raid=null;}}
   if(!C.night&&C.raidDone&&(C.day%300)<100) C.raidDone=false;}
-function lgmBaseIntro(){for(const b of LGMS.bases){if(b.beaten||!tribeOpen(b.i)||LGMS.seen[b.i]) continue; if(Math.hypot(b.B.heart.x-P.x,b.B.heart.y-P.y)<1100){LGMS.seen[b.i]=true; startCine(lgmTribeShots(b),()=>banner(b.tr.fort,'Break the gate, shatter the heart'));}}}
+function lgmBaseIntro(){const C=LGMS, CLI=MP.role==='client'&&MP.inGame;
+  for(const b of C.bases){if(b.beaten||!tribeOpen(b.sec)) continue; const d=Math.hypot(b.B.heart.x-P.x,b.B.heart.y-P.y);
+    if(!b.active&&!CLI&&d<5200){b.active=true; const V=LG_LV[b.lv]; LG_EBI=b.tr.bi; LG_ETIER=b.tier; for(let k=0;k<V.patrol;k++){const a=Math.random()*TAU, r=rand(300,700+b.lv*120); const m=spawnEnemy(pickType(b.tier),b.B.heart.x+Math.cos(a)*r,b.B.heart.y+Math.sin(a)*r); if(m){m.base=b.i; if(b.lv>1){m.max=Math.round(m.max*(1+.2*(b.lv-1))); m.hp=m.max;}}} LG_EBI=LG_ETIER=null;}
+    if(!C.seen['t'+b.sec]&&d<2000){C.seen['t'+b.sec]=true; C.seen[b.i]=true; startCine(lgmTribeShots(b),()=>banner(lgBaseName(b),`Level ${b.lv} · ${LG_LV[b.lv].diff} · break the gate${b.lv>1?'s':''}, shatter the heart`)); return;}
+    if(!C.seen[b.i]&&d<1500){C.seen[b.i]=true; banner(lgBaseName(b),`${b.tr.name} · Level ${b.lv} · ${LG_LV[b.lv].diff}${b.lv===4?' · their leader waits inside':''}`);}}}
 function lgmAct(a){const C=LGMS; if(!C||mode!=='play'||!P||P.dead) return;
   if(a==='house'||a==='recruit'){lgmVillageAct(a); lgmHud(); lgmBar(true); return;}
   if(LG_COST[a]){const c=LG_COST[a]; if(!Object.entries(c).every(([r,v])=>C.res[r]>=v)){toast(`Not enough: needs ${Object.entries(c).map(([r,v])=>v+' '+r).join(' and ')}`,'#ff8a6a'); return;}
@@ -7233,25 +7228,25 @@ function lgmAct(a){const C=LGMS; if(!C||mode!=='play'||!P||P.dead) return;
   else if(a==='mount'){C.ride=!C.ride; puff(P.x,P.y,'#ffd36a',14,120,.5,5); if(typeof sfx==='function') sfx('summon');}
   lgmHud(); lgmBar(true);}
 const lgmProgressTier=()=>{const B=lgmSave().beaten; return TRIBES.filter(t=>B[t.id]).length;};
-function lgmStructTick(e,dt){const b=LGMS&&LGMS.bases[e.base]; if(!b) return; e.kx=e.ky=0; e.t+=dt; const far=Math.hypot(e.x-P.x,e.y-P.y)>1300; if(far) return; const tr=b.tr;
+function lgmStructTick(e,dt){const b=LGMS&&LGMS.bases[e.base]; if(!b) return; e.kx=e.ky=0; e.t+=dt; const near=[P,...MP.others.values()].some(o=>Math.hypot(e.x-o.x,e.y-o.y)<1400); if(!near) return; const tr=b.tr, V=LG_LV[b.lv];
   if(tr.zone==='thorn'&&e.hp<(e.lastHp==null?e.hp:e.lastHp)&&Math.hypot(e.x-P.x,e.y-P.y)<e.r+80&&!P.dead&&!(e.thCd>0)){e.thCd=.5; hurtP(Math.round(2+b.tier),{}); puff(P.x,P.y-12,'#9ad06a',5,60,.3,3);} e.thCd=(e.thCd||0)-dt; e.lastHp=e.hp;
   if(e.type==='tower'){e.cd-=dt; if(e.cd>0) return; let best=null,bd=440; for(const f of foes()){const d=Math.hypot(f.x-e.x,f.y-e.y); if(d<bd){bd=d; best=f;}}
-    if(best){e.cd=tr.zone==='lava'?1.9:1.5; const an=Math.atan2((best.y-12)-(e.y-46),best.x-e.x); projs.push({x:e.x,y:e.y-46,vx:Math.cos(an)*400,vy:Math.sin(an)*400,dmg:Math.round(e.dmg*(tr.zone==='lava'?1.6:1)),r:6,col:tr.col,own:'e',life:1.6,slow:tr.zone==='ice'?1.5:0}); puff(e.x,e.y-46,tr.col,4,60,.3,3);} else e.cd=.4;}
+    if(best){e.cd=(tr.zone==='lava'?1.9:1.5)*(1-.06*(b.lv-1)); const an=Math.atan2((best.y-12)-(e.y-46),best.x-e.x); projs.push({x:e.x,y:e.y-46,vx:Math.cos(an)*400,vy:Math.sin(an)*400,dmg:Math.round(e.dmg*(tr.zone==='lava'?1.6:1)),r:6,col:tr.col,own:'e',life:1.6,slow:tr.zone==='ice'?1.5:0}); puff(e.x,e.y-46,tr.col,4,60,.3,3);} else e.cd=.4;}
   else if(e.type==='spawner'){if(tr.zone==='sand'){const ph=(e.t+e.id)%10; e.inv=ph>7.6; e.burrow=e.inv;}
-    e.cd-=dt; if(e.cd>0) return; e.cd=Math.max(5,9-.5*b.tier); const alive=ents.filter(m=>m.lgSp&&m.base===b.i&&m.hp>0).length; if(alive>=8+b.tier||Math.hypot(e.x-P.x,e.y-P.y)>1000) return;
-    LG_EBI=tr.bi; LG_ETIER=b.tier; for(let k=0;k<(b.tier>=3?2:1);k++){const a=Math.random()*TAU; const m=spawnEnemy(pickType(b.tier),e.x+Math.cos(a)*(e.r+24),e.y+Math.sin(a)*(e.r+24),true); if(m){m.lgSp=true; m.base=b.i; puff(m.x,m.y-10,tr.col,12,120,.5,5);}} LG_EBI=LG_ETIER=null;}}
+    e.cd-=dt; if(e.cd>0) return; e.cd=V.cd*rand(.85,1.15); const alive=ents.filter(m=>m.lgSp&&m.base===b.i&&m.hp>0).length; if(alive>=V.cap||Math.hypot(e.x-P.x,e.y-P.y)>1100) return;
+    LG_EBI=tr.bi; LG_ETIER=b.tier; for(let k=0;k<V.wave;k++){const a=Math.random()*TAU; const m=spawnEnemy(pickType(b.tier),e.x+Math.cos(a)*(e.r+24),e.y+Math.sin(a)*(e.r+24),true); if(m){m.lgSp=true; m.base=b.i; if(b.lv>1){m.max=Math.round(m.max*(1+.2*(b.lv-1))); m.hp=m.max;} puff(m.x,m.y-10,tr.col,12,120,.5,5);}} LG_EBI=LG_ETIER=null;}}
 function lgmStructDown(e){const b=LGMS.bases[e.base]; shake(e.type==='gate'||e.type==='heart'?12:6); flashT=.25; flashCol='#ffffff'; puff(e.x,e.y-20,e.c2,40,240,.9,7); puff(e.x,e.y-20,'#9a9488',30,200,.8,6); if(typeof sfx==='function') sfx('boom');
-  for(let i=0;i<(e.type==='heart'?10:4);i++) dropLoot(e.x,e.y,{kind:'shard',amt:2}); LGMS.res.gold+=e.type==='spawner'?10:e.type==='tower'?6:0;
-  if(e.type==='gate'){for(const t of b.B.gateTiles) L.g[t.y*L.w+t.x]=0; lgmGateCine(b); lgmB({k:'gate',b:b.i});}
-  else if(e.type==='spawner') toast(`Spawner destroyed! ${b.spawners.filter(s=>s.hp>0&&s!==e).length} left`,b.tr.col);
+  for(let i=0;i<(e.type==='heart'?10:3);i++) dropLoot(e.x,e.y,{kind:'shard',amt:2}); LGMS.res.gold+=e.type==='spawner'?10:e.type==='tower'?6:e.type==='gate'?8:0;
+  if(e.type==='gate'){const k=e.ring||0; for(const t of b.B.gateTiles[k]||[]) L.g[t.y*L.w+t.x]=0; lgmGateCine(b,k); lgmB({k:'gate',b:b.i,r:k});}
+  else if(e.type==='spawner') toast(`Spawner destroyed! ${b.spawners.filter(s=>s.hp>0&&s!==e).length} left at ${lgBaseName(b)}`,b.tr.col);
   else if(e.type==='heart') lgmHeartDown(b,e);}
-
 /* ---------------- HUD ---------------- */
-function lgmObjective(){const C=LGMS; if(!C) return []; const out=[]; const B=lgmSave().beaten;
+function lgmObjective(){const C=LGMS; if(!C) return []; const out=[]; const B=lgBeat();
   if(boss&&!boss.dead&&boss.lgp) out.push(`Defeat ${boss.name}`);
   if(C.raid) out.push(`Defend ${C.raid.V.name} · ${C.raid.mobs.length} raiders`);
-  const near=C.bases.filter(b=>!b.beaten&&tribeOpen(b.i)).sort((a,b)=>Math.hypot(a.B.heart.x-P.x,a.B.heart.y-P.y)-Math.hypot(b.B.heart.x-P.x,b.B.heart.y-P.y))[0];
-  if(near){const sp=near.spawners.filter(s=>s.hp>0).length; out.push(`${near.tr.fort}: ${near.gate&&near.gate.hp>0?'break the gate':near.heart&&near.heart.inv?`destroy ${sp} spawner${sp===1?'':'s'}`:near.heart&&near.heart.hp>0?'shatter the heart':'defeat the leader'}`);}
+  const near=C.bases.filter(b=>!b.beaten&&tribeOpen(b.sec)).sort((a,b)=>Math.hypot(a.B.heart.x-P.x,a.B.heart.y-P.y)-Math.hypot(b.B.heart.x-P.x,b.B.heart.y-P.y))[0];
+  if(near){const gl=(near.gates||[]).filter(g=>g.hp>0).length, sp=near.spawners.filter(s=>s.hp>0).length, others=C.bases.filter(o=>o.sec===near.sec&&o.lv<4&&!o.beaten).length; const dist=Math.round(Math.hypot(near.B.heart.x-P.x,near.B.heart.y-P.y)/T);
+    out.push(`${lgBaseName(near)} (Lv ${near.lv}, ${dist} m): ${gl?`break ${gl} gate${gl>1?'s':''}`:near.heart&&near.heart.inv?(near.lv===4&&others?`destroy the ${others} other ${near.tr.name} base${others>1?'s':''} first`:`destroy ${sp} spawner${sp===1?'':'s'}`):near.heart&&near.heart.hp>0?'shatter the heart':'defeat the leader'}`);}
   if(!lgFinalOpen()) out.push(`Free the first three lands (${['thorn','dune','bog'].filter(k=>B[k]).length}/3)`); else if(!B.hollow) out.push('Break into the Hollow Spire');
   return out.slice(0,3);}
 function lgmHud(){let el=$('#lgmHud'); if(!el){el=document.createElement('div'); el.id='lgmHud'; el.setAttribute('role','status'); $('#hud').appendChild(el);} if(!LGMS){el.hidden=true; let d=$('#lgmDay'); if(d) d.hidden=true; return;} el.hidden=false; const R0=LGMS.res;
@@ -7262,37 +7257,41 @@ function lgmBar(on){let el=$('#lgmBar'); if(!el){el=document.createElement('div'
     el.querySelectorAll('.lgb').forEach(b=>{const fire=ev=>{ev.preventDefault(); ev.stopPropagation(); lgmAct(b.dataset.b);}; b.addEventListener('click',fire); b.addEventListener('touchstart',fire,{passive:false});});}
   el.hidden=!on||!LGMS; if(LGMS) el.querySelectorAll('.lgb').forEach(b=>{const c=LG_COST[b.dataset.b]; b.classList.toggle('no',!!c&&!Object.entries(c).every(([r,v])=>LGMS.res[r]>=v)); b.classList.toggle('on',(b.dataset.b==='mount'&&LGMS.ride)||(b.dataset.b==='rally'&&!!LGMS.rally));});}
 let lgmMiniImg=null;
-function lgmMini(){const S2=mini.width, D=LGMS.D, sc=S2/L.w;
-  if(!lgmMiniImg){const c=document.createElement('canvas'); c.width=c.height=S2; const g2=c.getContext('2d'); for(let y=0;y<L.h;y++) for(let x=0;x<L.w;x++){const i=y*L.w+x; let col;
-      if(D.lake[i]) col='#3a7ab8'; else if(D.fw[i]) col='#8a8a8a'; else if(D.bld[i]) col='#c8a878'; else if(L.g[i]&&D.bar[i]<0) col=x<2||y<2?'#1a3a5a':'#4a4a48'; else if(D.bar[i]>=0&&!lgFinalOpen()) col='#9a6aff'; else {const s=D.reg[i], E=regEnv(s); col='#'+new THREE.Color(E.fl[1]).getHexString();}
-      if(Math.hypot(x-LG_C,y-LG_C)>72) col='#2a6a9a'; g2.fillStyle=col; g2.fillRect(x*sc,y*sc,Math.ceil(sc),Math.ceil(sc));} lgmMiniImg=c;}
-  mg.clearRect(0,0,S2,S2); mg.drawImage(lgmMiniImg,0,0);
-  const dot=(o,c,s)=>{mg.fillStyle=c; mg.fillRect(o.x/T*sc-s/2,o.y/T*sc-s/2,s,s);};
-  for(const b of LGMS.bases) if(!b.beaten){mg.fillStyle=tribeOpen(b.i)?b.tr.col:'#666'; mg.beginPath(); mg.arc(b.B.heart.x/T*sc,b.B.heart.y/T*sc,5,0,TAU); mg.fill(); mg.strokeStyle='#000'; mg.stroke();}
-  for(const V of D.villages) dot(V,'#ffe0a0',5); dot(D.hub,'#7ae8ff',7);
-  for(const e of ents) if(e.hp>0&&!e.st&&Math.hypot(e.x-P.x,e.y-P.y)<900) dot(e,'#ff4a4a',3);
-  if(LGMS.raid) {mg.strokeStyle='#ff4a4a'; mg.lineWidth=2; mg.beginPath(); mg.arc(LGMS.raid.V.x/T*sc,LGMS.raid.V.y/T*sc,8+Math.sin(time*6)*2,0,TAU); mg.stroke();}
-  for(const a of allies) dot(a,'#5fb3ff',3); if(LGMS.rally) dot(LGMS.rally,'#5fb3ff',6);
-  const px=P.x/T*sc, py=P.y/T*sc; mg.save(); mg.translate(px,py); mg.rotate(LGMS.yaw+Math.PI/2); mg.fillStyle='#fff'; mg.beginPath(); mg.moveTo(0,-7); mg.lineTo(5,5); mg.lineTo(-5,5); mg.closePath(); mg.fill(); mg.restore();}
-
+function lgmMini(){const S2=mini.width, D=LGMS.D, RES=2, IW=Math.ceil(L.w/RES);
+  if(!lgmMiniImg){const c=document.createElement('canvas'); c.width=c.height=IW; const g2=c.getContext('2d'), img=g2.createImageData(IW,IW), cache={};
+    for(let py=0;py<IW;py++) for(let px=0;px<IW;px++){const x=px*RES, y=py*RES, i=y*L.w+x; let col;
+      if(Math.hypot(x-LG_C,y-LG_C)>396) col='#2a6a9a'; else if(D.lake[i]) col='#3a7ab8'; else if(D.fw[i]) col='#8a8a8a'; else if(D.bld[i]) col='#c8a878'; else if(D.bar[i]>=0&&!lgFinalOpen()) col='#9a6aff'; else if(L.g[i]) col='#4a4a48'; else {const s=D.reg[i]; col=cache[s]||(cache[s]='#'+new THREE.Color(regEnv(s).fl[1]).getHexString());}
+      const k=(py*IW+px)*4, v=parseInt(col.slice(1),16); img.data[k]=v>>16; img.data[k+1]=(v>>8)&255; img.data[k+2]=v&255; img.data[k+3]=255;}
+    g2.putImageData(img,0,0); lgmMiniImg=c;}
+  const view=bigMap?L.w:220, sc=S2/view, ox=bigMap?0:clamp(P.x/T-view/2,0,L.w-view), oy=bigMap?0:clamp(P.y/T-view/2,0,L.h-view);
+  mg.clearRect(0,0,S2,S2); mg.imageSmoothingEnabled=false; mg.drawImage(lgmMiniImg,ox/RES,oy/RES,view/RES,view/RES,0,0,S2,S2);
+  const X=o=>(o.x/T-ox)*sc, Y=o=>(o.y/T-oy)*sc, dot=(o,c,s)=>{mg.fillStyle=c; mg.fillRect(X(o)-s/2,Y(o)-s/2,s,s);};
+  for(const b of LGMS.bases) if(!b.beaten){mg.fillStyle=tribeOpen(b.sec)?b.tr.col:'#666'; mg.beginPath(); mg.arc(X(b.B.heart),Y(b.B.heart),2+b.lv*(bigMap?1.2:1.6),0,TAU); mg.fill(); mg.strokeStyle='#000'; mg.lineWidth=1; mg.stroke();}
+  for(const V of D.villages) dot(V,'#ffe0a0',bigMap?3:5); dot(D.hub,'#7ae8ff',bigMap?5:8);
+  for(const e of ents) if(e.hp>0&&!e.st&&Math.hypot(e.x-P.x,e.y-P.y)<1500) dot(e,'#ff4a4a',2);
+  if(LGMS.raid){mg.strokeStyle='#ff4a4a'; mg.lineWidth=2; mg.beginPath(); mg.arc(X(LGMS.raid.V),Y(LGMS.raid.V),8+Math.sin(time*6)*2,0,TAU); mg.stroke();}
+  for(const a of allies) dot(a,'#5fb3ff',2); if(LGMS.rally) dot(LGMS.rally,'#5fb3ff',5); for(const o of MP.others.values()) dot(o,'#7aff8a',5);
+  mg.save(); mg.translate(X(P),Y(P)); mg.rotate(LGMS.yaw+Math.PI/2); mg.fillStyle='#fff'; mg.beginPath(); mg.moveTo(0,-7); mg.lineTo(5,5); mg.lineTo(-5,5); mg.closePath(); mg.fill(); mg.restore();}
 /* ---------------- cutscenes ---------------- */
 function lgmIntroShots(){const D=LGMS.D, hx=D.hub.x*S, hz=D.hub.y*S, b0=D.bases[0], fx=b0.heart.x*S, fz=b0.heart.y*S;
   return [{dur:4.6,title:'Legends',sub:'Isle of Six Crowns',speaker:'The Lorekeepers',text:'Long ago, the six lands of the isle lived in peace around the Crown Well, warmed by the light of three crystals.',cam:dolly([hx-30,26,hz+30,hx,0,hz],[hx-12,14,hz+16,hx,1,hz])},
-   {dur:4.4,speaker:'The Lorekeepers',text:'Then someone stole the crystals. Their light twisted the monsters of every land into six great hordes.',cam:orbit(fx,fz,16,12,-.6,.4,0)},
-   {dur:4.2,speaker:'The Lorekeepers',text:'Each horde built a fortress around a burning heart, and by night they raid the villages.',cam:dolly([fx-8,5,fz+9,fx,1,fz],[fx+8,5,fz+9,fx,1,fz])},
+   {dur:4.4,speaker:'The Lorekeepers',text:'Then someone stole the crystals. Their light twisted the monsters of every land into six great hordes, and each horde raised four fortresses.',cam:orbit(fx,fz,22,16,-.6,.4,0)},
+   {dur:4.2,speaker:'The Lorekeepers',text:'Small outposts near the well, and great fortresses at the edge of the world, where the horde leaders wait. By night they raid the villages.',cam:dolly([fx-10,7,fz+12,fx,1,fz],[fx+10,7,fz+12,fx,1,fz])},
    {dur:4,speaker:'The Lorekeepers',text:'So we called for a hero. Someone who could gather the lands, raise an army of golems and stand against them all.',cam:orbit(hx,hz,6,3.4,.4,1.2,1.2)},
-   heroShot('Six hordes, one hero, and a lot of golems. Where do I start?',3.4)];}
-function lgmTribeShots(b){const tr=b.tr, hx=b.B.heart.x*S, hz=b.B.heart.y*S, gx=b.B.gate.x*S, gz=b.B.gate.y*S, ox=b.B.out.x, oz=b.B.out.y, lead=tr.boss==='threefold'?'someone no one has seen':BOSSES[tr.boss].name;
-  return [{dur:4.2,title:tr.name,sub:`${tr.fort} · led by ${lead}`,text:tr.trait,cam:orbit(hx,hz,16,11,Math.atan2(oz,ox)-.6,Math.atan2(oz,ox)+.4,0)},
-   {dur:3.6,speaker:'The Lorekeepers',text:'Their gate is thick and their towers are sharp. Bring golems, and plant your banner at the gate.',cam:dolly([gx+ox*10,3.4,gz+oz*10,gx,1.2,gz],[gx+ox*6,2.4,gz+oz*6,gx,1.4,gz])},
+   heroShot('Twenty-four fortresses, one hero, and a lot of golems. Where do I start?',3.4)];}
+function lgmTribeShots(b){const tr=b.tr, hx=b.B.heart.x*S, hz=b.B.heart.y*S, g0=b.B.gates[0], gx=g0.x*S, gz=g0.y*S, ox=b.B.out.x, oz=b.B.out.y, lead=tr.boss==='threefold'?'someone no one has seen':BOSSES[tr.boss].name, R=Math.max(b.B.rect.w,b.B.rect.h)*.7+8;
+  return [{dur:4.2,title:tr.name,sub:`Four fortresses · led by ${lead}`,text:tr.trait,cam:orbit(hx,hz,R,R*.7,Math.atan2(oz,ox)-.6,Math.atan2(oz,ox)+.4,0)},
+   {dur:3.8,speaker:'The Lorekeepers',text:`This is ${lgBaseName(b)}, level ${b.lv} of 4. Destroy all four of their bases. The leader hides in the great fortress at the edge of their land.`,cam:dolly([gx+ox*12,4,gz+oz*12,gx,1.2,gz],[gx+ox*7,3,gz+oz*7,gx,1.6,gz])},
    heroShot('Right. Golems at the gate, then straight for the heart.',3)];}
-function lgmGateCine(b){const gx=b.B.gate.x*S, gz=b.B.gate.y*S, ox=b.B.out.x, oz=b.B.out.y;
-  startCine([{dur:2.8,title:'The gate falls!',sub:b.tr.fort,text:b.tr.zone==='void'?'But the heart is wrapped in a void shield. Destroy every spawner to break it.':'The way to the heart is open. Charge!',enter(){shake(10);},cam:dolly([gx+ox*7,3.4,gz+oz*7,gx,.8,gz],[gx+ox*4,2.4,gz+oz*4,gx-ox*2,1,gz-oz*2])}],()=>{});}
+function lgmGateCine(b,k){const g=b.B.gates[k||0]||b.B.gates[0], gx=g.x*S, gz=g.y*S, ox=b.B.out.x, oz=b.B.out.y, left=(b.gates||[]).filter(x=>x.hp>0).length;
+  startCine([{dur:2.6,title:'The gate falls!',sub:lgBaseName(b),text:left?`${left} more gate${left>1?'s':''} stand between you and the heart.`:b.tr.zone==='void'?'But the heart is wrapped in a void shield. Destroy every spawner to break it.':'The way to the heart is open. Charge!',enter(){shake(10);},cam:dolly([gx+ox*7,3.4,gz+oz*7,gx,.8,gz],[gx+ox*4,2.4,gz+oz*4,gx-ox*2,1,gz-oz*2])}],()=>{});}
 function lgmShieldCine(b){const hx=b.heart.x*S, hz=b.heart.y*S;
   startCine([{dur:2.8,speaker:'The Lorekeepers',text:b.tr.zone==='void'?'The void shield flickers and dies. The heart is open!':'The heart of the fortress lies open. Strike it down!',cam:orbit(hx,hz,5,3,.2,.9,1)}],()=>{});}
-function lgmHeartDown(b,e){const tr=b.tr; LGMS.bossBase=b.i; lgmB({k:'heart',b:b.i}); for(const s of ents) if(s.st&&s.base===b.i&&s.hp>0&&s!==e){s.hp=0; puff(s.x,s.y-20,s.c2,20,180,.6,6);} ents=ents.filter(s=>!s.st||s.hp>0);
+function lgmHeartDown(b,e){const tr=b.tr; lgmB({k:'heart',b:b.i});
+  for(const s of ents) if(s.st&&s.base===b.i&&s.hp>0&&s!==e){s.hp=0; puff(s.x,s.y-20,s.c2,20,180,.6,6);} ents=ents.filter(s=>!s.st||s.hp>0);
   for(const m of ents) if(m.hp>0&&!m.ally&&m.base===b.i){m.hp=0; puff(m.x,m.y-m.r,m.c1,8,100,.5,4);} ents=ents.filter(m=>m.hp>0); projs=projs.filter(p=>p.own==='p'); collectAllLoot();
-  L.bossAt={x:e.x,y:e.y}; L.arena=b.B.inner; L.bi=tr.bi; L.tier=b.tier;
+  if(b.lv<4){lgmBaseDestroyed(b); return;}
+  LGMS.bossBase=b.i; L.bossAt={x:e.x,y:e.y}; L.arena=b.B.inner; L.bi=tr.bi; L.tier=b.tier;
   {const fa=Math.atan2(P.y-e.y,P.x-e.x); allies.forEach((a,i)=>{a.x=P.x+Math.cos(fa)*(70+20*(i%3))+(i-allies.length/2)*26; a.y=P.y+Math.sin(fa)*(70+20*(i%3)); if(blocked(a.x,a.y,a.r)){a.x=P.x; a.y=P.y;}});}
   spawnBoss(tr.boss); boss.max=Math.round(boss.max*1.35); boss.hp=boss.max; boss.dm*=1.15; boss.awake=true; boss.cineHide=true; boss.face=angTo(boss,P); boss.lgp=true; boss.cd=2;
   const bx=boss.x*S, bz=boss.y*S;
@@ -7312,8 +7311,8 @@ function lgmThiefShots(){const bx=boss.x, by=boss.y, fa=Math.atan2(by-P.y,bx-P.x
    {dur:4.2,title:'The Threefold Legend',sub:'Emerald · Amethyst · Gold — three legends in one',enter(){th.gone=true; LGMS.cry.state='hide'; boss.cineHide=false; boss.roar=1.6; flashT=.7; flashCol='#ffffff'; shake(14); for(const c of ['#2affa0','#c45aff','#ffc43a']) puff(boss.x,boss.y,c,30,280,1,8);},cam:dolly([X-Math.cos(fa)*4.6,1.4,Z-Math.sin(fa)*4.6,X,2,Z],[X-Math.cos(fa)*3.2,2.4,Z-Math.sin(fa)*3.2,X,2.1,Z])},
    {dur:3.4,speaker:'The Threefold Legend',text:'Kneel, little hero. I AM the legend now.',cam:orbit(X,Z,4,2.6,fa+Math.PI-.3,fa+Math.PI+.3,1.9)},
    heroShot('No. A legend protects people. You are just a thief with shiny rocks.',3.2)];}
-function lgmBossDown(b){const C=LGMS, base=C.bases[C.bossBase], tr=base.tr; lgmB({k:'win',b:base.i}); collectAllLoot(); const bx=b.x*S, bz=b.y*S; base.beaten=true; const S0=lgmSave(), first=!S0.beaten[tr.id]; S0.beaten[tr.id]=true;
-  const r={shards:(first?200:80)+90*base.i,items:[randomItem(base.tier,2),randomItem(base.tier,first?2:1)]}; if(tr.boss==='threefold'&&first) r.items.push(randomItem(base.tier,2),makeCursed(base.tier));
+function lgmBossDown(b){const C=LGMS, base=C.bases[C.bossBase], tr=base.tr; lgmB({k:'win',b:base.i}); collectAllLoot(); const bx=b.x*S, bz=b.y*S; base.beaten=true; const S0=lgmSave(), first=!S0.beaten[tr.id]; S0.beaten[tr.id]=true; S0.bases=S0.bases||{}; S0.bases[lgBaseKey(base)]=true; for(const m of base.B.meshes||[]) if(!m.isInstancedMesh) m.visible=false; lgmRuin(base.B);
+  const r={shards:(first?200:80)+90*base.sec,items:[lgLoot(base.tier,2),lgLoot(base.tier,2),lgLoot(base.tier,first?2:1)]}; if(tr.boss==='threefold'&&first) r.items.push(lgLoot(base.tier,2),lgLoot(base.tier,2));
   SAVE.shards+=r.shards; for(const it of r.items) if(it) SAVE.inv.push(it); C.res.gold+=40; C.res.stone+=30; C.res.wood+=30; S0.res=C.res; persist();
   const done=()=>{lgmWinCard(base,r); L.bi=tr.bi; lgmRegion(true);};
   if(tr.boss==='threefold'){C.cry={k:0,state:'out'};
@@ -7363,13 +7362,13 @@ function buildSteed(){const R=model(),B=R.userData.body; const coat=M('#e8e0d0',
 function buildSpriteM(){const R=model(),B=R.userData.body; add(B,gSph,glow('#9ff0ff',2),0,0,0,.09); for(const s of [-1,1]){const w=add(B,gBox,M('#e8ffff',{transparent:true,opacity:.7,emissive:new THREE.Color('#9ff0ff'),emissiveIntensity:.6}),s*.1,.03,0,.12,.01,.07); w.rotation.z=s*.4;}
   const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0x9ff0ff,transparent:true,opacity:.7,depthWrite:false,blending:THREE.AdditiveBlending})); gl.scale.set(.6,.6,1); R.add(gl); CUR=null; return R;}
 function buildBannerM(){const R=model(),B=R.userData.body; add(B,gCyl,M('#4a3a2a'),0,1,0,.04,2,.04); add(B,gBox,M('#5fb3ff',{emissive:new THREE.Color('#5fb3ff'),emissiveIntensity:.5,side:THREE.DoubleSide}),.25,1.6,0,.5,.7,.02); add(B,gOct,glow('#ffd36a',2),0,2.1,0,.08); CUR=null; return R;}
-function lgmMobFx(m,e){const u=m.userData; if(u.lgfx) return; u.lgfx=true; const tr=TRIBES[e.base!=null?e.base:Math.max(0,LGMS.region)]||TRIBES[0], col=tr.col, sc=m.scale.x||1, h=(HEADH[e.type]||1.2)*(e.r/13)/sc;
+function lgmMobFx(m,e){const u=m.userData; if(u.lgfx) return; u.lgfx=true; const tr=(e.base!=null&&LGMS.bases[e.base]?LGMS.bases[e.base].tr:e.tribe!=null?TRIBES[e.tribe]:TRIBES[Math.max(0,LGMS.region)])||TRIBES[0], col=tr.col, sc=m.scale.x||1, h=(HEADH[e.type]||1.2)*(e.r/13)/sc;
   const c=add(m,gOct,glow(col,2.2),0,h+.12/sc,0,.06/sc,.11/sc,.06/sc); c.castShadow=false; u.lgCry=c;
   const ring=new THREE.Mesh(gRing,new THREE.MeshBasicMaterial({color:new THREE.Color(col),transparent:true,opacity:.6,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending})); ring.rotation.x=-Math.PI/2; ring.position.y=.04; ring.scale.setScalar(e.r*S*1.4/sc); m.add(ring);}
 function lgmBossFx(m,b){const u=m.userData; if(!LGMS||u.lgfx) return; u.lgfx=true; const base=LGMS.bases[LGMS.bossBase], col=base?base.tr.col:'#ffffff';
   const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:new THREE.Color(col),transparent:true,opacity:b.id==='threefold'?.18:.38,depthWrite:false,blending:THREE.AdditiveBlending})); gl.position.y=1; gl.scale.set(2.8,2.8,1); m.add(gl);
   u.lgOrb=[0,1,2,3].map(i=>{const c=add(m,crystal(3200+i,6),glow(i%2?col:'#ffffff',2.4),0,1.4,0,.07,.18,.07); c.castShadow=false; return c;});}
-function lgmSync(){const C=LGMS; if(!C||!L) return;
+function lgmSync(){const C=LGMS; if(!C||!L) return; lgmChunkTick();
   for(const n of C.nodes){if(Math.hypot(n.x-P.x,n.y-P.y)>2200) continue; const m=ensure(n,()=>buildNodeM(n.kind),'nd'+n.kind); m.position.set(n.x*S,0,n.y*S); m.scale.setScalar(n.hp>0?.6+.4*n.hp/n.max:.25);}
   for(const t of C.ptowers){const m=ensure(t,()=>buildTowerM('#5fb3ff',true),'ptw'); m.position.set(t.x*S,0,t.y*S);}
   for(const v of C.villagers){if(Math.hypot(v.x-P.x,v.y-P.y)>1800) continue; const m=ensure(v,()=>buildPlayer(v.skin),'vl'+v.skin); m.position.set(v.x*S,0,v.y*S); m.rotation.y=yawOf(v.face); animLimbs(m,v.walk,!!v.moving);}
@@ -7380,7 +7379,7 @@ function lgmSync(){const C=LGMS; if(!C||!L) return;
   const th=C.thief; if(th&&!th.gone){const m=ensure(th,()=>buildPlayer(th.skin),'thief'+th.skin); m.position.set(th.x*S,0,th.y*S); m.rotation.y=yawOf(th.face); animLimbs(m,0,false); m.scale.setScalar(1+.25*(th.glow||0)); setFlash(m,th.glow>.5&&Math.sin(time*30)>0?1:0);}
   const cr=C.cry; if(cr&&cr.state!=='hide'){const cx0=(th&&!th.gone?th.x:boss?boss.x:P.x)*S, cz0=(th&&!th.gone?th.y:boss?boss.y:P.y)*S; ['#2affa0','#c45aff','#ffc43a'].forEach((col,i)=>{const o=cr['o'+i]||(cr['o'+i]={}); const m=ensure(o,()=>{const R=model(); add(R.userData.body,crystal(3300+i,6),glow(col,3),0,0,0,.12,.3,.12); const g=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:new THREE.Color(col),transparent:true,opacity:.7,depthWrite:false,blending:THREE.AdditiveBlending})); g.scale.set(1.2,1.2,1); R.add(g); CUR=null; return R;},'lcry'+i);
       const a=time*1.8+i*TAU/3, k=cr.k||0, rad=cr.state==='in'?1.4*(1-k):cr.state==='out'?.4+k*2:1.4, y=cr.state==='out'?1.6+k*6:cr.state==='in'?2.4-k*1.2:2.2+Math.sin(time*2+i)*.2; m.position.set(cx0+Math.cos(a)*rad,y,cz0+Math.sin(a)*rad); m.rotation.y=time*3; m.visible=!(cr.state==='in'&&k>=.98);});}}
-function lgmSyncStruct(e){const b=LGMS&&LGMS.bases[e.base], tr=b?b.tr:{col:'#ffffff',zone:''}, dead=e.hp<=0; if(!dead&&Math.hypot(e.x-P.x,e.y-P.y)>2400) return;
+function lgmSyncStruct(e){const b=LGMS&&LGMS.bases[e.base], tr=b?b.tr:{col:'#ffffff',zone:''}, dead=e.hp<=0; if(!dead&&Math.hypot(e.x*S-camera.position.x,e.y*S-camera.position.z)>95) return;
   const m=ensure(e,()=>e.type==='tower'?buildTowerM(tr.col):e.type==='spawner'?buildSpawnerM(tr.col):e.type==='gate'?buildGateM(tr.col):buildHeartM(tr.col),'lst'+e.type);
   const el=dead?Math.min(1,(time-(e.dieAt||time))/.8):0; m.position.set(e.x*S,-el*1.2-(e.burrow?.6:0),e.y*S); if(e.type==='gate') m.rotation.y=e.horiz?0:Math.PI/2; m.rotation.z=dead?el*.3:0; setFlash(m,e.flash>0?1:0); const u=m.userData;
   if(u.disc){u.disc.rotation.z=time*2; u.disc.material.opacity=.5+.25*Math.sin(time*4);} if(u.cry) u.cry.rotation.y=time*1.2;
@@ -7425,18 +7424,69 @@ function lgmVillageAct(a){const C=LGMS, c=LG_COST[a]; if(!Object.entries(c).ever
     if(allies.length>=10) toast('Your army is full (10). The oldest one heads home.','#ffd36a'); C.villagers=C.villagers.filter(v=>v!==best); const px=P.x,py=P.y; P.x=best.x; P.y=best.y; summonAllies({minion:'lg_militia',count:1,pot:1+.35*Math.max(L.tier,lgmProgressTier())}); P.x=px; P.y=py;
     toast('A villager joins your army!','#ffd38a'); if(best.mine||!best.lore) setTimeout(()=>{if(LGMS&&best.hx) LGMS.villagers.push(Object.assign({},best,{x:best.hx,y:best.hy,skin:choice(lgSkins()),tx:null}));},90000);}
   for(const [r,v] of Object.entries(c)) C.res[r]-=v; if(typeof sfx==='function') sfx('summon');}
-function lgmMirrorStruct(r){const base=r[10], tr=TRIBES[base]||TRIBES[0], type=r[1], B=LGMS&&LGMS.bases[base];
-  return {st:true,base,type,ai:type,name:{tower:tr.name.replace(/Horde of (the )?/,'')+' Tower',spawner:'Horde Spawner',gate:tr.fort+' Gate',heart:'Heart of '+tr.fort}[type],c1:tr.c2,c2:tr.col,x:r[2],y:r[3],tx:r[2],ty:r[3],r:{tower:20,spawner:26,gate:52,heart:36}[type]||20,hp:r[4],max:r[5],mirror:true,face:0,walk:0,flash:0,inv:!!(r[8]&32),state:'idle',horiz:B?B.B.gate.horiz:true,t:0};}
-function lgmClientRefs(){for(const b of LGMS.bases){if(b.beaten) continue; const mine=ents.filter(e=>e.st&&e.base===b.i); const f=t=>mine.find(e=>e.type===t)||{hp:0,inv:false,x:0,y:0}; b.gate=f('gate'); b.heart=f('heart'); b.spawners=mine.filter(e=>e.type==='spawner'); b.towers=mine.filter(e=>e.type==='tower');}}
-function lgmNet(m){if(m.k==='start'){hideOverlays(); MP.inGame=true; MP.others.clear(); startLegends({seed:m.seed,beaten:m.beaten,day:m.day}); mode='play'; showOnly('hud'); lgmHud(); lgmBar(true); toast('You joined your party in Legends! Your golems and resources are your own.','#8fd06a'); return;}
+function lgmMirrorStruct(r){const base=r[10], B=LGMS&&LGMS.bases[base], tr=B?B.tr:TRIBES[0], type=r[1];
+  return {st:true,base,type,ai:type,name:{tower:tr.name.replace(/Horde of (the )?/,'')+' Tower',spawner:'Horde Spawner',gate:tr.fort+' Gate',heart:'Heart of '+tr.fort}[type],c1:tr.c2,c2:tr.col,x:r[2],y:r[3],tx:r[2],ty:r[3],r:{tower:20,spawner:26,gate:52,heart:36}[type]||20,hp:r[4],max:r[5],mirror:true,face:0,walk:0,flash:0,inv:!!(r[8]&32),state:'idle',horiz:B?B.B.gates[0].horiz:true,t:0};}
+function lgmClientRefs(){for(const b of LGMS.bases){if(b.beaten) continue; const mine=ents.filter(e=>e.st&&e.base===b.i); const f=t=>mine.find(e=>e.type===t)||{hp:0,inv:false,x:0,y:0}; b.gates=mine.filter(e=>e.type==='gate'); b.gate=b.gates[0]||{hp:0}; b.heart=f('heart'); b.spawners=mine.filter(e=>e.type==='spawner'); b.towers=mine.filter(e=>e.type==='tower');}}
+function lgmNet(m){if(m.k==='start'){hideOverlays(); MP.inGame=true; MP.others.clear(); startLegends({seed:m.seed,beaten:m.beaten,bases:m.bases,day:m.day}); mode='play'; showOnly('hud'); lgmHud(); lgmBar(true); toast('You joined your party in Legends! Your golems and resources are your own.','#8fd06a'); return;}
   if(!LGMS) return; const b=LGMS.bases[m.b];
-  if(m.k==='gate'&&b){for(const t of b.B.gateTiles) L.g[t.y*L.w+t.x]=0; if(mode==='play') lgmGateCine(b);}
+  if(m.k==='gate'&&b){for(const t of b.B.gateTiles[m.r||0]||[]) L.g[t.y*L.w+t.x]=0; if(mode==='play') lgmGateCine(b,m.r||0);}
+  else if(m.k==='heart'&&b&&b.lv<4){lgmBaseDestroyed(b,true);}
   else if(m.k==='heart'&&b){LGMS.bossBase=m.b; const hx=b.B.heart.x*S, hz=b.B.heart.y*S; if(mode==='play') startCine([{dur:3,title:b.tr.boss==='threefold'?'The Threefold Legend':BOSSES[b.tr.boss].name,sub:'Legend-powered',text:b.tr.boss==='threefold'?'The Crystal Thief absorbs the three crystals!':'The heart shatters and the horde\'s leader rises!',cam:orbit(hx,hz,7,5,.3,.9,1)}],()=>{});}
-  else if(m.k==='win'&&b){b.beaten=true; LG_BEAT=Object.assign({},lgBeat(),{[b.tr.id]:true}); const S0=lgmSave(); S0.beaten[b.tr.id]=true; SAVE.shards+=150; persist(); banner(b.tr.name+' defeated!','Your party broke the horde · +150 diamonds');}
+  else if(m.k==='win'&&b){b.beaten=true; LG_BEAT=Object.assign({},lgBeat(),{[b.tr.id]:true}); const S0=lgmSave(); S0.beaten[b.tr.id]=true; S0.bases=S0.bases||{}; S0.bases[lgBaseKey(b)]=true; const it=lgLoot(b.tier,2); if(it) SAVE.inv.push(it); persist(); banner(b.tr.name+' defeated!','Your party broke the horde'+(it?' · '+it.name:''));}
   else if(m.k==='barrier'){const D=LGMS.D; for(let i=0;i<D.bar.length;i++) if(D.bar[i]>=0) L.g[i]=0; if(L.lgBar) L.lgBar.visible=false; lgmMiniImg=null;}
   else if(m.k==='day') LGMS.day=m.d;
   else if(m.k==='house') lgmPlaceHouse(m.x,m.y,false,true,true);
-  else if(m.k==='quit'){LGMS=null; lgmHud(); lgmBar(false); MP.inGame=false; toMenu(); toast('The party leader left Legends','#ffd36a');}}
+  else if(m.k==='quit'){lgmGearOut(); camera.far=140; camera.updateProjectionMatrix(); LGMS=null; lgmHud(); lgmBar(false); MP.inGame=false; toMenu(); toast('The party leader left Legends','#ffd36a');}}
+function lgmChunk(ci,cj){const D=L.lgWorld, W=L.w, H=L.h, G=L.g, at=(x,y)=>y*W+x, inB=(x,y)=>x>=0&&y>=0&&x<W&&y<H, k=ci+','+cj; if(L.lgChunks.has(k)||ci<0||cj<0||ci*LG_CH>=W||cj*LG_CH>=H) return;
+  if(!L.lgNoTree){const R=D.bases.map(B=>({x0:B.rect.x-22,y0:B.rect.y-22,x1:B.rect.x+B.rect.w+22,y1:B.rect.y+B.rect.h+22})); L.lgNoTree=(x,y)=>R.some(r=>x>r.x0&&x<r.x1&&y>r.y0&&y<r.y1);}
+  const grp=new THREE.Group(); const save=levelGroup; levelGroup=grp;
+  try{
+  const floorT=(x,y)=>inB(x,y)&&(!G[at(x,y)]||D.bld[at(x,y)]||D.fw[at(x,y)]||D.bar[at(x,y)]>=0)&&!D.lake[at(x,y)];
+  const rockT=(x,y)=>inB(x,y)&&!floorT(x,y)&&!D.lake[at(x,y)];
+  const pal=L.lgPal||(L.lgPal={}); const palOf=s=>pal[s]||(pal[s]={fl:regEnv(s).fl.map(c=>new THREE.Color(c)),top:new THREE.Color(regEnv(s).top),rock:new THREE.Color(regEnv(s).rock)});
+  const tcol=(x,y)=>{x=clamp(x,0,W-1); y=clamp(y,0,H-1); const P0=palOf(D.reg[at(x,y)]), n=hash(x*3,y*5), c=P0.fl[n<.45?0:n<.85?1:2].clone(); return c.multiplyScalar(.9+hash(x+11,y+7)*.18);};
+  const vcol=(x,y)=>{const c=new THREE.Color(0,0,0); let n=0; for(const [i,j] of [[x-1,y-1],[x,y-1],[x-1,y],[x,y]]){if(floorT(i,j)){c.add(tcol(i,j)); n++;}} if(!n) return tcol(x,y).multiplyScalar(.7); c.multiplyScalar(1/n); let w=0; for(const [i,j] of [[x-1,y-1],[x,y-1],[x-1,y],[x,y]]) if(rockT(i,j)) w++; return c.multiplyScalar(1-.1*w);};
+  const x0=ci*LG_CH, y0=cj*LG_CH, x1=Math.min(W,x0+LG_CH), y1=Math.min(H,y0+LG_CH);
+  const fp=[],fc=[],tp=[],tc=[],wat=[], vc=new Map(), VC=(x,y)=>{const kk=x*4096+y; let c=vc.get(kk); if(!c){c=vcol(x,y); vc.set(kk,c);} return c;};
+  const cols=[], spires=[], trees={}, deco={};
+  for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){
+    if(D.lake[at(x,y)]){wat.push(x,.06,y, x,.06,y+1, x+1,.06,y, x+1,.06,y, x,.06,y+1, x+1,.06,y+1); continue;}
+    if(floorT(x,y)){const a=VC(x,y),b=VC(x,y+1),c=VC(x+1,y),d=VC(x+1,y+1); fp.push(x,0,y, x,0,y+1, x+1,0,y, x+1,0,y, x,0,y+1, x+1,0,y+1); for(const q of [a,b,c,c,b,d]) fc.push(q.r,q.g,q.b);
+      if(G[at(x,y)]) continue; const s=D.reg[at(x,y)], E=regEnv(s), forest=(Math.sin(x*.11+y*.07)+Math.sin(x*.035-y*.09)*1.3)*.5;
+      if(forest>.42&&hash(x*13,y*7)>.84&&Math.hypot(x-LG_C,y-LG_C)>20&&!(L.lgNoTree&&L.lgNoTree(x,y))&&!D.nodes.some(n=>Math.abs(n.tx-x)<2&&Math.abs(n.ty-y)<2)) (trees[E.tree]=trees[E.tree]||[]).push({x:x+.5+(hash(x,y+1)-.5)*.5,y:0,z:y+.5+(hash(x+1,y)-.5)*.5,s:.9+hash(x,y*3)*.8,ry:hash(y,x)*6});
+      else if(hash(x*11,y*17)>.9){const kd=E.floorDeco[(hash(x,y*5)*E.floorDeco.length)|0]; (deco[kd]=deco[kd]||[]).push({x:x+.2+hash(x+9,y)*.6,y:0,z:y+.2+hash(x,y+9)*.6,s:.8+hash(x*2,y)*.6,ry:hash(x,y)*6});}
+      continue;}
+    if(!rockT(x,y)) continue; const P0=palOf(D.reg[at(x,y)]), c=P0.top.clone().multiplyScalar(.82+hash(x,y)*.3); tp.push(x,WH,y, x,WH,y+1, x+1,WH,y, x+1,WH,y, x,WH,y+1, x+1,WH,y+1); for(let q=0;q<6;q++) tc.push(c.r,c.g,c.b);
+    const n=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>floorT(x+dx,y+dy)||(inB(x+dx,y+dy)&&D.lake[at(x+dx,y+dy)]));
+    if(n.length){for(let i=0;i<2;i++){const h1=hash(x*3+i,y*7), h2=hash(x*5+i,y*3+i); let ox=(h1-.5)*.4, oz=(h2-.5)*.4; for(const [dx,dy] of n){ox+=dx*.12; oz+=dy*.12;} const r=.4+hash(x+i,y)*.2; cols.push({x:x+.5+ox,y:WH*.5-.02,z:y+.5+oz,sx:r,sy:WH*(.96+hash(y,x+i)*.12),sz:r,ry:h1*6,c:P0.rock.clone().multiplyScalar(.7+h2*.45).getHex()});}}
+    else if(hash(x*17,y*13)>.72){const edge=Math.hypot(x-LG_C,y-LG_C)>385; spires.push({x:x+.5,y:WH,z:y+.5,sx:.9+hash(x,y)*.8,sy:(edge?3:1.4)*(.8+hash(y,x)*1.8),sz:.9+hash(x+3,y)*.8,ry:hash(x,y+2)*6,c:P0.rock.clone().multiplyScalar(.75+hash(x+5,y)*.35).getHex()});}}
+  const mk=(P,C,mat)=>{if(!P.length) return; const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(P,3)); if(C) g.setAttribute('color',new THREE.Float32BufferAttribute(C,3)); g.computeVertexNormals(); const m=new THREE.Mesh(g,mat); m.receiveShadow=true; grp.add(m);};
+  mk(fp,fc,L.lgMats.floor); mk(tp,tc,L.lgMats.top); mk(wat,null,L.lgMats.water);
+  inst(QT==='low'?gPrism:rockColGeo(),L.lgMats.col,cols); inst(gIco,L.lgMats.spire,spires);
+  for(const kk in trees) if(DECOR[kk]) placeDecor(kk,trees[kk]); for(const kk in deco) if(DECOR[kk]) placeDecor(kk,deco[kk],false);
+  } finally {levelGroup=save;}
+  levelGroup.add(grp); L.lgChunks.set(k,grp);}
+function lgmChunkTick(){if(!L||!L.lgChunks||!R3) return; const R=QT==='low'?3:4, cx=camera.position.x, cz=camera.position.z, ci=Math.floor(cx/LG_CH), cj=Math.floor(cz/LG_CH); let built=0;
+  const want=[]; for(let j=-R;j<=R;j++) for(let i=-R;i<=R;i++){if(i*i+j*j>R*R+1) continue; const k=(ci+i)+','+(cj+j); if(!L.lgChunks.has(k)) want.push([ci+i,cj+j,i*i+j*j]);}
+  want.sort((a,b)=>a[2]-b[2]); for(const [i,j] of want){if(built>=2) break; lgmChunk(i,j); built++;}
+  for(const [k,g] of L.lgChunks){const [i,j]=k.split(',').map(Number); if((i-ci)*(i-ci)+(j-cj)*(j-cj)>(R+2)*(R+2)){levelGroup.remove(g); g.traverse(o=>{if(o.geometry&&!o.geometry.userData.cached) o.geometry.dispose(); if(o.material&&!(o.material.userData&&o.material.userData.keep)) o.material.dispose();}); L.lgChunks.delete(k);}}}
+/* Legends keeps its own gear: your Isle gear is put away while you play Legends and comes back when you leave */
+function lgmStarterGear(){const w=mkItem('weapon',0,'common','sword'); w.name='Old Legends Blade'; w.lg=true; const a=mkItem('armor',0,'common'); a.name='Old Legends Tunic'; a.lg=true;
+  return {eq:{weapon:w,armor:a,a1:null,a2:null,a3:null,a4:null,a5:null,a6:null,a7:null,a8:null},inv:[],shards:0,arrows:30};}
+function lgmGearIn(){if(!SAVE||SAVE.lgSwap) return; const S0=lgmSave(); SAVE.lgSwap={eq:SAVE.eq,inv:SAVE.inv,shards:SAVE.shards,arrows:SAVE.arrows}; const g=S0.gear||lgmStarterGear();
+  SAVE.eq=g.eq; SAVE.inv=g.inv||[]; SAVE.shards=g.shards||0; SAVE.arrows=g.arrows!=null?g.arrows:30; delete S0.gear; try{calcStats(); refreshSlots();}catch(e){} persist();}
+function lgmGearOut(){if(!SAVE||!SAVE.lgSwap) return; const S0=lgmSave(); S0.gear={eq:SAVE.eq,inv:SAVE.inv,shards:SAVE.shards,arrows:SAVE.arrows}; const n=SAVE.lgSwap; SAVE.eq=n.eq; SAVE.inv=n.inv; SAVE.shards=n.shards; SAVE.arrows=n.arrows; delete SAVE.lgSwap; try{calcStats(); refreshSlots();}catch(e){} persist();}
+const LG_PREFIX=['Old Legends','Ancient','First Age','Lorekeeper\'s','Crownforged'];
+function lgLoot(tier,boost){const keys=['thornstag','moonhydra','runecolossus','omegaenchanter','mirrorknight','maskedjester','phantasmdragon','grandmagician','claytitan','worldsmith','stormleviathan','supremecreator'].filter(k=>BOSS_LOOT[k]);
+  let it; if(keys.length&&Math.random()<(boost>=2?.7:boost?.4:.2)){it=bossItem(choice(['weapon','armor','artifact']),choice(keys),tier); it.name='Legend of '+it.name;}
+  else {it=randomItem(tier,boost||0); if(!it) return null; it.name=choice(LG_PREFIX)+' '+it.name;} it.lg=true; return it;}
+function lgmRuin(B){const M=B.meshes&&B.meshes[0]; if(!M||!M.isInstancedMesh) return; const m4=new THREE.Matrix4(), p=new THREE.Vector3(), q=new THREE.Quaternion(), sc=new THREE.Vector3();
+  for(let i=0;i<M.count;i++){M.getMatrixAt(i,m4); m4.decompose(p,q,sc); const h=.5+hash(Math.floor(p.x),Math.floor(p.z))*1.2; sc.y=h; p.y=h/2; m4.compose(p,q,sc); M.setMatrixAt(i,m4);} M.instanceMatrix.needsUpdate=true; if(B.meshes[1]) B.meshes[1].count=0; B.ruin=true;}
+function lgmBaseDestroyed(b,fromNet){const S0=lgmSave(); S0.bases=S0.bases||{}; const first=!S0.bases[lgBaseKey(b)]; S0.bases[lgBaseKey(b)]=true; b.beaten=true;
+  const V=LG_LV[b.lv], r={gold:20*b.lv,stone:15*b.lv,wood:15*b.lv}; for(const k in r) LGMS.res[k]+=r[k]; const items=[]; if(first) for(let k=0;k<b.lv;k++){const it=lgLoot(b.tier,b.lv>=3?1:0); if(it){SAVE.inv.push(it); items.push(it);}} S0.res=LGMS.res; persist();
+  for(const m of b.B.meshes||[]) if(!m.isInstancedMesh) m.visible=false; lgmRuin(b.B); if(b.B.beacon) b.B.beacon.forEach(m=>m.visible=false); lgmMiniImg=null;
+  const hx=b.B.heart.x*S, hz=b.B.heart.y*S, left=LGMS.bases.filter(o=>o.sec===b.sec&&o.lv<4&&!o.beaten).length;
+  startCine([{dur:3.2,title:`${lgBaseName(b)} destroyed!`,sub:`${b.tr.name} · Level ${b.lv}`,text:left?`${left} more ${b.tr.name} base${left>1?'s':''} before their great fortress opens.`:`The way to ${b.tr.fort} is open. Their leader is waiting.`,enter(){flashT=.4; flashCol=b.tr.col; shake(10);},cam:orbit(hx,hz,Math.max(b.B.rect.w,b.B.rect.h)*.6+6,9,.3,1.1,0)}],()=>{banner(`+${r.gold} gold · +${r.stone} stone · +${r.wood} wood`,items.length?items.map(i=>i.name).join(' · '):'Legends loot goes to your Legends pack');});}
 /*LGM-END*/
 const hot=window.claude?.hot; if(hot&&hot.ready) hot.ready(start); else start(hot?.data??{});
 })();

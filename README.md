@@ -19,6 +19,18 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🏰 Version 5.2: a huge Legends island
+
+- **The Legends island is 30 times bigger.** Six huge lands surround the Crown Well, with mountains, lakes, forests and four villages in each land. The land is drawn in pieces around you as you travel, so it stays smooth.
+- **Each horde now has four bases:**
+  - **Level 1 Outpost (easy):** small, one wall, 3 towers, 2 spawners, a medium flow of monsters.
+  - **Level 2 Watchfort (medium):** bigger, two rings of walls, 7 towers, 4 spawners, a large flow of monsters.
+  - **Level 3 Bastion (hard):** larger, three rings of walls, 12 towers, 6 spawners, an extra-large flow of monsters.
+  - **Level 4 Fortress (hardest):** enormous, three thick rings of walls, 20 towers, 8 spawners, a super-large flow of monsters, and everything has far more health. The horde's leader waits inside, and its heart stays shielded until the other three bases of that horde are destroyed.
+- **Fortresses can be seen from 100 metres away:** tall walls, banners and a crystal beacon of the horde's colour rising from every heart.
+- **Legends has its own loot:** your Isle gear is put away when you enter Legends and comes back when you leave. In Legends you start with the Old Legends Blade and Tunic and earn your own gear from bases, raids and monsters. That gear is old-legend gear from the three legends' lands (Legend of …, Old Legends …, Ancient …, First Age …), and it stays in Legends.
+- **Bigger minimap:** it shows the land around you. Press **M** for the whole island with every base.
+
 ## 🏠 Version 5.1
 
 - **Smaller obstacle hitboxes:** statues, carts, crates, fountains and the other set pieces in levels now only block the space they actually take up. No more invisible walls around them, no more detours around tiny props, and relics next to them can be picked up.
