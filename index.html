@@ -1290,7 +1290,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='5.2.0', SAVE_VERSION=7;
+const APP_VERSION='5.2.1', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -6471,7 +6471,7 @@ function auTick(){const c=AU.ctx; if(!c||c.state!=='running') return; const want
   const S=AU.song; if(!S) return; if(AU.next<c.currentTime-.5) AU.next=c.currentTime+.05;
   while(AU.next<c.currentTime+.18){try{playStep(S,AU.step,AU.next,AU.bus);}catch(e){} AU.step=(AU.step+1)%S.len; AU.next+=S.stepDur;}}
 /* ---- sound effects ---- */
-function sfx(name,a,b){const c=AU.ctx; if(!c||c.state!=='running'||AU.vol.sfx<=0) return; const now=c.currentTime, gap={eshot:.07,ehit:.04,hit:.03,boom:.12,ewind:.09,shard:.05,haz:.15,cine:.3,ui:.05,ehurt:.05}[name]||0;
+function sfx(name,a,b){const c=AU.ctx; if(!c||c.state!=='running'||AU.vol.sfx<=0) return; const now=c.currentTime, gap={eshot:.07,ehit:.04,hit:.03,boom:.12,ewind:.09,haz:.15,cine:.3,ui:.05,shard:.45,ehurt:.05}[name]||0;
   const lk=name+(a&&a.id!=null&&name!=='roar'?'':''); if(gap&&AU.last[lk]&&now-AU.last[lk]<gap) return; AU.last[lk]=now; const t=now+.005, D=AU.sfx; try{SFX[name]&&SFX[name](D,t,a,b);}catch(e){}}
 function monVoice(e){const sp=(typeof monSpec==='function'&&L&&!e.feat&&!e.ally)?monSpec(L.bi,e.type):null, seed=strHash((sp?sp.name:e.type)+L.bi), r=srand(seed); return {plan:sp?sp.plan:'biped',p:.7+r()*.8,r};}
 const SFX={
@@ -6484,7 +6484,7 @@ const SFX={
  potion(D,t){for(let k=0;k<6;k++) vox(D,{t:t+k*.06,type:'sine',f:300+Math.random()*500,f2:700+Math.random()*500,d:.04,r:.05,v:.14});},
  art(D,t){[0,4,7,12,16].forEach((s,k)=>vox(D,{t:t+k*.04,type:'triangle',f:mtof(72+s),d:.08,r:.35,v:.12,rev:.6}));},
  loot(D,t,rar){const seq=rar==='unique'?[72,76,79,84,88]:rar==='rare'?[74,78,81]:[79,84]; seq.forEach((n,k)=>vox(D,{t:t+k*.07,type:'square',f:mtof(n),d:.06,r:.2,v:.08,lp:3000,rev:.4}));},
- shard(D,t){vox(D,{t,type:'sine',f:1800+Math.random()*600,d:.03,r:.15,v:.1,rev:.3});},
+ shard(D,t){vox(D,{t,type:'triangle',f:660,d:.05,a:.012,r:.22,v:.035,lp:1600,rev:.35});},
  chest(D,t){vox(D,{t,type:'sawtooth',f:110,f2:80,d:.25,r:.1,v:.1,lp:600}); [79,83,86,91].forEach((n,k)=>vox(D,{t:t+.2+k*.06,type:'triangle',f:mtof(n),d:.06,r:.4,v:.12,rev:.5}));},
  enchant(D,t){for(let k=0;k<8;k++) vox(D,{t:t+k*.05,type:'sine',f:mtof(76+[0,3,7,10,12,15,19,24][k]),d:.1,r:.5,v:.1,rev:.7}); nz(D,{t,ft:'highpass',f:5000,d:.8,v:.05,rev:.5});},
  win(D,t){[60,64,67,72,76,79,84].forEach((n,k)=>vox(D,{t:t+k*.08,type:'square',f:mtof(n),d:.1,r:.4,v:.09,lp:2500,rev:.5})); vox(D,{t:t+.6,type:'sawtooth',f:mtof(72),d:.8,a:.05,r:.8,v:.08,lp:2000,rev:.6});},
@@ -7198,9 +7198,9 @@ function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.ma
   if(!CLI) lgmRaids(dt); lgmVillagers(dt);
   C.saveT-=dt; if(C.saveT<=0){C.saveT=30; lgmSave().res=C.res; persist();}
   C.hudT-=dt; if(C.hudT<=0){C.hudT=.4; lgmHud(); lgmBar(true);}}
-function lgmHarvest(n,mult){n.hp--; const a=(n.kind==='gold'?3:5)*mult; LGMS.res[n.kind]+=a; ftext(n.x,n.y-40,'+'+a+' '+RES_ICO[n.kind],n.kind==='gold'?'#ffd36a':n.kind==='wood'?'#e0b080':'#d8d8d8',true); puff(n.x,n.y-10,n.kind==='gold'?'#ffd36a':n.kind==='wood'?'#7a5a34':'#9a9488',8,100,.4,4); if(typeof sfx==='function') sfx('shard'); if(n.hp<=0) n.regrow=40;}
+function lgmHarvest(n,mult,quiet){n.hp--; const a=(n.kind==='gold'?3:5)*mult; LGMS.res[n.kind]+=a; ftext(n.x,n.y-40,'+'+a+' '+RES_ICO[n.kind],n.kind==='gold'?'#ffd36a':n.kind==='wood'?'#e0b080':'#d8d8d8',true); puff(n.x,n.y-10,n.kind==='gold'?'#ffd36a':n.kind==='wood'?'#7a5a34':'#9a9488',8,100,.4,4); if(typeof sfx==='function'&&!quiet) sfx('shard'); if(n.hp<=0) n.regrow=40;}
 function lgmSprites(dt){const C=LGMS; for(const s of C.sprites){s.t+=dt; const tgt=s.state==='back'?P:s.node; const dx=tgt.x-s.x, dy=tgt.y-s.y, d=Math.hypot(dx,dy);
-    if(s.state==='work'){s.wt-=dt; s.x=s.node.x+Math.cos(s.t*5)*24; s.y=s.node.y+Math.sin(s.t*5)*24; if(s.wt<=0){if(s.node.hp>0) lgmHarvest(s.node,1); s.n++; s.wt=1.4; if(s.node.hp<=0||s.n>=3) s.state='back';} continue;}
+    if(s.state==='work'){s.wt-=dt; s.x=s.node.x+Math.cos(s.t*5)*24; s.y=s.node.y+Math.sin(s.t*5)*24; if(s.wt<=0){if(s.node.hp>0) lgmHarvest(s.node,1,true); s.n++; s.wt=1.4; if(s.node.hp<=0||s.n>=3) s.state='back';} continue;}
     if(d<16){if(s.state==='go') {s.state='work'; s.wt=1.4; s.n=0;} else s.done=true; continue;} const sp=360*dt; s.x+=dx/d*Math.min(d,sp); s.y+=dy/d*Math.min(d,sp);}
   C.sprites=C.sprites.filter(s=>!s.done);}
 function lgmVillagers(dt){for(const v of LGMS.villagers){if(v.still){v.face=Math.atan2(P.y-v.y,P.x-v.x); continue;} v.t-=dt; if(v.t<=0||!v.tx){v.t=rand(2,5); v.tx=v.hx+rand(-80,80); v.ty=v.hy+rand(-30,40);} const dx=v.tx-v.x, dy=v.ty-v.y, d=Math.hypot(dx,dy); v.moving=d>6; if(d>6){const sp=50*dt; v.x+=dx/d*sp; v.y+=dy/d*sp; v.face=Math.atan2(dy,dx); v.walk+=dt*8;}}}
