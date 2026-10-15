@@ -19,6 +19,10 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🌍 Version 5.4.1: open borders and a bigger Crown Well
+- Removed the rock walls between the lands. You can walk straight from one land into the next.
+- The middle land around the Crown Well is 10 times bigger, with more trees, rocks and gold to gather.
+
 ## 🏰 Version 5.4: varied lands and horde fortresses
 - **Every land has four areas of its own**, spread evenly, each with its own ground, trees, details, lakes and hills. Examples: Bloomfield, Old Oakwood, Red Mesa, Palm Oasis, Mushroom Hollow, Glacier Shelf, Lava Rivers and Star Wastes. The area's name pops up as you walk in, and the map shows the areas in their colours.
 - Every land's lakes are different: water, oasis, swamp, ice, lava or void.

@@ -1292,7 +1292,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='5.4.0', SAVE_VERSION=7;
+const APP_VERSION='5.4.1', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -7006,7 +7006,7 @@ const LG_SEC=[0,1,2,3,4,5];
 const LG_COST={cobble:{stone:12},plank:{wood:12},moss:{gold:8,wood:6},tower:{stone:20,wood:10},house:{wood:30,stone:15},recruit:{gold:5}};
 const LG_ACT=[['cobble','z','🗿','Cobble Golem'],['plank','x','🏹','Plank Golem'],['moss','c','🌿','Mossy Golem'],['tower','v','🗼','Arrow Tower'],['rally','t','🚩','Rally army'],['recall','y','↩️','Recall army'],['gather','g','✨','Send sprites'],['mount','r','🐎','Ride / dismount'],['house','h','🏠','Build house'],['recruit','u','🤝','Recruit villager'],['travel','f','🌀','Fast travel']];
 const RES_ICO={wood:'🪵',stone:'🪨',gold:'🪙'};
-const LG_K=Math.sqrt(50), LG_R=Math.round(392*LG_K), LG_N=2*LG_R+56, LG_C=LG_R+28, LG_CH=32;
+const LG_HUB=Math.round(20*Math.sqrt(10)), LG_K=Math.sqrt(50), LG_R=Math.round(392*LG_K), LG_N=2*LG_R+56, LG_C=LG_R+28, LG_CH=32;
 const LG_LV={1:{name:'Outpost',diff:'Easy',size:[24,20],rings:1,thick:2,wallH:2.4,towers:3,spawners:2,patrol:4,cd:9,wave:1,cap:8,hp:1,dmg:1,r:110,da:.13},
  2:{name:'Watchfort',diff:'Medium',size:[34,28],rings:2,thick:2,wallH:3.2,towers:7,spawners:4,patrol:8,cd:7,wave:2,cap:14,hp:1.6,dmg:1.15,r:190,da:-.16},
  3:{name:'Bastion',diff:'Hard',size:[46,38],rings:3,thick:2,wallH:4,towers:12,spawners:6,patrol:14,cd:6,wave:3,cap:20,hp:2.4,dmg:1.3,r:268,da:.15},
@@ -7084,17 +7084,17 @@ function genLegendWorld(){const N=LG_N,w=N,h=N,cx=LG_C,cy=LG_C,K=LG_K, g=new Uin
   // ridges between the lands, with passes every so often
   const passes=[];
   for(let k=0;k<6;k++){const a=secA(k)+TAU/12, ca=Math.cos(a), sa=Math.sin(a);
-    for(let r=24;r<LG_R+40;r+=.4){const inPass=(r%70)>28&&(r%70)<36; for(let o=-1.6;o<=1.6;o+=.4){const x=Math.round(cx+ca*r-sa*o), y=Math.round(cy+sa*r+ca*o); if(!inB(x,y)) continue; if(inPass){passes.push({x,y,k}); continue;} g[at(x,y)]=1;}}}
+    for(let r=24;r<LG_R+40;r+=.4){const inPass=(r%70)>28&&(r%70)<36; for(let o=-1.6;o<=1.6;o+=.4){const x=Math.round(cx+ca*r-sa*o), y=Math.round(cy+sa*r+ca*o); if(!inB(x,y)) continue; if(inPass){passes.push({x,y,k}); continue;}}}}
   // places that must stay clear, kept in a grid so checking is quick on the huge island
   const CG=64, cgrid=new Map(), clear=[];
   const addClear=c=>{clear.push(c); const r=c.r+24; for(let j=Math.floor((c.y-r)/CG);j<=Math.floor((c.y+r)/CG);j++) for(let i=Math.floor((c.x-r)/CG);i<=Math.floor((c.x+r)/CG);i++){const kk=i*4096+j; let a=cgrid.get(kk); if(!a) cgrid.set(kk,a=[]); a.push(c);}};
   const free=(x,y,m=0)=>{const a=cgrid.get(Math.floor(x/CG)*4096+Math.floor(y/CG)); if(!a) return true; for(const c of a) if(Math.abs(c.x-x)<c.r+m+2&&Math.hypot(c.x-x,c.y-y)<c.r+m) return false; return true;};
   const rArea=(r0,r1)=>Math.sqrt(rand(r0*r0,r1*r1));
   // where the fortresses and villages go
-  addClear({x:cx,y:cy,r:26}); const bases=[], villages=[];
+  addClear({x:cx,y:cy,r:LG_HUB+8}); const bases=[], villages=[];
   for(let s=0;s<6;s++){const a=secA(s); for(let lv=1;lv<=4;lv++){const V=LG_LV[lv], aa=a+V.da, bx=Math.round(cx+Math.cos(aa)*V.r*K), by=Math.round(cy+Math.sin(aa)*V.r*K); bases.push({sec:s,lv,cx:bx,cy:by}); addClear({x:bx,y:by,r:Math.max(V.size[0],V.size[1])*.75+10});}}
   for(let s=0;s<6;s++){const a=secA(s); let k=0;
-    for(let vr=70;vr<LG_R-110;vr+=rand(165,215),k++){for(let t=0;t<12;t++){const va=(k%2?1:-1)*rand(.12,.4)+(t?rand(-.08,.08):0), aa=a+va, vx=Math.round(cx+Math.cos(aa)*vr), vy=Math.round(cy+Math.sin(aa)*vr); if(!free(vx,vy,14)) continue; villages.push({sec:s,cx:vx,cy:vy}); addClear({x:vx,y:vy,r:9}); break;}}}
+    for(let vr=LG_HUB+40;vr<LG_R-110;vr+=rand(165,215),k++){for(let t=0;t<12;t++){const va=(k%2?1:-1)*rand(.12,.4)+(t?rand(-.08,.08):0), aa=a+va, vx=Math.round(cx+Math.cos(aa)*vr), vy=Math.round(cy+Math.sin(aa)*vr); if(!free(vx,vy,14)) continue; villages.push({sec:s,cx:vx,cy:vy}); addClear({x:vx,y:vy,r:9}); break;}}}
   // lakes, mountains and rocks
   for(let s=0;s<6;s++){const a=secA(s);
     for(let k=0;k<20*50;k++){for(let t=0;t<40;t++){const aa=a+rand(-.46,.46), rr=rArea(30,LG_R-24), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr), R=rand(3,9)*(Math.random()<.08?2:1); if(Math.random()*2>LG_SUB[s][lgSubAt(x,y)].lk) continue; if(!free(x,y,R+2)) continue;
@@ -7146,17 +7146,17 @@ function genLegendWorld(){const N=LG_N,w=N,h=N,cx=LG_C,cy=LG_C,K=LG_K, g=new Uin
     for(let j=-1;j<=1;j++) for(let i=-1;i<=1;i++){const xx=V.cx+i, yy=V.cy+j; g[at(xx,yy)]=0; fx[at(xx,yy)]&=~32;}
     V.x=(V.cx+.5)*T; V.y=(V.cy+.5)*T; const n=villages.filter(o=>o.sec===V.sec).indexOf(V); V.name=TRIBES[V.sec].vil+SUF[n%SUF.length]+(n>=SUF.length?' '+(1+Math.floor(n/SUF.length)):'');}
   villages.forEach((V,i)=>V.i=i);
-  for(let y=cy-18;y<=cy+18;y++) for(let x=cx-18;x<=cx+18;x++){const d=Math.hypot(x-cx,y-cy); if(d<18){g[at(x,y)]=0; fx[at(x,y)]&=~32;}}
+  for(let y=cy-LG_HUB;y<=cy+LG_HUB;y++) for(let x=cx-LG_HUB;x<=cx+LG_HUB;x++){const d=Math.hypot(x-cx,y-cy); if(d<18){g[at(x,y)]=0; fx[at(x,y)]&=~32;}}
   for(const [ox,oy] of [[-9,-6],[7,-6],[-9,5],[7,5]]){const x=cx+ox,y=cy+oy; for(let j=0;j<2;j++) for(let i=0;i<2;i++){g[at(x+i,y+j)]=1; fx[at(x+i,y+j)]|=64;} houses.push({x:x+1,y:y+1,sec:-1,ry:Math.atan2(cy-(y+1),cx-(x+1))});}
   for(let j=-1;j<=1;j++) for(let i=-1;i<=1;i++){g[at(cx+i,cy+j)]=1; fx[at(cx+i,cy+j)]|=64;}
   // resources: more gold the further out you go
   const nodes=[], ncell=new Set(), key=(x,y)=>(x>>2)*4096+(y>>2);
   for(let s=0;s<6;s++){const a=secA(s); let n=0; for(let t=0;t<3000*50&&n<150*50;t++){const aa=a+rand(-.5,.5), rr=rArea(22,LG_R-12), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!inB(x,y)||g[at(x,y)]||bar.has(at(x,y))||!free(x,y,1)||ncell.has(key(x,y))) continue;
       ncell.add(key(x,y)); const kd=Math.random()<.12+rr/(1200*K)?'gold':Math.random()<.55?'wood':'stone'; nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:kd,hp:4,max:4,regrow:0,sec:s}); n++;}}
-  for(let k=0;k<10;k++){const aa=k/10*TAU, x=Math.round(cx+Math.cos(aa)*14), y=Math.round(cy+Math.sin(aa)*14); if(!g[at(x,y)]) nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:['stone','wood','gold'][k%3],hp:4,max:4,regrow:0,sec:-1});}
+  for(let k=0;k<60;k++){const aa=k<10?k/10*TAU:rand(0,TAU), rr=k<10?14:rand(24,LG_HUB-4), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!g[at(x,y)]) nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:['stone','wood','gold'][k%3],hp:4,max:4,regrow:0,sec:-1});}
   const nodeB=new Map(), nodeTile=new Set(); for(const n of nodes){const kk=(n.tx>>5)*256+(n.ty>>5); let a=nodeB.get(kk); if(!a) nodeB.set(kk,a=[]); a.push(n); nodeTile.add(at(n.tx,n.ty));}
   const D={fx,bar,bases,villages,houses,nodes,nodeB,nodeTile,hub:{x:(cx+.5)*T,y:(cy+.5)*T},
-    regAt:i=>{const x=i%w, y=(i/w)|0; return Math.hypot(x-cx,y-cy)<20?-1:secOf(x,y);}, lakeAt:i=>fx[i]&32, bldAt:i=>fx[i]&64, fwAt:i=>fx[i]&31, seaAt:i=>fx[i]&128, barAt:i=>{const v=bar.get(i); return v===undefined?-1:v;}};
+    regAt:i=>{const x=i%w, y=(i/w)|0; return Math.hypot(x-cx,y-cy)<LG_HUB?-1:secOf(x,y);}, lakeAt:i=>fx[i]&32, bldAt:i=>fx[i]&64, fwAt:i=>fx[i]&31, seaAt:i=>fx[i]&128, barAt:i=>{const v=bar.get(i); return v===undefined?-1:v;}};
   return {w,h,g,start:{x:(cx+.5)*T,y:(cy+4.5)*T},exit:null,chests:[],spawns:[],bossAt:null,gates:[],keys:[],rooms:[],rects:[],lgWorld:D};}
 // resource nodes near a spot (they are kept in 32-tile buckets)
 function lgNodesNear(D,x,y,r){const out=[], t0x=Math.floor((x-r)/T)>>5, t1x=Math.floor((x+r)/T)>>5, t0y=Math.floor((y-r)/T)>>5, t1y=Math.floor((y+r)/T)>>5;
@@ -7585,7 +7585,7 @@ function lgmChunk(ci,cj){const D=L.lgWorld, W=L.w, H=L.h, G=L.g, at=(x,y)=>y*W+x
     if(D.lakeAt(at(x,y))){const ls=Math.max(0,D.regAt(at(x,y))); (wat[ls]=wat[ls]||[]).push(x,.06,y, x,.06,y+1, x+1,.06,y, x+1,.06,y, x,.06,y+1, x+1,.06,y+1); continue;}
     if(floorT(x,y)){const a=VC(x,y),b=VC(x,y+1),c=VC(x+1,y),d=VC(x+1,y+1); fp.push(x,0,y, x,0,y+1, x+1,0,y, x+1,0,y, x,0,y+1, x+1,0,y+1); for(const q of [a,b,c,c,b,d]) fc.push(q.r,q.g,q.b);
       if(G[at(x,y)]) continue; const v=TI(x,y), E=regEnv(v<0?-1:v>>2), sb=v<0?{tree:E.tree,tf:.42,th:.84,deco:E.floorDeco,dd:.9}:LG_SUB[v>>2][v&3], forest=(Math.sin(x*.11+y*.07)+Math.sin(x*.035-y*.09)*1.3)*.5;
-      if(forest>sb.tf&&hash(x*13,y*7)>sb.th&&Math.hypot(x-LG_C,y-LG_C)>20&&!(L.lgNoTree&&L.lgNoTree(x,y))&&!lgNodeTile(D,x,y)) (trees[sb.tree]=trees[sb.tree]||[]).push({x:x+.5+(hash(x,y+1)-.5)*.5,y:0,z:y+.5+(hash(x+1,y)-.5)*.5,s:.9+hash(x,y*3)*.8,ry:hash(y,x)*6});
+      if(forest>sb.tf&&hash(x*13,y*7)>sb.th&&Math.hypot(x-LG_C,y-LG_C)>18&&!(L.lgNoTree&&L.lgNoTree(x,y))&&!lgNodeTile(D,x,y)) (trees[sb.tree]=trees[sb.tree]||[]).push({x:x+.5+(hash(x,y+1)-.5)*.5,y:0,z:y+.5+(hash(x+1,y)-.5)*.5,s:.9+hash(x,y*3)*.8,ry:hash(y,x)*6});
       else if(hash(x*11,y*17)>sb.dd){const kd=sb.deco[(hash(x,y*5)*sb.deco.length)|0]; (deco[kd]=deco[kd]||[]).push({x:x+.2+hash(x+9,y)*.6,y:0,z:y+.2+hash(x,y+9)*.6,s:.8+hash(x*2,y)*.6,ry:hash(x,y)*6});}
       continue;}
     if(!rockT(x,y)) continue; const P0=palOf(TI(x,y)), c=P0.top.clone().multiplyScalar(.82+hash(x,y)*.3); tp.push(x,WH,y, x,WH,y+1, x+1,WH,y, x+1,WH,y, x,WH,y+1, x+1,WH,y+1); for(let q=0;q<6;q++) tc.push(c.r,c.g,c.b);
