@@ -19,6 +19,15 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🏠 Version 5.1
+
+- **Smaller obstacle hitboxes:** statues, carts, crates, fountains and the other set pieces in levels now only block the space they actually take up. No more invisible walls around them, no more detours around tiny props, and relics next to them can be picked up.
+- **Enchanting is unlimited again:** every item can be enchanted for free, like before 4.7.
+- **Developer cheats for the owner's account:** when signed in to that account (Google, or account name and email), the ⚙ button opens extra cheats: god mode, one-hit kills, super speed, maxing out all your gear, and Legends cheats (endless resources, open the final three lands, switch day and night).
+- **Legends: build your own village.** Press **H** (or 🏠) to build a house where you are looking (30 wood, 15 stone). Each house brings a new villager, and your houses are saved.
+- **Legends: recruit villagers.** Walk up to a villager and press **U** (or 🤝) to recruit them into your army as Villager Militia archers (5 gold).
+- **Legends with friends:** make a party in Friends & Party, then the party leader opens Legends and everyone joins the same island. You see each other, fight the same fortresses and bosses, and houses you build appear for everyone. Each player has their own golems and resources.
+
 ## 🛡️ Version 5.0: Legends, a game of its own
 
 Open **Game modes → Legends**. Legends now has its own title screen and plays like a whole new game. The monsters, bosses and cutscene style come from the main game.

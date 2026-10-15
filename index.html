@@ -120,6 +120,8 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #lgmDay span{font-size:11.5px;color:#9fd0ff}
 #lgmBar{position:absolute;right:max(12px,env(safe-area-inset-right));top:50%;transform:translateY(-44%);display:flex;flex-direction:column;gap:3px;z-index:4;padding:4px;background:rgba(10,18,36,.7);border:2px solid #4a6aa8}
 #lgmBar[hidden]{display:none}
+#hud:has(#lgmHud:not([hidden])) #partyHud{top:calc(max(14px,env(safe-area-inset-top)) + 190px)}
+@media (max-height:760px) and (min-width:621px){.lgb{height:40px;width:58px}.lgb small{display:none}.lgb .ic{font-size:18px}}
 .lgb{position:relative;width:64px;height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px;font:inherit;color:#f3e6c4;background:rgba(20,34,64,.92);border:2px solid #2a3a5a;cursor:pointer;touch-action:manipulation}
 .lgb .ic{font-size:21px;line-height:1}.lgb small{font-size:10px;color:#c8d8e8;white-space:nowrap;overflow:hidden;max-width:58px}.lgb i{position:absolute;left:3px;top:1px;font-style:normal;font-size:10px;color:#9fd0ff}
 .lgb:hover,.lgb:focus-visible{border-color:#ffd36a;outline:none}.lgb.no{opacity:.45}.lgb.on{border-color:#7aff8a;background:rgba(30,70,50,.92)}
@@ -1288,7 +1290,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='5.0.0', SAVE_VERSION=7;
+const APP_VERSION='5.1.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1332,6 +1334,7 @@ function calcStats(){const e=SAVE.eq,w=e.weapon,b=WEAPONS[w.kind],a=e.armor; con
   ST.curses=[]; for(const it of all) if(it.curse&&CURSES[it.curse]){CURSES[it.curse].f(ST); ST.curses.push(CURSES[it.curse]);}
   ST.dmg=Math.round(ST.dmg*(1+.06*upLv('mig'))); ST.maxhp=Math.round(ST.maxhp*(1+.1*upLv('vit'))); ST.red=Math.min(.7,ST.red+.02*upLv('arm')); ST.spd*=1+.04*upLv('swf'); ST.crit+=.03*upLv('cri');
   {const c=crestLv(); if(c){ST.dmg=Math.round(ST.dmg*(1+c/100)); ST.maxhp=Math.round(ST.maxhp*(1+c/100));}}
+  if(SAVE&&(SAVE.adminOHK||SAVE.adminSpd)&&isAdmin()){if(SAVE.adminOHK) ST.dmg*=1000; if(SAVE.adminSpd) ST.spd*=1.7;}
   return ST;}
 const SETS={regrowth:{n:'Regrowth',col:'#7aff8a',d:'Heal 3 health every second',f:S=>{S.regen+=3;}},
  sand:{n:'Sandstrider',col:'#f0c878',d:'Move 15% faster and swing 8% faster',f:S=>{S.spd*=1.15; S.rate*=.92;}},
@@ -1403,7 +1406,7 @@ let allies=[];
 let L=null,P=null,ents=[],projs=[],hazards=[],parts=[],texts=[],loot=[],boss=null,cam={x:0,y:0},shakeT=0,shakeA=0,flashT=0,flashCol='#fff';
 let run=null, amb=[], bigMap=false;
 const solid=(x,y)=>{const tx=Math.floor(x/T),ty=Math.floor(y/T); if(tx<0||ty<0||tx>=L.w||ty>=L.h) return true; return L.g[ty*L.w+tx]===1;};
-const ogAt=(x,y)=>{const O=L.og; if(!O) return false; const tx=Math.floor(x/T),ty=Math.floor(y/T); return tx>=0&&ty>=0&&tx<L.w&&ty<L.h&&O[ty*L.w+tx]===1;};
+const ogAt=(x,y)=>{const O=L.og; if(!O) return false; const tx=Math.floor(x/T),ty=Math.floor(y/T); if(!(tx>=0&&ty>=0&&tx<L.w&&ty<L.h&&O[ty*L.w+tx]===1)) return false; const c=L.ogC&&L.ogC[ty*L.w+tx]; return c?Math.hypot(x-c.x,y-c.y)<c.r:true;};
 const blocked=(x,y,r)=>solid(x-r,y-r)||solid(x+r,y-r)||solid(x-r,y+r)||solid(x+r,y+r)||(!!L.og&&(ogAt(x-r,y-r)||ogAt(x+r,y-r)||ogAt(x-r,y+r)||ogAt(x+r,y+r)));
 function moveCirc(e,dx,dy){const n=Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/(e.r*.8))||1; dx/=n; dy/=n;
   for(let i=0;i<n;i++){ if(!blocked(e.x+dx,e.y,e.r)) e.x+=dx; if(!blocked(e.x,e.y+dy,e.r)) e.y+=dy; }}
@@ -1482,7 +1485,7 @@ function useArt(slot){const it=SAVE.eq[slot]; if(!it||P.dead||P.acd[slot]>0) ret
 // The purple shockwave used by enchanted gear
 function soulWave(r,dmg,col){for(const e of targets()) if(dist(e,P)<r+e.r) hurtE(e,dmg,{});
   for(let i=0;i<36;i++){const a=i/36*TAU; parts.push({x:P.x+Math.cos(a)*18,y:P.y+Math.sin(a)*18,z:14,vx:Math.cos(a)*r*2.7,vy:Math.sin(a)*r*2.7,vz:30,life:.4,max:.4,col:i%2?col:'#e8d0ff',sz:6});} shake(3);}
-function hurtP(d,o={}){if(P.ally){const a=P; if(a.hp<=0||a.iframe>0) return; d=Math.max(1,Math.round(d)); a.hp-=d; a.iframe=.3; a.flash=.12; ftext(a.x,a.y-30,'-'+d,'#ffb0a0'); if(a.hp<=0){a.hp=0; a.dead=true;} return;}
+function hurtP(d,o={}){if(!P.ally&&SAVE&&SAVE.adminGod&&isAdmin()) return; if(P.ally){const a=P; if(a.hp<=0||a.iframe>0) return; d=Math.max(1,Math.round(d)); a.hp-=d; a.iframe=.3; a.flash=.12; ftext(a.x,a.y-30,'-'+d,'#ffb0a0'); if(a.hp<=0){a.hp=0; a.dead=true;} return;}
   if(P.remote){if(P.dead||P.roll||P.iframe>0||run.done) return; P.iframe=.35; P.flash=.15; send(P.code,{t:'hurt',d,slow:!!o.slow}); return;}
   if(P.dead||P.roll>0||P.iframe>0||run.done) return;
   if(ST.soulGuard&&Math.random()<.18){P.iframe=.35; ftext(P.x,P.y-36,'Blocked','#d8b0ff',true); soulWave(100,Math.round(ST.dmg*.5),'#9a5cff'); return;}
@@ -1688,7 +1691,7 @@ function bossDown(b,fromNet){
   b.dead=true; b.deadAt=time; b.hp=0; puff(b.x,b.y-b.r,b.c2,60,260,1.2,7); shock(b.x,b.y,b.r*4,b.c2,.7); hitStop=.15; puff(b.x,b.y-b.r,b.c1,40,200,1,6); shake(12); flashT=.4; flashCol='#fff';
   projs=projs.filter(p=>p.own==='p'); hazards=[]; ents.forEach(e=>{if(e.hp>0){e.hp=0; puff(e.x,e.y-e.r,e.c1,8,100,.5,4);}}); ents=[];
   $('#bossBar').hidden=true;
-  if(LGMS&&!fromNet){b.fallCine=true; b.deadAt=null; lgmBossDown(b); return;}
+  if(LGMS){b.fallCine=true; b.deadAt=null; if(fromNet){const base=LGMS.bases[LGMS.bossBase]; collectAllLoot(); startCine(defeatCine(b),()=>{});} else lgmBossDown(b); return;}
   for(let i=0;i<12;i++) dropLoot(b.x,b.y,{kind:'shard',amt:3});
   dropLoot(b.x,b.y,{kind:'arrows',amt:12});
   for(const sl of ['weapon','armor','artifact']) dropLoot(b.x,b.y,{kind:'item',item:bossItem(sl,b.id,L.tier)});
@@ -4948,7 +4951,7 @@ $('#btnContinue').onclick=()=>{if(SAVE) openMap();};
 $('#menuTitle').addEventListener('click',giftTap);
 /* ---------------- admin panel: only for one account (checked by a scrambled code, the email is not stored here) ---------------- */
 let _admK=null,_admE=null;
-function isAdmin(){const g=SAVE&&SAVE.profile&&SAVE.profile.google; if(!g||!g.email) return false; const e=String(g.email).trim().toLowerCase(); if(e!==_admE){_admE=e; _admK=keyOf(e)===GIFT_KEY;} return _admK;}
+function isAdmin(){const em=SAVE&&SAVE.profile?acctEmailOf(SAVE.profile):''; if(!em) return false; const e=String(em).trim().toLowerCase(); if(e!==_admE){_admE=e; _admK=keyOf(e)===GIFT_KEY;} return _admK;}
 function adminLoot(){const types=['usword','uweapon','uarmor','uarmor','uart','uart','uart']; let n=0;
   for(const t of types){const it=mkCatItem(pickCat(CAT[t],27),t,27,'unique'); enchantItem(it); delete it.newEnch; it.name='Admin '+it.name; it.pow=Math.round(it.pow*2);
     if(it.dmg) it.dmg=Math.round(it.dmg*2); if(it.hp) it.hp=Math.round(it.hp*2); if(it.pot) it.pot=+(it.pot*1.6).toFixed(2); SAVE.inv.push(it); n++;}
@@ -4958,7 +4961,7 @@ function adminPlay(bi,kind){$('#adminPanel').hidden=true; hideOverlays(); MP.inG
   startLevel(bi,B.levels.length,false); run.guest=true; const b=boss; if(!b) return; P.x=b.x; P.y=b.y+260; cam.x=P.x; cam.y=P.y; b.awake=true; b.face=angTo(b,P); b.cd=1.2;
   if(kind==='intro') startCine(bossCine(b),()=>{$('#bossBar').hidden=false;});
   else {if(b.id==='sov1'){const D=BOSSES.sov2; Object.assign(b,{id:'sov2',name:D.name,c1:D.c1,c2:D.c2,r:D.r});} if(b.id==='forms1'){const D=BOSSES.forms3; Object.assign(b,{id:'forms3',name:D.name,c1:D.c1,c2:D.c2});} b.hp=0; bossDown(b);}}
-function renderAdmin(){const p=$('#adminPanel'); p.querySelector('[data-a="gems"]').textContent='Infinite gems: '+(SAVE.adminGems?'ON':'OFF'); p.querySelector('[data-a="all"]').textContent='Unlock all levels & maps: '+(SAVE.adminAll?'ON':'OFF');}
+function renderAdmin(){const p=$('#adminPanel'); const tg=(k,f,l)=>{const b=p.querySelector(`[data-a="${k}"]`); if(b) b.textContent=l+': '+(SAVE[f]?'ON':'OFF');}; tg('god','adminGod','God mode (no damage)'); tg('ohk','adminOHK','One-hit kills'); tg('spd','adminSpd','Super speed'); tg('lgres','adminLgRes','Legends: endless wood, stone & gold'); p.querySelector('[data-a="gems"]').textContent='Infinite gems: '+(SAVE.adminGems?'ON':'OFF'); p.querySelector('[data-a="all"]').textContent='Unlock all levels & maps: '+(SAVE.adminAll?'ON':'OFF');}
 function buildAdmin(){if($('#adminBtn')) return;
   const b=document.createElement('button'); b.id='adminBtn'; b.title='Admin settings'; b.textContent='⚙'; b.hidden=true; document.body.appendChild(b);
   const p=document.createElement('div'); p.id='adminPanel'; p.hidden=true;
@@ -4966,6 +4969,10 @@ function buildAdmin(){if($('#adminBtn')) return;
     <button class="btn" data-a="gems"></button>
     <button class="btn" data-a="loot">Give admin loot</button>
     <button class="btn" data-a="all"></button>
+    <div class="admRow3"><button class="btn small" data-a="god"></button><button class="btn small" data-a="ohk"></button><button class="btn small" data-a="spd"></button></div>
+    <button class="btn small" data-a="maxgear">Max out all my gear (level ${UP_MAX}, enchanted)</button>
+    <button class="btn small" data-a="lgres"></button>
+    <div class="admRow3"><button class="btn small" data-a="lgall">Legends: open the final three</button><button class="btn small" data-a="lgnight">Legends: make it night</button><button class="btn small" data-a="lgday">Legends: make it day</button></div>
     <div class="admRow"><label>Cutscenes</label><select id="admReg">${BIOMES.map((B,i)=>`<option value="${i}">${B.name} · ${(BOSSES[B.boss]||{}).name||''}</option>`).join('')}</select></div>
     <div class="admRow3"><button class="btn small" data-a="region">Region intro</button><button class="btn small" data-a="intro">Boss intro</button><button class="btn small" data-a="defeat">Boss defeat</button></div>
     <button class="btn danger small" data-a="close">Close</button></div>`;
@@ -4975,6 +4982,10 @@ function buildAdmin(){if($('#adminBtn')) return;
     if(k==='close') p.hidden=true;
     else if(k==='gems'){SAVE.adminGems=!SAVE.adminGems; if(SAVE.adminGems) SAVE.shards=Math.max(SAVE.shards||0,999999); persist(); renderAdmin(); toast(SAVE.adminGems?'Infinite gems on':'Infinite gems off','#7fe0c8'); if(mode==='map'){openMap(); p.hidden=false;}}
     else if(k==='loot') adminLoot();
+    else if(k==='god'||k==='ohk'||k==='spd'||k==='lgres'){const f={god:'adminGod',ohk:'adminOHK',spd:'adminSpd',lgres:'adminLgRes'}[k]; SAVE[f]=!SAVE[f]; persist(); calcStats(); renderAdmin(); toast((a.textContent||'').replace(/: (ON|OFF)$/,'')+(SAVE[f]?' on':' off'),'#7fe0c8');}
+    else if(k==='maxgear'){const E=SAVE.eq; let n=0; for(const sl in E){const it=E[sl]; if(!it) continue; it.up=UP_MAX; if(!it.encd) enchantItem(it); n++;} calcStats(); persist(); toast(n+' pieces of gear maxed out','#ffd36a');}
+    else if(k==='lgall'){const S0=lgmSave(); for(const t of ['thorn','dune','bog']) S0.beaten[t]=true; persist(); if(LGMS) lgmOpenBarrier(); toast('The crystal barrier is open','#c8a0ff');}
+    else if(k==='lgnight'||k==='lgday'){if(LGMS){LGMS.day=Math.floor(LGMS.day/300)*300+(k==='lgnight'?212:20); toast(k==='lgnight'?'Night falls':'The sun rises','#9fd0ff');} else toast('Open Legends first','#ffd36a');}
     else if(k==='all'){SAVE.adminAll=!SAVE.adminAll; persist(); renderAdmin(); toast(SAVE.adminAll?'Every level and map unlocked':'Unlock-all turned off','#8fd06a'); if(mode==='map') openMap();}
     else adminPlay(+$('#admReg').value,k);});
   ['keydown','keyup'].forEach(t=>p.addEventListener(t,e=>e.stopPropagation()));
@@ -5207,14 +5218,14 @@ function renderDetail(){const box=$('#detail'); let it=null, inBag=false;
    ${it.curse&&CURSES[it.curse]?`<div class="cursed">☠ Cursed · <b>${CURSES[it.curse].buff}</b><br>Penalty: ${CURSES[it.curse].pen}</div>`:''}
    ${inBag?cmp(it,eqFor):''}
    <div class="actions uprow">${(it.up||0)>=UP_MAX?`<span class="uptag">⬆ Fully upgraded · level ${UP_MAX}</span>`:`<button class="btn small upbtn" data-act="up" ${SAVE.shards<gearCost(it)?'disabled':''} aria-label="Upgrade this gear for ${gearCost(it)} diamonds">⬆ Upgrade gear · level ${(it.up||0)} → ${(it.up||0)+1} · 💎 ${gearCost(it)}</button>${SAVE.shards<gearCost(it)?`<span class="upneed">Need ${gearCost(it)-SAVE.shards} more diamonds</span>`:''}`}</div>
-   <div class="actions encrow">${it.encd?`<span class="enctag">✦ Enchanted: +25% power, a new enchantment and ${SOUL_ABIL[it.slot][0]}</span>`:(enchTokens()>0?`<button class="btn small enchbtn" data-act="ench">✦ Enchant · Free (${enchTokens()>=99?'unlimited':enchTokens()+' left'})</button>`:`<button class="btn small enchbtn" disabled>✦ Enchant</button><span class="upneed">Next free enchantment in ${enchWait()}</span>`)}</div>
+   <div class="actions encrow">${it.encd?`<span class="enctag">✦ Enchanted: +25% power, a new enchantment and ${SOUL_ABIL[it.slot][0]}</span>`:(enchTokens()>0?`<button class="btn small enchbtn" data-act="ench">✦ Enchant · Free</button>`:`<button class="btn small enchbtn" disabled>✦ Enchant</button><span class="upneed">Next free enchantment in ${enchWait()}</span>`)}</div>
    <div class="actions">${inBag?(it.slot==='artifact'?`<button class="btn small gold" data-act="eq1">Slot 1</button><button class="btn small gold" data-act="eq2">Slot 2</button><button class="btn small gold" data-act="eq3">Slot 3</button><button class="btn small gold" data-act="eq4">Slot 4</button><button class="btn small gold" data-act="eq5">Slot 5</button><button class="btn small gold" data-act="eq6">Slot 6</button><button class="btn small gold" data-act="eq7">Slot 7</button><button class="btn small gold" data-act="eq8">Slot 8</button>`:`<button class="btn small gold" data-act="eq">Equip</button>`)+`<button class="btn small danger" data-act="salv">Salvage +${salv}</button>`
      :(it.slot==='artifact'?`<button class="btn small" data-act="uneq">Unequip</button>`:`<span class="empty">Equipped</span>`)}</div>`;
   box.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>invAction(b.dataset.act,it));}
 const enchCost=it=>0;
 // one free enchantment a week (they stack up to 4 if you're away)
 const WEEK=7*864e5;
-function enchTokens(){if(!SAVE) return 0; if(SAVE.adminAll||SAVE.adminGems) return 99; const now=Date.now(); if(SAVE.enchTok==null){SAVE.enchTok=1; SAVE.enchLast=now;}
+function enchTokens(){return 99; if(!SAVE) return 0; if(SAVE.adminAll||SAVE.adminGems) return 99; const now=Date.now(); if(SAVE.enchTok==null){SAVE.enchTok=1; SAVE.enchLast=now;}
   const w=Math.floor((now-(SAVE.enchLast||now))/WEEK); if(w>0){SAVE.enchTok=Math.min(4,SAVE.enchTok+w); SAVE.enchLast+=w*WEEK;} return SAVE.enchTok;}
 function enchWait(){const ms=(SAVE.enchLast||Date.now())+WEEK-Date.now(), d=Math.floor(ms/864e5), h=Math.ceil((ms%864e5)/36e5); return d>0?`${d} day${d>1?'s':''} ${h} h`:`${h} hour${h>1?'s':''}`;}
 // gear upgrades: spend diamonds to raise an item a level at a time (each level adds a little power)
@@ -5572,7 +5583,7 @@ const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const GIFT_KEY='1akwo3z6zhf';
 function keyOf(str){let h1=0xdeadbeef^6,h2=0x41c6ce57^6; for(let i=0,ch;i<str.length;i++){ch=str.charCodeAt(i); h1=Math.imul(h1^ch,2654435761); h2=Math.imul(h2^ch,1597334677);}
   h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909); return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
-function giftTap(){const g=SAVE&&SAVE.profile&&SAVE.profile.google; if(!g||!g.email||keyOf(String(g.email).trim().toLowerCase())!==GIFT_KEY) return; SAVE.shards=(SAVE.shards||0)+5000; persist(); toast('+5000 shards!','#7fe0c8'); const h=$('#menu h1'); h.classList.remove('giftpop'); void h.offsetWidth; h.classList.add('giftpop');}
+function giftTap(){if(!isAdmin()) return; SAVE.shards=(SAVE.shards||0)+5000; persist(); toast('+5000 shards!','#7fe0c8'); const h=$('#menu h1'); h.classList.remove('giftpop'); void h.offsetWidth; h.classList.add('giftpop');}
 function profileName(){return SAVE&&SAVE.profile&&SAVE.profile.name||null;}
 function renderAcct(){const el=$('#acct'); const p=SAVE&&SAVE.profile;
   const upd=`<button class="btn small" id="updBtn" title="Get the newest version of the game">Update</button>`;
@@ -6080,6 +6091,7 @@ function onMsg(code,m){if(!m||typeof m!=='object') return; const H=MP.role==='ho
   case 's': if(C&&MP.inGame) applySnap(m); break;
   case 'me': if(H&&MP.inGame) netMe(code,m); break;
   case 'hit': if(H&&MP.inGame) netHit(code,m); break;
+  case 'lgev': if(C) lgmNet(m); else if(H&&m.k==='house'&&LGMS){lgmPlaceHouse(m.x,m.y,false,false,true); bcast(m);} break;
   case 'hurt': if(C&&MP.inGame&&mode!=='cutscene') hurtP(m.d,{slow:m.slow}); break;
   case 'kill': if(C&&MP.inGame) netKill(m); break;
   case 'bdown': if(C&&MP.inGame) netBossDown(m); break;
@@ -6128,14 +6140,15 @@ const STS=['chase','wind','rec','dash','fuse'], STI={chase:0,wind:1,rec:2,dash:3
 const r1=v=>Math.round(v), r2=v=>Math.round(v*100)/100;
 function myState(){const w=SAVE.eq.weapon; return {x:r1(P.x),y:r1(P.y),f:r2(P.face),w:r2(P.walk%100),hp:Math.ceil(P.hp),mx:ST.maxhp,fl:(P.dead?1:0)|(P.roll>0?2:0)|(P.swing>0?4:0)|(MP.lastMove?8:0),sk:curSkin(),wk:w.kind,wc:w.col||'#d6dde2',wr:w.rar,n:myName()};}
 function buildSnap(){const b=boss; return {t:'s',
-  e:ents.filter(e=>e.hp>0).map(e=>[e.id,e.type,r1(e.x),r1(e.y),Math.ceil(e.hp),e.max,r2(e.face),STI[e.state]|0,(e.alert?1:0)|(e.flash>0?2:0)|(e.burn>0?4:0)|(e.summoned?8:0)|(e.stun>0?16:0),r2(e.da||0)]),
+  e:ents.filter(e=>e.hp>0).map(e=>[e.id,e.type,r1(e.x),r1(e.y),Math.ceil(e.hp),e.max,r2(e.face),STI[e.state]|0,(e.alert?1:0)|(e.flash>0?2:0)|(e.burn>0?4:0)|(e.summoned?8:0)|(e.stun>0?16:0)|(e.inv?32:0),r2(e.da||0),e.st?e.base:-1,e.bi!=null?e.bi:-1]),
   b:b?{id:b.id,x:r1(b.x),y:r1(b.y),hp:Math.ceil(b.hp),max:b.max,f:r2(b.face),w:r2(b.walk%100),hd:b.hidden?1:0,aw:b.awake?1:0,dd:b.dead?1:0,fm:b.form,fl:b.flash>0?1:0,tr:r2(b.trans||0),te:b.a&&b.a.tele?1:0,an:b.a&&b.a.ang!=null?r2(b.a.ang):0,ro:b.roar>0?1:0,r:b.r,nm:b.name}:null,
   p:projs.slice(0,140).map(p=>[r1(p.x),r1(p.y),r1(p.vx),r1(p.vy),p.r,p.col,p.own==='p'?1:0,p.arrow?1:0,r2(p.life)]),
   h:hazards.map(h=>[r1(h.x),r1(h.y),r1(h.r),r2(h.t),h.delay,h.col,h.done?1:0,h.persist||0,r2(h.life),h.own==='p'?1:0]),
   pl:[Object.assign({c:MP.code},myState())].concat([...MP.others.values()].map(o=>({c:o.code,x:r1(o.x),y:r1(o.y),f:o.face,w:o.walk,hp:o.hp,mx:o.max,fl:(o.dead?1:0)|(o.roll?2:0)|(o.swing?4:0)|(o.moving?8:0),sk:o.skin,wk:o.wk,wc:o.wc,wr:o.wr,n:o.name})))};}
 function mirrorEnemy(type,x,y){const e=makeEnemy(type,x,y,false); e.mirror=true; return e;}
 function applySnap(s){if(!L||!run) return; const byId=new Map(ents.map(e=>[e.id,e])); const next=[];
-  for(const r of s.e){let e=byId.get(r[0]); if(!e||e.type!==r[1]){e=mirrorEnemy(r[1],r[2],r[3]); e.id=r[0];}
+  for(const r of s.e){let e=byId.get(r[0]); if(!e||e.type!==r[1]){if(r[10]!=null&&r[10]>=0) e=lgmMirrorStruct(r); else {LG_EBI=r[11]!=null&&r[11]>=0?r[11]:null; e=mirrorEnemy(r[1],r[2],r[3]); LG_EBI=null;} e.id=r[0];}
+    if(e.st) e.inv=!!(r[8]&32);
     e.tx=r[2]; e.ty=r[3]; if(e.hpLocalT>0) e.hp=Math.min(e.hp,r[4]); else e.hp=r[4]; e.max=r[5]; e.tface=r[6]; e.state=STS[r[7]]||'chase'; e.alert=!!(r[8]&1); if(r[8]&2) e.flash=.1; e.burn=(r[8]&4)?1:0; e.summoned=!!(r[8]&8); e.stunNet=!!(r[8]&16); e.da=r[9]; next.push(e);}
   ents=next;
   if(s.b){const D=s.b; if(!boss||boss.id!==D.id){const B=BOSSES[D.id]; boss={id:D.id,isBoss:true,bi:L.bi,x:D.x,y:D.y,r:D.r,max:D.max,hp:D.hp,c1:B.c1,c2:B.c2,name:D.nm,face:D.f,walk:0,acts:[],cd:9,flash:0,awake:false,hidden:false,inv:false,burn:0,stun:0,trans:0,dead:false,form:D.fm,mirror:true};}
@@ -6716,7 +6729,7 @@ function placeStructures(E,bio,isF){if(!levelGroup||!L) return; const name=L.the
     const mx=x0+s/2, my=y0+s/2; for(const a of avoid) if(Math.hypot(a.x-mx,a.y-my)<s/2+1.2) return false;
     const parts=[], base=new THREE.Matrix4().compose(new THREE.Vector3(mx,0,my),new THREE.Quaternion().setFromEuler(new THREE.Euler(0,rot,0)),new THREE.Vector3(1,1,1)), q=new THREE.Quaternion(), e=new THREE.Euler();
     const A=(g,m,x,y,z,sx,sy=sx,sz=sx,rx=0,ry=0,rz=0)=>{const mm=new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),q.setFromEuler(e.set(rx,ry,rz)),new THREE.Vector3(sx,sy,sz)); parts.push({g:geoOf(g),m,mx:base.clone().multiply(mm)});};
-    D.b(A,mats); for(const me of bakeStruct(parts)) levelGroup.add(me); for(let y=y0;y<y0+s;y++) for(let x=x0;x<x0+s;x++) L.og[y*L.w+x]=1; n++; return true;};
+    D.b(A,mats); for(const me of bakeStruct(parts)) levelGroup.add(me); {const rr=s*.3; L.ogC=L.ogC||{}; for(let y=Math.floor(my-rr);y<=Math.floor(my+rr);y++) for(let x=Math.floor(mx-rr);x<=Math.floor(mx+rr);x++){if(x<0||y<0||x>=L.w||y>=L.h) continue; L.og[y*L.w+x]=1; L.ogC[y*L.w+x]={x:mx*T,y:my*T,r:rr*T};}} n++; return true;};
   rects.forEach((r,ri)=>{if(n>=maxN) return; const want=r.w*r.h>70?2:1; let placed=0; const cand=[];
     for(let y=r.y+1;y<r.y+r.h-1;y++) for(let x=r.x+1;x<r.x+r.w-1;x++){const dc=Math.hypot(x-(r.x+r.w/2),y-(r.y+r.h/2)); cand.push({x,y,k:hash(x*7+ri,y*13)-dc*.06});}
     cand.sort((a,b)=>a.k-b.k); for(const c of cand){if(placed>=want||n>=maxN) break; const kind=set[(ri*2+placed)%set.length], cx=c.x+.5, cy=c.y+.5; const rot=Math.round(Math.atan2((r.x+r.w/2)-cx,(r.y+r.h/2)-cy)/(Math.PI/2))*(Math.PI/2); if(tryPut(kind,cx,cy,rot)) placed++;}});
@@ -6974,17 +6987,19 @@ const TRIBES=[
  {id:'hollow',bi:5,boss:'threefold',name:'Horde of the Hollow',fort:'The Hollow Spire',vil:'Duskfall',col:'#c8b8ff',c2:'#3b3550',zone:'void',trait:'A void shield guards the heart until every spawner falls.',taunt:'',win:''}];
 // sector of each horde around the Crown Well (0 = west, going clockwise)
 const LG_SEC=[0,1,2,3,4,5];
-const LG_COST={cobble:{stone:12},plank:{wood:12},moss:{gold:8,wood:6},tower:{stone:20,wood:10}};
-const LG_ACT=[['cobble','z','🗿','Cobble Golem'],['plank','x','🏹','Plank Golem'],['moss','c','🌿','Mossy Golem'],['tower','v','🗼','Arrow Tower'],['rally','t','🚩','Rally army'],['recall','y','↩️','Recall army'],['gather','g','✨','Send sprites'],['mount','r','🐎','Ride / dismount']];
+const LG_COST={cobble:{stone:12},plank:{wood:12},moss:{gold:8,wood:6},tower:{stone:20,wood:10},house:{wood:30,stone:15},recruit:{gold:5}};
+const LG_ACT=[['cobble','z','🗿','Cobble Golem'],['plank','x','🏹','Plank Golem'],['moss','c','🌿','Mossy Golem'],['tower','v','🗼','Arrow Tower'],['rally','t','🚩','Rally army'],['recall','y','↩️','Recall army'],['gather','g','✨','Send sprites'],['mount','r','🐎','Ride / dismount'],['house','h','🏠','Build house'],['recruit','u','🤝','Recruit villager']];
 const RES_ICO={wood:'🪵',stone:'🪨',gold:'🪙'};
 const LG_N=150, LG_C=75;
 function lgmInit(){if(lgmInit.done) return; lgmInit.done=true;
-  Object.assign(MINIONS,{lg_cobble:{n:'Cobble Golem',feat:'golem',c1:'#8a8478',c2:'#d8c8a8',role:'melee',dmg:15,spd:150,r:15},lg_plank:{n:'Plank Golem',feat:'golem',c1:'#8a6a3a',c2:'#ffd38a',role:'ranged',dmg:10,spd:165,r:13,shot:'#ffe0a0'},lg_moss:{n:'Mossy Golem',feat:'golem',c1:'#4a7a3a',c2:'#9fe07a',role:'heal',dmg:5,spd:160,r:13,shot:'#9fe07a'}});
+  Object.assign(MINIONS,{lg_cobble:{n:'Cobble Golem',feat:'golem',c1:'#8a8478',c2:'#d8c8a8',role:'melee',dmg:15,spd:150,r:15},lg_plank:{n:'Plank Golem',feat:'golem',c1:'#8a6a3a',c2:'#ffd38a',role:'ranged',dmg:10,spd:165,r:13,shot:'#ffe0a0'},lg_moss:{n:'Mossy Golem',feat:'golem',c1:'#4a7a3a',c2:'#9fe07a',role:'heal',dmg:5,spd:160,r:13,shot:'#9fe07a'},lg_militia:{n:'Villager Militia',feat:'hooded',c1:'#6a4a2a',c2:'#ffd38a',role:'ranged',dmg:9,spd:170,r:11,shot:'#ffe0a0'}});
   Object.assign(HEADH,{tower:1.3,spawner:.9,gate:.5,heart:.7}); Object.assign(ROLE,{tower:['Tower · shoots your army','#ff9a6a'],spawner:['Spawner · keeps making monsters','#ffd36a'],gate:['Fortress gate · break it down','#e8b06a'],heart:['Fortress heart','#ff6a8a']});
   BOSSES.threefold={name:'The Threefold Legend',hp:1100,r:18,spd:155,c1:'#2a1a30',c2:'#ffe08a',acts:['blink','glyphs','spiral','voidrain','orbs','strikes','meteors','summon','combo','burst'],shot:'#ffe08a',minion:'caster'};}
+var LG_BEAT=null;
+const lgBeat=()=>LG_BEAT||lgmSave().beaten;
 function lgmSave(){const s=SAVE.lgm=SAVE.lgm||{}; s.beaten=s.beaten||{}; if(!s.res) s.res={wood:30,stone:30,gold:15}; if(!s.seed) s.seed=((Math.random()*1e9)|0)+1; s.days=s.days||1; return s;}
-function tribeOpen(i){const B=lgmSave().beaten, first=['thorn','dune','bog'].every(k=>B[k]); if(i<3) return true; if(i<5) return first; return first&&B.rime&&B.forge;}
-const lgFinalOpen=()=>{const B=lgmSave().beaten; return ['thorn','dune','bog'].every(k=>B[k]);};
+function tribeOpen(i){const B=lgBeat(), first=['thorn','dune','bog'].every(k=>B[k]); if(i<3) return true; if(i<5) return first; return first&&B.rime&&B.forge;}
+const lgFinalOpen=()=>{const B=lgBeat(); return ['thorn','dune','bog'].every(k=>B[k]);};
 
 /* ---------------- the world ---------------- */
 function genLegendWorld(){const N=LG_N,w=N,h=N,cx=LG_C,cy=LG_C, g=new Uint8Array(w*h), reg=new Int8Array(w*h).fill(-1), lake=new Uint8Array(w*h), bld=new Uint8Array(w*h), fw=new Uint8Array(w*h), bar=new Int8Array(w*h).fill(-1);
@@ -7072,7 +7087,7 @@ function lgmBuildWorld(){const D=L.lgWorld, W=L.w, H=L.h, G=L.g, at=(x,y)=>y*W+x
   for(const k in trees) if(DECOR[k]) placeDecor(k,trees[k]); for(const k in deco) if(DECOR[k]) placeDecor(k,deco[k],false);
   // fortress walls, banners and hazard pools
   const mtx=new THREE.Matrix4(), q=new THREE.Quaternion();
-  for(const B of D.bases){const tr=TRIBES[B.sec]; if(lgmSave().beaten[tr.id]) B.ruin=true; const stone=new THREE.Color('#77736c').lerp(new THREE.Color(tr.c2),.3); const tiles=[]; for(let y=B.rect.y;y<B.rect.y+B.rect.h;y++) for(let x=B.rect.x;x<B.rect.x+B.rect.w;x++) if(D.fw[at(x,y)]===B.sec+1) tiles.push([x,y]);
+  for(const B of D.bases){const tr=TRIBES[B.sec]; if(lgBeat()[tr.id]) B.ruin=true; const stone=new THREE.Color('#77736c').lerp(new THREE.Color(tr.c2),.3); const tiles=[]; for(let y=B.rect.y;y<B.rect.y+B.rect.h;y++) for(let x=B.rect.x;x<B.rect.x+B.rect.w;x++) if(D.fw[at(x,y)]===B.sec+1) tiles.push([x,y]);
     const blk=new THREE.InstancedMesh(gBox,new THREE.MeshStandardMaterial({color:stone,roughness:.85,flatShading:true}),tiles.length), cr=new THREE.InstancedMesh(gBox,new THREE.MeshStandardMaterial({color:stone.clone().multiplyScalar(.82),roughness:.9}),tiles.length); let n=0,c=0;
     for(const [x,y] of tiles){const hgt=B.ruin?(.5+hash(x,y)*.9):2.3; mtx.compose(new THREE.Vector3(x+.5,hgt/2,y+.5),q,new THREE.Vector3(1.02,hgt,1.02)); blk.setMatrixAt(n++,mtx); const edge=D.fw[at(x,y-1)]!==B.sec+1||D.fw[at(x,y+1)]!==B.sec+1||D.fw[at(x-1,y)]!==B.sec+1||D.fw[at(x+1,y)]!==B.sec+1; if(!B.ruin&&edge&&(x+y)%2===0){mtx.compose(new THREE.Vector3(x+.5,2.6,y+.5),q,new THREE.Vector3(.5,.36,.5)); cr.setMatrixAt(c++,mtx);}}
     blk.count=n; cr.count=c; blk.castShadow=blk.receiveShadow=true; levelGroup.add(blk); levelGroup.add(cr);
@@ -7085,7 +7100,8 @@ function lgmBuildWorld(){const D=L.lgWorld, W=L.w, H=L.h, G=L.g, at=(x,y)=>y*W+x
     tiles.forEach((i,k)=>{const x=i%W,y=(i/W)|0; mtx.compose(new THREE.Vector3(x+.5,.9+hash(x,y)*.4,y+.5),q.setFromEuler(new THREE.Euler(0,hash(y,x)*3,0)),new THREE.Vector3(.34,.9+hash(x+1,y)*.6,.34)); m.setMatrixAt(k,mtx);}); m.count=tiles.length; levelGroup.add(m); L.lgBar=m; m.visible=!lgFinalOpen();}
   // houses, wells and the Crown Well
   const pyr=geo('pyr4',()=>new THREE.ConeGeometry(1,1,4)), wall=new THREE.MeshStandardMaterial({color:0xd8c8a0,roughness:.9}), beam=new THREE.MeshStandardMaterial({color:0x5a3e24,roughness:.85});
-  for(const hs of D.houses){const roofC=hs.sec<0?'#3a5a9a':TRIBES[hs.sec].c2, gr=new THREE.Group(); gr.position.set(hs.x,0,hs.y); gr.rotation.y=-hs.ry+Math.PI/2; levelGroup.add(gr);
+  for(const hs of D.houses) lgmHouseMesh(hs);
+  if(false) for(const hs of D.houses){const roofC=hs.sec<0?'#3a5a9a':TRIBES[hs.sec].c2, gr=new THREE.Group(); gr.position.set(hs.x,0,hs.y); gr.rotation.y=-hs.ry+Math.PI/2; levelGroup.add(gr);
     const b=new THREE.Mesh(gBox,wall); b.position.y=.6; b.scale.set(1.7,1.2,1.7); b.castShadow=b.receiveShadow=true; gr.add(b);
     for(const [x,z] of [[-.85,-.85],[.85,-.85],[-.85,.85],[.85,.85]]){const p=new THREE.Mesh(gBox,beam); p.position.set(x,.6,z); p.scale.set(.14,1.22,.14); gr.add(p);}
     const r=new THREE.Mesh(pyr,new THREE.MeshStandardMaterial({color:roofC,roughness:.8,flatShading:true})); r.position.y=1.6; r.scale.set(1.5,.9,1.5); r.rotation.y=Math.PI/4; r.castShadow=true; gr.add(r);
@@ -7099,17 +7115,17 @@ function lgmBuildWorld(){const D=L.lgWorld, W=L.w, H=L.h, G=L.g, at=(x,y)=>y*W+x
   const sea=new THREE.Mesh(gPlane,new THREE.MeshStandardMaterial({color:0x2a6a9a,roughness:.15,metalness:.2})); sea.rotation.x=-Math.PI/2; sea.scale.set(W+400,H+400,1); sea.position.set(W/2,-.2,H/2); levelGroup.add(sea);}
 
 /* ---------------- starting, the title screen and quitting ---------------- */
-function openLegends(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} if(MP.party&&MP.party.members.length>1){toast('Legends is played solo for now. Leave the party to start it.','#ffd36a'); return;}
-  $('#modesPanel')&&($('#modesPanel').hidden=true); startLegends(); lgmTitle(true);}
+function openLegends(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} const party=MP.party&&MP.party.members.length>1; if(party&&MP.role!=='host'){toast('The party leader starts Legends','#ffd36a'); return;}
+  $('#modesPanel')&&($('#modesPanel').hidden=true); if(party){MP.inGame=true; MP.others.clear();} startLegends(); if(party){const S0=lgmSave(); bcast({t:'lgev',k:'start',seed:S0.seed,beaten:S0.beaten,day:LGMS.day}); toast('Your party is joining you in Legends','#8fd06a');} lgmTitle(true);}
 function startLegendBattle(){openLegends();}
-function startLegends(){lgmInit(); GAUNT=null; DUN=null; const S0=lgmSave();
+function startLegends(o){o=o||{}; lgmInit(); GAUNT=null; DUN=null; const S0=lgmSave(); LG_BEAT=o.beaten||null; const CL=MP.role==='client'&&MP.inGame;
   LGMS={res:S0.res,yaw:-Math.PI/2,pitch:.42,dist:7.6,ride:false,mount:{walk:0},sprites:[],rally:null,day:30,raid:null,region:-9,bases:[],seen:{},lastAtk:0,deadT:0,hudT:0,saveT:0,ptowers:[],cry:null,thief:null,villagers:[],lock:false,lookT:0};
   GEN_OVERRIDE=genLegendWorld; GEN_NAME='Legends'; GEN_THEME={wall:[],scatter:[],plat:[],name:''};
-  try{startLevel(0,1,false,S0.seed);} finally{GEN_OVERRIDE=null; GEN_NAME=null; GEN_THEME=null;}
+  try{startLevel(0,1,false,o.seed||S0.seed);} finally{GEN_OVERRIDE=null; GEN_NAME=null; GEN_THEME=null;}
   run.lgm=true; L.reinf=99; L.amb='petal'; const D=L.lgWorld; LGMS.nodes=D.nodes; LGMS.D=D; ents=[];
   if(!lgFinalOpen()) for(let i=0;i<D.bar.length;i++) if(D.bar[i]>=0) L.g[i]=1;
-  D.bases.forEach(B=>{const tr=TRIBES[B.sec], beaten=!!S0.beaten[tr.id], base={i:B.sec,tr,B,beaten,tier:tr.bi,gate:null,heart:null,spawners:[],towers:[]}; LGMS.bases.push(base);
-    if(beaten) return; for(const t of B.gateTiles) L.g[t.y*L.w+t.x]=1;
+  D.bases.forEach(B=>{const tr=TRIBES[B.sec], beaten=!!lgBeat()[tr.id], base={i:B.sec,tr,B,beaten,tier:tr.bi,gate:null,heart:null,spawners:[],towers:[]}; LGMS.bases.push(base);
+    if(beaten) return; for(const t of B.gateTiles) L.g[t.y*L.w+t.x]=1; if(CL) return;
     base.gate=mkStruct(base,'gate',B.gate.x,B.gate.y); base.heart=mkStruct(base,'heart',B.heart.x,B.heart.y,{inv:true});
     base.spawners=B.spawners.map(p=>mkStruct(base,'spawner',p.x,p.y)); base.towers=B.towers.map(p=>mkStruct(base,'tower',p.x,p.y));
     LG_EBI=tr.bi; LG_ETIER=tr.bi; for(let k=0;k<4+B.sec;k++){const a=Math.random()*TAU, r=rand(500,800); const m=spawnEnemy(pickType(tr.bi),B.heart.x+Math.cos(a)*r,B.heart.y+Math.sin(a)*r); if(m){m.base=B.sec;}} LG_EBI=LG_ETIER=null;});
@@ -7117,7 +7133,8 @@ function startLegends(){lgmInit(); GAUNT=null; DUN=null; const S0=lgmSave();
   const vsk=['pirate0','viking0','samurai0','solar0','ocean0','default'].filter(k=>SKIN_BY_ID[k]);
   for(const V of D.villages) for(let k=0;k<2;k++) LGMS.villagers.push({x:V.x+rand(-60,60),y:V.y+rand(60,90),hx:V.x,hy:V.y+70,skin:choice(vsk),face:rand(-3,3),walk:0,t:rand(0,3),tx:null});
   ['arcane0','arcane1','arcane2'].forEach((k,i)=>{const a=-Math.PI/2+(i-1)*.9; LGMS.villagers.push({x:D.hub.x+Math.cos(a)*95,y:D.hub.y+Math.sin(a)*95,hx:0,hy:0,skin:SKIN_BY_ID[k]?k:'default',face:a+Math.PI,walk:0,still:true,lore:true});});
-  P.x=D.hub.x; P.y=D.hub.y+150; LGMS.yaw=-Math.PI/2; $('#lvlName').innerHTML=''; lgmRegion(true); lgmHud(); lgmBar(true); lgmMiniImg=null;}
+  if(o.day!=null) LGMS.day=o.day; if(!CL) for(const h of (S0.houses||[])) lgmPlaceHouse(h.x,h.y,false,true);
+  P.x=D.hub.x+(CL?rand(-60,60):0); P.y=D.hub.y+150; LGMS.yaw=-Math.PI/2; $('#lvlName').innerHTML=''; lgmRegion(true); lgmHud(); lgmBar(true); lgmMiniImg=null;}
 function lgmTitle(on){let el=$('#lgTitle'); if(!on){if(el) el.hidden=true; if(mode==='lgmenu'){mode='play'; cine=null; showOnly('hud');} return;}
   if(!el){el=document.createElement('div'); el.id='lgTitle'; document.body.appendChild(el); ['keydown','keyup'].forEach(t=>el.addEventListener(t,e=>e.stopPropagation()));}
   const S0=lgmSave(), n=TRIBES.filter(t=>S0.beaten[t.id]).length, fresh=!S0.intro;
@@ -7133,7 +7150,7 @@ function lgmTitle(on){let el=$('#lgTitle'); if(!on){if(el) el.hidden=true; if(mo
   setTimeout(()=>{const b=el.querySelector('#lgPlay'); if(b) b.focus();},50);}
 function showMenuFromLegends(){cine=null; toMenu();}
 function lgmStartTip(){mode='play'; banner('The Crown Well','Six lands wait. Gather, build and rally.'); toast('Click the game to steer the camera with your mouse. R to ride, G to gather, Z/X/C/V to build, T to rally.','#ffd36a');}
-function lgmQuit(){if(!LGMS) return; const S0=lgmSave(); S0.res=LGMS.res; persist(); try{if(document.pointerLockElement) document.exitPointerLock();}catch(e){} LGMS=null; lgmHud(); lgmBar(false); const t=$('#lgTitle'); if(t) t.hidden=true; const rr=$('#resRetry'); if(rr) rr.textContent='Retry';}
+function lgmQuit(){if(!LGMS) return; lgmB({k:'quit'}); LG_BEAT=null; const S0=lgmSave(); S0.res=LGMS.res; persist(); try{if(document.pointerLockElement) document.exitPointerLock();}catch(e){} LGMS=null; lgmHud(); lgmBar(false); const t=$('#lgTitle'); if(t) t.hidden=true; const rr=$('#resRetry'); if(rr) rr.textContent='Retry';}
 function mkStruct(base,type,x,y,o){const tr=base.tr, tier=base.tier, df=DF();
   const bs={tower:[20,700],spawner:[26,1100],gate:[52,3000],heart:[36,2600]}[type];
   const e={id:MP.nextId++,st:true,base:base.i,type,ai:type,name:{tower:tr.name.replace(/Horde of (the )?/,'')+' Tower',spawner:'Horde Spawner',gate:tr.fort+' Gate',heart:'Heart of '+tr.fort}[type],c1:tr.c2,c2:tr.col,x,y,r:bs[0],tier,
@@ -7173,7 +7190,9 @@ function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.ma
   C.regT=(C.regT||0)-dt; if(C.regT<=0){C.regT=.4; lgmRegion(); lgmBaseIntro();}
   for(const e of ents) if(!e.st&&!e.lgp&&!e.ally){e.lgp=true; e.max=Math.round(e.max*1.25); e.hp=Math.round(e.hp*1.25); e.dmg*=1.1;}
   // far-away monsters that are not fighting go to sleep
-  for(const e of ents) if(!e.st&&!e.ally&&e.hp>0&&!e.raid&&Math.hypot(e.x-P.x,e.y-P.y)>2600) e.hp=0;
+  const CLI=MP.role==='client'&&MP.inGame; if(CLI) lgmClientRefs(); else for(const e of ents) if(!e.st&&!e.ally&&e.hp>0&&!e.raid&&!e.mirror&&Math.hypot(e.x-P.x,e.y-P.y)>2600&&![...MP.others.values()].some(o=>Math.hypot(e.x-o.x,e.y-o.y)<2600)) e.hp=0;
+  if(SAVE.adminLgRes&&isAdmin()) for(const k in C.res) C.res[k]=Math.max(C.res[k],9999);
+  if(MP.inGame&&MP.role==='host'){C.dsT=(C.dsT||0)-dt; if(C.dsT<=0){C.dsT=5; lgmB({k:'day',d:C.day});}}
   // gathering by hand
   for(const n of C.nodes){if(n.hp<=0){n.regrow-=dt; if(n.regrow<=0) n.hp=n.max; continue;}
     if(swing&&Math.hypot(n.x-P.x,n.y-P.y)<78) lgmHarvest(n,1);}
@@ -7181,11 +7200,11 @@ function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.ma
   // hazards near fortresses
   C.zt=(C.zt||0)-dt; for(const b of C.bases){if(b.beaten||Math.hypot(b.B.heart.x-P.x,b.B.heart.y-P.y)>1300) continue; for(const z of b.B.zones){if(Math.hypot(z.x-P.x,z.y-P.y)>z.r) continue; const zn=b.tr.zone; if(zn==='sand'||zn==='ice') P.slow=Math.max(P.slow,.25); else if(C.zt<=0){C.zt=.6; hurtP(Math.round((zn==='lava'?6:zn==='void'?5:3)*(1+.3*b.tier)),{});} break;}
     if(b.tr.zone==='poison'&&b.spawners.some(s=>s.hp>0)) for(const e of ents) if(e.st&&e.base===b.i&&e.hp>0&&e.hp<e.max) e.hp=Math.min(e.max,e.hp+e.max*.006*dt);
-    const H=b.heart; if(H&&H.inv&&H.hp>0){const ok=b.gate.hp<=0&&(b.tr.zone!=='void'||b.spawners.every(s=>s.hp<=0)); if(ok){H.inv=false; lgmShieldCine(b);}}}
+    const H=b.heart; if(!CLI&&H&&H.inv&&H.hp>0){const ok=b.gate.hp<=0&&(b.tr.zone!=='void'||b.spawners.every(s=>s.hp<=0)); if(ok){H.inv=false; lgmShieldCine(b);}}}
   // player towers
   for(const t of C.ptowers){t.cd-=dt; if(t.cd>0) continue; let best=null,bd=400; for(const e of targets()){const d=Math.hypot(e.x-t.x,e.y-t.y); if(d<bd){bd=d; best=e;}} if(best){t.cd=1.1; const an=Math.atan2((best.y-best.r)-(t.y-40),best.x-t.x); projs.push({x:t.x,y:t.y-40,vx:Math.cos(an)*560,vy:Math.sin(an)*560,dmg:Math.round(9*(1+.4*L.tier)),pet:true,r:5,col:'#bfe0ff',own:'p',life:1.2,arrow:true});}}
   if(C.rally){C.rally.t-=dt; if(C.rally.t<=0) C.rally=null;}
-  lgmRaids(dt); lgmVillagers(dt);
+  if(!CLI) lgmRaids(dt); lgmVillagers(dt);
   C.saveT-=dt; if(C.saveT<=0){C.saveT=30; lgmSave().res=C.res; persist();}
   C.hudT-=dt; if(C.hudT<=0){C.hudT=.4; lgmHud(); lgmBar(true);}}
 function lgmHarvest(n,mult){n.hp--; const a=(n.kind==='gold'?3:5)*mult; LGMS.res[n.kind]+=a; ftext(n.x,n.y-40,'+'+a+' '+RES_ICO[n.kind],n.kind==='gold'?'#ffd36a':n.kind==='wood'?'#e0b080':'#d8d8d8',true); puff(n.x,n.y-10,n.kind==='gold'?'#ffd36a':n.kind==='wood'?'#7a5a34':'#9a9488',8,100,.4,4); if(typeof sfx==='function') sfx('shard'); if(n.hp<=0) n.regrow=40;}
@@ -7202,6 +7221,7 @@ function lgmRaids(dt){const C=LGMS; if(C.night&&!C.raid&&!C.raidDone){const opts
   if(!C.night&&C.raidDone&&(C.day%300)<100) C.raidDone=false;}
 function lgmBaseIntro(){for(const b of LGMS.bases){if(b.beaten||!tribeOpen(b.i)||LGMS.seen[b.i]) continue; if(Math.hypot(b.B.heart.x-P.x,b.B.heart.y-P.y)<1100){LGMS.seen[b.i]=true; startCine(lgmTribeShots(b),()=>banner(b.tr.fort,'Break the gate, shatter the heart'));}}}
 function lgmAct(a){const C=LGMS; if(!C||mode!=='play'||!P||P.dead) return;
+  if(a==='house'||a==='recruit'){lgmVillageAct(a); lgmHud(); lgmBar(true); return;}
   if(LG_COST[a]){const c=LG_COST[a]; if(!Object.entries(c).every(([r,v])=>C.res[r]>=v)){toast(`Not enough: needs ${Object.entries(c).map(([r,v])=>v+' '+r).join(' and ')}`,'#ff8a6a'); return;}
     if(a==='tower'){if(C.ptowers.length>=8){toast('You can build up to 8 towers','#ffd36a'); return;} const x=P.x+Math.cos(C.yaw)*50, y=P.y+Math.sin(C.yaw)*50; if(blocked(x,y,14)){toast('No room for a tower here','#ffd36a'); return;} C.ptowers.push({x,y,cd:1,id:'pt'+Math.random()}); puff(x,y,'#5fb3ff',20,140,.6,5); shake(3);}
     else {if(allies.length>=10) toast('Your army is full (10). The oldest golem returns to the earth.','#ffd36a'); summonAllies({minion:'lg_'+a,count:1,pot:1+.35*Math.max(L.tier,lgmProgressTier())});}
@@ -7222,7 +7242,7 @@ function lgmStructTick(e,dt){const b=LGMS&&LGMS.bases[e.base]; if(!b) return; e.
     LG_EBI=tr.bi; LG_ETIER=b.tier; for(let k=0;k<(b.tier>=3?2:1);k++){const a=Math.random()*TAU; const m=spawnEnemy(pickType(b.tier),e.x+Math.cos(a)*(e.r+24),e.y+Math.sin(a)*(e.r+24),true); if(m){m.lgSp=true; m.base=b.i; puff(m.x,m.y-10,tr.col,12,120,.5,5);}} LG_EBI=LG_ETIER=null;}}
 function lgmStructDown(e){const b=LGMS.bases[e.base]; shake(e.type==='gate'||e.type==='heart'?12:6); flashT=.25; flashCol='#ffffff'; puff(e.x,e.y-20,e.c2,40,240,.9,7); puff(e.x,e.y-20,'#9a9488',30,200,.8,6); if(typeof sfx==='function') sfx('boom');
   for(let i=0;i<(e.type==='heart'?10:4);i++) dropLoot(e.x,e.y,{kind:'shard',amt:2}); LGMS.res.gold+=e.type==='spawner'?10:e.type==='tower'?6:0;
-  if(e.type==='gate'){for(const t of b.B.gateTiles) L.g[t.y*L.w+t.x]=0; lgmGateCine(b);}
+  if(e.type==='gate'){for(const t of b.B.gateTiles) L.g[t.y*L.w+t.x]=0; lgmGateCine(b); lgmB({k:'gate',b:b.i});}
   else if(e.type==='spawner') toast(`Spawner destroyed! ${b.spawners.filter(s=>s.hp>0&&s!==e).length} left`,b.tr.col);
   else if(e.type==='heart') lgmHeartDown(b,e);}
 
@@ -7270,7 +7290,7 @@ function lgmGateCine(b){const gx=b.B.gate.x*S, gz=b.B.gate.y*S, ox=b.B.out.x, oz
   startCine([{dur:2.8,title:'The gate falls!',sub:b.tr.fort,text:b.tr.zone==='void'?'But the heart is wrapped in a void shield. Destroy every spawner to break it.':'The way to the heart is open. Charge!',enter(){shake(10);},cam:dolly([gx+ox*7,3.4,gz+oz*7,gx,.8,gz],[gx+ox*4,2.4,gz+oz*4,gx-ox*2,1,gz-oz*2])}],()=>{});}
 function lgmShieldCine(b){const hx=b.heart.x*S, hz=b.heart.y*S;
   startCine([{dur:2.8,speaker:'The Lorekeepers',text:b.tr.zone==='void'?'The void shield flickers and dies. The heart is open!':'The heart of the fortress lies open. Strike it down!',cam:orbit(hx,hz,5,3,.2,.9,1)}],()=>{});}
-function lgmHeartDown(b,e){const tr=b.tr; LGMS.bossBase=b.i; for(const s of ents) if(s.st&&s.base===b.i&&s.hp>0&&s!==e){s.hp=0; puff(s.x,s.y-20,s.c2,20,180,.6,6);} ents=ents.filter(s=>!s.st||s.hp>0);
+function lgmHeartDown(b,e){const tr=b.tr; LGMS.bossBase=b.i; lgmB({k:'heart',b:b.i}); for(const s of ents) if(s.st&&s.base===b.i&&s.hp>0&&s!==e){s.hp=0; puff(s.x,s.y-20,s.c2,20,180,.6,6);} ents=ents.filter(s=>!s.st||s.hp>0);
   for(const m of ents) if(m.hp>0&&!m.ally&&m.base===b.i){m.hp=0; puff(m.x,m.y-m.r,m.c1,8,100,.5,4);} ents=ents.filter(m=>m.hp>0); projs=projs.filter(p=>p.own==='p'); collectAllLoot();
   L.bossAt={x:e.x,y:e.y}; L.arena=b.B.inner; L.bi=tr.bi; L.tier=b.tier;
   {const fa=Math.atan2(P.y-e.y,P.x-e.x); allies.forEach((a,i)=>{a.x=P.x+Math.cos(fa)*(70+20*(i%3))+(i-allies.length/2)*26; a.y=P.y+Math.sin(fa)*(70+20*(i%3)); if(blocked(a.x,a.y,a.r)){a.x=P.x; a.y=P.y;}});}
@@ -7292,7 +7312,7 @@ function lgmThiefShots(){const bx=boss.x, by=boss.y, fa=Math.atan2(by-P.y,bx-P.x
    {dur:4.2,title:'The Threefold Legend',sub:'Emerald · Amethyst · Gold — three legends in one',enter(){th.gone=true; LGMS.cry.state='hide'; boss.cineHide=false; boss.roar=1.6; flashT=.7; flashCol='#ffffff'; shake(14); for(const c of ['#2affa0','#c45aff','#ffc43a']) puff(boss.x,boss.y,c,30,280,1,8);},cam:dolly([X-Math.cos(fa)*4.6,1.4,Z-Math.sin(fa)*4.6,X,2,Z],[X-Math.cos(fa)*3.2,2.4,Z-Math.sin(fa)*3.2,X,2.1,Z])},
    {dur:3.4,speaker:'The Threefold Legend',text:'Kneel, little hero. I AM the legend now.',cam:orbit(X,Z,4,2.6,fa+Math.PI-.3,fa+Math.PI+.3,1.9)},
    heroShot('No. A legend protects people. You are just a thief with shiny rocks.',3.2)];}
-function lgmBossDown(b){const C=LGMS, base=C.bases[C.bossBase], tr=base.tr; collectAllLoot(); const bx=b.x*S, bz=b.y*S; base.beaten=true; const S0=lgmSave(), first=!S0.beaten[tr.id]; S0.beaten[tr.id]=true;
+function lgmBossDown(b){const C=LGMS, base=C.bases[C.bossBase], tr=base.tr; lgmB({k:'win',b:base.i}); collectAllLoot(); const bx=b.x*S, bz=b.y*S; base.beaten=true; const S0=lgmSave(), first=!S0.beaten[tr.id]; S0.beaten[tr.id]=true;
   const r={shards:(first?200:80)+90*base.i,items:[randomItem(base.tier,2),randomItem(base.tier,first?2:1)]}; if(tr.boss==='threefold'&&first) r.items.push(randomItem(base.tier,2),makeCursed(base.tier));
   SAVE.shards+=r.shards; for(const it of r.items) if(it) SAVE.inv.push(it); C.res.gold+=40; C.res.stone+=30; C.res.wood+=30; S0.res=C.res; persist();
   const done=()=>{lgmWinCard(base,r); L.bi=tr.bi; lgmRegion(true);};
@@ -7306,7 +7326,7 @@ function lgmBossDown(b){const C=LGMS, base=C.bases[C.bossBase], tr=base.tr; coll
   const nowOpen=['thorn','dune','bog'].every(k=>S0.beaten[k])&&['thorn','dune','bog'].includes(tr.id)&&first;
   if(nowOpen){const hx=C.D.hub.x*S, hz=C.D.hub.y*S; all.push({dur:4.6,title:'The barrier breaks',sub:'The final three',speaker:'The Lorekeepers',text:'With three hordes gone, the crystal barrier shatters. Beyond it, the Hordes of Rime, the Forge and the Hollow are waiting.',enter(){lgmOpenBarrier();},cam:orbit(hx,hz,26,16,.6,1.6,0)});}
   all.cleanup=d.cleanup; startCine(all,()=>done());}
-function lgmOpenBarrier(){const D=LGMS.D; for(let i=0;i<D.bar.length;i++) if(D.bar[i]>=0) L.g[i]=0; if(L.lgBar) L.lgBar.visible=false; lgmMiniImg=null; flashT=.5; flashCol='#c8a0ff'; shake(10);}
+function lgmOpenBarrier(){const D=LGMS.D; lgmB({k:'barrier'}); for(let i=0;i<D.bar.length;i++) if(D.bar[i]>=0) L.g[i]=0; if(L.lgBar) L.lgBar.visible=false; lgmMiniImg=null; flashT=.5; flashCol='#c8a0ff'; shake(10);}
 function lgmWinCard(base,r){let el=$('#lgWin'); if(!el){el=document.createElement('div'); el.id='lgWin'; el.setAttribute('role','dialog'); document.body.appendChild(el); ['keydown','keyup'].forEach(t=>el.addEventListener(t,e=>e.stopPropagation()));}
   const tr=base.tr, n=TRIBES.filter(t=>lgmSave().beaten[t.id]).length, fin=tr.boss==='threefold';
   el.innerHTML=`<div class="lgw"><div class="lgw-k">${fin?'The campaign is won':'Horde defeated'}</div><h2>${fin?'You are the Legend':esc(tr.name)+' is broken'}</h2><p>${fin?'The Threefold Legend is beaten and the three crystals are free. Every horde has scattered. The island is yours to explore.':esc(tr.win)}</p>
@@ -7377,6 +7397,46 @@ BOSS2.threefold=(R,B,u)=>{const em='#2affa0', am='#c45aff', go='#ffc43a';
   u.halo=grp(L0.T,0,.66,-.13); put(u.halo,thinTor(),light,0,0,0,.24,.24,.4); for(let i=0;i<12;i++){const a=i/12*TAU; put(u.halo,crystal(2260,5),glow([em,am,go][i%3],2.4),Math.cos(a)*.26,Math.sin(a)*.26,0,.02,.05,.02).rotation.z=a-Math.PI/2;}
   const st=grp(L0.aR.userData.hand,0,0,.02); put(st,gCyl,gold,0,0,0,.014,1,.014); put(st,crystal(2280,6),glow(am,3),0,.55,0,.05,.14,.05); put(st,crystal(2281,6),glow(em,3),0,-.5,0,.03,.08,.03);
   u.orbit=[cryE,cryA,cryG].map((m,i)=>{const q=grp(B,0,1,0); put(q,crystal(2270+i,6),m,0,0,0,.06,.14,.06); return q;});};
+
+/* ---- v5.1: building villages, recruiting villagers and playing Legends with friends ---- */
+const lgmB=m=>{if(MP.inGame&&MP.role==='host'&&MP.party&&MP.party.members.length>1) bcast(Object.assign({t:'lgev'},m));};
+function lgmHouseMesh(hs){const pyr=geo('pyr4',()=>new THREE.ConeGeometry(1,1,4)), wall=new THREE.MeshStandardMaterial({color:hs.own?0xe8d8b0:0xd8c8a0,roughness:.9}), beam=new THREE.MeshStandardMaterial({color:0x5a3e24,roughness:.85});
+  const roofC=hs.own?'#c84a3a':hs.sec<0?'#3a5a9a':TRIBES[hs.sec].c2, gr=new THREE.Group(); gr.position.set(hs.x,0,hs.y); gr.rotation.y=-hs.ry+Math.PI/2; levelGroup.add(gr);
+  const b=new THREE.Mesh(gBox,wall); b.position.y=.6; b.scale.set(1.7,1.2,1.7); b.castShadow=b.receiveShadow=true; gr.add(b);
+  for(const [x,z] of [[-.85,-.85],[.85,-.85],[-.85,.85],[.85,.85]]){const p=new THREE.Mesh(gBox,beam); p.position.set(x,.6,z); p.scale.set(.14,1.22,.14); gr.add(p);}
+  const r=new THREE.Mesh(pyr,new THREE.MeshStandardMaterial({color:roofC,roughness:.8,flatShading:true})); r.position.y=1.6; r.scale.set(1.5,.9,1.5); r.rotation.y=Math.PI/4; r.castShadow=true; gr.add(r);
+  const d=new THREE.Mesh(gBox,beam); d.position.set(0,.4,.86); d.scale.set(.4,.8,.04); gr.add(d);
+  if(hs.own){const f=new THREE.Mesh(gPlane,new THREE.MeshStandardMaterial({color:'#5fb3ff',emissive:new THREE.Color('#5fb3ff'),emissiveIntensity:.3,side:THREE.DoubleSide})); f.position.set(.9,2.1,.9); f.scale.set(.35,.5,1); gr.add(f); const pl=new THREE.Mesh(gCyl,beam); pl.position.set(.9,1.6,.9); pl.scale.set(.03,1.6,.03); gr.add(pl);}
+  return gr;}
+const lgSkins=()=>['pirate0','viking0','samurai0','solar0','ocean0','default'].filter(k=>SKIN_BY_ID[k]);
+function lgmPlaceHouse(tx,ty,charge,quiet,fromNet){const D=LGMS.D, W=L.w, ok=(x,y)=>x>1&&y>1&&x<W-2&&y<L.h-2&&!L.g[y*W+x]&&!D.lake[y*W+x]&&D.bar[y*W+x]<0&&!D.fw[y*W+x];
+  for(let j=0;j<2;j++) for(let i=0;i<2;i++) if(!ok(tx+i,ty+j)) return false;
+  if(D.bases.some(B=>tx>B.rect.x-6&&tx<B.rect.x+B.rect.w+6&&ty>B.rect.y-6&&ty<B.rect.y+B.rect.h+6)) return false;
+  for(let j=0;j<2;j++) for(let i=0;i<2;i++){L.g[(ty+j)*W+tx+i]=1; D.bld[(ty+j)*W+tx+i]=1;}
+  const hs={x:tx+1,y:ty+1,sec:-1,own:true,ry:Math.atan2(P.y/T-(ty+1),P.x/T-(tx+1))}; LGMS.myHouses=(LGMS.myHouses||0)+1; if(R3&&levelGroup) lgmHouseMesh(hs); lgmMiniImg=null;
+  LGMS.villagers.push({x:(tx+1)*T,y:(ty+2.6)*T,hx:(tx+1)*T,hy:(ty+3)*T,skin:choice(lgSkins()),face:Math.PI/2,walk:0,t:0,tx:null,mine:true});
+  if(!fromNet){const S0=lgmSave(); if(!quiet&&!(MP.role==='client'&&MP.inGame)){S0.houses=S0.houses||[]; S0.houses.push({x:tx,y:ty}); persist();}
+    if(MP.inGame&&MP.party&&MP.party.members.length>1){if(MP.role==='host') bcast({t:'lgev',k:'house',x:tx,y:ty}); else toHost({t:'lgev',k:'house',x:tx,y:ty});}}
+  if(!quiet){puff((tx+1)*T,(ty+1)*T,'#e8d8b0',30,160,.7,6); shake(3); const n=(lgmSave().houses||[]).length; banner(n>=3?'Your village grows':'A new house',n>=3?`${n} houses · a villager moves in`:'A villager moves in. Press U near villagers to recruit them');}
+  return true;}
+function lgmVillageAct(a){const C=LGMS, c=LG_COST[a]; if(!Object.entries(c).every(([r,v])=>C.res[r]>=v)){toast(`Not enough: needs ${Object.entries(c).map(([r,v])=>v+' '+r).join(' and ')}`,'#ff8a6a'); return;}
+  if(a==='house'){const d=110, x=P.x+Math.cos(C.yaw)*d, y=P.y+Math.sin(C.yaw)*d, tx=Math.floor(x/T)-1, ty=Math.floor(y/T)-1; if(!lgmPlaceHouse(tx,ty,true)){toast('No room for a house here. Find open, flat ground away from fortresses.','#ffd36a'); return;}}
+  else {let best=null,bd=130; for(const v of C.villagers){if(v.lore) continue; const d=Math.hypot(v.x-P.x,v.y-P.y); if(d<bd){bd=d; best=v;}} if(!best){toast('Walk up to a villager to recruit them','#ffd36a'); return;}
+    if(allies.length>=10) toast('Your army is full (10). The oldest one heads home.','#ffd36a'); C.villagers=C.villagers.filter(v=>v!==best); const px=P.x,py=P.y; P.x=best.x; P.y=best.y; summonAllies({minion:'lg_militia',count:1,pot:1+.35*Math.max(L.tier,lgmProgressTier())}); P.x=px; P.y=py;
+    toast('A villager joins your army!','#ffd38a'); if(best.mine||!best.lore) setTimeout(()=>{if(LGMS&&best.hx) LGMS.villagers.push(Object.assign({},best,{x:best.hx,y:best.hy,skin:choice(lgSkins()),tx:null}));},90000);}
+  for(const [r,v] of Object.entries(c)) C.res[r]-=v; if(typeof sfx==='function') sfx('summon');}
+function lgmMirrorStruct(r){const base=r[10], tr=TRIBES[base]||TRIBES[0], type=r[1], B=LGMS&&LGMS.bases[base];
+  return {st:true,base,type,ai:type,name:{tower:tr.name.replace(/Horde of (the )?/,'')+' Tower',spawner:'Horde Spawner',gate:tr.fort+' Gate',heart:'Heart of '+tr.fort}[type],c1:tr.c2,c2:tr.col,x:r[2],y:r[3],tx:r[2],ty:r[3],r:{tower:20,spawner:26,gate:52,heart:36}[type]||20,hp:r[4],max:r[5],mirror:true,face:0,walk:0,flash:0,inv:!!(r[8]&32),state:'idle',horiz:B?B.B.gate.horiz:true,t:0};}
+function lgmClientRefs(){for(const b of LGMS.bases){if(b.beaten) continue; const mine=ents.filter(e=>e.st&&e.base===b.i); const f=t=>mine.find(e=>e.type===t)||{hp:0,inv:false,x:0,y:0}; b.gate=f('gate'); b.heart=f('heart'); b.spawners=mine.filter(e=>e.type==='spawner'); b.towers=mine.filter(e=>e.type==='tower');}}
+function lgmNet(m){if(m.k==='start'){hideOverlays(); MP.inGame=true; MP.others.clear(); startLegends({seed:m.seed,beaten:m.beaten,day:m.day}); mode='play'; showOnly('hud'); lgmHud(); lgmBar(true); toast('You joined your party in Legends! Your golems and resources are your own.','#8fd06a'); return;}
+  if(!LGMS) return; const b=LGMS.bases[m.b];
+  if(m.k==='gate'&&b){for(const t of b.B.gateTiles) L.g[t.y*L.w+t.x]=0; if(mode==='play') lgmGateCine(b);}
+  else if(m.k==='heart'&&b){LGMS.bossBase=m.b; const hx=b.B.heart.x*S, hz=b.B.heart.y*S; if(mode==='play') startCine([{dur:3,title:b.tr.boss==='threefold'?'The Threefold Legend':BOSSES[b.tr.boss].name,sub:'Legend-powered',text:b.tr.boss==='threefold'?'The Crystal Thief absorbs the three crystals!':'The heart shatters and the horde\'s leader rises!',cam:orbit(hx,hz,7,5,.3,.9,1)}],()=>{});}
+  else if(m.k==='win'&&b){b.beaten=true; LG_BEAT=Object.assign({},lgBeat(),{[b.tr.id]:true}); const S0=lgmSave(); S0.beaten[b.tr.id]=true; SAVE.shards+=150; persist(); banner(b.tr.name+' defeated!','Your party broke the horde · +150 diamonds');}
+  else if(m.k==='barrier'){const D=LGMS.D; for(let i=0;i<D.bar.length;i++) if(D.bar[i]>=0) L.g[i]=0; if(L.lgBar) L.lgBar.visible=false; lgmMiniImg=null;}
+  else if(m.k==='day') LGMS.day=m.d;
+  else if(m.k==='house') lgmPlaceHouse(m.x,m.y,false,true,true);
+  else if(m.k==='quit'){LGMS=null; lgmHud(); lgmBar(false); MP.inGame=false; toMenu(); toast('The party leader left Legends','#ffd36a');}}
 /*LGM-END*/
 const hot=window.claude?.hot; if(hot&&hot.ready) hot.ready(start); else start(hot?.data??{});
 })();
