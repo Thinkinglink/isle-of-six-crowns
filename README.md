@@ -19,6 +19,10 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🔇 Version 5.2.1: quieter walking
+- Removed the high-pitched tick that played over and over while you walked (it came from picking up crystal shards on the move). Pickups now make one soft, low chime at most every half second.
+- Villagers gathering in Legends no longer tick in the background.
+
 ## 🏰 Version 5.2: a huge Legends island
 
 - **The Legends island is 30 times bigger.** Six huge lands surround the Crown Well, with mountains, lakes, forests and four villages in each land. The land is drawn in pieces around you as you travel, so it stays smooth.
