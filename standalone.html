@@ -96,7 +96,8 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 .lgt-b.gold{background:linear-gradient(180deg,#e8b84a,#b8841a);color:#1a1004;border-color:#ffe08a}
 .lgt-foot{margin:6px 0 0;font-size:13px;color:#9fb0c8}
 .lgt-panel{position:absolute;right:max(24px,env(safe-area-inset-right));top:50%;transform:translateY(-50%);width:min(460px,calc(100vw - 48px));max-height:calc(100vh - 48px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:18px;background:rgba(8,16,34,.95);border:2px solid #4a6aa8}
-.lgt-panel[hidden]{display:none}.lgt-panel h2{margin:0;font-family:var(--display);color:#ffd36a}
+.lgt-panel[hidden]{display:none}
+#lgTravel{position:fixed;z-index:40}#lgLoad{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:#0b1430;color:#f3e6c4;text-align:center}#lgLoad[hidden]{display:none}#lgLoad b{display:block;font-family:var(--display);font-size:44px;color:#ffd36a;letter-spacing:.08em}#lgLoad span{font-size:18px}#lgTravel .lgt-b small{display:block;font-family:inherit;font-size:12px;opacity:.75;margin-top:2px}#lgTravel .lgt-b:disabled{opacity:.5;cursor:default}#lgTravel .sp{margin:0;color:#cfd8e8}.lgt-panel h2{margin:0;font-family:var(--display);color:#ffd36a}
 .lgt-h{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-left:5px solid var(--tc);background:rgba(255,255,255,.04)}.lgt-h b{color:var(--tc)}.lgt-h span{font-size:12.5px;color:#9fb0c8}.lgt-h .st{color:#ffd36a}.lgt-h.done .st{color:#7aff8a}.lgt-h.locked{opacity:.55}
 .lgt-how{margin:0;padding-left:18px;font-size:14px;line-height:1.5;color:#c8d8e8}.lgt-how li{margin-bottom:6px}
 @media (max-width:760px){#lgTitle{align-items:flex-start;background:linear-gradient(180deg,rgba(6,12,28,.9),rgba(6,12,28,.55))}.lgt-panel{position:fixed;left:16px;right:16px;top:16px;transform:none;width:auto}}
@@ -475,6 +476,7 @@ body.cinemode #gl{filter:contrast(1.07) saturate(1.14)}
 /* Account */
 .acct{position:absolute;left:max(16px,4vw);top:max(16px,env(safe-area-inset-top));display:flex;gap:10px;align-items:center;flex-wrap:wrap;z-index:2;max-width:calc(100% - 32px)}
 .acct-me{display:flex;gap:10px;align-items:center;background:rgba(7,17,22,.8);border:3px solid var(--rim);box-shadow:inset 0 0 0 2px var(--edge);padding:5px 12px 5px 5px;color:var(--ink);cursor:pointer;text-align:left}
+.acode{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:30px;font-weight:700;letter-spacing:.14em;text-align:center;padding:10px 8px;margin:4px 0 8px;background:rgba(0,0,0,.35);border:2px dashed var(--crown);color:var(--crown);user-select:all;-webkit-user-select:all}
 .acct-me:hover{background:rgba(27,52,64,.9)}
 .acct-me:focus-visible{outline:3px solid var(--crown);outline-offset:2px}
 .avatar{width:34px;height:34px;display:grid;place-items:center;background:var(--crown);color:#1d1405;font-family:var(--display);font-size:18px;font-weight:700;box-shadow:inset 0 -4px 0 rgba(0,0,0,.25)}
@@ -1283,7 +1285,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='5.2.1', SAVE_VERSION=7;
+const APP_VERSION='5.3.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1409,7 +1411,7 @@ function ftext(x,y,s,col,big){texts.push({x,y,s,col,life:.8,big});}
 
 function startLevel(bi,li,forceIntro,seed){
   const B=BIOMES[bi], isBoss=li===B.levels.length; if(seed==null) seed=(Math.random()*1e9)|0;
-  calcStats(); const TH=GEN_THEME||themeFor(isBoss?null:B.levels[li],bi,isBoss); L=withSeed(seed,()=>GEN_OVERRIDE?GEN_OVERRIDE():genLevel(bi,isBoss,TH.layout)); L.theme=TH; L.amb=TH.amb||null; L.seed=seed; L.mpN=MP.inGame&&MP.party?MP.party.members.length:1; MP.others.clear(); MP.bossTgt=null; L.bi=bi; L.li=li; L.tier=tierOf(bi,li); L.boss=isBoss; L.seen=new Uint8Array(L.w*L.h); L.form2=false;
+  calcStats(); const TH=GEN_THEME||themeFor(isBoss?null:B.levels[li],bi,isBoss); L=withSeed(seed,()=>GEN_OVERRIDE?GEN_OVERRIDE():genLevel(bi,isBoss,TH.layout)); L.theme=TH; L.amb=TH.amb||null; L.seed=seed; L.mpN=MP.inGame&&MP.party?MP.party.members.length:1; MP.others.clear(); MP.bossTgt=null; L.bi=bi; L.li=li; L.tier=tierOf(bi,li); L.boss=isBoss; L.seen=new Uint8Array(L.lgWorld?1:L.w*L.h); L.form2=false;
   L.name=isBoss?BOSSES[B.boss].name.replace(/^The /,'')+"'s Lair":B.levels[li]; if(GEN_NAME) L.name=GEN_NAME;
   P={x:L.start.x,y:L.start.y,r:13,hp:ST.maxhp,face:-Math.PI/2,atk:0,swing:0,roll:0,rollCd:0,rdx:0,rdy:0,iframe:0,flash:0,bow:0,pot:0,acd:{a1:0,a2:0,a3:0,a4:0,a5:0,a6:0,a7:0,a8:0},slow:0,ward:0,gale:0,walk:0,dead:false,regenAcc:0,air:AIR_MAX};
   L.water=!!B.water; L.pods=L.water?(L.rooms||[]).map(p=>({x:p.x,y:p.y,pod:true})):[]; $('#airBar').hidden=!L.water;
@@ -5578,13 +5580,19 @@ function keyOf(str){let h1=0xdeadbeef^6,h2=0x41c6ce57^6; for(let i=0,ch;i<str.le
   h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909); h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909); return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);}
 function giftTap(){if(!isAdmin()) return; SAVE.shards=(SAVE.shards||0)+5000; persist(); toast('+5000 shards!','#7fe0c8'); const h=$('#menu h1'); h.classList.remove('giftpop'); void h.offsetWidth; h.classList.add('giftpop');}
 function profileName(){return SAVE&&SAVE.profile&&SAVE.profile.name||null;}
-function renderAcct(){const el=$('#acct'); const p=SAVE&&SAVE.profile;
+function renderAcct(){const el=$('#acct'); if(SAVE&&SAVE.profile) ensureAcctCode(); const p=SAVE&&SAVE.profile;
   const upd=`<button class="btn small" id="updBtn" title="Get the newest version of the game">Update</button>`;
-  if(p) el.innerHTML=upd+`<button class="acct-me" id="acctMe" title="Change account name"><span class="avatar">${esc(p.name[0].toUpperCase())}</span><span class="acct-txt"><b>${esc(p.name)}</b><small>${p.google?esc(p.google.email):'Signed in'}</small></span></button><button class="btn small" id="acctOut">Sign out</button>`;
+  if(p) el.innerHTML=upd+`<button class="acct-me" id="acctMe" title="Your account and account code"><span class="avatar">${esc(p.name[0].toUpperCase())}</span><span class="acct-txt"><b>${esc(p.name)}</b><small>Code ${esc(p.code||'')}</small></span></button><button class="btn small" id="acctOut">Sign out</button>`;
   else el.innerHTML=upd+`<button class="btn small" id="acctIn">Sign in</button>`;
   $('#updBtn').onclick=manualUpdate;
   const i=$('#acctIn'),o=$('#acctOut'),me=$('#acctMe');
-  if(i) i.onclick=openSignin; if(o) o.onclick=signOut; if(me) me.onclick=()=>{pendingGoogle=SAVE.profile.google||null; openSigninShell(); showNameStep(true);};}
+  if(i) i.onclick=openSignin; if(o) o.onclick=signOut; if(me) me.onclick=openAcctPanel;}
+function openAcctPanel(){const p=SAVE&&SAVE.profile; if(!p) return; ensureAcctCode(); openSigninShell(); const em=acctEmailOf(p);
+  sbox(`<h2>Your account</h2><p class="sp">Name: <b>${esc(p.name)}</b>${em?`<br>Email: <b>${esc(em)}</b>`:''}</p><p class="sp" style="margin-bottom:4px">Your account code</p><div class="acode" id="acodeV">${esc(p.code)}</div>
+    <p class="sp">Every account has its own code. To sign back in you need your account name, your email and this code. Write it down somewhere safe and don't share it.</p>
+    <div class="row"><button class="btn gold" id="acCopy">Copy code</button><button class="btn" id="acName">Change name</button><button class="btn" data-close>Close</button></div>`);
+  $('#acCopy').onclick=()=>{try{navigator.clipboard.writeText(p.code).then(()=>toast('Account code copied','#7fe0c8'),()=>toast('Select the code and copy it','#ffd36a'));}catch(e){toast('Select the code and copy it','#ffd36a');}};
+  $('#acName').onclick=()=>{pendingGoogle=p.google||null; showNameStep(true);};}
 function openSigninShell(){$('#signin').hidden=false;}
 function closeSignin(){$('#signin').hidden=true; if(authBusy){authBusy.cancel=true; authBusy=null;} renderAcct();}
 function sbox(html){const b=$('#signinBox'); b.innerHTML=html; const c=b.querySelector('[data-close]'); if(c) c.onclick=closeSignin; const f=b.querySelector('input,button'); if(f) f.focus();}
@@ -5592,32 +5600,40 @@ function sbox(html){const b=$('#signinBox'); b.innerHTML=html; const c=b.querySe
 const ACCT_KEY='isle6c-accounts', EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const acctKeyOf=(n,e)=>String(n).trim().toLowerCase().replace(/\s+/g,' ')+'|'+String(e).trim().toLowerCase();
 const acctEmailOf=p=>p&&(p.email||(p.google&&p.google.email))||'';
+const ACODE_CH='ABCDEFGHJKMNPQRSTUVWXYZ23456789', normCode=c=>String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+function newAcctCode(){const used=new Set(Object.values(acctReg()).map(h=>h&&h.code).filter(Boolean)); for(let k=0;k<50;k++){const a=new Uint32Array(8); try{crypto.getRandomValues(a);}catch(e){for(let i=0;i<8;i++) a[i]=Math.random()*4e9;} let c=''; for(const v of a) c+=ACODE_CH[v%ACODE_CH.length]; c=c.slice(0,4)+'-'+c.slice(4); if(!used.has(c)) return c;} return 'ISLE-'+Date.now().toString(36).toUpperCase().slice(-4);}
+function ensureAcctCode(){if(SAVE&&SAVE.profile&&!SAVE.profile.code){SAVE.profile.code=newAcctCode(); persist(); acctStoreNow();}}
+const hitCodeOf=h=>{if(!h) return ''; if(h.code) return h.code; try{const p=JSON.parse(h.save).profile; return p&&p.code||'';}catch(e){return '';}};
 function acctReg(){try{return JSON.parse(localStorage.getItem(ACCT_KEY)||'{}')||{};}catch(e){return {};}}
-function acctStoreNow(){if(!SAVE||!SAVE.profile) return; const em=acctEmailOf(SAVE.profile); if(!em) return; const r=acctReg(); r[acctKeyOf(SAVE.profile.name,em)]={name:SAVE.profile.name,email:em,t:Date.now(),save:JSON.stringify(SAVE)}; try{localStorage.setItem(ACCT_KEY,JSON.stringify(r));}catch(e){}}
+function acctStoreNow(){if(!SAVE||!SAVE.profile) return; const em=acctEmailOf(SAVE.profile); if(!em) return; const r=acctReg(); r[acctKeyOf(SAVE.profile.name,em)]={name:SAVE.profile.name,email:em,code:SAVE.profile.code||'',t:Date.now(),save:JSON.stringify(SAVE)}; try{localStorage.setItem(ACCT_KEY,JSON.stringify(r));}catch(e){}}
 var acctT=0; function acctStore(){clearTimeout(acctT); acctT=setTimeout(acctStoreNow,1500);}
 function openSignin(){openSigninShell(); const env=authEnv();
   sbox(`<h2>Sign in</h2><p class="sp">Choose how you want to sign in.</p><div class="row" style="flex-direction:column;align-items:stretch;gap:10px"><button class="btn gold" id="sgName">Sign in with account name and email</button>${env==='unsupported'||env==='unconfigured'?'':'<button class="btn" id="sgGoogle">Sign in with Google</button>'}</div><div class="row"><button class="btn small" data-close>Cancel</button></div>`);
   $('#sgName').onclick=openNameSignin; const g=$('#sgGoogle'); if(g) g.onclick=openGoogleSignin;}
 function openNameSignin(){const p=SAVE&&SAVE.profile;
-  sbox(`<h2>Sign in with your account</h2><p class="sp">Type your account name and email. If that account is saved on this device, you'll go straight back into it.</p>
+  sbox(`<h2>Sign in with your account</h2><p class="sp">Type your account name, email and account code. If that account is saved on this device, you'll go straight back into it.</p>
     <label class="sp" for="siName">Account name</label><input id="siName" class="nm" maxlength="16" autocomplete="username" spellcheck="false" value="${esc(p?p.name:'')}">
     <label class="sp" for="siMail">Email</label><input id="siMail" class="nm" type="email" maxlength="80" autocomplete="email" spellcheck="false" value="${esc(acctEmailOf(p))}" style="font-size:17px">
+    <label class="sp" for="siCode">Account code <small style="opacity:.75">(leave empty to make a new account)</small></label><input id="siCode" class="nm" maxlength="9" autocomplete="off" spellcheck="false" placeholder="ABCD-2345" style="font-size:20px;text-transform:uppercase;letter-spacing:.12em">
     <p class="sp warn" id="siErr" hidden></p><div class="row"><button class="btn gold" id="siGo">Sign in</button><button class="btn" data-close>Cancel</button></div>`);
   const err=t=>{const e=$('#siErr'); e.hidden=false; e.textContent=t;};
-  const go=()=>{const n=$('#siName').value.trim().replace(/\s+/g,' '), em=$('#siMail').value.trim();
+  const go=()=>{const n=$('#siName').value.trim().replace(/\s+/g,' '), em=$('#siMail').value.trim(), code=$('#siCode').value;
     if(!NAME_RE.test(n)) return err('Account names use 3 to 16 letters, numbers, spaces, - or _.'); if(!EMAIL_RE.test(em)) return err('That email doesn\'t look right. Check it and try again.');
     const key=acctKeyOf(n,em); if(SAVE&&SAVE.profile&&acctKeyOf(SAVE.profile.name,acctEmailOf(SAVE.profile))===key){closeSignin(); toast('You are already signed in as '+n,'#7fe0c8'); return;}
     const hit=acctReg()[key];
-    if(hit){let s2=null; try{s2=migrateSave(JSON.parse(hit.save)); delete s2._oldV;}catch(e){} if(!s2) return err('That account was found, but its save could not be read.');
-      acctStoreNow(); SAVE=s2; persist(); sbox(`<h2>Welcome back, ${esc(hit.name)}!</h2><p class="sp">Loading your account…</p>`); setTimeout(()=>location.reload(),500); return;}
+    if(hit){const hc=hitCodeOf(hit); if(hc&&normCode(code)!==normCode(hc)) return err(normCode(code)?'That account code is not right. Check it and try again.':'Type your account code too. It looks like ABCD-2345 and is shown under your name while you are signed in.');
+      let s2=null; try{s2=migrateSave(JSON.parse(hit.save)); delete s2._oldV;}catch(e){} if(!s2) return err('That account was found, but its save could not be read.');
+      acctStoreNow(); SAVE=s2; const fresh=!SAVE.profile.code; ensureAcctCode(); persist(); acctStoreNow();
+      if(fresh){sbox(`<h2>Welcome back, ${esc(hit.name)}!</h2><p class="sp">Accounts now have their own code. This is yours:</p><div class="acode">${esc(SAVE.profile.code)}</div><p class="sp">You'll need it with your name and email next time you sign in. You can always see it under your name at the top of the menu.</p><div class="row"><button class="btn gold" id="siOk">Got it</button></div>`); $('#siOk').onclick=()=>location.reload(); return;}
+      sbox(`<h2>Welcome back, ${esc(hit.name)}!</h2><p class="sp">Loading your account…</p>`); setTimeout(()=>location.reload(),500); return;}
     // not found: offer to make it
     const guest=SAVE&&!(SAVE.profile&&acctEmailOf(SAVE.profile));
     sbox(`<h2>Account not found</h2><p class="sp">There's no account called <b>${esc(n)}</b> with the email <b>${esc(em)}</b> on this device.</p>
       <p class="sp">Accounts live on the device where they were made. To play the same account on another device, sign in with Google there, or bring the save file over.</p>
       <div class="row" style="flex-direction:column;align-items:stretch;gap:10px">${guest?'<button class="btn gold" id="siKeep">Make this account with my current progress</button>':''}<button class="btn${guest?'':' gold'}" id="siNew">Make a new account</button><button class="btn" id="siBack">Try again</button></div>`);
-    const make=keep=>{if(!keep){acctStoreNow(); SAVE=migrateSave(newSave()); delete SAVE._oldV;} SAVE.profile={name:n,email:em,google:null,since:Date.now()}; persist(); acctStoreNow(); sbox(`<h2>Welcome, ${esc(n)}!</h2><p class="sp">Your account is ready. Next time, sign in with this name and email.</p>`); setTimeout(()=>location.reload(),900);};
+    const make=keep=>{if(!keep){acctStoreNow(); SAVE=migrateSave(newSave()); delete SAVE._oldV;} SAVE.profile={name:n,email:em,google:null,since:Date.now(),code:newAcctCode()}; persist(); acctStoreNow(); sbox(`<h2>Welcome, ${esc(n)}!</h2><p class="sp">Your account is ready. This is your account code:</p><div class="acode">${esc(SAVE.profile.code)}</div><p class="sp">Write it down. Next time, sign in with your name, email and this code. You can always see it under your name at the top of the menu.</p><div class="row"><button class="btn gold" id="siOk">Got it</button></div>`); $('#siOk').onclick=()=>location.reload();};
     if($('#siKeep')) $('#siKeep').onclick=()=>make(true); $('#siNew').onclick=()=>make(false); $('#siBack').onclick=openNameSignin;};
-  $('#siGo').onclick=go; ['siName','siMail'].forEach(id=>$('#'+id).onkeydown=e=>{if(e.key==='Enter'){e.preventDefault(); go();}});}
+  $('#siGo').onclick=go; ['siName','siMail','siCode'].forEach(id=>$('#'+id).onkeydown=e=>{if(e.key==='Enter'){e.preventDefault(); go();}});}
 function openGoogleSignin(){openSigninShell(); const env=authEnv();
   if(env==='unsupported') return sbox(`<h2>Sign in</h2><p class="sp">Google sign-in works in the Windows, Mac and Android apps (including on Chromebooks) and in the web version of the game at thinkinglink.github.io/isle-of-six-crowns. It can't run in this copy, which is the preview page or an offline file.</p><div class="row"><button class="btn" data-close>Close</button></div>`);
   if(env==='unconfigured') return sbox(`<h2>Sign in</h2><p class="sp">Google sign-in hasn't been switched on in this copy of the game yet. It needs the game's Google Client ID, which the game's creator adds.</p><div class="row"><button class="btn" data-close>Close</button></div>`);
@@ -5668,7 +5684,7 @@ function showNameStep(renaming,info){const guess=(profileName()||(info&&(info.gi
   const inp=$('#acctName'); inp.select();
   const save=()=>{const v=inp.value.trim().replace(/\s+/g,' '); if(!NAME_RE.test(v)){const e=$('#nameErr'); e.hidden=false; e.textContent='Use 3 to 16 letters, numbers, spaces, - or _.'; inp.focus(); return;}
     if(!SAVE){SAVE=migrateSave(newSave()); delete SAVE._oldV;}
-    SAVE.profile={name:v,google:pendingGoogle||(SAVE.profile&&SAVE.profile.google)||null,since:(SAVE.profile&&SAVE.profile.since)||Date.now()};
+    const old=SAVE.profile||{}; SAVE.profile={name:v,google:pendingGoogle||old.google||null,since:old.since||Date.now(),code:old.code||newAcctCode()}; if(renaming&&old.email) SAVE.profile.email=old.email;
     persist(); closeSignin(); $('#btnContinue').disabled=false; $('#menuCrowns').innerHTML=crownsHTML();};
   $('#saveName').onclick=save; inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault(); save();}};}
 function signOut(){if(!SAVE) return; SAVE.profile=null; persist(); try{window.google&&google.accounts&&google.accounts.id.disableAutoSelect();}catch(e){} renderAcct();}
@@ -6981,9 +6997,9 @@ const TRIBES=[
 // sector of each horde around the Crown Well (0 = west, going clockwise)
 const LG_SEC=[0,1,2,3,4,5];
 const LG_COST={cobble:{stone:12},plank:{wood:12},moss:{gold:8,wood:6},tower:{stone:20,wood:10},house:{wood:30,stone:15},recruit:{gold:5}};
-const LG_ACT=[['cobble','z','🗿','Cobble Golem'],['plank','x','🏹','Plank Golem'],['moss','c','🌿','Mossy Golem'],['tower','v','🗼','Arrow Tower'],['rally','t','🚩','Rally army'],['recall','y','↩️','Recall army'],['gather','g','✨','Send sprites'],['mount','r','🐎','Ride / dismount'],['house','h','🏠','Build house'],['recruit','u','🤝','Recruit villager']];
+const LG_ACT=[['cobble','z','🗿','Cobble Golem'],['plank','x','🏹','Plank Golem'],['moss','c','🌿','Mossy Golem'],['tower','v','🗼','Arrow Tower'],['rally','t','🚩','Rally army'],['recall','y','↩️','Recall army'],['gather','g','✨','Send sprites'],['mount','r','🐎','Ride / dismount'],['house','h','🏠','Build house'],['recruit','u','🤝','Recruit villager'],['travel','f','🌀','Fast travel']];
 const RES_ICO={wood:'🪵',stone:'🪨',gold:'🪙'};
-const LG_N=820, LG_C=410, LG_CH=32;
+const LG_K=Math.sqrt(50), LG_R=Math.round(392*LG_K), LG_N=2*LG_R+56, LG_C=LG_R+28, LG_CH=32;
 const LG_LV={1:{name:'Outpost',diff:'Easy',size:[24,20],rings:1,thick:2,wallH:2.4,towers:3,spawners:2,patrol:4,cd:9,wave:1,cap:8,hp:1,dmg:1,r:110,da:.13},
  2:{name:'Watchfort',diff:'Medium',size:[34,28],rings:2,thick:2,wallH:3.2,towers:7,spawners:4,patrol:8,cd:7,wave:2,cap:14,hp:1.6,dmg:1.15,r:190,da:-.16},
  3:{name:'Bastion',diff:'Hard',size:[46,38],rings:3,thick:2,wallH:4,towers:12,spawners:6,patrol:14,cd:6,wave:3,cap:20,hp:2.4,dmg:1.3,r:268,da:.15},
@@ -6996,45 +7012,52 @@ function lgmInit(){if(lgmInit.done) return; lgmInit.done=true;
   BOSSES.threefold={name:'The Threefold Legend',hp:1100,r:18,spd:155,c1:'#2a1a30',c2:'#ffe08a',acts:['blink','glyphs','spiral','voidrain','orbs','strikes','meteors','summon','combo','burst'],shot:'#ffe08a',minion:'caster'};}
 var LG_BEAT=null;
 const lgBeat=()=>LG_BEAT||lgmSave().beaten;
-function lgmSave(){const s=SAVE.lgm=SAVE.lgm||{}; s.beaten=s.beaten||{}; if(!s.res) s.res={wood:30,stone:30,gold:15}; if(!s.seed) s.seed=((Math.random()*1e9)|0)+1; s.days=s.days||1; return s;}
+function lgmSave(){const s=SAVE.lgm=SAVE.lgm||{}; s.beaten=s.beaten||{}; if(!s.res) s.res={wood:30,stone:30,gold:15}; if(!s.seed) s.seed=((Math.random()*1e9)|0)+1; s.days=s.days||1; if(s.mapV!==2){if(s.houses) for(const h of s.houses){h.x+=LG_C-410; h.y+=LG_C-410;} s.mapV=2;} return s;}
 function tribeOpen(i){const B=lgBeat(), first=['thorn','dune','bog'].every(k=>B[k]); if(i<3) return true; if(i<5) return first; return first&&B.rime&&B.forge;}
 const lgFinalOpen=()=>{const B=lgBeat(); return ['thorn','dune','bog'].every(k=>B[k]);};
 
 /* ---------------- the world ---------------- */
-function genLegendWorld(){const N=LG_N,w=N,h=N,cx=LG_C,cy=LG_C, g=new Uint8Array(w*h), reg=new Int8Array(w*h).fill(-1), lake=new Uint8Array(w*h), bld=new Uint8Array(w*h), fw=new Uint8Array(w*h), bar=new Int8Array(w*h).fill(-1);
+function genLegendWorld(){const N=LG_N,w=N,h=N,cx=LG_C,cy=LG_C,K=LG_K, g=new Uint8Array(w*h), fx=new Uint8Array(w*h), bar=new Map();
+  // fx bits: 0-4 fortress wall (base index + 1), 32 lake, 64 building, 128 open sea
   const at=(x,y)=>y*w+x, inB=(x,y)=>x>=0&&y>=0&&x<w&&y<h, secA=i=>-Math.PI+i*TAU/6;
   const secOf=(x,y)=>{const a=Math.atan2(y-cy,x-cx); return ((Math.round((a+Math.PI)/(TAU/6)))%6+6)%6;};
-  const edgeR=a=>392+Math.sin(a*3)*5+Math.sin(a*7+1)*4+Math.sin(a*13)*2;
-  for(let y=0;y<h;y++) for(let x=0;x<w;x++){const dx=x-cx,dy=y-cy,d=Math.hypot(dx,dy); reg[at(x,y)]=d<20?-1:secOf(x,y); if(d>edgeR(Math.atan2(dy,dx))||x<2||y<2||x>w-3||y>h-3) g[at(x,y)]=1;}
+  const edgeR=a=>LG_R+Math.sin(a*3)*17+Math.sin(a*7+1)*14+Math.sin(a*13)*7+Math.sin(a*29+2)*6+Math.sin(a*61)*3;
+  const rMin=LG_R-50;
+  for(let y=0;y<h;y++){const dy=y-cy; for(let x=0;x<w;x++){const dx=x-cx, d2=dx*dx+dy*dy; if(x<2||y<2||x>w-3||y>h-3||(d2>rMin*rMin&&Math.sqrt(d2)>edgeR(Math.atan2(dy,dx)))){const i=y*w+x; g[i]=1; fx[i]=128;}}}
   // ridges between the lands, with passes every so often
   const passes=[];
   for(let k=0;k<6;k++){const a=secA(k)+TAU/12, ca=Math.cos(a), sa=Math.sin(a);
-    for(let r=24;r<400;r+=.4){const inPass=(r%70)>28&&(r%70)<36; for(let o=-1.6;o<=1.6;o+=.4){const x=Math.round(cx+ca*r-sa*o), y=Math.round(cy+sa*r+ca*o); if(!inB(x,y)) continue; if(inPass){passes.push({x,y,k}); continue;} g[at(x,y)]=1;}}}
+    for(let r=24;r<LG_R+40;r+=.4){const inPass=(r%70)>28&&(r%70)<36; for(let o=-1.6;o<=1.6;o+=.4){const x=Math.round(cx+ca*r-sa*o), y=Math.round(cy+sa*r+ca*o); if(!inB(x,y)) continue; if(inPass){passes.push({x,y,k}); continue;} g[at(x,y)]=1;}}}
   const sealed=s=>s>=3;
-  for(let y=cy-24;y<=cy+24;y++) for(let x=cx-24;x<=cx+24;x++){const d=Math.hypot(x-cx,y-cy), s=secOf(x,y); if(d>20.5&&d<22.6&&sealed(s)&&!g[at(x,y)]) bar[at(x,y)]=s;}
-  for(const p of passes){const s1=p.k, s2=(p.k+1)%6; if(sealed(s1)!==sealed(s2)&&!g[at(p.x,p.y)]) bar[at(p.x,p.y)]=sealed(s1)?s1:s2;}
+  for(let y=cy-24;y<=cy+24;y++) for(let x=cx-24;x<=cx+24;x++){const d=Math.hypot(x-cx,y-cy), s=secOf(x,y); if(d>20.5&&d<22.6&&sealed(s)&&!g[at(x,y)]) bar.set(at(x,y),s);}
+  for(const p of passes){const s1=p.k, s2=(p.k+1)%6; if(sealed(s1)!==sealed(s2)&&!g[at(p.x,p.y)]) bar.set(at(p.x,p.y),sealed(s1)?s1:s2);}
+  // places that must stay clear, kept in a grid so checking is quick on the huge island
+  const CG=64, cgrid=new Map(), clear=[];
+  const addClear=c=>{clear.push(c); const r=c.r+24; for(let j=Math.floor((c.y-r)/CG);j<=Math.floor((c.y+r)/CG);j++) for(let i=Math.floor((c.x-r)/CG);i<=Math.floor((c.x+r)/CG);i++){const kk=i*4096+j; let a=cgrid.get(kk); if(!a) cgrid.set(kk,a=[]); a.push(c);}};
+  const free=(x,y,m=0)=>{const a=cgrid.get(Math.floor(x/CG)*4096+Math.floor(y/CG)); if(!a) return true; for(const c of a) if(Math.abs(c.x-x)<c.r+m+2&&Math.hypot(c.x-x,c.y-y)<c.r+m) return false; return true;};
+  const rArea=(r0,r1)=>Math.sqrt(rand(r0*r0,r1*r1));
   // where the fortresses and villages go
-  const clear=[{x:cx,y:cy,r:26}], bases=[], villages=[];
-  for(let s=0;s<6;s++){const a=secA(s); for(let lv=1;lv<=4;lv++){const V=LG_LV[lv], aa=a+V.da, bx=Math.round(cx+Math.cos(aa)*V.r), by=Math.round(cy+Math.sin(aa)*V.r); bases.push({sec:s,lv,cx:bx,cy:by}); clear.push({x:bx,y:by,r:Math.max(V.size[0],V.size[1])*.75+10});}
-    for(const [vr,va] of [[70,.32],[150,-.3],[230,-.05],[300,.33]]){const aa=a+va, vx=Math.round(cx+Math.cos(aa)*vr), vy=Math.round(cy+Math.sin(aa)*vr); villages.push({sec:s,cx:vx,cy:vy}); clear.push({x:vx,y:vy,r:9});}}
-  const free=(x,y,m=0)=>!clear.some(c=>Math.abs(c.x-x)<c.r+m+2&&Math.hypot(c.x-x,c.y-y)<c.r+m);
+  addClear({x:cx,y:cy,r:26}); const bases=[], villages=[];
+  for(let s=0;s<6;s++){const a=secA(s); for(let lv=1;lv<=4;lv++){const V=LG_LV[lv], aa=a+V.da, bx=Math.round(cx+Math.cos(aa)*V.r*K), by=Math.round(cy+Math.sin(aa)*V.r*K); bases.push({sec:s,lv,cx:bx,cy:by}); addClear({x:bx,y:by,r:Math.max(V.size[0],V.size[1])*.75+10});}}
+  for(let s=0;s<6;s++){const a=secA(s); let k=0;
+    for(let vr=70;vr<LG_R-110;vr+=rand(165,215),k++){for(let t=0;t<12;t++){const va=(k%2?1:-1)*rand(.12,.4)+(t?rand(-.08,.08):0), aa=a+va, vx=Math.round(cx+Math.cos(aa)*vr), vy=Math.round(cy+Math.sin(aa)*vr); if(!free(vx,vy,14)) continue; villages.push({sec:s,cx:vx,cy:vy}); addClear({x:vx,y:vy,r:9}); break;}}}
   // lakes, mountains and rocks
   for(let s=0;s<6;s++){const a=secA(s);
-    for(let k=0;k<20;k++){for(let t=0;t<40;t++){const aa=a+rand(-.46,.46), rr=rand(30,370), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr), R=rand(3,9); if(!free(x,y,R+2)) continue;
-      for(let j=-11;j<=11;j++) for(let i=-11;i<=11;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&Math.hypot(i,j*1.2)<R+Math.sin(i*1.7+j)*.8){g[at(xx,yy)]=1; lake[at(xx,yy)]=1;}} clear.push({x,y,r:R+1}); break;}}
-    for(let k=0;k<12;k++){for(let t=0;t<40;t++){const aa=a+rand(-.46,.46), rr=rand(40,370), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr), R=rand(4,10); if(!free(x,y,R+3)) continue;
-      for(let j=-12;j<=12;j++) for(let i=-12;i<=12;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&Math.hypot(i*1.1,j)<R+Math.sin(i*.9+j*1.3)*1.5) g[at(xx,yy)]=1;} clear.push({x,y,r:R+1}); break;}}
-    for(let k=0;k<160;k++){for(let t=0;t<20;t++){const aa=a+rand(-.48,.48), rr=rand(28,385), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!free(x,y,2)) continue; const sw=rint(1,3), sh=rint(1,2); for(let j=0;j<sh;j++) for(let i=0;i<sw;i++) if(inB(x+i,y+j)) g[at(x+i,y+j)]=1; break;}}}
+    for(let k=0;k<20*50;k++){for(let t=0;t<40;t++){const aa=a+rand(-.46,.46), rr=rArea(30,LG_R-24), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr), R=rand(3,9)*(Math.random()<.08?2:1); if(!free(x,y,R+2)) continue;
+      const RR=Math.ceil(R+2); for(let j=-RR;j<=RR;j++) for(let i=-RR;i<=RR;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&!(fx[at(xx,yy)]&128)&&Math.hypot(i,j*1.2)<R+Math.sin(i*1.7+j)*.8){g[at(xx,yy)]=1; fx[at(xx,yy)]|=32;}} addClear({x,y,r:R+1}); break;}}
+    for(let k=0;k<12*50;k++){for(let t=0;t<40;t++){const aa=a+rand(-.46,.46), rr=rArea(40,LG_R-24), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr), R=rand(4,10)*(Math.random()<.1?1.8:1); if(!free(x,y,R+3)) continue;
+      const RR=Math.ceil(R+3); for(let j=-RR;j<=RR;j++) for(let i=-RR;i<=RR;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&Math.hypot(i*1.1,j)<R+Math.sin(i*.9+j*1.3)*1.5) g[at(xx,yy)]=1;} addClear({x,y,r:R+1}); break;}}
+    for(let k=0;k<160*50;k++){for(let t=0;t<20;t++){const aa=a+rand(-.48,.48), rr=rArea(28,LG_R-12), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!free(x,y,2)) continue; const sw=rint(1,3), sh=rint(1,2); for(let j=0;j<sh;j++) for(let i=0;i<sw;i++) if(inB(x+i,y+j)) g[at(x+i,y+j)]=1; break;}}}
   // fortresses: rings of walls, a gate in each ring facing the Crown Well
   bases.forEach((B,bi)=>{const V=LG_LV[B.lv], FW=V.size[0], FH=V.size[1], x0=B.cx-(FW>>1), y0=B.cy-(FH>>1), x1=x0+FW-1, y1=y0+FH-1; B.idx=bi; B.rect={x:x0,y:y0,w:FW,h:FH};
-    for(let y=y0-10;y<=y1+10;y++) for(let x=x0-10;x<=x1+10;x++) if(inB(x,y)&&bar[at(x,y)]<0){g[at(x,y)]=0; lake[at(x,y)]=0;}
+    for(let y=y0-10;y<=y1+10;y++) for(let x=x0-10;x<=x1+10;x++) if(inB(x,y)&&!bar.has(at(x,y))){g[at(x,y)]=0; fx[at(x,y)]&=~32;}
     const dx=cx-B.cx, dy=cy-B.cy, horizSide=Math.abs(dx)>Math.abs(dy), out=horizSide?{x:Math.sign(dx),y:0}:{x:0,y:Math.sign(dy)}; B.out=out; B.rings=[]; B.gateTiles=[]; B.gates=[];
     for(let k=0;k<V.rings;k++){const o=k*(V.thick+4), rx0=x0+o, ry0=y0+o, rx1=x1-o, ry1=y1-o, th=V.thick; if(rx1-rx0<10||ry1-ry0<8) break; B.rings.push({x0:rx0,y0:ry0,x1:rx1,y1:ry1});
-      for(let y=ry0;y<=ry1;y++) for(let x=rx0;x<=rx1;x++) if(x<rx0+th||x>rx1-th||y<ry0+th||y>ry1-th){g[at(x,y)]=1; fw[at(x,y)]=bi+1;}
+      for(let y=ry0;y<=ry1;y++) for(let x=rx0;x<=rx1;x++) if(x<rx0+th||x>rx1-th||y<ry0+th||y>ry1-th){g[at(x,y)]=1; fx[at(x,y)]=(fx[at(x,y)]&~31)|(bi+1);}
       const gt=[]; let gx,gy;
       if(horizSide){const xs=[]; for(let q=0;q<th;q++) xs.push(dx>0?rx1-q:rx0+q); for(const x of xs) for(let y=B.cy-3;y<B.cy+3;y++) gt.push({x,y}); gx=dx>0?rx1-th/2+1:rx0+th/2; gy=B.cy;}
       else {const ys=[]; for(let q=0;q<th;q++) ys.push(dy>0?ry1-q:ry0+q); for(const y of ys) for(let x=B.cx-3;x<B.cx+3;x++) gt.push({x,y}); gx=B.cx; gy=dy>0?ry1-th/2+1:ry0+th/2;}
-      for(const t of gt){g[at(t.x,t.y)]=0; fw[at(t.x,t.y)]=0;} B.gateTiles.push(gt); B.gates.push({x:gx*T,y:gy*T,horiz:!horizSide});}
+      for(const t of gt){g[at(t.x,t.y)]=0; fx[at(t.x,t.y)]&=~31;} B.gateTiles.push(gt); B.gates.push({x:gx*T,y:gy*T,horiz:!horizSide});}
     B.inner=(()=>{const r=B.rings[B.rings.length-1], o=V.thick; return {x:r.x0+o,y:r.y0+o,w:r.x1-r.x0-2*o+1,h:r.y1-r.y0-2*o+1};})();
     B.heart={x:(B.cx+.5)*T,y:(B.cy+.5)*T};
     // tower and spawner spots, checked against the walls
@@ -7051,19 +7074,26 @@ function genLegendWorld(){const N=LG_N,w=N,h=N,cx=LG_C,cy=LG_C, g=new Uint8Array
     B.spawners=[]; for(const [x,y] of sp2){if(B.spawners.length>=V.spawners) break; if(fl(x,y)&&!B.towers.some(t=>Math.hypot(t.x/T-x,t.y/T-y)<2)&&!B.spawners.some(t=>Math.hypot(t.x/T-x,t.y/T-y)<3)) B.spawners.push({x:x*T,y:y*T});}
     B.zones=[]; for(let k=0;k<2+B.lv*2;k++){const aa=Math.atan2(out.y,out.x)+rand(-1.1,1.1), rr=Math.max(FW,FH)*.5+rand(6,14); B.zones.push({x:(B.cx+Math.cos(aa)*rr)*T,y:(B.cy+Math.sin(aa)*rr)*T,r:rand(55,95)});}});
   // villages and the hub
-  const houses=[];
-  for(const V of villages){for(const [ox,oy] of [[-4,-3],[3,-3],[-4,2],[3,2]]){const x=V.cx+ox, y=V.cy+oy; for(let j=-1;j<3;j++) for(let i=-1;i<3;i++) if(inB(x+i,y+j)&&!fw[at(x+i,y+j)]){g[at(x+i,y+j)]=0; lake[at(x+i,y+j)]=0;} for(let j=0;j<2;j++) for(let i=0;i<2;i++){g[at(x+i,y+j)]=1; bld[at(x+i,y+j)]=1;} houses.push({x:x+1,y:y+1,sec:V.sec,ry:Math.atan2(V.cy-(y+1),V.cx-(x+1))});}
-    V.x=(V.cx+.5)*T; V.y=(V.cy+.5)*T; V.name=TRIBES[V.sec].vil+['',' Hollow',' Ford',' Rise'][villages.filter(o=>o.sec===V.sec).indexOf(V)];}
-  for(let y=cy-18;y<=cy+18;y++) for(let x=cx-18;x<=cx+18;x++){const d=Math.hypot(x-cx,y-cy); if(d<18){g[at(x,y)]=0; lake[at(x,y)]=0;}}
-  for(const [ox,oy] of [[-9,-6],[7,-6],[-9,5],[7,5]]){const x=cx+ox,y=cy+oy; for(let j=0;j<2;j++) for(let i=0;i<2;i++){g[at(x+i,y+j)]=1; bld[at(x+i,y+j)]=1;} houses.push({x:x+1,y:y+1,sec:-1,ry:Math.atan2(cy-(y+1),cx-(x+1))});}
-  for(let j=-1;j<=1;j++) for(let i=-1;i<=1;i++){g[at(cx+i,cy+j)]=1; bld[at(cx+i,cy+j)]=1;}
+  const houses=[], SUF=['',' Hollow',' Ford',' Rise',' Crossing',' Vale',' Watch',' Mill',' Brook',' Green',' Reach',' Haven',' Field',' End',' Hill',' Gate',' Barrow',' Spring'];
+  for(const V of villages){for(const [ox,oy] of [[-4,-3],[3,-3],[-4,2],[3,2]]){const x=V.cx+ox, y=V.cy+oy; for(let j=-1;j<3;j++) for(let i=-1;i<3;i++) if(inB(x+i,y+j)&&!(fx[at(x+i,y+j)]&31)){g[at(x+i,y+j)]=0; fx[at(x+i,y+j)]&=~32;} for(let j=0;j<2;j++) for(let i=0;i<2;i++){g[at(x+i,y+j)]=1; fx[at(x+i,y+j)]|=64;} houses.push({x:x+1,y:y+1,sec:V.sec,ry:Math.atan2(V.cy-(y+1),V.cx-(x+1))});}
+    for(let j=-1;j<=1;j++) for(let i=-1;i<=1;i++){const xx=V.cx+i, yy=V.cy+j; g[at(xx,yy)]=0; fx[at(xx,yy)]&=~32;}
+    V.x=(V.cx+.5)*T; V.y=(V.cy+.5)*T; const n=villages.filter(o=>o.sec===V.sec).indexOf(V); V.name=TRIBES[V.sec].vil+SUF[n%SUF.length]+(n>=SUF.length?' '+(1+Math.floor(n/SUF.length)):'');}
+  villages.forEach((V,i)=>V.i=i);
+  for(let y=cy-18;y<=cy+18;y++) for(let x=cx-18;x<=cx+18;x++){const d=Math.hypot(x-cx,y-cy); if(d<18){g[at(x,y)]=0; fx[at(x,y)]&=~32;}}
+  for(const [ox,oy] of [[-9,-6],[7,-6],[-9,5],[7,5]]){const x=cx+ox,y=cy+oy; for(let j=0;j<2;j++) for(let i=0;i<2;i++){g[at(x+i,y+j)]=1; fx[at(x+i,y+j)]|=64;} houses.push({x:x+1,y:y+1,sec:-1,ry:Math.atan2(cy-(y+1),cx-(x+1))});}
+  for(let j=-1;j<=1;j++) for(let i=-1;i<=1;i++){g[at(cx+i,cy+j)]=1; fx[at(cx+i,cy+j)]|=64;}
   // resources: more gold the further out you go
-  const nodes=[], ncell=new Set(), key=(x,y)=>((x>>2)<<10)|(y>>2);
-  for(let s=0;s<6;s++){const a=secA(s); let n=0; for(let t=0;t<3000&&n<150;t++){const aa=a+rand(-.5,.5), rr=rand(22,380), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!inB(x,y)||g[at(x,y)]||bar[at(x,y)]>=0||!free(x,y,1)||ncell.has(key(x,y))) continue;
-      ncell.add(key(x,y)); const kd=Math.random()<.12+rr/1200?'gold':Math.random()<.55?'wood':'stone'; nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:kd,hp:4,max:4,regrow:0,sec:s}); n++;}}
+  const nodes=[], ncell=new Set(), key=(x,y)=>(x>>2)*4096+(y>>2);
+  for(let s=0;s<6;s++){const a=secA(s); let n=0; for(let t=0;t<3000*50&&n<150*50;t++){const aa=a+rand(-.5,.5), rr=rArea(22,LG_R-12), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!inB(x,y)||g[at(x,y)]||bar.has(at(x,y))||!free(x,y,1)||ncell.has(key(x,y))) continue;
+      ncell.add(key(x,y)); const kd=Math.random()<.12+rr/(1200*K)?'gold':Math.random()<.55?'wood':'stone'; nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:kd,hp:4,max:4,regrow:0,sec:s}); n++;}}
   for(let k=0;k<10;k++){const aa=k/10*TAU, x=Math.round(cx+Math.cos(aa)*14), y=Math.round(cy+Math.sin(aa)*14); if(!g[at(x,y)]) nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:['stone','wood','gold'][k%3],hp:4,max:4,regrow:0,sec:-1});}
-  return {w,h,g,start:{x:(cx+.5)*T,y:(cy+4.5)*T},exit:null,chests:[],spawns:[],bossAt:null,gates:[],keys:[],rooms:[],rects:[],
-    lgWorld:{reg,lake,bld,fw,bar,bases,villages,houses,nodes,hub:{x:(cx+.5)*T,y:(cy+.5)*T}}};}
+  const nodeB=new Map(), nodeTile=new Set(); for(const n of nodes){const kk=(n.tx>>5)*256+(n.ty>>5); let a=nodeB.get(kk); if(!a) nodeB.set(kk,a=[]); a.push(n); nodeTile.add(at(n.tx,n.ty));}
+  const D={fx,bar,bases,villages,houses,nodes,nodeB,nodeTile,hub:{x:(cx+.5)*T,y:(cy+.5)*T},
+    regAt:i=>{const x=i%w, y=(i/w)|0; return Math.hypot(x-cx,y-cy)<20?-1:secOf(x,y);}, lakeAt:i=>fx[i]&32, bldAt:i=>fx[i]&64, fwAt:i=>fx[i]&31, seaAt:i=>fx[i]&128, barAt:i=>{const v=bar.get(i); return v===undefined?-1:v;}};
+  return {w,h,g,start:{x:(cx+.5)*T,y:(cy+4.5)*T},exit:null,chests:[],spawns:[],bossAt:null,gates:[],keys:[],rooms:[],rects:[],lgWorld:D};}
+// resource nodes near a spot (they are kept in 32-tile buckets)
+function lgNodesNear(D,x,y,r){const out=[], t0x=Math.floor((x-r)/T)>>5, t1x=Math.floor((x+r)/T)>>5, t0y=Math.floor((y-r)/T)>>5, t1y=Math.floor((y+r)/T)>>5;
+  for(let j=t0y;j<=t1y;j++) for(let i=t0x;i<=t1x;i++){const a=D.nodeB.get(i*256+j); if(a) for(const n of a) if(Math.abs(n.x-x)<r&&Math.abs(n.y-y)<r) out.push(n);} return out;}
 const HUB_ENV=Object.assign({},{void:0x1a3a5a,sky:0xe8f4ff,gnd:0x3a4a2a,sun:0xfff4e0,hi:.9,si:1.05,rock:0x8a8a7a,top:0x7aaa4a,tree:'oak',floorDeco:['flower','tuft','pebble'],fl:[0x5a8a3a,0x649442,0x6a9a48]});
 const regEnv=s=>s<0?HUB_ENV:B3[BIOMES[TRIBES[s].bi].id];
 function lgmBuildWorld(){const D=L.lgWorld, W=L.w, H=L.h, at=(x,y)=>y*W+x;
@@ -7073,9 +7103,9 @@ function lgmBuildWorld(){const D=L.lgWorld, W=L.w, H=L.h, at=(x,y)=>y*W+x;
   // fortress walls (always drawn, so you can see them from far away), banners, beacons and hazard pools
   const destroyed=lgmSave().bases||{};
   for(const B of D.bases){const tr=TRIBES[B.sec], V=LG_LV[B.lv]; B.ruin=!!destroyed[tr.id+'-'+B.lv]||(B.lv===4&&!!lgBeat()[tr.id]);
-    const stone=new THREE.Color('#77736c').lerp(new THREE.Color(tr.c2),.3), tiles=[]; for(let y=B.rect.y;y<B.rect.y+B.rect.h;y++) for(let x=B.rect.x;x<B.rect.x+B.rect.w;x++) if(D.fw[at(x,y)]===B.idx+1) tiles.push([x,y]);
+    const stone=new THREE.Color('#77736c').lerp(new THREE.Color(tr.c2),.3), tiles=[]; for(let y=B.rect.y;y<B.rect.y+B.rect.h;y++) for(let x=B.rect.x;x<B.rect.x+B.rect.w;x++) if(D.fwAt(at(x,y))===B.idx+1) tiles.push([x,y]);
     const blk=new THREE.InstancedMesh(gBox,new THREE.MeshStandardMaterial({color:stone,roughness:.85,flatShading:true}),Math.max(1,tiles.length)), cr=new THREE.InstancedMesh(gBox,new THREE.MeshStandardMaterial({color:stone.clone().multiplyScalar(.82),roughness:.9}),Math.max(1,tiles.length)); let n=0,c=0;
-    for(const [x,y] of tiles){const hgt=B.ruin?(.5+hash(x,y)*1.1):V.wallH*(.96+hash(x,y)*.08); mtx.compose(new THREE.Vector3(x+.5,hgt/2,y+.5),q,new THREE.Vector3(1.02,hgt,1.02)); blk.setMatrixAt(n++,mtx); const id=B.idx+1, edge=D.fw[at(x,y-1)]!==id||D.fw[at(x,y+1)]!==id||D.fw[at(x-1,y)]!==id||D.fw[at(x+1,y)]!==id; if(!B.ruin&&edge&&(x+y)%2===0){mtx.compose(new THREE.Vector3(x+.5,V.wallH+.18,y+.5),q,new THREE.Vector3(.5,.4,.5)); cr.setMatrixAt(c++,mtx);}}
+    for(const [x,y] of tiles){const hgt=B.ruin?(.5+hash(x,y)*1.1):V.wallH*(.96+hash(x,y)*.08); mtx.compose(new THREE.Vector3(x+.5,hgt/2,y+.5),q,new THREE.Vector3(1.02,hgt,1.02)); blk.setMatrixAt(n++,mtx); const id=B.idx+1, edge=D.fwAt(at(x,y-1))!==id||D.fwAt(at(x,y+1))!==id||D.fwAt(at(x-1,y))!==id||D.fwAt(at(x+1,y))!==id; if(!B.ruin&&edge&&(x+y)%2===0){mtx.compose(new THREE.Vector3(x+.5,V.wallH+.18,y+.5),q,new THREE.Vector3(.5,.4,.5)); cr.setMatrixAt(c++,mtx);}}
     blk.count=n; cr.count=c; blk.castShadow=blk.receiveShadow=true; levelGroup.add(blk); levelGroup.add(cr); B.meshes=[blk,cr];
     if(B.ruin) continue;
     const banM=new THREE.MeshStandardMaterial({color:tr.col,emissive:new THREE.Color(tr.col),emissiveIntensity:.25,side:THREE.DoubleSide}), pole=new THREE.MeshStandardMaterial({color:0x3a2a1a}), R0=B.rings[0];
@@ -7086,10 +7116,10 @@ function lgmBuildWorld(){const D=L.lgWorld, W=L.w, H=L.h, at=(x,y)=>y*W+x;
     const ZC={thorn:'#3a5a24',sand:'#d8b878',poison:'#7ad040',ice:'#bfe8ff',lava:'#ff6a1a',void:'#7a40c0'}[tr.zone];
     for(const z of B.zones){const m=new THREE.Mesh(gCircle,new THREE.MeshBasicMaterial({color:ZC,transparent:true,opacity:tr.zone==='lava'||tr.zone==='void'?.85:.6,depthWrite:false})); m.rotation.x=-Math.PI/2; m.position.set(z.x*S,.07,z.y*S); m.scale.setScalar(z.r*S); levelGroup.add(m); z.mesh=m; B.meshes.push(m);}}
   // crystal barriers
-  {const tiles=[]; for(let i=0;i<W*H;i++) if(D.bar[i]>=0) tiles.push(i); const m=new THREE.InstancedMesh(gOct,new THREE.MeshStandardMaterial({color:0xb48aff,emissive:new THREE.Color('#7a3aff'),emissiveIntensity:.8,transparent:true,opacity:.75,roughness:.1}),tiles.length||1);
+  {const tiles=[...D.bar.keys()]; const m=new THREE.InstancedMesh(gOct,new THREE.MeshStandardMaterial({color:0xb48aff,emissive:new THREE.Color('#7a3aff'),emissiveIntensity:.8,transparent:true,opacity:.75,roughness:.1}),tiles.length||1);
     tiles.forEach((i,k)=>{const x=i%W,y=(i/W)|0; mtx.compose(new THREE.Vector3(x+.5,.9+hash(x,y)*.4,y+.5),q.setFromEuler(new THREE.Euler(0,hash(y,x)*3,0)),new THREE.Vector3(.34,.9+hash(x+1,y)*.6,.34)); m.setMatrixAt(k,mtx);}); m.count=tiles.length; levelGroup.add(m); L.lgBar=m; m.visible=!lgFinalOpen();}
   for(const hs of D.houses) lgmHouseMesh(hs);
-  const well=(x,z,big)=>{const s=big?1.6:.8, gr=new THREE.Group(); gr.position.set(x,0,z); levelGroup.add(gr); const st=new THREE.MeshStandardMaterial({color:0x9a968c,roughness:.9,flatShading:true});
+  const well=(x,z,big)=>{const s=big?1.6:.8, gr=new THREE.Group(); gr.position.set(x,0,z); levelGroup.add(gr); if(!big) (L.lgFar=L.lgFar||[]).push(gr); const st=new THREE.MeshStandardMaterial({color:0x9a968c,roughness:.9,flatShading:true});
     const ring=new THREE.Mesh(gCyl,st); ring.position.y=.3*s; ring.scale.set(s,.6*s,s); gr.add(ring); const wt=new THREE.Mesh(gCircle,new THREE.MeshBasicMaterial({color:big?0x7ae8ff:0x5ab8e8})); wt.rotation.x=-Math.PI/2; wt.position.y=.62*s; wt.scale.setScalar(s*.85); gr.add(wt);
     if(big){const gold=new THREE.MeshStandardMaterial({color:0xe8c050,metalness:.6,roughness:.25}); for(let i=0;i<6;i++){const a=i/6*TAU, p=new THREE.Mesh(gCyl,gold); p.position.set(Math.cos(a)*s,1.1,Math.sin(a)*s); p.scale.set(.06,1.6,.06); gr.add(p); const g2=new THREE.Mesh(gOct,new THREE.MeshStandardMaterial({color:0xffd36a,emissive:new THREE.Color('#ffb020'),emissiveIntensity:1})); g2.position.set(Math.cos(a)*s,2,Math.sin(a)*s); g2.scale.set(.12,.2,.12); gr.add(g2);}
       const halo=new THREE.Mesh(thinTor(),gold); halo.rotation.x=Math.PI/2; halo.position.y=1.9; halo.scale.setScalar(s); gr.add(halo); const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0x9ff0ff,transparent:true,opacity:.6,depthWrite:false,blending:THREE.AdditiveBlending,fog:false})); sp.position.y=1.2; sp.scale.set(4,4,1); gr.add(sp);
@@ -7100,7 +7130,9 @@ function lgmBuildWorld(){const D=L.lgWorld, W=L.w, H=L.h, at=(x,y)=>y*W+x;
   const sx=Math.floor(L.start.x/T/LG_CH), sy=Math.floor(L.start.y/T/LG_CH); for(let j=-2;j<=2;j++) for(let i=-2;i<=2;i++) lgmChunk(sx+i,sy+j);}
 /* ---------------- starting, the title screen and quitting ---------------- */
 function openLegends(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} const party=MP.party&&MP.party.members.length>1; if(party&&MP.role!=='host'){toast('The party leader starts Legends','#ffd36a'); return;}
-  $('#modesPanel')&&($('#modesPanel').hidden=true); if(party){MP.inGame=true; MP.others.clear();} startLegends(); if(party){const S0=lgmSave(); bcast({t:'lgev',k:'start',seed:S0.seed,beaten:S0.beaten,bases:S0.bases||{},day:LGMS.day}); toast('Your party is joining you in Legends','#8fd06a');} lgmTitle(true);}
+  $('#modesPanel')&&($('#modesPanel').hidden=true); lgmLoading(true); setTimeout(()=>{try{openLegends2(party);} finally{lgmLoading(false);}},40);}
+function lgmLoading(on){let el=$('#lgLoad'); if(!el){el=document.createElement('div'); el.id='lgLoad'; el.innerHTML='<div><b>LEGENDS</b><span>Building the island…</span></div>'; document.body.appendChild(el);} el.hidden=!on;}
+function openLegends2(party){if(party){MP.inGame=true; MP.others.clear();} startLegends(); if(party){const S0=lgmSave(); bcast({t:'lgev',k:'start',seed:S0.seed,beaten:S0.beaten,bases:S0.bases||{},day:LGMS.day}); toast('Your party is joining you in Legends','#8fd06a');} lgmTitle(true);}
 function startLegendBattle(){openLegends();}
 function startLegends(o){o=o||{}; lgmInit(); GAUNT=null; DUN=null; const S0=lgmSave(); LG_BEAT=o.beaten||null; const CL=MP.role==='client'&&MP.inGame;
   LGMS={res:S0.res,yaw:-Math.PI/2,pitch:.34,dist:7.6,ride:false,mount:{walk:0},sprites:[],rally:null,day:30,raid:null,region:-9,bases:[],seen:{},lastAtk:0,deadT:0,hudT:0,saveT:0,ptowers:[],cry:null,thief:null,villagers:[],lock:false,lookT:0};
@@ -7108,7 +7140,7 @@ function startLegends(o){o=o||{}; lgmInit(); GAUNT=null; DUN=null; const S0=lgmS
   GEN_OVERRIDE=genLegendWorld; GEN_NAME='Legends'; GEN_THEME={wall:[],scatter:[],plat:[],name:''};
   try{startLevel(0,1,false,o.seed||S0.seed);} finally{GEN_OVERRIDE=null; GEN_NAME=null; GEN_THEME=null;}
   run.lgm=true; L.reinf=99; L.amb='petal'; const D=L.lgWorld; LGMS.nodes=D.nodes; LGMS.D=D; ents=[]; camera.far=340; camera.updateProjectionMatrix();
-  if(!lgFinalOpen()) for(let i=0;i<D.bar.length;i++) if(D.bar[i]>=0) L.g[i]=1;
+  if(!lgFinalOpen()) for(const i of D.bar.keys()) L.g[i]=1;
   const destroyed=o.bases||S0.bases||{};
   D.bases.forEach(B=>{const tr=TRIBES[B.sec], key=tr.id+'-'+B.lv, done=!!destroyed[key]||(B.lv===4&&!!lgBeat()[tr.id]), base={i:B.idx,sec:B.sec,lv:B.lv,tr,B,beaten:done,tier:tr.bi,gates:[],gate:null,heart:null,spawners:[],towers:[],active:false}; LGMS.bases.push(base);
     if(done){for(const gt of B.gateTiles) for(const t of gt) L.g[t.y*L.w+t.x]=0; return;}
@@ -7131,7 +7163,7 @@ function lgmTitle(on){let el=$('#lgTitle'); if(!on){if(el) el.hidden=true; if(mo
   el.querySelector('#lgBack').onclick=()=>{lgmTitle(false); lgmQuit(); showMenuFromLegends();};
   const panel=el.querySelector('#lgPanel');
   el.querySelector('#lgHordes').onclick=()=>{panel.hidden=false; panel.innerHTML=`<h2>The hordes</h2>${TRIBES.map((t,i)=>{const done=!!S0.beaten[t.id], open=tribeOpen(i); return `<div class="lgt-h${done?' done':''}${open?'':' locked'}" style="--tc:${t.col}"><b>${t.name}</b><span>${esc(t.fort)} · ${esc(BIOMES[t.bi].name)} · led by ${t.boss==='threefold'?'???':esc(BOSSES[t.boss].name)}</span><span class="st">${done?'✓ Defeated':open?'Their fortress waits in '+esc(BIOMES[t.bi].name):i<5?'Sealed behind the crystal barrier':'Sealed until Rime and the Forge fall'}</span></div>`;}).join('')}<button class="lgt-b" id="lgPanelX">Close</button>`; panel.querySelector('#lgPanelX').onclick=()=>{panel.hidden=true;};};
-  el.querySelector('#lgHow').onclick=()=>{panel.hidden=false; panel.innerHTML=`<h2>How to play</h2><ul class="lgt-how"><li><b>Look around:</b> click the game to steer the camera with your mouse (Esc to let go). On touch screens, drag on the right side. Arrow keys also turn the camera.</li><li><b>Move:</b> WASD or the joystick. <b>R</b> calls your Crown Steed to ride faster.</li><li><b>Gather:</b> hit trees 🪵, rocks 🪨 and gold veins 🪙, or press <b>G</b> to send your sprites to gather for you.</li><li><b>Build:</b> <b>Z</b> Cobble Golem, <b>X</b> Plank Golem (archer), <b>C</b> Mossy Golem (heals you), <b>V</b> Arrow Tower.</li><li><b>Command:</b> <b>T</b> plants a rally banner where you look and your army charges there. <b>Y</b> calls them back.</li><li><b>Fortresses:</b> break the gate, destroy the spawners, shatter the heart and beat the horde's leader.</li><li><b>Night:</b> the hordes raid a village. Ride there and defend it for a reward.</li><li><b>Fall in battle</b> and you wake by the Crown Well. Nothing is lost.</li></ul><button class="lgt-b" id="lgPanelX">Close</button>`; panel.querySelector('#lgPanelX').onclick=()=>{panel.hidden=true;};};
+  el.querySelector('#lgHow').onclick=()=>{panel.hidden=false; panel.innerHTML=`<h2>How to play</h2><ul class="lgt-how"><li><b>Look around:</b> click the game to steer the camera with your mouse (Esc to let go). On touch screens, drag on the right side. Arrow keys also turn the camera.</li><li><b>Move:</b> WASD or the joystick. <b>R</b> calls your Crown Steed to ride faster.</li><li><b>Travel:</b> the island is huge. Walk near a village to find its well, then press <b>F</b> (🌀) beside any well to jump to another one.</li><li><b>Gather:</b> hit trees 🪵, rocks 🪨 and gold veins 🪙, or press <b>G</b> to send your sprites to gather for you.</li><li><b>Build:</b> <b>Z</b> Cobble Golem, <b>X</b> Plank Golem (archer), <b>C</b> Mossy Golem (heals you), <b>V</b> Arrow Tower.</li><li><b>Command:</b> <b>T</b> plants a rally banner where you look and your army charges there. <b>Y</b> calls them back.</li><li><b>Fortresses:</b> break the gate, destroy the spawners, shatter the heart and beat the horde's leader.</li><li><b>Night:</b> the hordes raid a village. Ride there and defend it for a reward.</li><li><b>Fall in battle</b> and you wake by the Crown Well. Nothing is lost.</li></ul><button class="lgt-b" id="lgPanelX">Close</button>`; panel.querySelector('#lgPanelX').onclick=()=>{panel.hidden=true;};};
   setTimeout(()=>{const b=el.querySelector('#lgPlay'); if(b) b.focus();},50);}
 function showMenuFromLegends(){cine=null; toMenu();}
 function lgmStartTip(){mode='play'; banner('The Crown Well','Six lands wait. Gather, build and rally.'); toast('Click the game to steer the camera with your mouse. R to ride, G to gather, Z/X/C/V to build, T to rally.','#ffd36a');}
@@ -7143,7 +7175,7 @@ function mkStruct(base,type,x,y,o){const tr=base.tr, tier=base.tier, df=DF(), V=
   e.hp=e.max; Object.assign(e,o||{}); ents.push(e); return e;}
 /* ---------------- the third-person camera and controls ---------------- */
 function lgmCamActive(){return !!(LGMS&&L&&L.lgWorld&&mode!=='lgmenu');}
-function lgmCamera(sx,sz){const C=LGMS, ride=C.ride?.45:0; let dd=C.dist+(C.ride?1.6:0); {const D=C.D, cyw=Math.cos(C.yaw), syw=Math.sin(C.yaw); for(let t=.6;t<dd;t+=.3){const bx=P.x*S-cyw*t*Math.cos(C.pitch), bz=P.y*S-syw*t*Math.cos(C.pitch), tx=Math.floor(bx), tz=Math.floor(bz); if(tx<0||tz<0||tx>=L.w||tz>=L.h) break; const i=tz*L.w+tx; if(!L.g[i]||D.lake[i]) continue; const wh=D.fw[i]?2.7:D.bld[i]?2.2:D.bar[i]>=0?2:1.6; if(t*Math.sin(C.pitch)+1.2+ride<wh){dd=Math.max(1.8,t-.4); break;}}} const back=dd*Math.cos(C.pitch), up=dd*Math.sin(C.pitch)+1.2+ride, px=P.x*S, pz=P.y*S, cy=Math.cos(C.yaw), sy=Math.sin(C.yaw);
+function lgmCamera(sx,sz){const C=LGMS, ride=C.ride?.45:0; let dd=C.dist+(C.ride?1.6:0); {const D=C.D, cyw=Math.cos(C.yaw), syw=Math.sin(C.yaw); for(let t=.6;t<dd;t+=.3){const bx=P.x*S-cyw*t*Math.cos(C.pitch), bz=P.y*S-syw*t*Math.cos(C.pitch), tx=Math.floor(bx), tz=Math.floor(bz); if(tx<0||tz<0||tx>=L.w||tz>=L.h) break; const i=tz*L.w+tx; if(!L.g[i]||D.lakeAt(i)) continue; const wh=D.fwAt(i)?2.7:D.bldAt(i)?2.2:D.barAt(i)>=0?2:1.6; if(t*Math.sin(C.pitch)+1.2+ride<wh){dd=Math.max(1.8,t-.4); break;}}} const back=dd*Math.cos(C.pitch), up=dd*Math.sin(C.pitch)+1.2+ride, px=P.x*S, pz=P.y*S, cy=Math.cos(C.yaw), sy=Math.sin(C.yaw);
   camera.position.set(px-cy*back+sx,up,pz-sy*back+sz); camera.lookAt(px+cy*2.2,1.1+ride,pz+sy*2.2); return [px+cy*4,pz+sy*4];}
 function lgmMove(v){if(!lgmCamActive()) return v; const f={x:Math.cos(LGMS.yaw),y:Math.sin(LGMS.yaw)}, r={x:-f.y,y:f.x}; return {x:r.x*v.x-f.x*v.y,y:r.y*v.x-f.y*v.y};}
 function lgmAim(){const C=LGMS, fwd=C.lock?C.yaw:(moveVec().x||moveVec().y?P.face:C.yaw); let best=null,bd=300; for(const e of targets()){const d=Math.hypot(e.x-P.x,e.y-P.y), a=Math.abs(angDiff(fwd,Math.atan2(e.y-P.y,e.x-P.x))); if(a<1.2&&d<bd){bd=d; best=e;}} return best?Math.atan2(best.y-P.y,best.x-P.x):fwd;}
@@ -7157,7 +7189,7 @@ cv.addEventListener('wheel',e=>{if(!lgmCamActive()) return; e.preventDefault(); 
 document.addEventListener('keydown',e=>{if(!LGMS||mode!=='play'||e.repeat) return; const t=e.target; if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA')) return; const k=(e.key||'').toLowerCase(); const a=LG_ACT.find(x=>x[1]===k); if(a){lgmAct(a[0]); e.preventDefault();}});
 
 /* ---------------- per frame ---------------- */
-function lgmRegion(force){const D=LGMS.D, tx=clamp(Math.floor(P.x/T),0,L.w-1), ty=clamp(Math.floor(P.y/T),0,L.h-1), s=D.reg[ty*L.w+tx]; if(!force&&s===LGMS.region) return; LGMS.region=s;
+function lgmRegion(force){const D=LGMS.D, tx=clamp(Math.floor(P.x/T),0,L.w-1), ty=clamp(Math.floor(P.y/T),0,L.h-1), s=D.regAt(ty*L.w+tx); if(!force&&s===LGMS.region) return; LGMS.region=s;
   const E=regEnv(s); L.env=E; applyLights(E,false); L.bi=s<0?0:TRIBES[s].bi; L.tier=s<0?0:TRIBES[s].bi; LGMS.envSi=E.si; LGMS.envHi=E.hi; LGMS.sky=new THREE.Color(E.sky).lerp(new THREE.Color('#bfe0ff'),.35);
   L.amb=s<0?'petal':BIOMES[L.bi].amb; if(!force&&mode==='play'){const tr=s<0?null:TRIBES[s], beaten=tr&&lgmSave().beaten[tr.id]; banner(s<0?'The Crown Well':BIOMES[tr.bi].name,s<0?'Home of the Lorekeepers':beaten?`Freed from the ${tr.name}`:`Land of the ${tr.name}`);}}
 function lgmDayLight(){const C=LGMS, t=C.day%300, k=t<200?1:t<215?1-(t-200)/15*.7:t<285?.3:.3+(t-285)/15*.7; C.dayK=k; C.night=t>=210&&t<288;
@@ -7168,10 +7200,10 @@ function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.ma
   if(keys['arrowleft']) C.yaw-=dt*2.2; if(keys['arrowright']) C.yaw+=dt*2.2; if(keys['arrowup']) C.pitch=clamp(C.pitch-dt,.18,.95); if(keys['arrowdown']) C.pitch=clamp(C.pitch+dt,.18,.95);
   {const mv=moveVec(); if(!C.lock&&C.lookT<=0&&(mv.x||mv.y)){const raw={x:(keys['a']?-1:0)+(keys['d']?1:0),y:(keys['w']?-1:0)+(keys['s']?1:0)}; const fwd=TOUCH?joy.y<-.3:raw.y<0&&!raw.x; if(fwd||TOUCH) C.yaw+=angDiff(C.yaw,P.face)*Math.min(1,dt*(TOUCH?1.4:2));}}
   // death: wake at the Crown Well
-  if(P.dead){run.endT=0; C.deadT=(C.deadT||3.2)-dt; if(C.deadT<=0){C.deadT=0; P.dead=false; P.hp=ST.maxhp; P.iframe=2; const D=C.D; P.x=D.hub.x; P.y=D.hub.y+150; C.ride=false; for(const a of allies){a.x=P.x+rand(-50,50); a.y=P.y+rand(20,60);} C.rally=null; toast('You wake beside the Crown Well. Your army regroups around you.','#9fe0ff'); lgmRegion(true);} return;}
+  if(P.dead){run.endT=0; C.deadT=(C.deadT||3.2)-dt; if(C.deadT<=0){C.deadT=0; P.dead=false; P.hp=ST.maxhp; P.iframe=2; const D=C.D, wl=lgmNearestWell(); P.x=wl.x; P.y=wl.y+110; C.ride=false; for(const a of allies){a.x=P.x+rand(-50,50); a.y=P.y+rand(20,60);} C.rally=null; toast(`You wake beside ${wl.name}. Your army regroups around you.`,'#9fe0ff'); lgmRegion(true);} return;}
   C.day+=dt; lgmDayLight(); if(C.day%300<dt*1.5) {const S0=lgmSave(); S0.days++;}
   const swing=P.atk>C.lastAtk+.01; C.lastAtk=P.atk;
-  C.regT=(C.regT||0)-dt; if(C.regT<=0){C.regT=.4; lgmRegion(); lgmBaseIntro();}
+  C.regT=(C.regT||0)-dt; if(C.regT<=0){C.regT=.4; lgmRegion(); lgmBaseIntro(); lgmWellsTick();}
   for(const e of ents) if(!e.st&&!e.lgp&&!e.ally){e.lgp=true; e.max=Math.round(e.max*1.25); e.hp=Math.round(e.hp*1.25); e.dmg*=1.1;}
   // far-away monsters that are not fighting go to sleep
   const CLI=MP.role==='client'&&MP.inGame; if(CLI) lgmClientRefs(); else for(const e of ents) if(!e.st&&!e.ally&&e.hp>0&&!e.raid&&!e.mirror&&Math.hypot(e.x-P.x,e.y-P.y)>2600&&![...MP.others.values()].some(o=>Math.hypot(e.x-o.x,e.y-o.y)<2600)) e.hp=0;
@@ -7179,7 +7211,7 @@ function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.ma
   if(MP.inGame&&MP.role==='host'){C.dsT=(C.dsT||0)-dt; if(C.dsT<=0){C.dsT=5; lgmB({k:'day',d:C.day});}}
   // gathering by hand
   for(const n of C.nodes){if(n.hp<=0){n.regrow-=dt; if(n.regrow<=0) n.hp=n.max; continue;}
-    if(swing&&Math.hypot(n.x-P.x,n.y-P.y)<78) lgmHarvest(n,1);}
+    if(swing&&Math.abs(n.x-P.x)<78&&Math.abs(n.y-P.y)<78&&Math.hypot(n.x-P.x,n.y-P.y)<78) lgmHarvest(n,1);}
   lgmSprites(dt);
   // hazards near fortresses
   C.zt=(C.zt||0)-dt; for(const b of C.bases){if(b.beaten||Math.hypot(b.B.heart.x-P.x,b.B.heart.y-P.y)>3000) continue; for(const z of b.B.zones){if(Math.hypot(z.x-P.x,z.y-P.y)>z.r) continue; const zn=b.tr.zone; if(zn==='sand'||zn==='ice') P.slow=Math.max(P.slow,.25); else if(C.zt<=0){C.zt=.6; hurtP(Math.round((zn==='lava'?6:zn==='void'?5:3)*(1+.3*b.tier)),{});} break;}
@@ -7197,7 +7229,7 @@ function lgmSprites(dt){const C=LGMS; for(const s of C.sprites){s.t+=dt; const t
     if(d<16){if(s.state==='go') {s.state='work'; s.wt=1.4; s.n=0;} else s.done=true; continue;} const sp=360*dt; s.x+=dx/d*Math.min(d,sp); s.y+=dy/d*Math.min(d,sp);}
   C.sprites=C.sprites.filter(s=>!s.done);}
 function lgmVillagers(dt){for(const v of LGMS.villagers){if(v.still){v.face=Math.atan2(P.y-v.y,P.x-v.x); continue;} v.t-=dt; if(v.t<=0||!v.tx){v.t=rand(2,5); v.tx=v.hx+rand(-80,80); v.ty=v.hy+rand(-30,40);} const dx=v.tx-v.x, dy=v.ty-v.y, d=Math.hypot(dx,dy); v.moving=d>6; if(d>6){const sp=50*dt; v.x+=dx/d*sp; v.y+=dy/d*sp; v.face=Math.atan2(dy,dx); v.walk+=dt*8;}}}
-function lgmRaids(dt){const C=LGMS; if(C.night&&!C.raid&&!C.raidDone){const vs=C.D.villages.filter(V=>tribeOpen(V.sec)&&!lgBeat()[TRIBES[V.sec].id]).sort((a,b)=>Math.hypot(a.x-P.x,a.y-P.y)-Math.hypot(b.x-P.x,b.y-P.y)).slice(0,3); if(!vs.length){C.raidDone=true; return;} const V=choice(vs), tr=TRIBES[V.sec], lvl=1+Math.min(3,Math.floor(Math.hypot(V.cx-LG_C,V.cy-LG_C)/100));
+function lgmRaids(dt){const C=LGMS; if(C.night&&!C.raid&&!C.raidDone){const vs=C.D.villages.filter(V=>tribeOpen(V.sec)&&!lgBeat()[TRIBES[V.sec].id]).sort((a,b)=>Math.hypot(a.x-P.x,a.y-P.y)-Math.hypot(b.x-P.x,b.y-P.y)).slice(0,3); if(!vs.length){C.raidDone=true; return;} const V=choice(vs), tr=TRIBES[V.sec], lvl=1+Math.min(3,Math.floor(Math.hypot(V.cx-LG_C,V.cy-LG_C)/(100*LG_K)));
     C.raid={b:{tr,i:-1},V,mobs:[]}; LG_EBI=tr.bi; LG_ETIER=tr.bi; for(let k=0;k<4+lvl*3;k++){const a=Math.random()*TAU, r=rand(120,280); const m=spawnEnemy(pickType(tr.bi),V.x+Math.cos(a)*r,V.y+Math.sin(a)*r,true); if(m){m.raid=true; m.base=null; m.tribe=V.sec; C.raid.mobs.push(m); puff(m.x,m.y,tr.col,10,100,.5,4);}} LG_EBI=LG_ETIER=null;
     banner(`${tr.name} raids ${V.name}!`,'Ride to the village and drive them off before dawn'); if(typeof sfx==='function') sfx('roar');}
   if(C.raid){C.raid.mobs=C.raid.mobs.filter(m=>m.hp>0); if(!C.raid.mobs.length){const r={gold:24,stone:20,wood:20}; for(const k in r) C.res[k]+=r[k]; const it=lgLoot(C.raid.b.tr.bi,1); if(it) SAVE.inv.push(it); banner(`${C.raid.V.name} is safe!`,`The villagers give you ${r.gold} gold, ${r.stone} stone, ${r.wood} wood${it?' and '+it.name:''}`); if(typeof sfx==='function') sfx('win'); C.raid=null; C.raidDone=true;}
@@ -7210,13 +7242,14 @@ function lgmBaseIntro(){const C=LGMS, CLI=MP.role==='client'&&MP.inGame;
     if(!C.seen[b.i]&&d<1500){C.seen[b.i]=true; banner(lgBaseName(b),`${b.tr.name} · Level ${b.lv} · ${LG_LV[b.lv].diff}${b.lv===4?' · their leader waits inside':''}`);}}}
 function lgmAct(a){const C=LGMS; if(!C||mode!=='play'||!P||P.dead) return;
   if(a==='house'||a==='recruit'){lgmVillageAct(a); lgmHud(); lgmBar(true); return;}
+  if(a==='travel'){lgmTravel(); return;}
   if(LG_COST[a]){const c=LG_COST[a]; if(!Object.entries(c).every(([r,v])=>C.res[r]>=v)){toast(`Not enough: needs ${Object.entries(c).map(([r,v])=>v+' '+r).join(' and ')}`,'#ff8a6a'); return;}
     if(a==='tower'){if(C.ptowers.length>=8){toast('You can build up to 8 towers','#ffd36a'); return;} const x=P.x+Math.cos(C.yaw)*50, y=P.y+Math.sin(C.yaw)*50; if(blocked(x,y,14)){toast('No room for a tower here','#ffd36a'); return;} C.ptowers.push({x,y,cd:1,id:'pt'+Math.random()}); puff(x,y,'#5fb3ff',20,140,.6,5); shake(3);}
     else {if(allies.length>=10) toast('Your army is full (10). The oldest golem returns to the earth.','#ffd36a'); summonAllies({minion:'lg_'+a,count:1,pot:1+.35*Math.max(L.tier,lgmProgressTier())});}
     for(const [r,v] of Object.entries(c)) C.res[r]-=v; if(typeof sfx==='function') sfx('summon');}
   else if(a==='rally'){if(!allies.length){toast('Build some golems first (Z, X or C)','#ffd36a'); return;} const d=260, x=P.x+Math.cos(C.yaw)*d, y=P.y+Math.sin(C.yaw)*d; C.rally={x,y,t:25}; toast('Charge! Your army rallies to the banner.','#5fb3ff'); puff(x,y,'#5fb3ff',16,120,.5,5);}
   else if(a==='recall'){C.rally=null; toast('Your army falls back to you.','#5fb3ff');}
-  else if(a==='gather'){const free=C.nodes.filter(n=>n.hp>0&&!C.sprites.some(s=>s.node===n)&&Math.hypot(n.x-P.x,n.y-P.y)<700).sort((a,b)=>Math.hypot(a.x-P.x,a.y-P.y)-Math.hypot(b.x-P.x,b.y-P.y)); const room=3-C.sprites.length; if(room<=0){toast('All three sprites are busy','#ffd36a'); return;} if(!free.length){toast('Nothing to gather nearby','#ffd36a'); return;}
+  else if(a==='gather'){const free=lgNodesNear(C.D,P.x,P.y,700).filter(n=>n.hp>0&&!C.sprites.some(s=>s.node===n)&&Math.hypot(n.x-P.x,n.y-P.y)<700).sort((a,b)=>Math.hypot(a.x-P.x,a.y-P.y)-Math.hypot(b.x-P.x,b.y-P.y)); const room=3-C.sprites.length; if(room<=0){toast('All three sprites are busy','#ffd36a'); return;} if(!free.length){toast('Nothing to gather nearby','#ffd36a'); return;}
     free.slice(0,room).forEach(n=>C.sprites.push({x:P.x,y:P.y,node:n,state:'go',t:Math.random()*6})); toast('Your sprites fly off to gather','#9fe0ff');}
   else if(a==='mount'){C.ride=!C.ride; puff(P.x,P.y,'#ffd36a',14,120,.5,5); if(typeof sfx==='function') sfx('summon');}
   lgmHud(); lgmBar(true);}
@@ -7250,13 +7283,13 @@ function lgmBar(on){let el=$('#lgmBar'); if(!el){el=document.createElement('div'
     el.querySelectorAll('.lgb').forEach(b=>{const fire=ev=>{ev.preventDefault(); ev.stopPropagation(); lgmAct(b.dataset.b);}; b.addEventListener('click',fire); b.addEventListener('touchstart',fire,{passive:false});});}
   el.hidden=!on||!LGMS; if(LGMS) el.querySelectorAll('.lgb').forEach(b=>{const c=LG_COST[b.dataset.b]; b.classList.toggle('no',!!c&&!Object.entries(c).every(([r,v])=>LGMS.res[r]>=v)); b.classList.toggle('on',(b.dataset.b==='mount'&&LGMS.ride)||(b.dataset.b==='rally'&&!!LGMS.rally));});}
 let lgmMiniImg=null;
-function lgmMini(){const S2=mini.width, D=LGMS.D, RES=2, IW=Math.ceil(L.w/RES);
+function lgmMini(){const S2=mini.width, D=LGMS.D, RES=Math.max(2,Math.ceil(L.w/640)), IW=Math.ceil(L.w/RES);
   if(!lgmMiniImg){const c=document.createElement('canvas'); c.width=c.height=IW; const g2=c.getContext('2d'), img=g2.createImageData(IW,IW), cache={};
     for(let py=0;py<IW;py++) for(let px=0;px<IW;px++){const x=px*RES, y=py*RES, i=y*L.w+x; let col;
-      if(Math.hypot(x-LG_C,y-LG_C)>396) col='#2a6a9a'; else if(D.lake[i]) col='#3a7ab8'; else if(D.fw[i]) col='#8a8a8a'; else if(D.bld[i]) col='#c8a878'; else if(D.bar[i]>=0&&!lgFinalOpen()) col='#9a6aff'; else if(L.g[i]) col='#4a4a48'; else {const s=D.reg[i]; col=cache[s]||(cache[s]='#'+new THREE.Color(regEnv(s).fl[1]).getHexString());}
+      if(D.seaAt(i)) col='#2a6a9a'; else if(D.lakeAt(i)) col='#3a7ab8'; else if(D.fwAt(i)) col='#8a8a8a'; else if(D.bldAt(i)) col='#c8a878'; else if(D.barAt(i)>=0&&!lgFinalOpen()) col='#9a6aff'; else if(L.g[i]) col='#4a4a48'; else {const s=D.regAt(i); col=cache[s]||(cache[s]='#'+new THREE.Color(regEnv(s).fl[1]).getHexString());}
       const k=(py*IW+px)*4, v=parseInt(col.slice(1),16); img.data[k]=v>>16; img.data[k+1]=(v>>8)&255; img.data[k+2]=v&255; img.data[k+3]=255;}
     g2.putImageData(img,0,0); lgmMiniImg=c;}
-  const view=bigMap?L.w:220, sc=S2/view, ox=bigMap?0:clamp(P.x/T-view/2,0,L.w-view), oy=bigMap?0:clamp(P.y/T-view/2,0,L.h-view);
+  const view=bigMap?L.w:300, sc=S2/view, ox=bigMap?0:clamp(P.x/T-view/2,0,L.w-view), oy=bigMap?0:clamp(P.y/T-view/2,0,L.h-view);
   mg.clearRect(0,0,S2,S2); mg.imageSmoothingEnabled=false; mg.drawImage(lgmMiniImg,ox/RES,oy/RES,view/RES,view/RES,0,0,S2,S2);
   const X=o=>(o.x/T-ox)*sc, Y=o=>(o.y/T-oy)*sc, dot=(o,c,s)=>{mg.fillStyle=c; mg.fillRect(X(o)-s/2,Y(o)-s/2,s,s);};
   for(const b of LGMS.bases) if(!b.beaten){mg.fillStyle=tribeOpen(b.sec)?b.tr.col:'#666'; mg.beginPath(); mg.arc(X(b.B.heart),Y(b.B.heart),2+b.lv*(bigMap?1.2:1.6),0,TAU); mg.fill(); mg.strokeStyle='#000'; mg.lineWidth=1; mg.stroke();}
@@ -7318,7 +7351,7 @@ function lgmBossDown(b){const C=LGMS, base=C.bases[C.bossBase], tr=base.tr; lgmB
   const nowOpen=['thorn','dune','bog'].every(k=>S0.beaten[k])&&['thorn','dune','bog'].includes(tr.id)&&first;
   if(nowOpen){const hx=C.D.hub.x*S, hz=C.D.hub.y*S; all.push({dur:4.6,title:'The barrier breaks',sub:'The final three',speaker:'The Lorekeepers',text:'With three hordes gone, the crystal barrier shatters. Beyond it, the Hordes of Rime, the Forge and the Hollow are waiting.',enter(){lgmOpenBarrier();},cam:orbit(hx,hz,26,16,.6,1.6,0)});}
   all.cleanup=d.cleanup; startCine(all,()=>done());}
-function lgmOpenBarrier(){const D=LGMS.D; lgmB({k:'barrier'}); for(let i=0;i<D.bar.length;i++) if(D.bar[i]>=0) L.g[i]=0; if(L.lgBar) L.lgBar.visible=false; lgmMiniImg=null; flashT=.5; flashCol='#c8a0ff'; shake(10);}
+function lgmOpenBarrier(){const D=LGMS.D; lgmB({k:'barrier'}); for(const i of D.bar.keys()) L.g[i]=0; if(L.lgBar) L.lgBar.visible=false; lgmMiniImg=null; flashT=.5; flashCol='#c8a0ff'; shake(10);}
 function lgmWinCard(base,r){let el=$('#lgWin'); if(!el){el=document.createElement('div'); el.id='lgWin'; el.setAttribute('role','dialog'); document.body.appendChild(el); ['keydown','keyup'].forEach(t=>el.addEventListener(t,e=>e.stopPropagation()));}
   const tr=base.tr, n=TRIBES.filter(t=>lgmSave().beaten[t.id]).length, fin=tr.boss==='threefold';
   el.innerHTML=`<div class="lgw"><div class="lgw-k">${fin?'The campaign is won':'Horde defeated'}</div><h2>${fin?'You are the Legend':esc(tr.name)+' is broken'}</h2><p>${fin?'The Threefold Legend is beaten and the three crystals are free. Every horde has scattered. The island is yours to explore.':esc(tr.win)}</p>
@@ -7362,7 +7395,8 @@ function lgmBossFx(m,b){const u=m.userData; if(!LGMS||u.lgfx) return; u.lgfx=tru
   const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:new THREE.Color(col),transparent:true,opacity:b.id==='threefold'?.18:.38,depthWrite:false,blending:THREE.AdditiveBlending})); gl.position.y=1; gl.scale.set(2.8,2.8,1); m.add(gl);
   u.lgOrb=[0,1,2,3].map(i=>{const c=add(m,crystal(3200+i,6),glow(i%2?col:'#ffffff',2.4),0,1.4,0,.07,.18,.07); c.castShadow=false; return c;});}
 function lgmSync(){const C=LGMS; if(!C||!L) return; lgmChunkTick();
-  for(const n of C.nodes){if(Math.hypot(n.x-P.x,n.y-P.y)>2200) continue; const m=ensure(n,()=>buildNodeM(n.kind),'nd'+n.kind); m.position.set(n.x*S,0,n.y*S); m.scale.setScalar(n.hp>0?.6+.4*n.hp/n.max:.25);}
+  if(L.lgFar){const cx=camera.position.x, cz=camera.position.z; for(const g of L.lgFar){const dx=g.position.x-cx, dz=g.position.z-cz; g.visible=dx*dx+dz*dz<150*150;}}
+  for(const n of lgNodesNear(C.D,P.x,P.y,2200)){ const m=ensure(n,()=>buildNodeM(n.kind),'nd'+n.kind); m.position.set(n.x*S,0,n.y*S); m.scale.setScalar(n.hp>0?.6+.4*n.hp/n.max:.25);}
   for(const t of C.ptowers){const m=ensure(t,()=>buildTowerM('#5fb3ff',true),'ptw'); m.position.set(t.x*S,0,t.y*S);}
   for(const v of C.villagers){if(Math.hypot(v.x-P.x,v.y-P.y)>1800) continue; const m=ensure(v,()=>buildPlayer(v.skin),'vl'+v.skin); m.position.set(v.x*S,0,v.y*S); m.rotation.y=yawOf(v.face); animLimbs(m,v.walk,!!v.moving);}
   for(const s of C.sprites){const m=ensure(s,buildSpriteM,'spr'); m.position.set(s.x*S,1.1+Math.sin(time*6+s.t)*.15,s.y*S); m.rotation.y=time*4;}
@@ -7399,12 +7433,12 @@ function lgmHouseMesh(hs){const pyr=geo('pyr4',()=>new THREE.ConeGeometry(1,1,4)
   const r=new THREE.Mesh(pyr,new THREE.MeshStandardMaterial({color:roofC,roughness:.8,flatShading:true})); r.position.y=1.6; r.scale.set(1.5,.9,1.5); r.rotation.y=Math.PI/4; r.castShadow=true; gr.add(r);
   const d=new THREE.Mesh(gBox,beam); d.position.set(0,.4,.86); d.scale.set(.4,.8,.04); gr.add(d);
   if(hs.own){const f=new THREE.Mesh(gPlane,new THREE.MeshStandardMaterial({color:'#5fb3ff',emissive:new THREE.Color('#5fb3ff'),emissiveIntensity:.3,side:THREE.DoubleSide})); f.position.set(.9,2.1,.9); f.scale.set(.35,.5,1); gr.add(f); const pl=new THREE.Mesh(gCyl,beam); pl.position.set(.9,1.6,.9); pl.scale.set(.03,1.6,.03); gr.add(pl);}
-  return gr;}
+  (L.lgFar=L.lgFar||[]).push(gr); return gr;}
 const lgSkins=()=>['pirate0','viking0','samurai0','solar0','ocean0','default'].filter(k=>SKIN_BY_ID[k]);
-function lgmPlaceHouse(tx,ty,charge,quiet,fromNet){const D=LGMS.D, W=L.w, ok=(x,y)=>x>1&&y>1&&x<W-2&&y<L.h-2&&!L.g[y*W+x]&&!D.lake[y*W+x]&&D.bar[y*W+x]<0&&!D.fw[y*W+x];
+function lgmPlaceHouse(tx,ty,charge,quiet,fromNet){const D=LGMS.D, W=L.w, ok=(x,y)=>x>1&&y>1&&x<W-2&&y<L.h-2&&!L.g[y*W+x]&&!D.lakeAt(y*W+x)&&D.barAt(y*W+x)<0&&!D.fwAt(y*W+x);
   for(let j=0;j<2;j++) for(let i=0;i<2;i++) if(!ok(tx+i,ty+j)) return false;
   if(D.bases.some(B=>tx>B.rect.x-6&&tx<B.rect.x+B.rect.w+6&&ty>B.rect.y-6&&ty<B.rect.y+B.rect.h+6)) return false;
-  for(let j=0;j<2;j++) for(let i=0;i<2;i++){L.g[(ty+j)*W+tx+i]=1; D.bld[(ty+j)*W+tx+i]=1;}
+  for(let j=0;j<2;j++) for(let i=0;i<2;i++){L.g[(ty+j)*W+tx+i]=1; D.fx[(ty+j)*W+tx+i]|=64;}
   const hs={x:tx+1,y:ty+1,sec:-1,own:true,ry:Math.atan2(P.y/T-(ty+1),P.x/T-(tx+1))}; LGMS.myHouses=(LGMS.myHouses||0)+1; if(R3&&levelGroup) lgmHouseMesh(hs); lgmMiniImg=null;
   LGMS.villagers.push({x:(tx+1)*T,y:(ty+2.6)*T,hx:(tx+1)*T,hy:(ty+3)*T,skin:choice(lgSkins()),face:Math.PI/2,walk:0,t:0,tx:null,mine:true});
   if(!fromNet){const S0=lgmSave(); if(!quiet&&!(MP.role==='client'&&MP.inGame)){S0.houses=S0.houses||[]; S0.houses.push({x:tx,y:ty}); persist();}
@@ -7426,33 +7460,33 @@ function lgmNet(m){if(m.k==='start'){hideOverlays(); MP.inGame=true; MP.others.c
   else if(m.k==='heart'&&b&&b.lv<4){lgmBaseDestroyed(b,true);}
   else if(m.k==='heart'&&b){LGMS.bossBase=m.b; const hx=b.B.heart.x*S, hz=b.B.heart.y*S; if(mode==='play') startCine([{dur:3,title:b.tr.boss==='threefold'?'The Threefold Legend':BOSSES[b.tr.boss].name,sub:'Legend-powered',text:b.tr.boss==='threefold'?'The Crystal Thief absorbs the three crystals!':'The heart shatters and the horde\'s leader rises!',cam:orbit(hx,hz,7,5,.3,.9,1)}],()=>{});}
   else if(m.k==='win'&&b){b.beaten=true; LG_BEAT=Object.assign({},lgBeat(),{[b.tr.id]:true}); const S0=lgmSave(); S0.beaten[b.tr.id]=true; S0.bases=S0.bases||{}; S0.bases[lgBaseKey(b)]=true; const it=lgLoot(b.tier,2); if(it) SAVE.inv.push(it); persist(); banner(b.tr.name+' defeated!','Your party broke the horde'+(it?' · '+it.name:''));}
-  else if(m.k==='barrier'){const D=LGMS.D; for(let i=0;i<D.bar.length;i++) if(D.bar[i]>=0) L.g[i]=0; if(L.lgBar) L.lgBar.visible=false; lgmMiniImg=null;}
+  else if(m.k==='barrier'){const D=LGMS.D; for(const i of D.bar.keys()) L.g[i]=0; if(L.lgBar) L.lgBar.visible=false; lgmMiniImg=null;}
   else if(m.k==='day') LGMS.day=m.d;
   else if(m.k==='house') lgmPlaceHouse(m.x,m.y,false,true,true);
   else if(m.k==='quit'){lgmGearOut(); camera.far=140; camera.updateProjectionMatrix(); LGMS=null; lgmHud(); lgmBar(false); MP.inGame=false; toMenu(); toast('The party leader left Legends','#ffd36a');}}
 function lgmChunk(ci,cj){const D=L.lgWorld, W=L.w, H=L.h, G=L.g, at=(x,y)=>y*W+x, inB=(x,y)=>x>=0&&y>=0&&x<W&&y<H, k=ci+','+cj; if(L.lgChunks.has(k)||ci<0||cj<0||ci*LG_CH>=W||cj*LG_CH>=H) return;
-  if(!L.lgNoTree){const R=D.bases.map(B=>({x0:B.rect.x-22,y0:B.rect.y-22,x1:B.rect.x+B.rect.w+22,y1:B.rect.y+B.rect.h+22})); L.lgNoTree=(x,y)=>R.some(r=>x>r.x0&&x<r.x1&&y>r.y0&&y<r.y1);}
+  if(!L.lgNoTree){const R=D.bases.map(B=>({x0:B.rect.x-22,y0:B.rect.y-22,x1:B.rect.x+B.rect.w+22,y1:B.rect.y+B.rect.h+22})); const VV=D.villages; L.lgNoTree=(x,y)=>R.some(r=>x>r.x0&&x<r.x1&&y>r.y0&&y<r.y1)||VV.some(v=>Math.abs(v.cx-x)<15&&Math.abs(v.cy-y)<13);}
   const grp=new THREE.Group(); const save=levelGroup; levelGroup=grp;
   try{
-  const floorT=(x,y)=>inB(x,y)&&(!G[at(x,y)]||D.bld[at(x,y)]||D.fw[at(x,y)]||D.bar[at(x,y)]>=0)&&!D.lake[at(x,y)];
-  const rockT=(x,y)=>inB(x,y)&&!floorT(x,y)&&!D.lake[at(x,y)];
+  const floorT=(x,y)=>inB(x,y)&&(!G[at(x,y)]||D.bldAt(at(x,y))||D.fwAt(at(x,y))||D.barAt(at(x,y))>=0)&&!D.lakeAt(at(x,y));
+  const rockT=(x,y)=>inB(x,y)&&!floorT(x,y)&&!D.lakeAt(at(x,y));
   const pal=L.lgPal||(L.lgPal={}); const palOf=s=>pal[s]||(pal[s]={fl:regEnv(s).fl.map(c=>new THREE.Color(c)),top:new THREE.Color(regEnv(s).top),rock:new THREE.Color(regEnv(s).rock)});
-  const tcol=(x,y)=>{x=clamp(x,0,W-1); y=clamp(y,0,H-1); const P0=palOf(D.reg[at(x,y)]), n=hash(x*3,y*5), c=P0.fl[n<.45?0:n<.85?1:2].clone(); return c.multiplyScalar(.9+hash(x+11,y+7)*.18);};
+  const tcol=(x,y)=>{x=clamp(x,0,W-1); y=clamp(y,0,H-1); const P0=palOf(D.regAt(at(x,y))), n=hash(x*3,y*5), c=P0.fl[n<.45?0:n<.85?1:2].clone(); return c.multiplyScalar(.9+hash(x+11,y+7)*.18);};
   const vcol=(x,y)=>{const c=new THREE.Color(0,0,0); let n=0; for(const [i,j] of [[x-1,y-1],[x,y-1],[x-1,y],[x,y]]){if(floorT(i,j)){c.add(tcol(i,j)); n++;}} if(!n) return tcol(x,y).multiplyScalar(.7); c.multiplyScalar(1/n); let w=0; for(const [i,j] of [[x-1,y-1],[x,y-1],[x-1,y],[x,y]]) if(rockT(i,j)) w++; return c.multiplyScalar(1-.1*w);};
   const x0=ci*LG_CH, y0=cj*LG_CH, x1=Math.min(W,x0+LG_CH), y1=Math.min(H,y0+LG_CH);
-  const fp=[],fc=[],tp=[],tc=[],wat=[], vc=new Map(), VC=(x,y)=>{const kk=x*4096+y; let c=vc.get(kk); if(!c){c=vcol(x,y); vc.set(kk,c);} return c;};
+  const fp=[],fc=[],tp=[],tc=[],wat=[], vc=new Map(), VC=(x,y)=>{const kk=x*8192+y; let c=vc.get(kk); if(!c){c=vcol(x,y); vc.set(kk,c);} return c;};
   const cols=[], spires=[], trees={}, deco={};
   for(let y=y0;y<y1;y++) for(let x=x0;x<x1;x++){
-    if(D.lake[at(x,y)]){wat.push(x,.06,y, x,.06,y+1, x+1,.06,y, x+1,.06,y, x,.06,y+1, x+1,.06,y+1); continue;}
+    if(D.lakeAt(at(x,y))){wat.push(x,.06,y, x,.06,y+1, x+1,.06,y, x+1,.06,y, x,.06,y+1, x+1,.06,y+1); continue;}
     if(floorT(x,y)){const a=VC(x,y),b=VC(x,y+1),c=VC(x+1,y),d=VC(x+1,y+1); fp.push(x,0,y, x,0,y+1, x+1,0,y, x+1,0,y, x,0,y+1, x+1,0,y+1); for(const q of [a,b,c,c,b,d]) fc.push(q.r,q.g,q.b);
-      if(G[at(x,y)]) continue; const s=D.reg[at(x,y)], E=regEnv(s), forest=(Math.sin(x*.11+y*.07)+Math.sin(x*.035-y*.09)*1.3)*.5;
-      if(forest>.42&&hash(x*13,y*7)>.84&&Math.hypot(x-LG_C,y-LG_C)>20&&!(L.lgNoTree&&L.lgNoTree(x,y))&&!D.nodes.some(n=>Math.abs(n.tx-x)<2&&Math.abs(n.ty-y)<2)) (trees[E.tree]=trees[E.tree]||[]).push({x:x+.5+(hash(x,y+1)-.5)*.5,y:0,z:y+.5+(hash(x+1,y)-.5)*.5,s:.9+hash(x,y*3)*.8,ry:hash(y,x)*6});
+      if(G[at(x,y)]) continue; const s=D.regAt(at(x,y)), E=regEnv(s), forest=(Math.sin(x*.11+y*.07)+Math.sin(x*.035-y*.09)*1.3)*.5;
+      if(forest>.42&&hash(x*13,y*7)>.84&&Math.hypot(x-LG_C,y-LG_C)>20&&!(L.lgNoTree&&L.lgNoTree(x,y))&&!lgNodeTile(D,x,y)) (trees[E.tree]=trees[E.tree]||[]).push({x:x+.5+(hash(x,y+1)-.5)*.5,y:0,z:y+.5+(hash(x+1,y)-.5)*.5,s:.9+hash(x,y*3)*.8,ry:hash(y,x)*6});
       else if(hash(x*11,y*17)>.9){const kd=E.floorDeco[(hash(x,y*5)*E.floorDeco.length)|0]; (deco[kd]=deco[kd]||[]).push({x:x+.2+hash(x+9,y)*.6,y:0,z:y+.2+hash(x,y+9)*.6,s:.8+hash(x*2,y)*.6,ry:hash(x,y)*6});}
       continue;}
-    if(!rockT(x,y)) continue; const P0=palOf(D.reg[at(x,y)]), c=P0.top.clone().multiplyScalar(.82+hash(x,y)*.3); tp.push(x,WH,y, x,WH,y+1, x+1,WH,y, x+1,WH,y, x,WH,y+1, x+1,WH,y+1); for(let q=0;q<6;q++) tc.push(c.r,c.g,c.b);
-    const n=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>floorT(x+dx,y+dy)||(inB(x+dx,y+dy)&&D.lake[at(x+dx,y+dy)]));
+    if(!rockT(x,y)) continue; const P0=palOf(D.regAt(at(x,y))), c=P0.top.clone().multiplyScalar(.82+hash(x,y)*.3); tp.push(x,WH,y, x,WH,y+1, x+1,WH,y, x+1,WH,y, x,WH,y+1, x+1,WH,y+1); for(let q=0;q<6;q++) tc.push(c.r,c.g,c.b);
+    const n=[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>floorT(x+dx,y+dy)||(inB(x+dx,y+dy)&&D.lakeAt(at(x+dx,y+dy))));
     if(n.length){for(let i=0;i<2;i++){const h1=hash(x*3+i,y*7), h2=hash(x*5+i,y*3+i); let ox=(h1-.5)*.4, oz=(h2-.5)*.4; for(const [dx,dy] of n){ox+=dx*.12; oz+=dy*.12;} const r=.4+hash(x+i,y)*.2; cols.push({x:x+.5+ox,y:WH*.5-.02,z:y+.5+oz,sx:r,sy:WH*(.96+hash(y,x+i)*.12),sz:r,ry:h1*6,c:P0.rock.clone().multiplyScalar(.7+h2*.45).getHex()});}}
-    else if(hash(x*17,y*13)>.72){const edge=Math.hypot(x-LG_C,y-LG_C)>385; spires.push({x:x+.5,y:WH,z:y+.5,sx:.9+hash(x,y)*.8,sy:(edge?3:1.4)*(.8+hash(y,x)*1.8),sz:.9+hash(x+3,y)*.8,ry:hash(x,y+2)*6,c:P0.rock.clone().multiplyScalar(.75+hash(x+5,y)*.35).getHex()});}}
+    else if(hash(x*17,y*13)>.72){const edge=Math.hypot(x-LG_C,y-LG_C)>LG_R-40; spires.push({x:x+.5,y:WH,z:y+.5,sx:.9+hash(x,y)*.8,sy:(edge?3:1.4)*(.8+hash(y,x)*1.8),sz:.9+hash(x+3,y)*.8,ry:hash(x,y+2)*6,c:P0.rock.clone().multiplyScalar(.75+hash(x+5,y)*.35).getHex()});}}
   const mk=(P,C,mat)=>{if(!P.length) return; const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(P,3)); if(C) g.setAttribute('color',new THREE.Float32BufferAttribute(C,3)); g.computeVertexNormals(); const m=new THREE.Mesh(g,mat); m.receiveShadow=true; grp.add(m);};
   mk(fp,fc,L.lgMats.floor); mk(tp,tc,L.lgMats.top); mk(wat,null,L.lgMats.water);
   inst(QT==='low'?gPrism:rockColGeo(),L.lgMats.col,cols); inst(gIco,L.lgMats.spire,spires);
@@ -7480,6 +7514,20 @@ function lgmBaseDestroyed(b,fromNet){const S0=lgmSave(); S0.bases=S0.bases||{}; 
   for(const m of b.B.meshes||[]) if(!m.isInstancedMesh) m.visible=false; lgmRuin(b.B); if(b.B.beacon) b.B.beacon.forEach(m=>m.visible=false); lgmMiniImg=null;
   const hx=b.B.heart.x*S, hz=b.B.heart.y*S, left=LGMS.bases.filter(o=>o.sec===b.sec&&o.lv<4&&!o.beaten).length;
   startCine([{dur:3.2,title:`${lgBaseName(b)} destroyed!`,sub:`${b.tr.name} · Level ${b.lv}`,text:left?`${left} more ${b.tr.name} base${left>1?'s':''} before their great fortress opens.`:`The way to ${b.tr.fort} is open. Their leader is waiting.`,enter(){flashT=.4; flashCol=b.tr.col; shake(10);},cam:orbit(hx,hz,Math.max(b.B.rect.w,b.B.rect.h)*.6+6,9,.3,1.1,0)}],()=>{banner(`+${r.gold} gold · +${r.stone} stone · +${r.wood} wood`,items.length?items.map(i=>i.name).join(' · '):'Legends loot goes to your Legends pack');});}
+/* ---------------- wells: fast travel across the huge island ---------------- */
+function lgNodeTile(D,x,y){const W=L.w; for(let j=-1;j<=1;j++) for(let i=-1;i<=1;i++) if(D.nodeTile.has((y+j)*W+x+i)) return true; return false;}
+function lgmWellList(){const S0=lgmSave(), k=String(L.seed); S0.wellsBy=S0.wellsBy||{}; return S0.wellsBy[k]||(S0.wellsBy[k]=[]);}
+function lgmWells(){const D=LGMS.D, got=lgmWellList(); return [{name:'the Crown Well',x:D.hub.x,y:D.hub.y,sec:-1}].concat(D.villages.filter(V=>got.includes(V.i)).map(V=>({name:V.name+' well',x:V.x,y:V.y,sec:V.sec})));}
+function lgmNearestWell(){let best=null,bd=1e18; for(const w of lgmWells()){const d=Math.hypot(w.x-P.x,w.y-P.y); if(d<bd){bd=d; best=w;}} return best;}
+function lgmWellsTick(){const D=LGMS.D, got=lgmWellList(); for(const V of D.villages){if(Math.abs(V.x-P.x)>520||Math.abs(V.y-P.y)>520||got.includes(V.i)) continue; if(Math.hypot(V.x-P.x,V.y-P.y)<520){got.push(V.i); persist(); toast(`You found the well at ${V.name}! Press F (🌀) at any well to travel here.`,'#9fe0ff');}}}
+function lgmTravel(){const C=LGMS, D=C.D, ws=lgmWells(); const near=ws.find(w=>Math.hypot(w.x-P.x,w.y-P.y)<(w.sec<0?280:230));
+  if(!near){toast('Stand next to a well to fast travel: the Crown Well, or a village well you have found.','#ffd36a'); return;}
+  let el=$('#lgTravel'); if(!el){el=document.createElement('div'); el.id='lgTravel'; el.className='lgt-panel'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Fast travel'); document.body.appendChild(el); ['keydown','keyup'].forEach(t=>el.addEventListener(t,e=>{e.stopPropagation(); if(e.key==='Escape') el.hidden=true;}));}
+  const list=ws.map(w=>Object.assign({d:Math.hypot(w.x-P.x,w.y-P.y)},w)).sort((a,b)=>a.d-b.d), got=lgmWellList().length;
+  el.innerHTML=`<h2>🌀 Fast travel</h2><p class="sp">Step into a well and come out at another. You have found ${got} of ${D.villages.length} village wells. Explore to find more.</p>${list.map((w,i)=>`<button class="lgt-b" data-i="${i}"${w.d<300?' disabled':''}>${esc(w.name[0].toUpperCase()+w.name.slice(1))}<small>${w.sec<0?'Home of the Lorekeepers':esc(BIOMES[TRIBES[w.sec].bi].name)} · ${w.d<300?'you are here':Math.round(w.d/T)+' steps away'}</small></button>`).join('')}<button class="lgt-b" id="lgTrX">Close</button>`;
+  el.hidden=false; el.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const w=list[+b.dataset.i]; el.hidden=true; lgmTeleport(w);}); el.querySelector('#lgTrX').onclick=()=>{el.hidden=true;}; const f=el.querySelector('[data-i]:not([disabled])')||el.querySelector('#lgTrX'); f.focus();}
+function lgmTeleport(w){const x=w.x, y=w.y+110; puff(P.x,P.y,'#9ff0ff',30,180,.7,6); P.x=x; P.y=y; P.iframe=Math.max(P.iframe||0,1.5); for(const a of allies){a.x=x+rand(-60,60); a.y=y+rand(20,70);} for(const s of LGMS.sprites) s.done=true; LGMS.rally=null;
+  puff(x,y,'#9ff0ff',30,180,.7,6); flashT=.3; flashCol='#9ff0ff'; lgmRegion(true); if(typeof sfx==='function') sfx('art'); banner(w.name[0].toUpperCase()+w.name.slice(1),'You rise out of the well');}
 /*LGM-END*/
 const hot=window.claude?.hot; if(hot&&hot.ready) hot.ready(start); else start(hot?.data??{});
 })();

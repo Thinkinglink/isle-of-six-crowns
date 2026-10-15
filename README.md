@@ -19,6 +19,15 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🗺️ Version 5.3: a 50× bigger Legends island, and account codes
+- **The Legends island is 50 times bigger.** It is now 5,600 × 5,600 steps, with about 84 villages, thousands of lakes, mountains and forests, and 45,000 trees, rocks and gold veins to gather. Each horde still has its 4 bases, now spread far apart across its land.
+- **Fast travel through wells.** Walk near a village to find its well. Then press **F** (🌀) beside any well to jump to another one. When you fall in battle, you wake at the nearest well you have found.
+- A short "Building the island…" screen shows while the huge island is made.
+- Houses you already built keep their place next to the Crown Well, and destroyed bases stay destroyed.
+- **Every account now has its own account code** (like `ABCD-2345`). It's shown under your name at the top of the menu. Click your name to see it, copy it, or change your name.
+- Signing in with an account name and email now also needs the account code. Accounts made before this update get their code the next time you sign in, and the game shows it to you.
+- Fixed: changing your account name no longer forgets your email.
+
 ## 🔇 Version 5.2.1: quieter walking
 - Removed the high-pitched tick that played over and over while you walked (it came from picking up crystal shards on the move). Pickups now make one soft, low chime at most every half second.
 - Villagers gathering in Legends no longer tick in the background.
