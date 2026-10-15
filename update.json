@@ -1,7 +1,7 @@
 {
   "applicationId": "com.akinya.sixcrowns",
-  "version": "5.2.0",
-  "resourcesURL": "https://raw.githubusercontent.com/Thinkinglink/isle-of-six-crowns/ba2b747d93b2eed5710f7d82f3e2e21ef2746993/resources.neu",
-  "data": { "size": 2032297 },
-  "web": { "version": "5.2.0", "url": "https://raw.githubusercontent.com/Thinkinglink/isle-of-six-crowns/ba2b747d93b2eed5710f7d82f3e2e21ef2746993/standalone.html", "size": 1919799 }
+  "version": "5.2.1",
+  "resourcesURL": "https://raw.githubusercontent.com/Thinkinglink/isle-of-six-crowns/41d5e96f1baa84d1227275e39c65e52fd9a8dd2e/resources.neu",
+  "data": { "size": 2032319 },
+  "web": { "version": "5.2.1", "url": "https://raw.githubusercontent.com/Thinkinglink/isle-of-six-crowns/41d5e96f1baa84d1227275e39c65e52fd9a8dd2e/standalone.html", "size": 1919821 }
 }
