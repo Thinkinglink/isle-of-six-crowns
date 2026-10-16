@@ -19,6 +19,16 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🏟️ Version 6.1: the Arena, mounts and golem spawners
+- **Arena mode** (Game modes): a Duel (1 on 1 against a rival champion), a Team fight (you and 3 allies against 4 champions) and an Arena raid (5 waves). Every win makes the next fight tougher and the prizes bigger.
+- **4 mounts in Legends 1 and 2:** horse, tiger (fastest on the ground), beetle (takes 35% less damage) and the Great Bird, which **flies** over walls and mountains, but Sky Raiders and Sky Predators hunt you in the air. Each mount has 4 skins. Press 0 (🐾 in the Travel menu) to choose, and R to ride.
+- **Golem spawners:** Z, X and C first build a spawner for that golem, then spawn golems from it when you stand near it. Your army can now have **20 golems**, and golems are smaller, like in Minecraft Legends.
+- **Key shortcuts for the menus:** B opens Build, O opens Army, E opens Travel.
+- **Legends 2:** the Ancient City now fills 80% of the mine. Gear found in the sculk lands and the mine is sculk-themed (Sculk, Echoing, Warden's, Shrieking and Deep Dark gear).
+- **Legends gear drops** from 70% of monsters, and your Legends gear works in both Legends 1 and 2.
+- The prison is about 12 times bigger.
+- Developer cheat: "Get every item in the game" (about 2,300 items).
+
 ## 🏹 Version 6.0: bows, supplies, traders, camps and mega crafting
 - **New Bow slot** (main game and Legends). There are 1,000 common, 500 rare and 100 unique bows. Every boss drops its own unique bow (for example the Sculk Monstrosity's Bow), and monsters and chests can drop bows too. Your bow changes your arrow damage and draw speed, unique bows fire 3 arrows, and the bow on your back takes on the colour of the bow you equip.
 - **Fuse items (main game):** in your Pack, press ⚒ Fuse items. Pick 3 items, then choose weapon, armor, artifact or bow, and you get a Mega unique item.
