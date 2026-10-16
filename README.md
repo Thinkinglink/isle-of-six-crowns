@@ -19,6 +19,11 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🌑 Version 5.7: the Deep Dark, and a giant-sized world
+- **The Deep Dark** now fills the outer two thirds of the mineshaft. It's pitch black, covered in **glowing sculk** (patches, veins, sensors and shriekers), with the most diamonds and the toughest monsters.
+- The rest of the mineshaft is **50% brighter**, and all its ladders back up are in this brighter middle part.
+- **Everything is much bigger than you:** houses are now huge (they fill 4×4 tiles and stand over twice as tall), trees are about 2.5 times bigger, and wells, fortress walls, towers, gates, portals, mine doors, the crafting hut and resource nodes are all scaled up.
+
 ## 🗺️ Version 5.6: a patchwork island, like the Minecraft Legends map
 - **Biomes are mixed across the whole island.** Instead of six slices, the island is a patchwork of about 66 provinces. Each of the six biomes (meadows, dunes, Murkfen, frost, the forge lands and the void) turns up in 10 to 12 places, never two of the same side by side. Each province still has its own areas inside it.
 - **Every horde's bases are in its own biome.** The Bog horde builds in Murkfen, the Dune horde in the desert, and so on, with its 4 bases spread across the island. The map shows the patchwork in each biome's colours.
