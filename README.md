@@ -19,6 +19,15 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🎵 Version 5.9: Legends 2
+- When you beat the Threefold Legend, you go back to the game modes menu, where the Legends button turns to stone, cracks open and becomes **Legends 2**.
+- **The sculk returns:** a cutscene shows sculk pouring out of the mineshaft and swallowing about 80% of the island, across every biome.
+- **The sculk mine:** the whole mineshaft is now sculk, full of sculk monsters. Defeat them and find the **Ancient City**, which fills about 30% of the mine: black stone halls, pillars, ruins and a great empty portal.
+- **Five note blocks** are hidden around the city. Bring them back and set them before the portal, then step on the pressure plate. The city sings for 10 seconds, and the portal opens.
+- **The Shift:** a whole new world made of the Shift biomes (Sculk Obsession, Monarch Kingdom, Grass of Harmony and Singer's Meadows), with three hordes: the **Sculk Horde** (The Sculk Monstrosity), the **Monarch Horde** (The Monarch) and the **Sprout Horde** (The Harmonizer). They work just like the first Legends hordes: 4 bases each, portals, night upgrades and village raids. Their bosses wear the legend crown, halo and rune rings.
+- Beat those three and **The Singer's Horde** appears, led by the Singer.
+- New cutscenes for the sculk spreading, the Ancient City, the portal opening, entering the Shift and each horde.
+
 ## 🧭 Version 5.8: horde portals on the map, a compass bar and tidy menus
 - **Horde bases on the map are portal symbols**, like the Minecraft Legends map. Each horde's lands glow in its colour around its portals, and the big map (M) has a legend that names each horde's boss.
 - **The portal's frame shows the base level:** wood for level 1, stone for level 2, spiked iron for level 3, and a glowing gold frame with a crown for level 4. It changes when a base upgrades at night.
