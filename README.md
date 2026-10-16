@@ -19,6 +19,12 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🧭 Version 5.8: horde portals on the map, a compass bar and tidy menus
+- **Horde bases on the map are portal symbols**, like the Minecraft Legends map. Each horde's lands glow in its colour around its portals, and the big map (M) has a legend that names each horde's boss.
+- **The portal's frame shows the base level:** wood for level 1, stone for level 2, spiked iron for level 3, and a glowing gold frame with a crown for level 4. It changes when a base upgrades at night.
+- **A compass bar along the top of the screen** shows north, east, south and west, plus the nearest wells, villages, horde portals, the mineshaft and any village under attack, with how many steps away each one is. In the mine it points to the ladders.
+- **Three menu buttons instead of eleven:** 🔨 Build (golems, towers, houses, crafting), 🚩 Army (rally, recall, sprites, recruit) and 🧭 Travel (ride, fast travel). Tap one to see its choices. All the keyboard shortcuts still work.
+
 ## 💡 Version 5.7.2: a brighter mineshaft
 - The mineshaft tunnels are a bit brighter and you can see further down them. The Deep Dark stays dark.
 

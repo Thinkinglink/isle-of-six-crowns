@@ -117,16 +117,26 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #lgmHud .la{font-size:12.5px;color:#c8d8e8;text-shadow:0 1px 2px #000}
 #lgmHud .lo{margin:0;padding:8px 10px 8px 22px;background:rgba(10,18,36,.72);border-left:4px solid #ffd36a;font-size:13px;line-height:1.45;color:#ffe8b0}
 #lgmHud[hidden],#lgmDay[hidden]{display:none}
-#lgmDay{position:absolute;left:50%;top:max(14px,env(safe-area-inset-top));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;padding:4px 14px;background:rgba(10,18,36,.82);border:2px solid #4a6aa8;color:#fff;font-size:15px;pointer-events:none;z-index:3}
+#lgmDay{position:absolute;left:50%;top:calc(max(8px,env(safe-area-inset-top)) + 48px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;padding:4px 14px;background:rgba(10,18,36,.82);border:2px solid #4a6aa8;color:#fff;font-size:15px;pointer-events:none;z-index:3}
 #lgmDay span{font-size:11.5px;color:#9fd0ff}
 #lgmBar{position:absolute;right:max(12px,env(safe-area-inset-right));top:50%;transform:translateY(-44%);display:flex;flex-direction:column;gap:3px;z-index:4;padding:4px;background:rgba(10,18,36,.7);border:2px solid #4a6aa8}
 #lgmBar[hidden]{display:none}
+#lgmBar .lgg{height:64px}#lgmBar .lgg .ic{font-size:24px}#lgmBar .lgg.sel{border-color:#ffd36a;background:rgba(60,50,20,.95)}
+#lgmBar .lgfly{position:absolute;right:calc(100% + 8px);top:50%;transform:translateY(-50%);display:grid;grid-template-columns:repeat(2,64px);gap:3px;padding:6px;background:rgba(10,18,36,.94);border:2px solid #ffd36a}
+#lgmBar .lgfly[hidden]{display:none}#lgmBar .lgft{grid-column:1/-1;text-align:center;font-family:var(--display);font-size:13px;color:#ffd36a;padding-bottom:2px}
+#lgCompass{position:absolute;left:50%;top:max(8px,env(safe-area-inset-top));transform:translateX(-50%);width:min(620px,52vw);height:40px;background:linear-gradient(90deg,transparent,rgba(10,18,36,.86) 10%,rgba(10,18,36,.86) 90%,transparent);border-top:2px solid #4a6aa8;border-bottom:2px solid #4a6aa8;pointer-events:none;z-index:3;overflow:hidden}
+#lgCompass[hidden]{display:none}#lgCompass .cbar{position:absolute;inset:0}#lgCompass .cmid{position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:#ffd36a;opacity:.55}
+#lgCompass span{position:absolute;top:3px;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;line-height:1;gap:2px}
+#lgCompass .cc{top:11px;font-family:var(--display);font-weight:700;font-size:14px;color:#ffd36a}
+#lgCompass .cp b{font-size:16px;font-weight:400}#lgCompass .cp i{font-style:normal;font-size:10px;color:#d8e6f4}#lgCompass .raid i{color:#ff8a6a}
+#lgCompass .pt{display:block;width:12px;height:17px;border-radius:7px 7px 1px 1px;background:radial-gradient(circle at 50% 55%,#fff 0,var(--pc) 35%,#1a0a2a 92%);border:2px solid #8a5a2a}
+#lgCompass .pt.l2{border-color:#9a9aa4}#lgCompass .pt.l3{border-color:#2c2c38}#lgCompass .pt.l4{border-color:#e8c050;box-shadow:0 0 6px var(--pc)}
 #hud:has(#lgmHud:not([hidden])) #partyHud{top:calc(max(14px,env(safe-area-inset-top)) + 190px)}
 @media (max-height:760px) and (min-width:621px){.lgb{height:40px;width:58px}.lgb small{display:none}.lgb .ic{font-size:18px}}
 .lgb{position:relative;width:64px;height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:2px;font:inherit;color:#f3e6c4;background:rgba(20,34,64,.92);border:2px solid #2a3a5a;cursor:pointer;touch-action:manipulation}
 .lgb .ic{font-size:21px;line-height:1}.lgb small{font-size:10px;color:#c8d8e8;white-space:nowrap;overflow:hidden;max-width:58px}.lgb i{position:absolute;left:3px;top:1px;font-style:normal;font-size:10px;color:#9fd0ff}
 .lgb:hover,.lgb:focus-visible{border-color:#ffd36a;outline:none}.lgb.no{opacity:.45}.lgb.on{border-color:#7aff8a;background:rgba(30,70,50,.92)}
-@media (max-width:620px){#lgmBar{right:auto;left:50%;top:auto;bottom:calc(max(8px,env(safe-area-inset-bottom)) + 200px);transform:translateX(-50%);flex-direction:row;gap:2px}#lgmDay{left:max(14px,env(safe-area-inset-left));top:calc(max(14px,env(safe-area-inset-top)) + 44px);transform:none;font-size:13px}#lgmDay span{display:none}#lgmHud .la{display:none}.lgb{width:40px;height:44px}.lgb small,.lgb i{display:none}#lgmHud{max-width:calc(100vw - 150px)}#lgmHud .lo{display:none}}
+@media (max-width:620px){#lgCompass{width:92vw;top:auto;bottom:calc(max(8px,env(safe-area-inset-bottom)) + 262px)}#lgmBar .lgfly{right:auto;left:50%;top:auto;bottom:calc(100% + 8px);transform:translateX(-50%);grid-template-columns:repeat(3,48px)}#lgmBar .lgg{width:56px;height:48px}#lgmBar{right:auto;left:50%;top:auto;bottom:calc(max(8px,env(safe-area-inset-bottom)) + 200px);transform:translateX(-50%);flex-direction:row;gap:2px}#lgmDay{left:max(14px,env(safe-area-inset-left));top:calc(max(14px,env(safe-area-inset-top)) + 44px);transform:none;font-size:13px}#lgmDay span{display:none}#lgmHud .la{display:none}.lgb{width:40px;height:44px}.lgb small,.lgb i{display:none}#lgmHud{max-width:calc(100vw - 150px)}#lgmHud .lo{display:none}}
 #dunHud{position:absolute;left:50%;top:max(64px,calc(env(safe-area-inset-top) + 56px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;padding:6px 14px;background:rgba(7,17,22,.8);border:2px solid #8a6ad8;color:#f3e6c4;pointer-events:none;z-index:3;text-align:center}
 #dunHud b{font-size:22px;color:#c8b0ff;font-variant-numeric:tabular-nums}#dunHud span{font-size:12px}#dunHud.low b{color:#ff8a6a}#dunHud.prison{border-color:#ff8a6a}#dunHud.prison b{font-size:18px;color:#ffd36a}#dunHud[hidden]{display:none}
 #gauntHud{position:absolute;left:50%;top:max(64px,calc(env(safe-area-inset-top) + 56px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;padding:6px 14px;background:rgba(7,17,22,.8);border:2px solid #d8a840;color:#f3e6c4;pointer-events:none;z-index:3}
@@ -1292,7 +1302,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='5.7.2', SAVE_VERSION=7;
+const APP_VERSION='5.8.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -7357,6 +7367,48 @@ function lgAdminGear(){const items=[]; const add=it=>{if(!it) return; it.lg=true
   if(LGMS||SAVE.lgSwap) SAVE.inv.push(...items); else {const S0=lgmSave(); S0.gear=S0.gear||lgmStarterGear(); S0.gear.inv=(S0.gear.inv||[]).concat(items);}
   persist(); toast(`${items.length} weapons, armor and artifacts added to your Legends pack`,'#ffd36a');}
 function adminPrison(){if(LGMS) lgmQuit(); GAUNT=null; const D=dunSave(); DUN={phase:'dungeon',left:DUN_TIME,seed:D.seed,bi:dunBiome(D.seed),name:dunName(D.seed),over:false,t:0,lastAtk:0,prisoner:null}; hideOverlays&&hideOverlays(); startPrison();}
+/* ---------------- v5.8: horde portals on the map, the compass bar, and grouped action menus ---------------- */
+// a portal icon: the frame shows the base's level (wood, stone, iron with spikes, gold with a crown), the swirl shows its horde
+function lgPortalIcon(g,x,y,lv,col,sz){const w=sz*.72, h=sz, fr=[null,'#8a5a2a','#9a9aa4','#3c3c48','#e8c050'][lv], th=[0,1.6,2.4,3,3.4][lv]*sz/18;
+  g.save(); g.translate(x,y);
+  const arch=(ww,hh)=>{g.beginPath(); g.moveTo(-ww/2,hh/2); g.lineTo(-ww/2,-hh/2+ww/2); g.arc(0,-hh/2+ww/2,ww/2,Math.PI,0); g.lineTo(ww/2,hh/2); g.closePath();};
+  if(lv===4){g.shadowColor=col; g.shadowBlur=sz*.6;}
+  arch(w+th*2,h+th*2); g.fillStyle=fr; g.fill(); g.shadowBlur=0; g.lineWidth=1; g.strokeStyle='#000'; g.stroke();
+  if(lv===1){g.strokeStyle='#5a3a1a'; g.lineWidth=1; for(let k=-1;k<=1;k+=2){g.beginPath(); g.moveTo(k*(w/2+th/2),-h/2+w/2); g.lineTo(k*(w/2+th/2),h/2); g.stroke();}}
+  if(lv===2){g.fillStyle='#6a6a74'; for(let k=0;k<3;k++) g.fillRect(-w/2-th,-h/2+w/2+k*h*.28,th,1.2);}
+  if(lv===3){g.fillStyle='#3c3c48'; for(let k=-2;k<=2;k++){g.beginPath(); const bx=k*w*.22, by=-h/2-th+(Math.abs(k)*sz*.06); g.moveTo(bx-sz*.07,by+1); g.lineTo(bx,by-sz*.24); g.lineTo(bx+sz*.07,by+1); g.fill();}}
+  if(lv===4){g.fillStyle='#ffe08a'; g.beginPath(); const cy=-h/2-th-sz*.05; g.moveTo(-sz*.28,cy); g.lineTo(-sz*.28,cy-sz*.18); g.lineTo(-sz*.14,cy-sz*.08); g.lineTo(0,cy-sz*.26); g.lineTo(sz*.14,cy-sz*.08); g.lineTo(sz*.28,cy-sz*.18); g.lineTo(sz*.28,cy); g.closePath(); g.fill(); g.strokeStyle='#7a5a10'; g.stroke();}
+  arch(w,h); const gr=g.createRadialGradient(0,0,1,0,0,h*.6); gr.addColorStop(0,'#ffffff'); gr.addColorStop(.25,col); gr.addColorStop(1,'#1a0a2a'); g.fillStyle=gr; g.fill();
+  g.strokeStyle='rgba(255,255,255,.55)'; g.lineWidth=Math.max(1,sz/14); g.beginPath(); for(let t=0;t<9;t+=.3){const r=t*w*.05, a=t+time*2; const px=Math.cos(a)*r, py=Math.sin(a)*r*1.3; if(t===0) g.moveTo(px,py); else g.lineTo(px,py);} g.stroke();
+  g.restore();}
+function lgmMapHordes(X,Y,sc){const g=mg;
+  // each horde's lands glow in its colour around its portals, so you can tell whose base is whose
+  for(const b of LGMS.bases){if(b.beaten||b.hidden) continue; const r=Math.max(10,(Math.max(b.B.rect.w,b.B.rect.h)*1.2+60)*sc), x=X(b.B.heart), y=Y(b.B.heart), gr=g.createRadialGradient(x,y,r*.2,x,y,r);
+    gr.addColorStop(0,b.tr.col+'aa'); gr.addColorStop(.7,b.tr.col+'55'); gr.addColorStop(1,b.tr.col+'00'); g.fillStyle=gr; g.beginPath(); g.arc(x,y,r,0,TAU); g.fill(); g.strokeStyle=b.tr.col; g.lineWidth=Math.max(1.5,r*.08); g.setLineDash([r*.25,r*.15]); g.beginPath(); g.arc(x,y,r*.82,0,TAU); g.stroke(); g.setLineDash([]);}
+  for(const b of LGMS.bases){if(b.beaten||b.hidden) continue; const lv=lgLv(b); lgPortalIcon(g,X(b.B.heart),Y(b.B.heart),lv,b.tr.col,(bigMap?11:16)+lv*(bigMap?2:3));}}
+function lgmMapLegend(S2){const g=mg, open=TRIBES.filter((t,i)=>tribeOpen(i)), B=lgBeat(); if(!open.length) return; const f=Math.max(6,S2*.024), lh=f*1.5, w=S2*.52, h=open.length*lh+f*3.4, x0=S2*.02, y0=S2-h-S2*.02;
+  g.fillStyle='rgba(8,14,30,.82)'; g.fillRect(x0,y0,w,h); g.strokeStyle='#4a6aa8'; g.lineWidth=1; g.strokeRect(x0,y0,w,h); g.font=`bold ${f}px sans-serif`; g.fillStyle='#ffd36a'; g.fillText('HORDES',x0+f*.6,y0+f*1.3);
+  open.forEach((t,k)=>{const y=y0+f*1.6+k*lh+lh/2; g.fillStyle=t.col; g.beginPath(); g.arc(x0+f,y,f*.4,0,TAU); g.fill(); g.font=`${f}px sans-serif`; g.fillStyle=B[t.id]?'#7a8a9a':'#e8eef6'; g.fillText(`${t.name.replace(/^Horde of (the )?/,'')} · ${t.boss==='threefold'?'???':(BOSSES[t.boss]||{}).name||''}${B[t.id]?' ✓':''}`,x0+f*1.8,y+f*.35);});
+  g.font=`${f*.85}px sans-serif`; g.fillStyle='#9fb0c8'; g.fillText('Portal frame: wood 1 · stone 2 · iron 3 · gold 4',x0+f*.6,y0+h-f*.5);}
+// the compass bar along the top of the screen: the nearest wells, villages, horde bases and mines
+function lgmCompassPOI(){const C=LGMS, D=C.D, inM=lgInMine(P.x,P.y), out=[], d=o=>Math.hypot(o.x-P.x,o.y-P.y), near=(arr,n)=>arr.map(o=>[o,d(o)]).sort((a,b)=>a[1]-b[1]).slice(0,n);
+  if(inM){for(const [e] of near(D.mine.doors.map(q=>q.ex),3)) out.push({x:e.x,y:e.y,ic:'🪜',t:'Ladder up',k:'well'}); return out;}
+  const got=lgmWellList(); for(const [w] of near(lgmWells(),3)) out.push({x:w.x,y:w.y,ic:'🌀',t:w.name[0].toUpperCase()+w.name.slice(1),k:'well'});
+  for(const [V] of near(D.villages.filter(V=>!got.includes(V.i)),3)) out.push({x:V.x,y:V.y,ic:'🏠',t:V.name,k:'vil'});
+  for(const [b] of near(C.bases.filter(b=>!b.beaten&&!b.hidden).map(b=>Object.assign({x:b.B.heart.x,y:b.B.heart.y,b})),4)) out.push({x:b.x,y:b.y,ic:'',t:lgBaseName(b.b),k:'base',col:b.b.tr.col,lv:lgLv(b.b)});
+  for(const [m] of near(D.mine.doors,1)) out.push({x:m.x,y:m.y,ic:'⛏️',t:'Mineshaft',k:'mine'});
+  if(C.raid) out.push({x:C.raid.V.x,y:C.raid.V.y,ic:'⚔️',t:C.raid.V.name+' is under attack!',k:'raid'});
+  return out;}
+function lgmCompass(){let el=$('#lgCompass'); if(!el){el=document.createElement('div'); el.id='lgCompass'; el.setAttribute('aria-hidden','true'); el.innerHTML='<div class="cbar"></div><div class="cmid"></div>'; $('#hud').appendChild(el);}
+  if(!LGMS||mode!=='play'){el.hidden=true; return;} el.hidden=false; const C=LGMS, now=performance.now(); if(!C.cmpT||now-C.cmpT>400){C.cmpT=now; C.cmpPOI=lgmCompassPOI();}
+  const bar=el.firstChild, FOV=1.75, items=[{a:-Math.PI/2,lab:'N',card:1},{a:0,lab:'E',card:1},{a:Math.PI/2,lab:'S',card:1},{a:Math.PI,lab:'W',card:1}].concat(C.cmpPOI.map(p=>Object.assign({a:Math.atan2(p.y-P.y,p.x-P.x),dist:Math.round(Math.hypot(p.x-P.x,p.y-P.y)/T)},p)));
+  while(bar.children.length<items.length){const s=document.createElement('span'); bar.appendChild(s);}
+  items.forEach((it,k)=>{const s=bar.children[k], rel=angDiff(C.yaw,it.a); if(Math.abs(rel)>FOV){s.style.display='none'; return;} s.style.display=''; s.style.left=(50+rel/FOV*50)+'%';
+    const key=it.card?'c'+it.lab:it.k+it.t+it.dist; if(s.dataset.k===key) return; s.dataset.k=key; s.className=it.card?'cc':'cp '+it.k; s.title=it.t||'';
+    s.innerHTML=it.card?it.lab:it.k==='base'?`<b class="pt l${it.lv}" style="--pc:${it.col}"></b><i>${it.dist}</i>`:`<b>${it.ic}</b><i>${it.dist}</i>`;});
+  for(let k=items.length;k<bar.children.length;k++) bar.children[k].style.display='none';}
+// the action menus: Build, Army and Travel, each opening its own choices
+const LG_GROUPS=[{id:'build',ico:'🔨',n:'Build',acts:['cobble','plank','moss','tower','house','craft'],hint:'Golems, towers, houses and crafting'},{id:'army',ico:'🚩',n:'Army',acts:['rally','recall','gather','recruit'],hint:'Command your army and helpers'},{id:'travel',ico:'🧭',n:'Travel',acts:['mount','travel'],hint:'Ride your steed or use a well'}];
 /* ---------------- starting, the title screen and quitting ---------------- */
 function openLegends(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} const party=MP.party&&MP.party.members.length>1; if(party&&MP.role!=='host'){toast('The party leader starts Legends','#ffd36a'); return;}
   $('#modesPanel')&&($('#modesPanel').hidden=true); lgmLoading(true); setTimeout(()=>{try{openLegends2(party);} finally{lgmLoading(false);}},40);}
@@ -7506,9 +7558,16 @@ function lgmHud(){let el=$('#lgmHud'); if(!el){el=document.createElement('div');
   el.innerHTML=`<div class="lr"><span>${RES_ICO.wood}<b>${R0.wood}</b></span><span>${RES_ICO.stone}<b>${R0.stone}</b></span><span>${RES_ICO.gold}<b>${R0.gold}</b></span><span>${RES_ICO.diamond}<b>${R0.diamond||0}</b></span></div><div class="la">⚔ ${allies.length} golem${allies.length===1?'':'s'} · ✨ ${3-LGMS.sprites.length}/3 sprites${LGMS.ride?' · 🐎 riding':''}${LGMS.rally?' · 🚩 charging':''}</div><ul class="lo">${lgmObjective().map(o=>`<li>${esc(o)}</li>`).join('')}</ul>`;
   let d=$('#lgmDay'); if(!d){d=document.createElement('div'); d.id='lgmDay'; $('#hud').appendChild(d);} d.hidden=!$('#bossBar').hidden; const t=LGMS.day%300; d.innerHTML=`${LGMS.night?'🌙 Night':'☀️ Day'} ${lgmSave().days}<span>${LGMS.night?'Hordes raid by night':`Night in ${Math.max(0,Math.ceil((210-t)/60))} min`}</span>`;}
 function lgmBar(on){let el=$('#lgmBar'); if(!el){el=document.createElement('div'); el.id='lgmBar'; $('#hud').appendChild(el);
-    el.innerHTML=LG_ACT.map(([k,key,ico,name])=>`<button type="button" class="lgb" data-b="${k}" aria-label="${name} (${key.toUpperCase()})"><span class="ic">${ico}</span><i>${key.toUpperCase()}</i><small>${LG_COST[k]?Object.entries(LG_COST[k]).map(([r,v])=>RES_ICO[r]+v).join(''):name}</small></button>`).join('');
-    el.querySelectorAll('.lgb').forEach(b=>{const fire=ev=>{ev.preventDefault(); ev.stopPropagation(); lgmAct(b.dataset.b);}; b.addEventListener('click',fire); b.addEventListener('touchstart',fire,{passive:false});});}
-  el.hidden=!on||!LGMS; if(LGMS) el.querySelectorAll('.lgb').forEach(b=>{const c=LG_COST[b.dataset.b]; b.classList.toggle('no',!!c&&!Object.entries(c).every(([r,v])=>LGMS.res[r]>=v)); b.classList.toggle('on',(b.dataset.b==='mount'&&LGMS.ride)||(b.dataset.b==='rally'&&!!LGMS.rally));});}
+    el.innerHTML=LG_GROUPS.map(gp=>`<button type="button" class="lgb lgg" data-g="${gp.id}" aria-label="${gp.n}: ${gp.hint}" aria-expanded="false" title="${gp.hint}"><span class="ic">${gp.ico}</span><small>${gp.n}</small></button>`).join('')+'<div class="lgfly" hidden role="menu"></div>';
+    const fly=el.querySelector('.lgfly');
+    const close=()=>{el.dataset.open=''; fly.hidden=true; el.querySelectorAll('.lgg').forEach(b=>{b.setAttribute('aria-expanded','false'); b.classList.remove('sel');});};
+    const open=id=>{if(el.dataset.open===id) return close(); const gp=LG_GROUPS.find(g=>g.id===id); close(); el.dataset.open=id; const gb=el.querySelector(`[data-g="${id}"]`); gb.setAttribute('aria-expanded','true'); gb.classList.add('sel');
+      fly.innerHTML=`<div class="lgft">${gp.ico} ${gp.n}</div>`+gp.acts.map(k=>{const a=LG_ACT.find(x=>x[0]===k); if(!a) return ''; const [,key,ico,name]=a; return `<button type="button" class="lgb" role="menuitem" data-b="${k}" aria-label="${name} (${key.toUpperCase()})" title="${name}"><span class="ic">${ico}</span><i>${key.toUpperCase()}</i><small>${LG_COST[k]?Object.entries(LG_COST[k]).map(([r,v])=>RES_ICO[r]+v).join(''):name}</small></button>`;}).join('');
+      fly.hidden=false; fly.querySelectorAll('.lgb').forEach(b=>{const fire=ev=>{ev.preventDefault(); ev.stopPropagation(); lgmAct(b.dataset.b); if(b.dataset.b!=='rally') close(); lgmBar(true);}; b.addEventListener('click',fire); b.addEventListener('touchstart',fire,{passive:false});}); lgmBar(true);};
+    el.querySelectorAll('.lgg').forEach(b=>{const fire=ev=>{ev.preventDefault(); ev.stopPropagation(); open(b.dataset.g);}; b.addEventListener('click',fire); b.addEventListener('touchstart',fire,{passive:false});});
+    el.addEventListener('keydown',e=>{if(e.key==='Escape') close();}); el._close=close;}
+  el.hidden=!on||!LGMS; if(!on&&el._close) el._close(); if(LGMS){el.querySelectorAll('.lgb[data-b]').forEach(b=>{const c=LG_COST[b.dataset.b]; b.classList.toggle('no',!!c&&!Object.entries(c).every(([r,v])=>LGMS.res[r]>=v)); b.classList.toggle('on',(b.dataset.b==='mount'&&LGMS.ride)||(b.dataset.b==='rally'&&!!LGMS.rally));});
+    el.querySelectorAll('.lgg').forEach(b=>{const gp=LG_GROUPS.find(g=>g.id===b.dataset.g); b.classList.toggle('on',(gp.acts.includes('mount')&&LGMS.ride)||(gp.acts.includes('rally')&&!!LGMS.rally));});}}
 let lgmMiniImg=null;
 function lgmMini(){const S2=mini.width, D=LGMS.D, RES=Math.max(2,Math.ceil(L.w/640)), IW=Math.ceil(L.w/RES);
   if(!lgmMiniImg){const c=document.createElement('canvas'); c.width=c.height=IW; const g2=c.getContext('2d'), img=g2.createImageData(IW,IW), cache={};
@@ -7521,12 +7580,12 @@ function lgmMini(){const S2=mini.width, D=LGMS.D, RES=Math.max(2,Math.ceil(L.w/6
   mg.clearRect(0,0,S2,S2); mg.imageSmoothingEnabled=false; mg.drawImage(lgmMiniImg,ox/RES,oy/RES,view/RES,view/RES,0,0,S2,S2);
   if(!bigMap&&lgInMine(P.x,P.y)){mg.fillStyle='#0b0b10'; mg.fillRect(0,0,S2,S2);}
   const X=o=>(o.x/T-ox)*sc, Y=o=>(o.y/T-oy)*sc, dot=(o,c,s)=>{mg.fillStyle=c; mg.fillRect(X(o)-s/2,Y(o)-s/2,s,s);};
-  for(const b of LGMS.bases) if(!b.beaten&&!b.hidden){mg.fillStyle=tribeOpen(b.sec)?b.tr.col:'#666'; mg.beginPath(); mg.arc(X(b.B.heart),Y(b.B.heart),2+b.lv*(bigMap?1.2:1.6),0,TAU); mg.fill(); mg.strokeStyle='#000'; mg.lineWidth=1; mg.stroke();}
+  if(!lgInMine(P.x,P.y)||bigMap) lgmMapHordes(X,Y,sc);
   for(const V of D.villages) dot(V,'#ffe0a0',bigMap?3:5); dot(D.hub,'#7ae8ff',bigMap?5:8); if(D.mine){const inM=lgInMine(P.x,P.y); for(const d of D.mine.doors){if(!inM) dot(d,'#c89a5a',bigMap?4:7); else if(!bigMap) dot(d.ex,'#fff0c0',6);} dot(D.mine.hut,'#ffd38a',bigMap?4:7);}
   for(const e of ents) if(e.hp>0&&!e.st&&Math.hypot(e.x-P.x,e.y-P.y)<1500) dot(e,'#ff4a4a',2);
   if(LGMS.raid){mg.strokeStyle='#ff4a4a'; mg.lineWidth=2; mg.beginPath(); mg.arc(X(LGMS.raid.V),Y(LGMS.raid.V),8+Math.sin(time*6)*2,0,TAU); mg.stroke();}
   for(const a of allies) dot(a,'#5fb3ff',2); if(LGMS.rally) dot(LGMS.rally,'#5fb3ff',5); for(const o of MP.others.values()) dot(o,'#7aff8a',5);
-  mg.save(); mg.translate(X(P),Y(P)); mg.rotate(LGMS.yaw+Math.PI/2); mg.fillStyle='#fff'; mg.beginPath(); mg.moveTo(0,-7); mg.lineTo(5,5); mg.lineTo(-5,5); mg.closePath(); mg.fill(); mg.restore();}
+  mg.save(); mg.translate(X(P),Y(P)); mg.rotate(LGMS.yaw+Math.PI/2); mg.fillStyle='#fff'; mg.beginPath(); mg.moveTo(0,-7); mg.lineTo(5,5); mg.lineTo(-5,5); mg.closePath(); mg.fill(); mg.restore(); if(bigMap) lgmMapLegend(S2);}
 /* ---------------- cutscenes ---------------- */
 function lgmIntroShots(){const D=LGMS.D, hx=D.hub.x*S, hz=D.hub.y*S, b0=D.bases[0], fx=b0.heart.x*S, fz=b0.heart.y*S;
   return [{dur:4.6,title:'Legends',sub:'Isle of Six Crowns',speaker:'The Lorekeepers',text:'Long ago, the six lands of the isle lived in peace around the Crown Well, warmed by the light of three crystals.',cam:dolly([hx-30,26,hz+30,hx,0,hz],[hx-12,14,hz+16,hx,1,hz])},
@@ -7632,7 +7691,7 @@ function lgmBossFx(m,b){const u=m.userData; if(!LGMS||u.lgfx) return; u.lgfx=tru
   const aura=new THREE.Mesh(gCircle,new THREE.MeshBasicMaterial({color:new THREE.Color(col),transparent:true,opacity:.4,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide})); aura.rotation.x=-Math.PI/2; aura.position.y=.04; aura.scale.setScalar(h*.9); m.add(aura); u.lgAura=aura;
   const ring2=new THREE.Mesh(thinTor(),glow(col,1.6)); ring2.rotation.x=Math.PI/2; ring2.position.y=.06; ring2.scale.setScalar(h*1.0); m.add(ring2); u.lgRing=ring2;
   u.lgOrb=[0,1,2,3,4,5].map(i=>{const c=add(m,crystal(3200+i,6),glow(i%2?col:'#ffe08a',2.4),0,1.4,0,.08,.2,.08); c.castShadow=false; return c;}); u.lgH=h;}
-function lgmSync(){const C=LGMS; if(!C||!L) return; lgmChunkTick();
+function lgmSync(){const C=LGMS; if(!C||!L) return; lgmChunkTick(); lgmCompass();
   if(L.lgFar){const cx=camera.position.x, cz=camera.position.z; for(const g of L.lgFar){const dx=g.position.x-cx, dz=g.position.z-cz; g.visible=dx*dx+dz*dz<150*150;}}
   for(const n of lgNodesNear(C.D,P.x,P.y,2200)){ const m=ensure(n,()=>buildNodeM(n.kind),'nd'+n.kind); m.position.set(n.x*S,0,n.y*S); m.scale.setScalar((n.hp>0?.6+.4*n.hp/n.max:.25)*(n.kind==='wood'?2.4:1.6));}
   for(const t of C.ptowers){const m=ensure(t,()=>buildTowerM('#5fb3ff',true),'ptw'); m.position.set(t.x*S,0,t.y*S); m.scale.setScalar(1.9);}
