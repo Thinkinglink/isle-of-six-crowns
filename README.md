@@ -19,6 +19,9 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 💡 Version 5.7.2: a brighter mineshaft
+- The mineshaft tunnels are a bit brighter and you can see further down them. The Deep Dark stays dark.
+
 ## 👾 Version 5.7.1: monsters back to normal above ground
 - Only the mineshaft has fewer monsters now. Fortress patrols, spawners and village raids are back to their full numbers.
 

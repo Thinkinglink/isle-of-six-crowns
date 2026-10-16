@@ -1285,7 +1285,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='5.7.1', SAVE_VERSION=7;
+const APP_VERSION='5.7.2', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -7418,7 +7418,7 @@ function lgmRegion(force){const D=LGMS.D, tx=clamp(Math.floor(P.x/T),0,L.w-1), t
 function lgmDayLight(){const C=LGMS, t=C.day%300, k=t<200?1:t<215?1-(t-200)/15*.7:t<285?.3:.3+(t-285)/15*.7; C.dayK=k; C.night=t>=210&&t<288;
   sun.intensity=(C.envSi||1)*(.25+.75*k); hemi.intensity=(C.envHi||.85)*.85*(.45+.55*k); const night=new THREE.Color('#0b1430'), col=(C.sky||new THREE.Color('#bfe0ff')).clone().lerp(night,1-k);
   scene.background=col; if(scene.fog){scene.fog.color.copy(col); scene.fog.near=QT==='low'?30:40; scene.fog.far=QT==='low'?88:118;}
-  if(C.region===-2){const dk=new THREE.Color('#0e1016'); scene.background=dk; if(scene.fog){scene.fog.color.copy(dk); scene.fog.near=15; scene.fog.far=63;} sun.intensity=.45; hemi.intensity=1.12;}
+  if(C.region===-2){const dk=new THREE.Color('#161a22'); scene.background=dk; if(scene.fog){scene.fog.color.copy(dk); scene.fog.near=20; scene.fog.far=80;} sun.intensity=.6; hemi.intensity=1.4;}
   else if(C.region===-3){const dk=new THREE.Color('#020407'); scene.background=dk; if(scene.fog){scene.fog.color.copy(dk); scene.fog.near=6; scene.fog.far=30;} sun.intensity=.14; hemi.intensity=.42;}}
 function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.max(0,C.lookT-dt);
   // camera: keys turn it, and without the mouse lock it slowly swings behind you as you run
