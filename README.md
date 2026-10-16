@@ -19,6 +19,14 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🏹 Version 6.0: bows, supplies, traders, camps and mega crafting
+- **New Bow slot** (main game and Legends). There are 1,000 common, 500 rare and 100 unique bows. Every boss drops its own unique bow (for example the Sculk Monstrosity's Bow), and monsters and chests can drop bows too. Your bow changes your arrow damage and draw speed, unique bows fire 3 arrows, and the bow on your back takes on the colour of the bow you equip.
+- **Fuse items (main game):** in your Pack, press ⚒ Fuse items. Pick 3 items, then choose weapon, armor, artifact or bow, and you get a Mega unique item.
+- **Mega crafter (Legends):** beside the crafting hut. Press N (✨ in the Build menu), place a weapon, armor, artifact or bow, and pay diamonds, gold and supplies. Mega items get +50% power and a unique Legends effect.
+- **Supplies (Legends):** monsters drop supplies like Rotten Brains, Bone Shards and Spider Silk. Bosses drop 5 to 10 unique ones, and about 30% of the land hides bags of supplies on the ground.
+- **Wandering traders (Legends):** on about half of all days, 3 traders visit villages. Press J (🐪 in the Army menu) next to one to trade gold, diamonds, stone or wood for supplies.
+- **Camps (Legends):** press L (🏕️ in the Build menu) to build a camp and rest. You and your army are fully healed, and at night you sleep through to morning.
+
 ## 🎵 Version 5.9: Legends 2
 - When you beat the Threefold Legend, you go back to the game modes menu, where the Legends button turns to stone, cracks open and becomes **Legends 2**.
 - **The sculk returns:** a cutscene shows sculk pouring out of the mineshaft and swallowing about 80% of the island, across every biome.
