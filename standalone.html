@@ -1285,7 +1285,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='5.7.0', SAVE_VERSION=7;
+const APP_VERSION='5.7.1', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -7319,7 +7319,7 @@ function lgmCraft(){const C=LGMS, m=C.D.mine; if(!m||Math.hypot(P.x-m.hut.x,P.y-
   el.hidden=false; el.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const r=LG_CRAFT[+b.dataset.i]; if(!can(r)) return; for(const [k,v] of Object.entries(r.cost)) R0[k]-=v; const it=r.make(tier); SAVE.inv.push(it); lgmSave().res=R0; persist(); if(typeof sfx==='function') sfx('enchant'); toast(`Crafted ${it.name}! It's in your pack (I).`,'#ffd38a'); lgmHud(); lgmCraft();});
   el.querySelector('#lgCrX').onclick=()=>{el.hidden=true;}; const f=el.querySelector('[data-i]:not([disabled])')||el.querySelector('#lgCrX'); f.focus();}
 /* ---------------- v5.6: fewer monsters, invasions, hordes that grow stronger at night ---------------- */
-const LG_MOB=.3; // 70% fewer monsters than before
+const LG_MOB=1; // the overworld keeps its full hordes; only the mineshaft has fewer monsters
 const lgLv=b=>Math.min(4,b.lv+(b.up||0));
 // a base the hero leaves alone may grow to the next level when night falls
 function lgmUpgradeBase(base,quiet){const B=base.B; if(base.beaten||base.hidden||base.lv>=4||lgLv(base)>=4) return false; base.up=(base.up||0)+1; const n=base.up;
@@ -7479,7 +7479,7 @@ function lgmStructTick(e,dt){const b=LGMS&&LGMS.bases[e.base]; if(!b) return; e.
   if(e.type==='tower'){e.cd-=dt; if(e.cd>0) return; let best=null,bd=440; for(const f of foes()){const d=Math.hypot(f.x-e.x,f.y-e.y); if(d<bd){bd=d; best=f;}}
     if(best){e.cd=(tr.zone==='lava'?1.9:1.5)*(1-.06*(b.lv-1)); const an=Math.atan2((best.y-12)-(e.y-46),best.x-e.x); projs.push({x:e.x,y:e.y-46,vx:Math.cos(an)*400,vy:Math.sin(an)*400,dmg:Math.round(e.dmg*(tr.zone==='lava'?1.6:1)),r:6,col:tr.col,own:'e',life:1.6,slow:tr.zone==='ice'?1.5:0}); puff(e.x,e.y-46,tr.col,4,60,.3,3);} else e.cd=.4;}
   else if(e.type==='spawner'){if(tr.zone==='sand'){const ph=(e.t+e.id)%10; e.inv=ph>7.6; e.burrow=e.inv;}
-    e.cd-=dt; if(e.cd>0) return; e.cd=V.cd*1.8*rand(.85,1.15); const alive=ents.filter(m=>m.lgSp&&m.base===b.i&&m.hp>0).length; if(alive>=Math.max(2,Math.round(V.cap*LG_MOB))||Math.hypot(e.x-P.x,e.y-P.y)>1100) return;
+    e.cd-=dt; if(e.cd>0) return; e.cd=V.cd*rand(.85,1.15); const alive=ents.filter(m=>m.lgSp&&m.base===b.i&&m.hp>0).length; if(alive>=Math.max(2,Math.round(V.cap*LG_MOB))||Math.hypot(e.x-P.x,e.y-P.y)>1100) return;
     LG_EBI=tr.bi; LG_ETIER=b.tier; for(let k=0;k<Math.max(1,Math.round(V.wave*LG_MOB));k++){const a=Math.random()*TAU; const m=spawnEnemy(pickType(b.tier),e.x+Math.cos(a)*(e.r+24),e.y+Math.sin(a)*(e.r+24),true); if(m){m.lgSp=true; m.base=b.i; if(b.lv>1){m.max=Math.round(m.max*(1+.2*(b.lv-1))); m.hp=m.max;} puff(m.x,m.y-10,tr.col,12,120,.5,5);}} LG_EBI=LG_ETIER=null;}}
 function lgmStructDown(e){const b=LGMS.bases[e.base]; shake(e.type==='gate'||e.type==='heart'?12:6); flashT=.25; flashCol='#ffffff'; puff(e.x,e.y-20,e.c2,40,240,.9,7); puff(e.x,e.y-20,'#9a9488',30,200,.8,6); if(typeof sfx==='function') sfx('boom');
   for(let i=0;i<(e.type==='heart'?10:3);i++) dropLoot(e.x,e.y,{kind:'shard',amt:2}); LGMS.res.gold+=e.type==='spawner'?10:e.type==='tower'?6:e.type==='gate'?8:0;
