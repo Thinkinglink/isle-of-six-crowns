@@ -19,6 +19,21 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🐟 Version 6.2
+- **Rivers and ponds:** every lake flows down a river to a deep pond, and each deep pond hides sunken treasure.
+- **Wild mounts:** only the horse starts tamed. The tiger, beetle, Great Bird and the new **Spiritfin** (a water mount that swims and dives) live in dens marked 🐾. Find each one and finish its quest to tame it.
+- **Spiritfin:** ride on rivers, lakes and ponds; press Space to dive underwater and open sunken treasure.
+- **Great Bird:** hold Space to fly higher and Shift to fly lower. Sky predators are now rare (5%), look like birds and go down in a hit or two.
+- **You now sit in the saddle** on every mount.
+- **4 Legend Golems,** much bigger than you: Stoneheart Colossus `[`, Oakroot Warden `]`, Brickbound Keeper `;` and Slatestorm Titan `'`.
+- **Golem spawners:** after you build a spawner, its golems are free.
+- **Quests** (`9`, Army menu) with rewards.
+- **Menus:** B = Build, O = Army, E = Travel, and every action has its own key. The crafting hut and mega crafter can be clicked again.
+- **Arena fixed:** the Arena menu works again. It searches for real players online for 10 seconds, and if no one comes you fight smart AI bots that dodge and heal.
+- **Prison:** now 8 floors deep.
+- **New enchantments:** Soulreaper, Shockwave, Phoenix and Echoing.
+- **Admin cheats:** have all skins, give all mounts, infinite supplies, and unlock Legends 1 and 2 (pick either one).
+
 ## 🏟️ Version 6.1: the Arena, mounts and golem spawners
 - **Arena mode** (Game modes): a Duel (1 on 1 against a rival champion), a Team fight (you and 3 allies against 4 champions) and an Arena raid (5 waves). Every win makes the next fight tougher and the prizes bigger.
 - **4 mounts in Legends 1 and 2:** horse, tiger (fastest on the ground), beetle (takes 35% less damage) and the Great Bird, which **flies** over walls and mountains, but Sky Raiders and Sky Predators hunt you in the air. Each mount has 4 skins. Press 0 (🐾 in the Travel menu) to choose, and R to ride.

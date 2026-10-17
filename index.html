@@ -80,7 +80,7 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 #btnModes:focus-visible{outline:3px solid #ffd36a;outline-offset:2px}
 @media (max-width:560px){#btnModes span{display:none}}
 #modesPanel{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:16px}
-#modesPanel[hidden]{display:none}
+#modesPanel[hidden]{display:none}.stpanel{position:fixed;inset:0;z-index:72;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:16px;overflow:auto}.stpanel[hidden]{display:none}#arenaMM,#lgPick{z-index:74}
 .modesbox{width:min(720px,100%)}
 .modesbox h2{margin:0;font-family:var(--display);color:#f0c050;font-size:24px}
 .modegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
@@ -104,7 +104,8 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 .lgt-foot{margin:6px 0 0;font-size:13px;color:#9fb0c8}
 .lgt-panel{position:absolute;right:max(24px,env(safe-area-inset-right));top:50%;transform:translateY(-50%);width:min(460px,calc(100vw - 48px));max-height:calc(100vh - 48px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:18px;background:rgba(8,16,34,.95);border:2px solid #4a6aa8}
 .lgt-panel[hidden]{display:none}
-#lgTravel{position:fixed;z-index:40}#lgStable{position:fixed;z-index:40}#lgStable .lgst{display:flex;gap:6px;align-items:center}#lgStable .lgst .lgt-b{flex:1}#lgStable .lgst.on .lgt-b{border-color:#ffd36a}#lgStable .lgsk{display:flex;gap:4px}#lgStable .sk{width:30px;height:30px;border:2px solid #2a3a5a;cursor:pointer;padding:0}#lgStable .sk.sel{border-color:#ffd36a;box-shadow:0 0 0 2px #ffd36a}#lgTrade,#lgMega{position:fixed;z-index:40}
+#lgTravel{position:fixed;z-index:40}body>.lgt-panel{position:fixed!important;z-index:45}#lgmBar .lgfly{grid-template-columns:repeat(3,64px)!important}
+#lgQuests .qh{margin:6px 0 0;font-size:13px;color:#9fd0ff}#lgQuests .lgq{display:flex;flex-direction:column;padding:6px 8px;background:rgba(12,24,48,.85);border-left:4px solid #4a6aa8}#lgQuests .lgq span{font-size:12.5px;color:#cfd8e8}#lgQuests .lgq.done{border-left-color:#7aff8a;opacity:.75}#lgStable .lgst.locked{opacity:.55}#lgStable{position:fixed;z-index:40}#lgStable .lgst{display:flex;gap:6px;align-items:center}#lgStable .lgst .lgt-b{flex:1}#lgStable .lgst.on .lgt-b{border-color:#ffd36a}#lgStable .lgsk{display:flex;gap:4px}#lgStable .sk{width:30px;height:30px;border:2px solid #2a3a5a;cursor:pointer;padding:0}#lgStable .sk.sel{border-color:#ffd36a;box-shadow:0 0 0 2px #ffd36a}#lgTrade,#lgMega{position:fixed;z-index:40}
 #fusePanel .fusebox{max-width:720px}#fusePanel .fuseout{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}#fusePanel .fuselist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;max-height:46vh;overflow:auto;margin-bottom:10px}
 #fusePanel .fcell{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px;background:rgba(10,18,30,.8);border:2px solid #2a3a5a;color:inherit;font:inherit;font-size:12px;cursor:pointer;text-align:center}#fusePanel .fcell img{width:32px;height:32px;image-rendering:pixelated}#fusePanel .fcell small{opacity:.7}#fusePanel .fcell.sel{border-color:#ffd36a;background:rgba(60,50,20,.9)}
 .modecard{position:relative}.modecard.stone{background:repeating-linear-gradient(45deg,#6e6e6e 0 8px,#626262 8px 16px)!important;color:#e0e0e0!important;border-color:#4a4a4a!important;filter:grayscale(1)}.modecard.stone .mico{filter:grayscale(1) brightness(.75)}
@@ -1309,7 +1310,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='6.1.0', SAVE_VERSION=7;
+const APP_VERSION='6.2.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1473,7 +1474,7 @@ function aimAngle(){if(lgmCamActive()) return lgmAim();
   const w=mouseWorld(); return w?Math.atan2(w.y-P.y,w.x-P.x):P.face;}
 function targets(){const t=ents.filter(e=>e.hp>0); if(boss&&!boss.dead&&!boss.hidden&&boss.awake) t.push(boss); return t;}
 function attackFace(useMouse){const m=moveVec(); if(m.x||m.y) return Math.atan2(m.y,m.x); if(TOUCH||useMouse) return aimAngle(); return P.face;}
-function melee(useMouse){if(P.dead||P.atk>0||P.roll>0) return; P.face=attackFace(useMouse); P.atk=ST.rate*(P.fury>0?.6:1); P.swing=.16;
+function melee(useMouse){if(P.dead||P.atk>0||P.roll>0) return; P.face=attackFace(useMouse); P.atk=ST.rate*(P.fury>0?.6:1); P.swing=.16; if(ARENA&&ARENA.pvp) arenaPvpHit(ST.dmg); P.swN=(P.swN||0)+1; if(P.swN%4===0&&(SAVE.eq.weapon.ench||[]).includes('Shockwave')){for(const e of targets()) if(dist(e,P)<140+e.r) hurtE(e,ST.dmg*.6,{}); shock(P.x,P.y,140,'#9fd0ff',.3);}
   let hit=false; for(const e of targets()){const d=dist(e,P); if(d>ST.reach*(TOUCH?1.18:1)+e.r) continue; if(d>e.r+18&&Math.abs(angDiff(P.face,angTo(P,e)))>ST.arc/2) continue;
     hurtE(e,ST.dmg*(P.fury>0?1.2:1),{melee:true}); hit=true; if(ST.stun&&!e.isBoss) e.stun=.7; const ha=angTo(P,e); sparks(e.x-Math.cos(ha)*e.r*.6,e.y-Math.sin(ha)*e.r*.6,ha,SAVE.eq.weapon.encd?'#d8b0ff':'#ffe9a0',e.isBoss?14:9,e.r*1.1); shock(e.x,e.y,e.r*2.2,'#ffffff',.22);}
   if(hit){shake(2.5); hitStop=Math.max(hitStop,WEAPONS[SAVE.eq.weapon.kind].stun?.07:.045);}
@@ -1481,7 +1482,7 @@ function melee(useMouse){if(P.dead||P.atk>0||P.roll>0) return; P.face=attackFace
 function fireBow(useMouse){if(P.dead||P.bow>0||P.roll>0) return; if(SAVE.arrows<=0){toast('Out of arrows','#e2504a'); P.bow=.6; return;}
   P.face=attackFace(useMouse); const bw=SAVE.eq.bow; P.bow=.5*(bw?bw.rate:1); SAVE.arrows--; const dmg=Math.round((5+ST.dmg*.6)*(bw?bw.mult:1)*(bw&&bw.mega&&LGMS?1.5:1)), n=bw?(bw.multi||1):1;
   for(let k=0;k<n;k++){const a=P.face+(k-(n-1)/2)*.12; projs.push({x:P.x+Math.cos(a)*16,y:P.y-12+Math.sin(a)*16,vx:Math.cos(a)*640,vy:Math.sin(a)*640,dmg,r:5,col:bw?bw.col:'#f0dfa8',own:'p',life:1.4,arrow:true});} refreshSlots();}
-function roll(){if(DUN&&DUN.phase==='prison'){dunJump(); return;} if(P.dead||P.roll>0||P.rollCd>0) return; P.landT=0; setTimeout(()=>{if(P) P.landT=.12;},280); let dx=0,dy=0; const m=moveVec(); dx=m.x;dy=m.y; if(!dx&&!dy){dx=Math.cos(P.face);dy=Math.sin(P.face);} const l=Math.hypot(dx,dy); P.rdx=dx/l;P.rdy=dy/l; P.roll=.28; P.rollCd=1.0; puff(P.x,P.y,'#cbbf9f',6,80,.4,3);}
+function roll(){if(DUN&&DUN.phase==='prison'){dunJump(); return;} if(typeof LGMS!=='undefined'&&LGMS&&lgFlying()) return; if(typeof LGMS!=='undefined'&&LGMS&&lgSwim()&&lgmDive()) return; if(P.dead||P.roll>0||P.rollCd>0) return; P.landT=0; setTimeout(()=>{if(P) P.landT=.12;},280); let dx=0,dy=0; const m=moveVec(); dx=m.x;dy=m.y; if(!dx&&!dy){dx=Math.cos(P.face);dy=Math.sin(P.face);} const l=Math.hypot(dx,dy); P.rdx=dx/l;P.rdy=dy/l; P.roll=.28; P.rollCd=1.0; puff(P.x,P.y,'#cbbf9f',6,80,.4,3);}
 function potion(){if(P.dead||P.pot>0) return; if(P.hp>=ST.maxhp){toast('Health is full'); return;} const h=Math.round(ST.maxhp*(.5+.1*upLv('pot'))); P.hp=Math.min(ST.maxhp,P.hp+h); P.pot=18-2*upLv('pot'); P.drinkT=.6; ftext(P.x,P.y-40,'+'+h,'#8fd06a',true); puff(P.x,P.y-10,'#ff6a7a',14,90,.7,4);}
 function bolt(e){for(let i=0;i<16;i++) parts.push({x:e.x+rand(-5,5),y:e.y,z:i*16,vx:0,vy:0,vz:30,life:.32,max:.32,col:i%3?'#fff6a0':'#ffffff',sz:6}); puff(e.x,e.y,'#fff6a0',8,140,.4,4);}
 function chainLightning(src,dmg){targets().filter(t=>t!==src&&t.hp>0&&dist(t,src)<210).sort((a,b)=>dist(a,src)-dist(b,src)).slice(0,2).forEach(t=>{hurtE(t,dmg,{}); bolt(t);});}
@@ -1505,7 +1506,7 @@ function useArt(slot){const it=SAVE.eq[slot]; if(!it||P.dead||P.acd[slot]>0) ret
 // The purple shockwave used by enchanted gear
 function soulWave(r,dmg,col){for(const e of targets()) if(dist(e,P)<r+e.r) hurtE(e,dmg,{});
   for(let i=0;i<36;i++){const a=i/36*TAU; parts.push({x:P.x+Math.cos(a)*18,y:P.y+Math.sin(a)*18,z:14,vx:Math.cos(a)*r*2.7,vy:Math.sin(a)*r*2.7,vz:30,life:.4,max:.4,col:i%2?col:'#e8d0ff',sz:6});} shake(3);}
-function hurtP(d,o={}){if(!P.ally&&SAVE&&SAVE.adminGod&&isAdmin()) return; if(!P.ally&&typeof LGMS!=='undefined'&&LGMS&&LGMS.ride){if(lgFlying()&&!ents.some(e=>e.sky&&e.hp>0&&Math.abs(e.x-P.x)<520&&Math.abs(e.y-P.y)<520)) return; const T0=LG_MOUNTS[lgMount().type]; if(T0.tank) d*=1-T0.tank;} if(P.ally){const a=P; if(a.hp<=0||a.iframe>0) return; d=Math.max(1,Math.round(d)); a.hp-=d; a.iframe=.3; a.flash=.12; ftext(a.x,a.y-30,'-'+d,'#ffb0a0'); if(a.hp<=0){a.hp=0; a.dead=true;} return;}
+function hurtP(d,o={}){if(!P.ally&&SAVE&&SAVE.adminGod&&isAdmin()) return; if(!P.ally&&typeof LGMS!=='undefined'&&LGMS&&LGMS.dive) return; if(!P.ally&&typeof LGMS!=='undefined'&&LGMS&&LGMS.ride){if(lgFlying()&&!ents.some(e=>e.sky&&e.hp>0&&Math.abs(e.x-P.x)<520&&Math.abs(e.y-P.y)<520)) return; const T0=LG_MOUNTS[lgMount().type]; if(T0.tank) d*=1-T0.tank;} if(P.ally){const a=P; if(a.hp<=0||a.iframe>0) return; d=Math.max(1,Math.round(d)); a.hp-=d; a.iframe=.3; a.flash=.12; ftext(a.x,a.y-30,'-'+d,'#ffb0a0'); if(a.hp<=0){a.hp=0; a.dead=true;} return;}
   if(P.remote){if(P.dead||P.roll||P.iframe>0||run.done) return; P.iframe=.35; P.flash=.15; send(P.code,{t:'hurt',d,slow:!!o.slow}); return;}
   if(P.dead||P.roll>0||P.iframe>0||run.done) return;
   if(ST.soulGuard&&Math.random()<.18){P.iframe=.35; ftext(P.x,P.y-36,'Blocked','#d8b0ff',true); soulWave(100,Math.round(ST.dmg*.5),'#9a5cff'); return;}
@@ -1529,7 +1530,7 @@ function hurtE(e,d,o={}){if(e.inv||e.hp<=0) return; if(o.pet) d*=(e===boss||e.is
   puff(e.x,e.y-e.r,e.c2,4,90,.3,3);
   if(e.hp<=0){ if(e.isBoss) bossDown(e); else killE(e); }}
 let dying=[];
-function killE(e,fromNet){if(e.st){run.kills++; e.dieAt=time; e.state='dead'; dying.push(e); if(LGMS) lgmStructDown(e); return;} if(LGMS&&!e.ally){LGMS.res.gold+=2; if(!e.mirror&&Math.random()<.35){const sn=SUPS[[...String(e.type||e.name||'m')].reduce((s,c)=>s+c.charCodeAt(0),0)%SUPS.length]; lgGiveSup(sn,1,e.x,e.y);}} run.kills++; if(!e.ally){e.dieAt=time; e.dieDir=Math.random()<.5?-1:1; e.state='dead'; dying.push(e); sparks(e.x,e.y,Math.random()*TAU,e.c2||'#ffffff',8,e.r);} puff(e.x,e.y-e.r,e.c1,14,150,.6,5); if(!fromNet&&MP.role==='host'&&MP.inGame) bcast({t:'kill',id:e.id,x:Math.round(e.x),y:Math.round(e.y),ty:e.type,s:e.summoned?1:0});
+function killE(e,fromNet){if(!e.ally&&!e.st&&!fromNet&&P&&!P.dead&&SAVE.eq.weapon&&(SAVE.eq.weapon.ench||[]).includes('Soulreaper')) P.hp=Math.min(ST.maxhp,P.hp+ST.maxhp*.06);if(e.st){run.kills++; e.dieAt=time; e.state='dead'; dying.push(e); if(LGMS) lgmStructDown(e); return;} if(LGMS&&!e.ally){const ts=LGMS.D.msites&&LGMS.D.msites.tiger, tq=ts&&lgMQ().tiger; if(tq&&tq.st==='active'&&Math.hypot(e.x-ts.x,e.y-ts.y)<1400) tq.n++; LGMS.res.gold+=2; if(!e.mirror&&Math.random()<.35){const sn=SUPS[[...String(e.type||e.name||'m')].reduce((s,c)=>s+c.charCodeAt(0),0)%SUPS.length]; lgGiveSup(sn,1,e.x,e.y);}} run.kills++; if(!e.ally){e.dieAt=time; e.dieDir=Math.random()<.5?-1:1; e.state='dead'; dying.push(e); sparks(e.x,e.y,Math.random()*TAU,e.c2||'#ffffff',8,e.r);} puff(e.x,e.y-e.r,e.c1,14,150,.6,5); if(!fromNet&&MP.role==='host'&&MP.inGame) bcast({t:'kill',id:e.id,x:Math.round(e.x),y:Math.round(e.y),ty:e.type,s:e.summoned?1:0});
   if(e.summoned&&Math.random()<.6) return;
   const n=rint(1,3); for(let i=0;i<n;i++) dropLoot(e.x,e.y,{kind:'shard',amt:1});
   if(Math.random()<.22) dropLoot(e.x,e.y,{kind:'arrows',amt:rint(3,6)});
@@ -1862,7 +1863,7 @@ function updPlayer(dt){
   if(P.blades>0){P.blades-=dt; P.bladeT=(P.bladeT||0)+dt; if(P.bladeT>.25){P.bladeT=0; for(const e of targets()) if(dist(e,P)<82+e.r) hurtE(e,Math.max(1,Math.round(6*P.bladePow)),{});}}
   if(P.roll>0){P.roll-=dt; moveCirc(P,P.rdx*480*dt,P.rdy*480*dt); P.walk+=dt*20; if(Math.random()<.5) puff(P.x,P.y,'#cbbf9f',1,40,.3,3); return;}
   const m=moveVec(); const l=Math.hypot(m.x,m.y); MP.lastMove=l>0;
-  if(l>0){const sp=ST.spd*(LGMS&&LGMS.ride?LG_MOUNTS[lgMount().type].spd:1)*(LGMS&&SAVE.adminLgFast&&isAdmin()?2.4:1)*(P.jumpT>0?1.3:1)*(P.slow>0?.55:1)*(P.gale>0?1.6:1)*(P.atk>ST.rate*.5?.6:1); if(lgFlying()){const nx=clamp(P.x+m.x/l*sp*dt*Math.min(1,l),200,L.w*T-200), ny=clamp(P.y+m.y/l*sp*dt*Math.min(1,l),200,L.h*T-200); if(!lgInMine(nx,ny)){P.x=nx; P.y=ny;}} else moveCirc(P,m.x/l*sp*dt*Math.min(1,l),m.y/l*sp*dt*Math.min(1,l)); P.walk+=dt*10; if(P.swing<=0){const want=Math.atan2(m.y,m.x); P.face+=angDiff(P.face,want)*Math.min(1,dt*18);}}
+  if(l>0){const sp=ST.spd*(LGMS&&LGMS.ride?LG_MOUNTS[lgMount().type].spd:1)*(LGMS&&SAVE.adminLgFast&&isAdmin()?2.4:1)*(P.jumpT>0?1.3:1)*(P.slow>0?.55:1)*(P.gale>0?1.6:1)*(P.atk>ST.rate*.5?.6:1); if(lgSwim()){const dx=m.x/l*sp*dt*Math.min(1,l), dy=m.y/l*sp*dt*Math.min(1,l); if(lgWaterAt(P.x+dx,P.y+dy)){P.x+=dx; P.y+=dy;} else if(lgWaterAt(P.x+dx,P.y)) P.x+=dx; else if(lgWaterAt(P.x,P.y+dy)) P.y+=dy;} else if(lgFlying()){const nx=clamp(P.x+m.x/l*sp*dt*Math.min(1,l),200,L.w*T-200), ny=clamp(P.y+m.y/l*sp*dt*Math.min(1,l),200,L.h*T-200); if(!lgInMine(nx,ny)){P.x=nx; P.y=ny;}} else moveCirc(P,m.x/l*sp*dt*Math.min(1,l),m.y/l*sp*dt*Math.min(1,l)); P.walk+=dt*10; if(P.swing<=0){const want=Math.atan2(m.y,m.x); P.face+=angDiff(P.face,want)*Math.min(1,dt*18);}}
   if(mouse.l||keys['j']||touchAtk) melee(mouse.l);
   if(mouse.r||keys['k']||touchBow) fireBow(mouse.r);
 }
@@ -1961,7 +1962,7 @@ function openModes(){let p=$('#modesPanel'); if(!p){p=document.createElement('di
     if(id==='gaunt'){if(!SAVE||!gauntList().length){startGauntlet(); return;} p.hidden=true; startGauntlet(); return;}
     if(id==='dun'){p.hidden=true; startDungeon(); return;}
     if(id==='arena'){p.hidden=true; openArena(); return;}
-    if(id==='leg'){p.hidden=true; LG_CAMP=SAVE&&SAVE.lg2unlock?2:1; openLegends(); return;}});
+    if(id==='leg'){p.hidden=true; if(SAVE&&SAVE.lg2unlock&&!SAVE.lg2anim){lgPickCamp(); return;} LG_CAMP=1; openLegends(); return;}});
   p.hidden=false; const f=p.querySelector('.modecard'); if(f) f.focus();}
 /*GAUNT-END*/
 /*DUN-START*/
@@ -2022,7 +2023,7 @@ const PSEG={
  sweep:[pRow('.............'),pRow('.............'),pRow('.....$.......'),pRow('.............'),pRow('.............'),pRow('.............'),pRow('......W......'),pRow('.............'),pRow('.............'),pRow('.............'),pRow('.........$...'),pRow('.............'),pRow('.............'),pRow('......K......')],
  plats:[pRow('.............'),pRow('.............'),pRow('mmmmmmmmmmmmm'),pRow('mmmmmmmmmmmmm'),pRow('ooooooooooooo'),pRow('mmmmmmmmmmmmm'),pRow('mmmmmmmmmmmmm'),pRow('.............'),pRow('......K......')],
  guards:[pRow('.............'),pRow('..#.....#....'),pRow('..#..g..#..$.'),pRow('.....#.......'),pRow('.g...#....#..'),pRow('..........#..'),pRow('......K......')]};
-function genPrison(){const pool=shuffleA(['gaps1','gaps2','lasers1','lasers2','sweep','plats','guards']).slice(0,5); const mids=[]; for(let r=0;r<12;r++) mids.push(...shuffleA(pool.concat(['cells2','cells1'])));
+function genPrison(){const pool=shuffleA(['gaps1','gaps2','lasers1','lasers2','sweep','plats','guards']).slice(0,5); const mids=[]; for(let r=0;r<13;r++) mids.push(...shuffleA(pool.concat(['cells2','cells1'])));
   const rows=[...PSEG.exit]; for(const k of mids) rows.push(...PSEG[k]); rows.push(...PSEG.cell);
   const w=PW,h=rows.length,g=new Uint8Array(w*h).fill(1),pit=new Uint8Array(w*h),lane=new Uint8Array(w*h);
   const O={cks:[],levers:[],pris:[],lasers:[],sweeps:[],lanes:[],spawns:[],coins:[],start:null,crack:null,escape:null}; const groups={B:[],b:[],E:[]};
@@ -2057,7 +2058,7 @@ function startDungeon(){if(!SAVE){toast('Start an expedition first','#ffd36a'); 
 function dunCaptured(why){if(!DUN||DUN.phase!=='dungeon'||DUN.capturing) return; DUN.capturing=true; run.endT=0; run.done=true; const px=P.x*S,pz=P.y*S;
   startCine([{dur:3.6,title:'Captured!',sub:why==='time'?'The torches burned out':'You were overpowered',text:'The jailers drag you down to the cells below the dungeon...',cam:orbit(px,pz,6,6,-.3,.5,.5)}],()=>startPrison());}
 function startPrison(){if(!DUN) return; DUN.phase='prison'; DUN.capturing=false; DUN.freed=0; DUN.trail=[]; DUN.t=0;
-  GEN_OVERRIDE=genPrison; GEN_NAME='The Prison Below'; GEN_THEME={wall:[['brazier',.05]],scatter:[],plat:[],name:''}; try{startLevel(DUN.bi,1,false,(DUN.seed^0x5bd1e995)>>>0);} finally{GEN_OVERRIDE=null; GEN_NAME=null; GEN_THEME=null;}
+  GEN_OVERRIDE=genPrison; GEN_NAME='The Prison Below'; GEN_THEME={wall:[['brazier',.05]],scatter:[],plat:[],name:''}; try{startLevel(DUN.bi,1,false,((DUN.seed^0x5bd1e995)+(DUN.floor||1)*7919)>>>0);} finally{GEN_OVERRIDE=null; GEN_NAME=null; GEN_THEME=null;}
   run.dun=true; const O=L.prison; DUN.O=O; DUN.total=O.pris.length; DUN.cp={x:O.start.x,y:O.start.y}; DUN.trail=[{x:P.x,y:P.y}];
   if(O.crack){addBlock(O.crack.tx,O.crack.ty,'rock',0); }
   for(const c of O.coins) dropLoot(c.x,c.y,{kind:'shard',amt:3});
@@ -2155,7 +2156,7 @@ function dunTickPrison(dt,swing){const O=DUN.O, wd=DUN.wd;
   if(wd.active){if(wd.stun>0) wd.stun-=dt; else {const tr=DUN.trail; let budget=ST.spd*.8*dt; while(budget>0&&wd.idx<tr.length){const t=tr[wd.idx], dx=t.x-wd.x, dy=t.y-wd.y, d=Math.hypot(dx,dy); if(d<=budget){wd.x=t.x; wd.y=t.y; budget-=d; wd.idx++;} else {wd.x+=dx/d*budget; wd.y+=dy/d*budget; wd.face=Math.atan2(dy,dx); budget=0;}} wd.walk+=dt*7; wd.moving=true;
       if(Math.hypot(wd.x-P.x,wd.y-P.y)<34&&P.iframe<=0){shake(8); dunRespawn('The Warden caught you! Back to the last checkpoint.');}}}
   if(O.escape&&Math.hypot(O.escape.x-P.x,O.escape.y-P.y)<44&&!DUN.escaping){DUN.escaping=true; const px=P.x*S,pz=P.y*S; run.done=true;
-    startCine([{dur:3.6,title:'You escaped!',sub:'The Prison Below',text:DUN.freed?`${DUN.freed} prisoner${DUN.freed>1?'s':''} escaped with you.`:'You slipped out alone.',cam:orbit(px,pz,5,4,-.4,.6,.7)}],()=>dunEnd('escape'));}}
+    const fl=DUN.floor||1, last=fl>=8; startCine([{dur:3.6,title:last?'You escaped!':`Floor ${fl} of 8 cleared`,sub:'The Prison Below',text:last?(DUN.freed?`${DUN.freed} prisoner${DUN.freed>1?'s':''} escaped with you.`:'You slipped out alone.'):'The stairs lead down to the next floor of the prison. Keep going!',cam:orbit(px,pz,5,4,-.4,.6,.7)}],()=>{if(last) dunEnd('escape'); else {const fr=DUN.freed, tot=DUN.total; DUN.floor=fl+1; DUN.escaping=false; run.done=false; startPrison(); DUN.freed=fr; DUN.total+=tot; setTimeout(()=>banner(`Prison floor ${DUN.floor} of 8`,'Free the prisoners and find the way out'),400);}});}}
 
 /* ---- models ---- */
 function buildLeverM(col){const R=model(),B=R.userData.body; const st=M('#5a5650',{roughness:.9,flatShading:true}), wd=M('#6a4a2a',{roughness:.8}), cap=glow(col,1.2);
@@ -2491,7 +2492,7 @@ function buildCreature(R,B,sp,c1,c2,role){const u=R.userData; u.legs=[]; u.arms=
   if(role==='bomb'){const f=add(B,gSphL,glow('#ffb03a',2.2),0,sp.plan==='sac'?.82:.7,0,.05); u.orb=f;}}
 function buildEnemy(e){
   const ebi=e.bi!=null?e.bi:L.bi, R=model(),B=R.userData.body,bio=BIOMES[ebi],f=e.feat||FEAT[bio.id][e.type],c1=e.c1,c2=e.c2,acc=bio.accent; R.userData.kind=f;
-  if(!e.feat&&!e.ally&&!L.menu){buildCreature(R,B,monSpec(ebi,e.type),c1,c2,e.type);} else switch(f){
+  if(f&&String(f).startsWith('lgx_')) buildLegendGolem(R,B,f); else if(e.sky) buildSkyBird(R,B); else if(!e.feat&&!e.ally&&!L.menu){buildCreature(R,B,monSpec(ebi,e.type),c1,c2,e.type);} else switch(f){
   case 'husk': case 'frosthusk': case 'mummy': {
     const h=humanoid({body:c1,skin:c2,hunch:.32,armsFwd:1.35,eye:f==='mummy'?'#ffd36a':f==='frosthusk'?'#7fd0ff':'#d8ff6a',eyeGlow:true,legC:hexShade(c1,-.45)});
     if(f==='husk'){const moss=M('#3f6a2a',{roughness:1}); add(h.torso,gSphL,moss,-.2,.47,.02,.09); add(h.torso,gSphL,moss,.16,.48,-.05,.075); add(h.head,gSphL,moss,.08,.13,-.03,.08); add(h.head,gSphL,moss,-.07,.15,0,.06);
@@ -4551,7 +4552,7 @@ function bossPose(m,b){const u=m.userData, a=b.a&&!b.hidden&&!b.cineHide?b.a:nul
 const yawOf=face=>Math.PI/2-face;
 function syncEnemy(e){if(e.st){lgmSyncStruct(e); return;} const m=ensure(e,()=>buildEnemy(e),e.ally?'al'+e.mk:'e'+(e.bi!=null?e.bi:L.bi)+e.type); const u=m.userData; if(LGMS&&!e.ally) lgmMobFx(m,e);
   if(e.ally){if(!u.allyRing){u.allyRing=new THREE.Mesh(gRing,new THREE.MeshBasicMaterial({color:new THREE.Color(e.c2),transparent:true,opacity:.75,depthWrite:false,side:THREE.DoubleSide})); u.allyRing.rotation.x=-Math.PI/2; u.allyRing.position.y=.03; u.allyRing.scale.setScalar(e.r*S*1.5); m.add(u.allyRing);} u.allyRing.material.opacity=e.life<3?.3+.4*Math.abs(Math.sin(time*8)):.75;}
-  m.position.set(e.x*S,0,e.y*S); m.rotation.y=yawOf(e.face); if(u.ph==null) u.ph=Math.random()*6; if(!u.base0) u.base0=m.scale.x; if(e.ally&&e.mk&&e.mk.startsWith('lg_')) m.scale.setScalar(u.base0*.62); if(e.sky) m.position.y=4.6+Math.sin(time*3+u.ph)*.25;
+  m.position.set(e.x*S,0,e.y*S); m.rotation.y=yawOf(e.face); if(u.ph==null) u.ph=Math.random()*6; if(!u.base0) u.base0=m.scale.x; if(e.ally&&e.mk&&e.mk.startsWith('lg_')) m.scale.setScalar(u.base0*.62); else if(e.ally&&e.mk&&e.mk.startsWith('lgx_')) m.scale.setScalar(u.base0*1.9); if(e.sky) m.position.y=4.6+Math.sin(time*3+u.ph)*.25;
   const moving=e.alert&&e.state==='chase'; animLimbs(m,e.walk,moving||e.state==='dash');
   if(u.float&&u.body) u.body.position.y=.12+Math.sin(time*2.2+u.ph)*.06; if(u.sway) u.sway.forEach((g,i)=>{g.rotation.z=Math.sin(time*2.4+i+u.ph)*.3; g.rotation.x=Math.cos(time*1.9+i)*.25;});
   {const b0=u.base0, fl=clamp((e.flash||0)/.1,0,1); let sx=1,sy=1, lean=0;
@@ -4589,7 +4590,7 @@ function syncPlayer(){const sk=curSkin(); const m=ensure(P,()=>buildPlayer(sk),'
   {const bw=SAVE.eq.bow, bk=bw?bw.id:'none'; if(u.backBow&&u.bwk!==bk){u.bwk=bk; const mt=u.backBow.material; mt.color.set(bw?bw.col:'#7a5030'); mt.emissive=new THREE.Color(bw&&bw.rar!=='common'?bw.col:'#000000'); mt.emissiveIntensity=bw&&bw.rar==='unique'?.6:bw&&bw.rar==='rare'?.25:0; mt.metalness=bw&&/Iron|Gold|Silver|Copper/.test(bw.name)?.6:0; u.backBow.scale.setScalar(bw&&bw.rar==='unique'?.38:.3);}}
   const w=SAVE.eq.weapon; if(u.wk!==w.id){u.wk=w.id; u.hand.clear(); CUR=m; const wm=weaponMesh(w.kind,RAR[w.rar].col,w.col); if(w.reach) wm.scale.z=w.reach/WEAPONS[w.kind].reach; u.hand.add(wm); CUR=null;}
   const ar=SAVE.eq.armor; if(ar&&u.ak!==ar.id&&u.skin==='default'){u.ak=ar.id; u.tunic.color.set('#2e8c8a').lerp(new THREE.Color(ar.col||ARMOR_COL[ar.bi]),.7);}
-  const moving=moveVec(); const mv=(moving.x||moving.y)&&P.roll<=0; animLimbs(m,P.walk,mv); if(LGMS&&LGMS.ride&&u.legs){m.position.y=(lgMount().type==='bird'?.95:lgMount().type==='beetle'?.85:.62)+(P.jz||0); u.legs.forEach((l,i)=>{l.rotation.x=-1.25; l.rotation.z=(i?1:-1)*.35;});}
+  const moving=moveVec(); const mv=(moving.x||moving.y)&&P.roll<=0; animLimbs(m,P.walk,mv); if(LGMS&&LGMS.ride&&u.legs){m.position.y=(lgMount().type==='bird'?1.5:lgMount().type==='beetle'?.95:lgMount().type==='fish'?.85:lgMount().type==='tiger'?.82:.95)+(P.jz||0); u.body.position.y=0; u.legs.forEach((l,i)=>{l.rotation.x=-1.25; l.rotation.z=(i?1:-1)*.35;});}
   // footstep dust
   {const st=Math.sign(Math.sin(P.walk)); if(mv&&st!==u.lastStep){u.lastStep=st; for(let i=0;i<3;i++) parts.push({x:P.x+rand(-6,6),y:P.y+rand(-4,4),z:2,vx:rand(-30,30),vy:rand(-30,30),vz:rand(20,50),life:.35,max:.35,col:'#b8ad94',sz:rand(3,5)});}}
   u.body.rotation.z=0; u.body.position.z=0; u.body.scale.set(1,1,1);
@@ -4997,7 +4998,7 @@ function adminPlay(bi,kind){$('#adminPanel').hidden=true; hideOverlays(); MP.inG
   startLevel(bi,B.levels.length,false); run.guest=true; const b=boss; if(!b) return; P.x=b.x; P.y=b.y+260; cam.x=P.x; cam.y=P.y; b.awake=true; b.face=angTo(b,P); b.cd=1.2;
   if(kind==='intro') startCine(bossCine(b),()=>{$('#bossBar').hidden=false;});
   else {if(b.id==='sov1'){const D=BOSSES.sov2; Object.assign(b,{id:'sov2',name:D.name,c1:D.c1,c2:D.c2,r:D.r});} if(b.id==='forms1'){const D=BOSSES.forms3; Object.assign(b,{id:'forms3',name:D.name,c1:D.c1,c2:D.c2});} b.hp=0; bossDown(b);}}
-function renderAdmin(){const p=$('#adminPanel'); const tg=(k,f,l)=>{const b=p.querySelector(`[data-a="${k}"]`); if(b) b.textContent=l+': '+(SAVE[f]?'ON':'OFF');}; tg('god','adminGod','God mode (no damage)'); tg('ohk','adminOHK','One-hit kills'); tg('spd','adminSpd','Super speed'); tg('lgres','adminLgRes','Legends: infinite materials'); tg('lgfast','adminLgFast','Legends: super fast'); p.querySelector('[data-a="gems"]').textContent='Infinite gems: '+(SAVE.adminGems?'ON':'OFF'); p.querySelector('[data-a="all"]').textContent='Unlock all levels & maps: '+(SAVE.adminAll?'ON':'OFF');}
+function renderAdmin(){const p=$('#adminPanel'); const tg=(k,f,l)=>{const b=p.querySelector(`[data-a="${k}"]`); if(b) b.textContent=l+': '+(SAVE[f]?'ON':'OFF');}; tg('god','adminGod','God mode (no damage)'); tg('ohk','adminOHK','One-hit kills'); tg('spd','adminSpd','Super speed'); tg('lgres','adminLgRes','Legends: infinite materials'); tg('lgfast','adminLgFast','Legends: super fast'); tg('lgsup','adminLgSup','Legends: infinite supplies'); p.querySelector('[data-a="gems"]').textContent='Infinite gems: '+(SAVE.adminGems?'ON':'OFF'); p.querySelector('[data-a="all"]').textContent='Unlock all levels & maps: '+(SAVE.adminAll?'ON':'OFF');}
 function buildAdmin(){if($('#adminBtn')) return;
   const b=document.createElement('button'); b.id='adminBtn'; b.title='Admin settings'; b.textContent='⚙'; b.hidden=true; document.body.appendChild(b);
   const p=document.createElement('div'); p.id='adminPanel'; p.hidden=true;
@@ -5008,7 +5009,7 @@ function buildAdmin(){if($('#adminBtn')) return;
     <div class="admRow3"><button class="btn small" data-a="god"></button><button class="btn small" data-a="ohk"></button><button class="btn small" data-a="spd"></button></div>
     <button class="btn small" data-a="maxgear">Max out all my gear (level ${UP_MAX}, enchanted)</button>
     <div class="admRow3"><button class="btn small" data-a="lgres"></button><button class="btn small" data-a="lgfast"></button><button class="btn small" data-a="lggear">Legends: every weapon, armor &amp; artifact</button></div>
-    <div class="admRow3"><button class="btn small" data-a="prison">Become a prisoner (prison escape)</button><button class="btn small gold" data-a="allitems">Get every item in the game</button></div>
+    <div class="admRow3"><button class="btn small" data-a="prison">Become a prisoner (prison escape)</button><button class="btn small gold" data-a="allitems">Get every item in the game</button></div><div class="admRow3"><button class="btn small" data-a="allskins">Have all skins (player and mount)</button><button class="btn small" data-a="lgmounts">Legends: give all mounts</button></div><div class="admRow3"><button class="btn small" data-a="lgsup"></button><button class="btn small" data-a="lgboth">Unlock Legends 1 and 2</button></div>
     <div class="admRow3"><button class="btn small" data-a="lgall">Legends: open the final three</button><button class="btn small" data-a="lgnight">Legends: make it night</button><button class="btn small" data-a="lgday">Legends: make it day</button></div>
     <div class="admRow"><label>Cutscenes</label><select id="admReg">${BIOMES.map((B,i)=>`<option value="${i}">${B.name} · ${(BOSSES[B.boss]||{}).name||''}</option>`).join('')}</select></div>
     <div class="admRow3"><button class="btn small" data-a="region">Region intro</button><button class="btn small" data-a="intro">Boss intro</button><button class="btn small" data-a="defeat">Boss defeat</button></div>
@@ -5021,8 +5022,11 @@ function buildAdmin(){if($('#adminBtn')) return;
     else if(k==='loot') adminLoot();
     else if(k==='lggear') lgAdminGear();
     else if(k==='allitems') adminAllItems();
+    else if(k==='allskins') adminAllSkins();
+    else if(k==='lgmounts') adminAllMounts();
+    else if(k==='lgboth') adminLegendsBoth();
     else if(k==='prison'){p.hidden=true; adminPrison();}
-    else if(k==='god'||k==='ohk'||k==='spd'||k==='lgres'||k==='lgfast'){const f={god:'adminGod',ohk:'adminOHK',spd:'adminSpd',lgres:'adminLgRes',lgfast:'adminLgFast'}[k]; SAVE[f]=!SAVE[f]; persist(); calcStats(); renderAdmin(); toast((a.textContent||'').replace(/: (ON|OFF)$/,'')+(SAVE[f]?' on':' off'),'#7fe0c8');}
+    else if(k==='god'||k==='ohk'||k==='spd'||k==='lgres'||k==='lgfast'||k==='lgsup'){const f={god:'adminGod',ohk:'adminOHK',spd:'adminSpd',lgres:'adminLgRes',lgfast:'adminLgFast',lgsup:'adminLgSup'}[k]; SAVE[f]=!SAVE[f]; persist(); calcStats(); renderAdmin(); toast((a.textContent||'').replace(/: (ON|OFF)$/,'')+(SAVE[f]?' on':' off'),'#7fe0c8');}
     else if(k==='maxgear'){const E=SAVE.eq; let n=0; for(const sl in E){const it=E[sl]; if(!it) continue; it.up=UP_MAX; if(!it.encd) enchantItem(it); n++;} calcStats(); persist(); toast(n+' pieces of gear maxed out','#ffd36a');}
     else if(k==='lgall'){const S0=lgmSave(); for(const t of lgFirst3()) S0.beaten[t]=true; persist(); if(LGMS) lgmOpenBarrier(); toast('The last three hordes have appeared','#c8a0ff');}
     else if(k==='lgnight'||k==='lgday'){if(LGMS){LGMS.day=Math.floor(LGMS.day/300)*300+(k==='lgnight'?212:20); toast(k==='lgnight'?'Night falls':'The sun rises','#9fd0ff');} else toast('Open Legends first','#ffd36a');}
@@ -6129,13 +6133,16 @@ function hideOverlays(){for(const id of ['inv','pause','result','shop','codex','
 /* --- messages --- */
 function onMsg(code,m){if(!m||typeof m!=='object') return; const H=MP.role==='host', C=MP.role==='client'&&MP.party&&code===MP.party.host;
   switch(m.t){
+  case 'arena': if(C) startArena(m.m,{net:true,seed:m.seed}); break;
+  case 'pvp': arenaPvpMsg(code,m); break;
+  case 'pvpdead': arenaPvpDead(code,m); break;
   case 'hello': if(mpSave().friends.some(f=>f.code===code)||m.party===MP.code||(MP.party&&MP.party.host===code)) addFriend(code,m.name,true); else {addFriend(code,m.name,true); toast(m.name+' added you as a friend','#8fd06a');}
     MP.online[code]=true; if(m.party) MP.inParty[code]=m.party; else delete MP.inParty[code]; renderFriendsIfOpen(); break;
   case 'invite': if(MP.party&&MP.party.members.length>1){send(code,{t:'busy',name:myName()}); return;} showInvite(code,m); break;
   case 'busy': toast(m.name+' is already in a party'); break;
   case 'decline': toast(m.name+' declined your invite'); break;
   case 'join': if(!H&&!(!MP.party)) {send(code,{t:'full'}); return;} {const p=ensureParty(); if(p.members.length>=MP_MAX||p.members.some(x=>x.code===code)){if(!p.members.some(x=>x.code===code)) send(code,{t:'full'}); else shareParty(); return;}
-    p.members.push({code,name:m.name,skin:m.skin}); toast(m.name+' joined your party','#8fd06a'); shareParty();
+    p.members.push({code,name:m.name,skin:m.skin}); toast(m.name+' joined your party','#8fd06a'); shareParty(); arenaJoined(code);
     if(MP.inGame) send(code,{t:'start',bi:L.bi,li:L.li,seed:L.seed,n:L.mpN,late:1});} break;
   case 'full': toast('That party is full','#e2504a'); break;
   case 'party': if(code!==m.party.host) return; MP.party=m.party; MP.role=m.party.host===MP.code?'host':'client'; if(!m.party.members.some(x=>x.code===MP.code)){MP.party=null; MP.role=null;} renderFriendsIfOpen(); renderPartyHud(); break;
@@ -7041,8 +7048,8 @@ const TRIBES=[
  {id:'hollow',bi:5,boss:'threefold',name:'Horde of the Hollow',fort:'The Hollow Spire',vil:'Duskfall',col:'#c8b8ff',c2:'#3b3550',zone:'void',trait:'A void shield guards the heart until every spawner falls.',taunt:'',win:''}];
 // sector of each horde around the Crown Well (0 = west, going clockwise)
 const LG_SEC=[0,1,2,3,4,5];
-const LG_COST={cobble:{stone:12},plank:{wood:12},moss:{gold:8,wood:6},tower:{stone:20,wood:10},house:{wood:30,stone:15},recruit:{gold:5},camp:{wood:20,stone:10}};
-const LG_ACT=[['cobble','z','🗿','Cobble Golem'],['plank','x','🏹','Plank Golem'],['moss','c','🌿','Mossy Golem'],['tower','v','🗼','Arrow Tower'],['rally','t','🚩','Rally army'],['recall','y','↩️','Recall army'],['gather','g','✨','Send sprites'],['mount','r','🐎','Ride / dismount'],['house','h','🏠','Build house'],['recruit','u','🤝','Recruit villager'],['travel','f','🌀','Fast travel'],['craft','k','🔨','Craft'],['camp','l','🏕️','Camp / rest'],['mega','n','✨','Mega craft'],['trade','j','🐪','Trade'],['stable','0','🐾','Mounts']];
+const LG_COST={cobble:{stone:12},plank:{wood:12},moss:{gold:8,wood:6},tower:{stone:20,wood:10},house:{wood:30,stone:15},recruit:{gold:5},camp:{wood:20,stone:10},lgx_stone:{stone:60,gold:20,diamond:2},lgx_oak:{wood:60,gold:20,diamond:2},lgx_brick:{stone:40,wood:30,diamond:2},lgx_slate:{stone:50,gold:30,diamond:3}};
+const LG_ACT=[['cobble','z','🗿','Cobble Golem'],['plank','x','🏹','Plank Golem'],['moss','c','🌿','Mossy Golem'],['tower','v','🗼','Arrow Tower'],['rally','t','🚩','Rally army'],['recall','y','↩️','Recall army'],['gather','g','✨','Send sprites'],['mount','r','🐎','Ride / dismount'],['house','h','🏠','Build house'],['recruit','u','🤝','Recruit villager'],['travel','f','🌀','Fast travel'],['craft','k','🔨','Craft'],['camp','l','🏕️','Camp / rest'],['mega','n','✨','Mega craft'],['trade','j','🐪','Trade'],['stable','0','🐾','Mounts'],['quests','9','📜','Quests'],['lgx_stone','[','🗿','Stoneheart Colossus'],['lgx_oak',']','🌳','Oakroot Warden'],['lgx_brick',';','🧱','Brickbound Keeper'],['lgx_slate','\'','⚡','Slatestorm Titan']];
 const RES_ICO={wood:'🪵',stone:'🪨',gold:'🪙',diamond:'💎'};
 const LG_HUB=Math.round(20*Math.sqrt(10)), LG_K=Math.sqrt(50), LG_R=Math.round(392*LG_K), LG_N=2*LG_R+56, LG_C=LG_R+28, LG_CH=32;
 const LG_LV={1:{name:'Outpost',diff:'Easy',size:[24,20],rings:1,thick:2,wallH:2.4,towers:3,spawners:2,patrol:4,cd:9,wave:1,cap:8,hp:1,dmg:1,r:110,da:.13},
@@ -7051,7 +7058,7 @@ const LG_LV={1:{name:'Outpost',diff:'Easy',size:[24,20],rings:1,thick:2,wallH:2.
  4:{name:'Fortress',diff:'Hardest',size:[64,52],rings:3,thick:3,wallH:5.2,towers:20,spawners:8,patrol:22,cd:4.5,wave:4,cap:28,hp:4,dmg:1.5,r:336,da:0}};
 const lgBaseName=b=>b.lv===4?b.tr.fort:(b.tr.fort.replace(/^The /,'').split(' ')[0]+' '+LG_LV[Math.min(4,b.lv+(b.up||0))].name);
 const lgBaseKey=b=>b.tr.id+'-'+b.lv;
-function lgmInit(){if(lgmInit.done) return; lgmInit.done=true;
+function lgmInit(){if(lgmInit.done) return; lgmInit.done=true; lgxInit();
   Object.assign(MINIONS,{lg_cobble:{n:'Cobble Golem',feat:'golem',c1:'#8a8478',c2:'#d8c8a8',role:'melee',dmg:15,spd:150,r:15},lg_plank:{n:'Plank Golem',feat:'golem',c1:'#8a6a3a',c2:'#ffd38a',role:'ranged',dmg:10,spd:165,r:13,shot:'#ffe0a0'},lg_moss:{n:'Mossy Golem',feat:'golem',c1:'#4a7a3a',c2:'#9fe07a',role:'heal',dmg:5,spd:160,r:13,shot:'#9fe07a'},lg_militia:{n:'Villager Militia',feat:'hooded',c1:'#6a4a2a',c2:'#ffd38a',role:'ranged',dmg:9,spd:170,r:11,shot:'#ffe0a0'}});
   Object.assign(HEADH,{tower:1.3,spawner:.9,gate:.5,heart:.7}); Object.assign(ROLE,{tower:['Tower · shoots your army','#ff9a6a'],spawner:['Spawner · keeps making monsters','#ffd36a'],gate:['Fortress gate · break it down','#e8b06a'],heart:['Fortress heart','#ff6a8a']});
   BOSSES.threefold={name:'The Threefold Legend',hp:1100,r:18,spd:155,c1:'#2a1a30',c2:'#ffe08a',acts:['blink','glyphs','spiral','voidrain','orbs','strikes','meteors','summon','combo','burst'],shot:'#ffe08a',minion:'caster'};}
@@ -7192,11 +7199,29 @@ function genLegendWorld(){const N=LG_N,w=N,h=N,cx=LG_C,cy=LG_C,K=LG_K, g=new Uin
   for(const p of prov){const want=p.r<LG_R*.5?1:2; let made=0; for(let t=0;t<30&&made<want;t++){const a=rand(0,TAU), d=rand(90,240), vx=Math.round(p.x+Math.cos(a)*d), vy=Math.round(p.y+Math.sin(a)*d); if(bioAt(vx,vy)!==p.b||!free(vx,vy,16)) continue; villages.push({sec:p.b,cx:vx,cy:vy}); addClear({x:vx,y:vy,r:16}); made++;}}
   for(let k=0;k<6;k++){const a=k/6*TAU+.3, vx=Math.round(cx+Math.cos(a)*(LG_HUB+60)), vy=Math.round(cy+Math.sin(a)*(LG_HUB+60)), b=bioAt(vx,vy); if(b>=0&&free(vx,vy,16)){villages.push({sec:b,cx:vx,cy:vy}); addClear({x:vx,y:vy,r:16});}}
   // lakes, mountains and rocks, shaped by each area's character
+  const lakesL=[];
   for(let k=0;k<6*20*50;k++){for(let t=0;t<40;t++){const [x,y]=rndPt(30,LG_R-24), s=bioAt(x,y), R=rand(3,9)*(Math.random()<.08?2:1); if(s<0||Math.random()*2>LG_SUB[s][lgSubAt(x,y)].lk) continue; if(!free(x,y,R+2)) continue;
-      const RR=Math.ceil(R+2); for(let j=-RR;j<=RR;j++) for(let i=-RR;i<=RR;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&!(fx[at(xx,yy)]&128)&&Math.hypot(i,j*1.2)<R+Math.sin(i*1.7+j)*.8){g[at(xx,yy)]=1; fx[at(xx,yy)]|=32;}} addClear({x,y,r:R+1}); break;}}
+      const RR=Math.ceil(R+2); for(let j=-RR;j<=RR;j++) for(let i=-RR;i<=RR;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&!(fx[at(xx,yy)]&128)&&Math.hypot(i,j*1.2)<R+Math.sin(i*1.7+j)*.8){g[at(xx,yy)]=1; fx[at(xx,yy)]|=32;}} addClear({x,y,r:R+1}); lakesL.push({x,y,R}); break;}}
   for(let k=0;k<6*12*50;k++){for(let t=0;t<40;t++){const [x,y]=rndPt(40,LG_R-24), s=bioAt(x,y), R=rand(4,10)*(Math.random()<.1?1.8:1); if(s<0||Math.random()*2>LG_SUB[s][lgSubAt(x,y)].mt) continue; if(!free(x,y,R+3)) continue;
       const RR=Math.ceil(R+3); for(let j=-RR;j<=RR;j++) for(let i=-RR;i<=RR;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&Math.hypot(i*1.1,j)<R+Math.sin(i*.9+j*1.3)*1.5) g[at(xx,yy)]=1;} addClear({x,y,r:R+1}); break;}}
   for(let k=0;k<6*160*50;k++){for(let t=0;t<20;t++){const [x,y]=rndPt(28,LG_R-12), s=bioAt(x,y); if(s<0||Math.random()*2>LG_SUB[s][lgSubAt(x,y)].rk) continue; if(!free(x,y,2)) continue; const sw=rint(1,3), sh=rint(1,2); for(let j=0;j<sh;j++) for(let i=0;i<sw;i++) if(inB(x+i,y+j)) g[at(x+i,y+j)]=1; break;}}
+  // deep ponds (each hides a treasure), and rivers: every lake near a pond flows into it
+  const ponds=[]; for(let k=0;k<240;k++){for(let t=0;t<60;t++){const [x,y]=rndPt(110,LG_R-70), s=bioAt(x,y), R=rand(9,13); if(s<0||!free(x,y,R+6)) continue;
+      const RR=Math.ceil(R+2); for(let j=-RR;j<=RR;j++) for(let i=-RR;i<=RR;i++){const xx=x+i,yy=y+j; if(inB(xx,yy)&&!(fx[at(xx,yy)]&128)&&Math.hypot(i,j*1.1)<R+Math.sin(i*.7+j*1.3)*1.2){g[at(xx,yy)]=1; fx[at(xx,yy)]|=32;}} ponds.push({x,y,R,i:ponds.length}); addClear({x,y,r:R+3}); break;}}
+  const pgrid=new Map(), PGC=300; for(const p of ponds){const kk=Math.floor(p.x/PGC)*64+Math.floor(p.y/PGC); let a=pgrid.get(kk); if(!a) pgrid.set(kk,a=[]); a.push(p);}
+  const nearPond=(x,y)=>{let best=null,bd=1e9; const ci=Math.floor(x/PGC), cj=Math.floor(y/PGC); for(let j=cj-1;j<=cj+1;j++) for(let i=ci-1;i<=ci+1;i++){const a=pgrid.get(i*64+j); if(a) for(const p of a){const d=Math.hypot(p.x-x,p.y-y); if(d<bd){bd=d; best=p;}}} return [best,bd];};
+  const HUBR=LG_HUB+25;
+  for(const lk of lakesL){const [p,d]=nearPond(lk.x,lk.y); if(!p||d>330||d<lk.R+p.R) continue; const n=Math.ceil(d/1.2), nx=-(p.y-lk.y)/d, ny=(p.x-lk.x)/d, amp=rand(6,18), fr=rand(1.5,3.2), ph=rand(0,TAU);
+    for(let s=0;s<=n;s++){const q=s/n, w=Math.sin(q*Math.PI)*amp*Math.sin(q*fr*Math.PI+ph), cxr=lk.x+(p.x-lk.x)*q+nx*w, cyr=lk.y+(p.y-lk.y)*q+ny*w;
+      for(let j=-1;j<=1;j++) for(let i=-1;i<=1;i++){const xx=Math.round(cxr)+i, yy=Math.round(cyr)+j; if(!inB(xx,yy)) continue; const k=at(xx,yy); if(fx[k]&(128|32)) continue; if(Math.hypot(xx-cx,yy-cy)<HUBR) continue; g[k]=0; fx[k]|=32;}}}
+  // wild mounts wait in dens around the island: find them and finish their quests to tame them
+  const msites={}; {const want=[['tiger',500,950],['beetle',950,1450],['bird',1400,2100],['fish',600,1300]];
+    for(const [m,r0,r1] of want){for(let t=0;t<400;t++){let x,y; if(m==='fish'){const p=ponds[(Math.random()*ponds.length)|0]; if(!p) break; const dd=Math.hypot(p.x-cx,p.y-cy); if(dd<r0||dd>r1||LG_LIQ[Math.max(0,bioAt(p.x,p.y))].em) continue; const a=rand(0,TAU); x=Math.round(p.x+Math.cos(a)*(p.R+5)); y=Math.round(p.y+Math.sin(a)*(p.R+5)); msites[m]={tx:x,ty:y,pond:p.i};}
+        else {[x,y]=rndPt(r0,r1); if(bioAt(x,y)<0||!free(x,y,10)) continue; msites[m]={tx:x,ty:y};}
+        for(let j=-4;j<=4;j++) for(let i=-4;i<=4;i++){const k=at(x+i,y+j); if(!inB(x+i,y+j)||(fx[k]&(31|64|128))) continue; if(m==='fish'&&Math.hypot(x+i-ponds[msites.fish.pond].x,y+j-ponds[msites.fish.pond].y)<ponds[msites.fish.pond].R) continue; g[k]=0; fx[k]&=~32;}
+        addClear({x,y,r:6}); const S2=msites[m]; S2.x=(x+.5)*T; S2.y=(y+.5)*T; S2.items=[];
+        if(m==='bird'||m==='fish'){for(let q=0;q<400&&S2.items.length<5;q++){const a=rand(0,TAU), r=rand(40,m==='bird'?260:150), ix=Math.round(x+Math.cos(a)*r), iy=Math.round(y+Math.sin(a)*r); if(!inB(ix,iy)||g[at(ix,iy)]||(fx[at(ix,iy)]&128)||bioAt(ix,iy)<0) continue; S2.items.push({x:(ix+.5)*T,y:(iy+.5)*T});}}
+        break;}}}
   // fortresses: rings of walls in the horde's own shape, a gate in each ring facing the Crown Well
   bases.forEach((B,bi)=>{const V=LG_LV[B.lv], ST=LG_STYLE[B.sec], FW=V.size[0], FH=V.size[1], a=FW/2, b=FH/2, mn=Math.min(a,b), ext=Math.ceil(Math.max(a,b)*1.36)+2; B.idx=bi; B.shape=ST.shape;
     const M=(x,y)=>lgShapeM(ST.shape,x-B.cx,y-B.cy,a,b), sk=(V.thick+4)/mn, tk=V.thick/mn, outer=[];
@@ -7283,14 +7308,14 @@ function genLegendWorld(){const N=LG_N,w=N,h=N,cx=LG_C,cy=LG_C,K=LG_K, g=new Uin
   mine.doors=doorT.map((d,k)=>({tx:d.tx,ty:d.ty,b:d.b,x:(d.tx+.5)*T,y:(d.ty+.5)*T,name:d.vil?'the mine by '+(d.vil.name||'a village'):'the Crown Well mine',ex:mine.exits[k%mine.exits.length]})); mine.door=mine.doors[0]; mine.hut={x:hut.tx*T,y:hut.ty*T,tx:hut.tx,ty:hut.ty};
   // resources: more gold the further out you go
   const nodes=[], ncell=new Set(), key=(x,y)=>(x>>2)*4096+(y>>2);
-  {let n=0; for(let t=0;t<6*3000*50&&n<6*150*50;t++){const [x,y]=rndPt(22,LG_R-12), s=bioAt(x,y); if(s<0||!inB(x,y)||g[at(x,y)]||!free(x,y,1)||ncell.has(key(x,y))) continue;
+  {let n=0; for(let t=0;t<6*3000*50&&n<6*150*50;t++){const [x,y]=rndPt(22,LG_R-12), s=bioAt(x,y); if(s<0||!inB(x,y)||g[at(x,y)]||(fx[at(x,y)]&32)||!free(x,y,1)||ncell.has(key(x,y))) continue;
       ncell.add(key(x,y)); const rr=Math.hypot(x-cx,y-cy), kd=Math.random()<.12+rr/(1200*K)?'gold':Math.random()<.55?'wood':'stone'; nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:kd,hp:4,max:4,regrow:0,sec:s}); n++;}}
   for(let k=0;k<60;k++){const aa=k<10?k/10*TAU:rand(0,TAU), rr=k<10?14:rand(24,LG_HUB-4), x=Math.round(cx+Math.cos(aa)*rr), y=Math.round(cy+Math.sin(aa)*rr); if(!g[at(x,y)]) nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:['stone','wood','gold'][k%3],hp:4,max:4,regrow:0,sec:-1});}
   // stone, gold and diamonds in the mineshaft: the deeper you go, the richer it gets
   {const M2=mine; let n=0; for(let t=0;t<60000&&n<5200;t++){const x=rint(M2.x0+2,M2.x1-3), y=rint(M2.y0+2,M2.y1-3); if(g[at(x,y)]||ncell.has(key(x,y))) continue; const dd=Math.hypot(x-M2.sx,y-M2.sy); if(dd<9) continue;
     ncell.add(key(x,y)); const r=Math.random(), deep=Math.min(1,dd/300), kd=r<.04+.12*deep+(M2.deep(x,y)?.08:0)?'diamond':r<.3+.15*deep?'gold':'stone'; nodes.push({tx:x,ty:y,x:(x+.5)*T,y:(y+.5)*T,kind:kd,hp:4,max:4,regrow:0,sec:-2}); n++;}}
   const nodeB=new Map(), nodeTile=new Set(); for(const n of nodes){const kk=(n.tx>>5)*256+(n.ty>>5); let a=nodeB.get(kk); if(!a) nodeB.set(kk,a=[]); a.push(n); nodeTile.add(at(n.tx,n.ty));}
-  const D={fx,bar,mine,prov,bases,villages,houses,nodes,nodeB,nodeTile,hub:{x:(cx+.5)*T,y:(cy+.5)*T},
+  const D={fx,bar,mine,prov,ponds,msites,bases,villages,houses,nodes,nodeB,nodeTile,hub:{x:(cx+.5)*T,y:(cy+.5)*T},
     regAt:i=>{const x=i%w, y=(i/w)|0; if(x>=mine.x0-3&&y>=mine.y0-3&&x<mine.x1+3&&y<mine.y1+3) return mine.city&&mine.city.inC(x,y)?-4:(lgL2A()||mine.deep(x,y))?-3:-2; return bioAt(x,y);}, lakeAt:i=>fx[i]&32, bldAt:i=>fx[i]&64, fwAt:i=>fx[i]&31, seaAt:i=>fx[i]&128, barAt:i=>{const v=bar.get(i); return v===undefined?-1:v;}};
   return {w,h,g,start:{x:(cx+.5)*T,y:(cy+4.5)*T},exit:null,chests:[],spawns:[],bossAt:null,gates:[],keys:[],rooms:[],rects:[],lgWorld:D};}
 // resource nodes near a spot (they are kept in 32-tile buckets)
@@ -7307,7 +7332,7 @@ function lgmBuildWorld(){const D=L.lgWorld, W=L.w, H=L.h, at=(x,y)=>y*W+x;
   const destroyed=lgmSave().bases||{};
   for(const B of D.bases){const tr=TRIBES[B.sec]; B.ruin=lgL2A()||!!destroyed[tr.id+'-'+B.lv]||(B.lv===4&&!!lgBeat()[tr.id]); if(!B.ruin&&!tribeOpen(B.sec)) continue; lgmBuildBase(B);}
   L.lgBar=null;
-  for(const hs of D.houses) lgmHouseMesh(hs); lgmMineMeshes(); if(lgL2A()) lgmL2Meshes();
+  for(const hs of D.houses) lgmHouseMesh(hs); lgmMineMeshes(); if(lgL2A()) lgmL2Meshes(); lgmMountMeshes();
   const well=(x,z,big)=>{const s=big?2.8:1.7, gr=new THREE.Group(); gr.position.set(x,0,z); levelGroup.add(gr); if(!big) (L.lgFar=L.lgFar||[]).push(gr); const st=new THREE.MeshStandardMaterial({color:0x9a968c,roughness:.9,flatShading:true});
     const ring=new THREE.Mesh(gCyl,st); ring.position.y=.3*s; ring.scale.set(s,.6*s,s); gr.add(ring); const wt=new THREE.Mesh(gCircle,new THREE.MeshBasicMaterial({color:big?0x7ae8ff:0x5ab8e8})); wt.rotation.x=-Math.PI/2; wt.position.y=.62*s; wt.scale.setScalar(s*.85); gr.add(wt);
     if(big){const gold=new THREE.MeshStandardMaterial({color:0xe8c050,metalness:.6,roughness:.25}); for(let i=0;i<6;i++){const a=i/6*TAU, p=new THREE.Mesh(gCyl,gold); p.position.set(Math.cos(a)*s,1.1,Math.sin(a)*s); p.scale.set(.06,1.6,.06); gr.add(p); const g2=new THREE.Mesh(gOct,new THREE.MeshStandardMaterial({color:0xffd36a,emissive:new THREE.Color('#ffb020'),emissiveIntensity:1})); g2.position.set(Math.cos(a)*s,2,Math.sin(a)*s); g2.scale.set(.12,.2,.12); gr.add(g2);}
@@ -7474,7 +7499,7 @@ function lgmCompassPOI(){const C=LGMS, D=C.D, inM=lgInMine(P.x,P.y), out=[], d=o
   const got=lgmWellList(); for(const [w] of near(lgmWells(),3)) out.push({x:w.x,y:w.y,ic:'🌀',t:w.name[0].toUpperCase()+w.name.slice(1),k:'well'});
   for(const [V] of near(D.villages.filter(V=>!got.includes(V.i)),3)) out.push({x:V.x,y:V.y,ic:'🏠',t:V.name,k:'vil'});
   for(const [b] of near(C.bases.filter(b=>!b.beaten&&!b.hidden).map(b=>Object.assign({x:b.B.heart.x,y:b.B.heart.y,b})),4)) out.push({x:b.x,y:b.y,ic:'',t:lgBaseName(b.b),k:'base',col:b.b.tr.col,lv:lgLv(b.b)});
-  for(const [m] of near(D.mine.doors,1)) out.push({x:m.x,y:m.y,ic:'⛏️',t:'Mineshaft',k:'mine'});
+  for(const [m] of near(D.mine.doors,1)) out.push({x:m.x,y:m.y,ic:'⛏️',t:'Mineshaft',k:'mine'}); {const M0=lgMounts(); for(const [k,s] of Object.entries(D.msites||{})) if(!M0[k]) out.push({x:s.x,y:s.y,ic:'🐾',t:'Wild '+LG_MOUNTS[k].n,k:'mine'});}
   if(C.raid) out.push({x:C.raid.V.x,y:C.raid.V.y,ic:'⚔️',t:C.raid.V.name+' is under attack!',k:'raid'});
   return out;}
 function lgmCompass(){let el=$('#lgCompass'); if(!el){el=document.createElement('div'); el.id='lgCompass'; el.setAttribute('aria-hidden','true'); el.innerHTML='<div class="cbar"></div><div class="cmid"></div>'; $('#hud').appendChild(el);}
@@ -7486,7 +7511,7 @@ function lgmCompass(){let el=$('#lgCompass'); if(!el){el=document.createElement(
     s.innerHTML=it.card?it.lab:it.k==='base'?`<b class="pt l${it.lv}" style="--pc:${it.col}"></b><i>${it.dist}</i>`:`<b>${it.ic}</b><i>${it.dist}</i>`;});
   for(let k=items.length;k<bar.children.length;k++) bar.children[k].style.display='none';}
 // the action menus: Build, Army and Travel, each opening its own choices
-const LG_GROUPS=[{id:'build',key:'b',ico:'🔨',n:'Build',acts:['cobble','plank','moss','tower','house','camp','craft','mega'],hint:'Golems, towers, houses and crafting'},{id:'army',key:'o',ico:'🚩',n:'Army',acts:['rally','recall','gather','recruit','trade'],hint:'Command your army and helpers'},{id:'travel',key:'e',ico:'🧭',n:'Travel',acts:['mount','stable','travel'],hint:'Ride your steed or use a well'}];
+const LG_GROUPS=[{id:'build',key:'b',ico:'🔨',n:'Build',acts:['cobble','plank','moss','lgx_stone','lgx_oak','lgx_brick','lgx_slate','tower','house','camp','craft','mega'],hint:'Golems, towers, houses and crafting'},{id:'army',key:'o',ico:'🚩',n:'Army',acts:['rally','recall','gather','recruit','trade','quests'],hint:'Command your army and helpers'},{id:'travel',key:'e',ico:'🧭',n:'Travel',acts:['mount','stable','travel'],hint:'Ride your steed or use a well'}];
 /* ---------------- Legends 2 at runtime: the corrupted island, the Ancient City, the note blocks and the portal ---------------- */
 function lgmL2Meshes(){const m=L.lgWorld.mine, c=m&&m.city; if(!c) return; const S0=lgmSave(); S0.notes=S0.notes||[0,0,0,0,0];
   const deep=new THREE.MeshStandardMaterial({color:0x1a1e2a,roughness:.9,flatShading:true}), glowC=new THREE.MeshStandardMaterial({color:0x2ae8f0,emissive:new THREE.Color('#1ab8d0'),emissiveIntensity:1});
@@ -7570,13 +7595,13 @@ SOUL_ABIL.bow=['Soul Volley','Every shot fires an extra soul arrow'];
 // supplies (Legends): monster parts and finds, used for mega crafting and trading
 const SUPS=['Rotten Brain','Bone Shard','Spider Silk','Slime Gel','Beetle Shell','Ember Dust','Frost Scale','Void Dust','Sculk Sac','Royal Wing','Seed Pod','Echo Note','Bramble Thorn','Sand Glass','Bog Moss','Iron Scrap'];
 const lgSup=()=>{const S0=lgmSave(); return S0.sup=S0.sup||{};};
-const lgSupCount=()=>Object.values(lgSup()).reduce((a,b)=>a+b,0);
-function lgGiveSup(name,n,x,y,quiet){const s=lgSup(); s[name]=(s[name]||0)+n; if(!quiet&&x!=null) ftext(x,y-30,`+${n} ${name}`,'#e8c89a',true);}
-function lgSpendSup(n){const s=lgSup(); for(const k of Object.keys(s).sort((a,b)=>s[b]-s[a])){while(n>0&&s[k]>0){s[k]--; n--;} if(!s[k]) delete s[k]; if(n<=0) break;} return n<=0;}
+const lgSupCount=()=>SAVE&&SAVE.adminLgSup&&isAdmin()?999:Object.values(lgSup()).reduce((a,b)=>a+b,0);
+function lgGiveSup(name,n,x,y,quiet){const s=lgSup(); s[name]=(s[name]||0)+n; lgmQ('sup',n); if(!quiet&&x!=null) ftext(x,y-30,`+${n} ${name}`,'#e8c89a',true);}
+function lgSpendSup(n){if(SAVE&&SAVE.adminLgSup&&isAdmin()) return true;const s=lgSup(); for(const k of Object.keys(s).sort((a,b)=>s[b]-s[a])){while(n>0&&s[k]>0){s[k]--; n--;} if(!s[k]) delete s[k]; if(n<=0) break;} return n<=0;}
 // a camp: rest to heal everyone, and sleep through the night
 function lgmCamp(){const C=LGMS, S0=lgmSave(); S0.camps=S0.camps||[]; const near=S0.camps.find(c=>Math.hypot(c.x-P.x,c.y-P.y)<240);
   if(!near){const c=LG_COST.camp; if(!Object.entries(c).every(([r,v])=>C.res[r]>=v)){toast(`Not enough: a camp needs ${c.wood} wood and ${c.stone} stone`,'#ff8a6a'); return;}
-    let x=0,y=0,okc=false; for(let k=0;k<16&&!okc;k++){const a=C.yaw+[0,.6,-.6,1.2,-1.2,1.8,-1.8,Math.PI][k%8], d=k<8?90:150; x=P.x+Math.cos(a)*d; y=P.y+Math.sin(a)*d; okc=!blocked(x,y,22)&&!lgInMine(x,y);} if(!okc){toast('No room for a camp here','#ffd36a'); return;} for(const [r,v] of Object.entries(c)) C.res[r]-=v; const cp={x,y}; S0.camps.push(cp); if(S0.camps.length>12) S0.camps.shift(); lgmCampMesh(cp); banner('Camp built','Rest here any time with L (🏕️ in the Build menu)');}
+    let x=0,y=0,okc=false; for(let k=0;k<16&&!okc;k++){const a=C.yaw+[0,.6,-.6,1.2,-1.2,1.8,-1.8,Math.PI][k%8], d=k<8?90:150; x=P.x+Math.cos(a)*d; y=P.y+Math.sin(a)*d; okc=!blocked(x,y,22)&&!lgInMine(x,y);} if(!okc){toast('No room for a camp here','#ffd36a'); return;} for(const [r,v] of Object.entries(c)) C.res[r]-=v; const cp={x,y}; S0.camps.push(cp); lgmQ('camps',1); if(S0.camps.length>12) S0.camps.shift(); lgmCampMesh(cp); banner('Camp built','Rest here any time with L (🏕️ in the Build menu)');}
   const night=C.night; P.hp=ST.maxhp; for(const a of allies) a.hp=a.max; flashT=.8; flashCol='#000000';
   if(night){C.day=Math.floor(C.day/300)*300+300+4; S0.days=(S0.days||1)+1; if(C.raid){for(const m of C.raid.mobs){m.hp=0;} C.raid=null;} for(const e of ents) if(!e.st&&!e.ally&&e.raid) e.hp=0; banner('You sleep by the fire','The night passes safely. Morning comes, and everyone is fully healed.');}
   else banner('You rest by the fire','You and your army are fully healed'); if(typeof sfx==='function') sfx('potion'); persist();}
@@ -7660,11 +7685,12 @@ function lgmStable(){let el=$('#lgStable'); if(!el){el=document.createElement('d
   el.querySelector('#lgStX').onclick=()=>{el.hidden=true;};}
 const lgFlying=()=>!!(LGMS&&LGMS.ride&&LG_MOUNTS[lgMount().type].fly);
 // sky monsters hunt anyone who flies
-function lgmSkyTick(dt){const C=LGMS; const fly=lgFlying(); const tgt=fly?5:0; P.jz=(P.jz||0)+(tgt-(P.jz||0))*Math.min(1,dt*3); if(!fly&&P.jz<.02) P.jz=0;
-  if(!fly||(MP.role==='client'&&MP.inGame)) return; C.skyT=(C.skyT||3)-dt; if(C.skyT>0) return; C.skyT=4.5;
+function lgmSkyTick(dt){const C=LGMS; const fly=lgFlying(), sw=lgSwim(); if(!sw) C.dive=false; const tgt=fly?lgFlyAlt(dt):sw?(C.dive?-1.8:-.3):0; P.jz=(P.jz||0)+(tgt-(P.jz||0))*Math.min(1,dt*3); if(!fly&&!sw&&Math.abs(P.jz)<.02) P.jz=0;
+  for(const e of ents){if(!e.sky||e.hp<=0) continue; const sm=REG.get(e); if(sm&&sm.userData.wings) sm.userData.wings.forEach((w,i)=>w.rotation.z=(i?1:-1)*Math.sin(time*9+e.x)*.6);}
+  if(!fly||(MP.role==='client'&&MP.inGame)) return; C.skyT=(C.skyT||3)-dt; if(C.skyT>0) return; C.skyT=4.5; if(Math.random()>.05) return;
   const n=ents.filter(e=>e.sky&&e.hp>0&&Math.abs(e.x-P.x)<1200&&Math.abs(e.y-P.y)<1200).length; if(n>=4) return;
   const pred=Math.random()<.45, a=rand(0,TAU), r=rand(420,620), x=P.x+Math.cos(a)*r, y=P.y+Math.sin(a)*r; LG_EBI=L.bi; LG_ETIER=Math.max(L.tier,lgmProgressTier());
-  const e=spawnEnemy(pred?'lunge':'ranged',x,y,true); LG_EBI=LG_ETIER=null; if(e){e.sky=true; e.ghost=true; e.name=pred?'Sky Predator':'Sky Raider'; e.spd*=1.4; e.max=Math.round(e.max*1.3); e.hp=e.max; puff(x,y,'#9fd0ff',10,100,.6,5);}}
+  const e=spawnEnemy(pred?'lunge':'ranged',x,y,true); LG_EBI=LG_ETIER=null; if(e){e.sky=true; e.ghost=true; e.name=pred?'Sky Predator':'Sky Raider'; e.spd*=1.4; e.max=Math.max(2,Math.round(e.max*.06)); e.hp=e.max; puff(x,y,'#9fd0ff',10,100,.6,5);}}
 // golem spawners: build one, then spawn golems from it (up to 20 golems)
 const LG_GSPAWN={wood:15,stone:15};
 function lgmGolemSpawner(a){const C=LGMS; if(!C.gsp){const S0=lgmSave(); C.gsp=S0.gsp=S0.gsp||[];} const near=C.gsp.filter(s=>s.t===a&&Math.hypot(s.x-P.x,s.y-P.y)<520).sort((u,v)=>Math.hypot(u.x-P.x,u.y-P.y)-Math.hypot(v.x-P.x,v.y-P.y))[0]; if(near) return near;
@@ -7693,27 +7719,155 @@ function genArena(){const w=44,h=44,g=new Uint8Array(w*h).fill(1); for(let y=0;y
   for(let k=0;k<8;k++){const a=k/8*TAU+.4, px=Math.round(21.5+Math.cos(a)*11), py=Math.round(21.5+Math.sin(a)*11); for(let j=0;j<2;j++) for(let i=0;i<2;i++) g[(py+j)*w+px+i]=1;}
   return {w,h,g,start:{x:21.5*T,y:36*T},exit:null,chests:[],spawns:[],bossAt:null,gates:[],keys:[],rooms:[],rects:[]};}
 function openArena(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} let p=$('#arenaPanel'); if(!p){p=document.createElement('div'); p.id='arenaPanel'; p.className='stpanel'; p.setAttribute('role','dialog'); p.setAttribute('aria-label','Arena'); document.body.appendChild(p); p.addEventListener('click',e=>{if(e.target===p) p.hidden=true;}); ['keydown','keyup'].forEach(t=>p.addEventListener(t,e=>{e.stopPropagation(); if(e.key==='Escape') p.hidden=true;}));}
-  p.innerHTML=`<div class="stBox modesbox"><h2>🏟️ The Arena</h2><p class="sp">Fight rival champions in the great arena. Wins: ${SAVE.arenaWins||0}</p><div class="modegrid">${ARENA_MODES.map((m,i)=>`<button class="modecard" data-a="${m.id}"><span class="mico" aria-hidden="true">${m.ico}</span><b>${m.n}</b><span class="md">${m.d}</span><span class="msub">Key ${i+1}</span></button>`).join('')}</div><button class="btn small" id="arX">Close</button></div>`;
-  p.hidden=false; p.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{p.hidden=true; startArena(b.dataset.a);}); p.querySelector('#arX').onclick=()=>{p.hidden=true;};
-  p.onkeydown=e=>{const i=+e.key-1; if(ARENA_MODES[i]){p.hidden=true; startArena(ARENA_MODES[i].id);}}; const f=p.querySelector('[data-a]'); if(f) f.focus();}
-function startArena(m){if(DUN) dunQuit(); if(LGMS) lgmQuit(); GAUNT=null; lgmInit(); $('#modesPanel')&&($('#modesPanel').hidden=true); const bi=Math.max(0,BIOMES.findIndex(b=>b.id==='citadel')), tier=Math.min(27,Math.max(2,(SAVE.arenaWins||0)+2));
+  p.innerHTML=`<div class="stBox modesbox"><h2>🏟️ The Arena</h2><p class="sp">Fight real players online, or smart AI bots when no one is around. Wins: ${SAVE.arenaWins||0}</p><div class="modegrid">${ARENA_MODES.map((m,i)=>`<button class="modecard" data-a="${m.id}"><span class="mico" aria-hidden="true">${m.ico}</span><b>${m.n}</b><span class="md">${m.d}</span><span class="msub">Key ${i+1}</span></button>`).join('')}</div><button class="btn small" id="arX">Close</button></div>`;
+  p.hidden=false; p.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{p.hidden=true; arenaFind(b.dataset.a);}); p.querySelector('#arX').onclick=()=>{p.hidden=true;};
+  p.onkeydown=e=>{const i=+e.key-1; if(ARENA_MODES[i]){p.hidden=true; arenaFind(ARENA_MODES[i].id);}}; const f=p.querySelector('[data-a]'); if(f) f.focus();}
+function startArena(m,o){o=o||{}; const party=MP.party&&MP.party.members.length>1; if(party&&!o.net&&MP.role!=='host'){toast('The party leader starts the Arena','#ffd36a'); return;} const seed=o.seed||((Math.random()*1e9)|0);if(DUN) dunQuit(); if(LGMS) lgmQuit(); GAUNT=null; lgmInit(); $('#modesPanel')&&($('#modesPanel').hidden=true); const bi=Math.max(0,BIOMES.findIndex(b=>b.id==='citadel')), tier=Math.min(27,Math.max(2,(SAVE.arenaWins||0)+2));
   ARENA={mode:m,wave:0,over:false,bi,tier,t:0};
-  GEN_OVERRIDE=genArena; GEN_NAME='The Arena'; GEN_THEME={wall:[['brazier',.08]],scatter:[],plat:[],name:''}; try{startLevel(bi,1,false,(Math.random()*1e9)|0);} finally{GEN_OVERRIDE=null; GEN_NAME=null; GEN_THEME=null;}
-  run.arena=true; ents=[]; L.reinf=0; arenaWave(); $('#lvlName').innerHTML=`<small>Arena · ${ARENA_MODES.find(x=>x.id===m).n}</small>The Arena`;
-  if(m==='team'){summonAllies({minion:'lg_militia',count:3,pot:2.2+.2*tier}); for(const a of allies) a.name='Ally champion';}
+  GEN_OVERRIDE=genArena; GEN_NAME='The Arena'; GEN_THEME={wall:[['brazier',.08]],scatter:[],plat:[],name:''}; try{startLevel(bi,1,false,seed);} finally{GEN_OVERRIDE=null; GEN_NAME=null; GEN_THEME=null;}
+  run.arena=true; ents=[]; L.reinf=0; ARENA.pvp=party&&m!=='raid'; ARENA.team=arenaTeams(); ARENA.dead=new Set(); if(party&&!o.net){MP.inGame=true; bcast({t:'arena',m,seed});}
+  if(ARENA.pvp){if(ARENA.team[MP.code]===1){P.y=8*T; P.face=Math.PI/2;} banner('The Arena',m==='duel'?'Duel your friend! Last one standing wins':'Team fight: your team against theirs');} else if(!o.net) arenaWave(); $('#lvlName').innerHTML=`<small>Arena · ${ARENA_MODES.find(x=>x.id===m).n}</small>The Arena`;
+  if(m==='team'&&!ARENA.pvp&&!o.net){summonAllies({minion:'lg_militia',count:3,pot:2.2+.2*tier}); for(const a of allies) a.name='Ally champion';}
   banner('The Arena',ARENA_MODES.find(x=>x.id===m).d);}
-function arenaChamp(type,x,y,f){LG_EBI=ARENA.bi; LG_ETIER=ARENA.tier; const e=spawnEnemy(type,x,y,true); LG_EBI=LG_ETIER=null; if(!e) return null; e.arena=true; e.name='Champion '+choice(ARENA_NAMES); e.max=Math.round(e.max*f); e.hp=e.max; e.dmg*=1.2; return e;}
+function arenaChamp(type,x,y,f){LG_EBI=ARENA.bi; LG_ETIER=ARENA.tier; const e=spawnEnemy(type,x,y,true); LG_EBI=LG_ETIER=null; if(!e) return null; e.arena=true; e.bot=true; e.spd*=1.25; e.name='Bot '+choice(ARENA_NAMES); e.max=Math.round(e.max*f); e.hp=e.max; e.dmg*=1.2; return e;}
 function arenaWave(){const A=ARENA; A.wave++; const cx=21.5*T, cy=10*T;
   if(A.mode==='duel') arenaChamp('melee',cx,cy,8);
   else if(A.mode==='team') ['melee','ranged','lunge','brute'].forEach((t,i)=>arenaChamp(t,cx+(i-1.5)*90,cy,3.5));
   else {const n=3+A.wave*2; for(let i=0;i<n;i++){const a=i/n*Math.PI, e=arenaChamp(choice(['melee','ranged','lunge','bomb']),cx+Math.cos(a)*260,cy+Math.sin(a)*120,1+.3*A.wave); if(e&&i>0) e.name=null;} if(A.wave===5) arenaChamp('brute',cx,cy,10); banner(`Wave ${A.wave} of 5`,A.wave===5?'The arena champion enters!':'Here they come');}}
-function arenaTick(dt){const A=ARENA; if(!A||A.over||mode!=='play') return; A.t+=dt; if(ents.some(e=>e.arena&&e.hp>0)) return;
+function arenaTick(dt){const A=ARENA; if(!A||A.over||mode!=='play') return; A.t+=dt; if(!A.pvp) arenaBots(dt);
+  if(A.pvp){if(P.dead){const mm={t:'pvpdead',who:MP.code}; if(MP.role==='host') bcast(mm); else toHost(mm); A.over=true; A.won=false; run.victory=false; run.endT=1.4; return;} const my=A.team[MP.code], foes=Object.keys(A.team).filter(c=>A.team[c]!==my); if(foes.length&&foes.every(c=>A.dead.has(c))){A.over=true; A.won=true; SAVE.arenaWins=(SAVE.arenaWins||0)+1; const sh=200; SAVE.shards+=sh; A.rew={sh,it:null}; persist(); run.victory=true; run.endT=1.4; if(typeof sfx==='function') sfx('win');} return;} if(ents.some(e=>e.arena&&e.hp>0)) return;
   if(A.mode==='raid'&&A.wave<5){arenaWave(); return;}
   A.over=true; A.won=true; SAVE.arenaWins=(SAVE.arenaWins||0)+1; const sh=120+40*A.tier; SAVE.shards+=sh; const it=randomItem(Math.min(27,A.tier),2); if(it) SAVE.inv.push(it); A.rew={sh,it}; persist(); run.victory=true; run.endT=1.4; if(typeof sfx==='function') sfx('win');}
 function arenaResult(kind){const A=ARENA; A.over=true; mode='result'; $('#result').hidden=false; const won=kind!=='dead'&&A.won, m=ARENA_MODES.find(x=>x.id===A.mode);
   $('#resTitle').textContent=won?`${m.n} won!`:`You fell in the Arena`; $('#resSub').textContent=won?'The crowd roars. Your prize is in your pack.':'The rival champions win this round. Train, upgrade your gear and try again.';
   const t=Math.round(A.t); $('#resStats').innerHTML=`<dt>Mode</dt><dd>${m.n}</dd>${A.mode==='raid'?`<dt>Waves</dt><dd>${A.wave} of 5</dd>`:''}<dt>Fight time</dt><dd>${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}</dd><dt>Arena wins</dt><dd>${SAVE.arenaWins||0}</dd>${won&&A.rew?`<dt>Diamonds won</dt><dd>${A.rew.sh}</dd><dt>Gear won</dt><dd>${A.rew.it?esc(A.rew.it.name):'none'}</dd>`:''}`;
   $('#resRetry').hidden=false; $('#resRetry').textContent='Fight again'; $('#resMap').focus(); persist();}
+/* ---------------- v6.2: wild mounts and their quests, the Spiritfin, deep-pond treasure, quests, legend golems ---------------- */
+// panels must be clickable: free the mouse from camera steering when one opens
+const lgUnlock=()=>{try{if(document.pointerLockElement) document.exitPointerLock();}catch(e){}};
+{const W=(f)=>function(){lgUnlock(); return f.apply(this,arguments);}; lgmCraft=W(lgmCraft); lgmMega=W(lgmMega); lgmTrade=W(lgmTrade); lgmTravel=W(lgmTravel); lgmStable=W(lgmStable);}
+// the fifth mount: the Spiritfin, a great ghostly river fish
+LG_MOUNTS.fish={n:'Spiritfin',ico:'🐟',spd:2.0,swim:true,d:'Swims rivers, lakes and ponds, and dives for treasure in deep ponds (Space to dive)',skins:[['River Spirit','#7ad8c8','#2a5a6a','#e8fff8'],['Moon Fin','#c8d0ff','#3a3a7a','#ffffff'],['Ember Fin','#ff8a5a','#5a1a1a','#ffe0a0'],['Shade Fin','#3a4a5a','#0a1018','#7af0ff']]};
+const LG_MQ={tiger:{n:'The Tiger\'s Trial',d:'Defeat 15 monsters near the tiger\'s den to earn its respect.',need:15},beetle:{n:'The Beetle\'s Burden',d:'Bring 40 stone and 8 supplies to the beetle\'s hollow.',need:1},bird:{n:'Feathers of the Nest',d:'Collect the 5 golden feathers scattered around the great nest.',need:5},fish:{n:'Pearls of the Pond',d:'Collect the 5 river pearls on the shores near the Spiritfin\'s pond.',need:5}};
+const lgMounts=()=>{const S0=SAVE.lgm=SAVE.lgm||{}; return S0.mounts=S0.mounts||{horse:true};};
+const lgMQ=()=>{const S0=lgmSave(); S0.mq=S0.mq||{}; for(const k in LG_MQ) S0.mq[k]=S0.mq[k]||{st:'none',n:0,got:[]}; return S0.mq;};
+const lgSwim=()=>!!(LGMS&&LGMS.ride&&LG_MOUNTS[lgMount().type]&&LG_MOUNTS[lgMount().type].swim);
+const lgWaterAt=(x,y)=>{const D=LGMS&&LGMS.D; if(!D) return false; const tx=Math.floor(x/T), ty=Math.floor(y/T); if(tx<0||ty<0||tx>=L.w||ty>=L.h) return false; const i=ty*L.w+tx; return !!D.lakeAt(i)&&!D.seaAt(i);};
+const lgPondAt=(x,y)=>{const D=LGMS&&LGMS.D; if(!D||!D.ponds) return null; for(const p of D.ponds) if(Math.abs((p.x+.5)*T-x)<p.R*T&&Math.abs((p.y+.5)*T-y)<p.R*T&&Math.hypot((p.x+.5)*T-x,(p.y+.5)*T-y)<p.R*T) return p; return null;};
+function lgFishModel(B,c1,c2,c3){add(B,gSph,c1,0,.7,0,.42,.38,1.1); add(B,gSph,c3,0,.6,.1,.3,.24,.8); add(B,gCone,c2,0,1.15,-.1,.06,.5,.5).rotation.x=-.4; for(let i=0;i<3;i++) add(B,gCone,c2,0,1.0+i*.05,.4-i*.35,.05,.35-i*.05,.2).rotation.x=-.6;
+  const tl=new THREE.Group(); tl.position.set(0,.7,-1.0); B.add(tl); add(tl,gCone,c2,0,.18,-.1,.06,.45,.3).rotation.x=-1; add(tl,gCone,c2,0,-.18,-.1,.06,.45,.3).rotation.x=-2.1;
+  for(const s of [-1,1]){add(B,gSph,M('#ffffff',{emissive:new THREE.Color('#7af0ff'),emissiveIntensity:1}),s*.25,.85,.75,.07); add(B,gCone,c2,s*.42,.6,.3,.04,.4,.25).rotation.z=s*1.2;}
+  const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:new THREE.Color(c3),transparent:true,opacity:.35,depthWrite:false,blending:THREE.AdditiveBlending})); gl.position.y=.7; gl.scale.set(3,3,1); B.add(gl); return tl;}
+{const _bm=buildMountM; buildMountM=function(type,si){if(type!=='fish') return _bm(type,si); const T0=LG_MOUNTS.fish, sk=T0.skins[si]||T0.skins[0], R=model(), B=R.userData.body; R.userData.tail=lgFishModel(B,M(sk[1],{roughness:.3,metalness:.1,transparent:true,opacity:.92}),M(sk[2],{roughness:.5}),M(sk[3],{roughness:.4,emissive:new THREE.Color(sk[3]),emissiveIntensity:.25})); R.userData.legs=[]; R.userData.arms=[]; R.userData.legType='quad'; applyHi(R); R.scale.setScalar(1.4); CUR=null; return R;};}
+// legend golems: four great golems, bigger than you, one of each at a time
+const LGX=[['lgx_stone','[','🗿','Stoneheart Colossus',{stone:60,gold:20,diamond:2},'Huge fists that smash gates and towers'],['lgx_oak',']','🌳','Oakroot Warden',{wood:60,gold:20,diamond:2},'Fires volleys of arrows from far away'],['lgx_brick',';','🧱','Brickbound Keeper',{stone:40,wood:30,diamond:2},'Heals your whole army'],['lgx_slate','\'','⚡','Slatestorm Titan',{stone:50,gold:30,diamond:3},'Stuns everything it strikes']];
+function lgxInit(){Object.assign(MINIONS,{lgx_stone:{n:'Stoneheart Colossus',feat:'lgx_stone',c1:'#8a8478',c2:'#ffd36a',role:'melee',dmg:80,spd:120,r:24},lgx_oak:{n:'Oakroot Warden',feat:'lgx_oak',c1:'#6a4a2a',c2:'#9fe07a',role:'ranged',dmg:34,spd:135,r:20,shot:'#c8ff8a'},
+  lgx_brick:{n:'Brickbound Keeper',feat:'lgx_brick',c1:'#a8543a',c2:'#ffe0a0',role:'heal',dmg:16,spd:130,r:20,shot:'#ffd38a'},lgx_slate:{n:'Slatestorm Titan',feat:'lgx_slate',c1:'#d8d4cc',c2:'#7ad0ff',role:'melee',dmg:55,spd:125,r:22}});}
+function buildLegendGolem(R,B,f){const u=R.userData, D={lgx_stone:['#8a8478','#5a5650','#ffd36a'],lgx_oak:['#7a5a34','#4a3420','#9fe07a'],lgx_brick:['#b8603e','#6a3020','#ffe0a0'],lgx_slate:['#e0dcd2','#8a8a90','#7ad0ff']}[f]||['#888','#555','#fff'], m=M(D[0],{roughness:.9,flatShading:true}), dk=M(D[1],{roughness:.9,flatShading:true}), gl=glow(D[2],2);
+  u.legs=[limb(B,-.26,.5,0,.5,.16,dk),limb(B,.26,.5,0,.5,.16,dk)]; const t=new THREE.Group(); t.position.y=.5; B.add(t); u.torso=t; t.userData.rx0=0;
+  if(f==='lgx_stone'){add(t,gBox,m,0,.42,0,.9,.75,.6); add(t,gBox,dk,0,.85,0,1.05,.2,.66); add(t,gSph,gl,0,.45,.31,.12); for(const s of [-1,1]) add(t,gIco,dk,s*.55,.95,0,.22);}
+  else if(f==='lgx_oak'){add(t,gCyl,m,0,.42,0,.4,.8,.4); for(let i=0;i<5;i++){const a=i/5*TAU; add(t,gIco,M('#3f7a2e',{flatShading:true}),Math.cos(a)*.35,1.0+Math.sin(i)*.1,Math.sin(a)*.35,.28);} add(t,gSph,gl,0,.55,.36,.08); add(t,gBox,dk,.5,.6,.1,.08,.8,.08);}
+  else if(f==='lgx_brick'){add(t,gBox,m,0,.42,0,.8,.8,.55); for(let r=0;r<4;r++) add(t,gBox,dk,0,.12+r*.2,.28,.82,.03,.02); add(t,gSph,gl,0,1.0,0,.22); add(t,gBox,dk,0,.86,0,.5,.1,.4);}
+  else {add(t,gBox,m,0,.42,0,.75,.8,.5); add(t,gCone,gl,0,1.05,0,.18,.5,.18); for(const s of [-1,1]) add(t,gCone,gl,s*.38,.95,0,.08,.35,.08); add(t,gSph,gl,0,.45,.27,.1);}
+  const hg=new THREE.Group(); hg.position.set(0,f==='lgx_oak'?.9:.95,.08); t.add(hg); add(hg,gBox,m,0,0,0,.34,.3,.3); add(hg,gSph,gl,-.08,.02,.16,.04); add(hg,gSph,gl,.08,.02,.16,.04); u.head=hg;
+  u.arms=[limb(t,-.6,.66,0,.7,.17,m,dk),limb(t,.6,.66,0,.7,.17,m,dk)]; for(const a of u.arms) add(a,gBox,dk,0,-.72,0,.3,.26,.3);}
+function lgmLegendGolem(a){const C=LGMS, d=LGX.find(x=>x[0]===a); if(allies.some(e=>e.mk===a&&e.hp>0)){toast(`Your ${d[3]} is already on the field`,'#ffd36a'); return;} if(allies.length>=20){toast('Your army is full (20 golems)','#ffd36a'); return;}
+  if(!Object.entries(d[4]).every(([r,v])=>(C.res[r]||0)>=v)){toast(`${d[3]} needs ${Object.entries(d[4]).map(([r,v])=>v+' '+r).join(', ')}`,'#ff8a6a'); return;} for(const [r,v] of Object.entries(d[4])) C.res[r]-=v;
+  summonAllies({minion:a,count:1,pot:4+.5*Math.max(L.tier,lgmProgressTier())}); const g=allies[allies.length-1]; if(g){g.hpMax=(g.hpMax||100)*4; g.hp=g.hpMax; g.r=MINIONS[a].r;} flashT=.3; flashCol=MINIONS[a].c2; shake(6); banner(d[3],d[5]); lgmQ('golem',1); if(typeof sfx==='function') sfx('roar');}
+// quests: finish them for rewards
+const LG_QUESTS=[{id:'recruit',n:'Rally the villages',d:'Recruit 5 villagers',need:5,r:{gold:40,stone:20}},{id:'bases',n:'Break the hordes',d:'Destroy 3 horde bases',need:3,r:{diamond:3,item:1}},{id:'wells',n:'Well traveller',d:'Find 10 village wells',need:10,r:{gold:30,stone:30,wood:30}},
+ {id:'sup',n:'Supply hunter',d:'Collect 40 supplies',need:40,r:{diamond:4}},{id:'camps',n:'Camper',d:'Build 2 camps',need:2,r:{wood:40}},{id:'golem',n:'Golem master',d:'Spawn 20 golems',need:20,r:{diamond:2,gold:30}},{id:'boss',n:'Legend slayer',d:'Defeat a horde leader',need:1,r:{diamond:5,item:2}},
+ {id:'treasure',n:'Deep diver',d:'Find 3 deep-pond treasures',need:3,r:{diamond:8,item:2}},{id:'mounts',n:'Beast tamer',d:'Tame all 4 wild mounts',need:4,r:{diamond:10,bow:1}}];
+const lgQS=()=>{const S0=SAVE.lgm=SAVE.lgm||{}; S0.qs=S0.qs||{}; S0.qd=S0.qd||{}; return S0;};
+function lgmQ(id,n){const S0=lgQS(); S0.qs[id]=(S0.qs[id]||0)+n;}
+function lgQProg(q){const S0=lgQS(), L1=SAVE.lgm||{}; if(q.id==='bases') return Object.keys(L1.bases||{}).length+Object.keys((SAVE.lgm2||{}).bases||{}).length; if(q.id==='wells'){let n=0; for(const k in (L1.wellsBy||{})) n=Math.max(n,L1.wellsBy[k].length); for(const k in ((SAVE.lgm2||{}).wellsBy||{})) n=Math.max(n,SAVE.lgm2.wellsBy[k].length); return n;}
+  if(q.id==='boss') return Object.keys(L1.beaten||{}).length+Object.keys((SAVE.lgm2||{}).beaten||{}).length; if(q.id==='mounts') return Object.keys(lgMounts()).filter(k=>k!=='horse').length; return S0.qs[q.id]||0;}
+function lgmQuestTick(){const S0=lgQS(); for(const q of LG_QUESTS){if(S0.qd[q.id]) continue; if(lgQProg(q)>=q.need){S0.qd[q.id]=true; const r=q.r, got=[]; for(const k of ['gold','stone','wood','diamond']) if(r[k]){LGMS.res[k]=(LGMS.res[k]||0)+r[k]; got.push(`${r[k]} ${k}`);}
+    for(let i=0;i<(r.item||0);i++){const it=lgLoot(Math.max(L.tier,lgmProgressTier()),2); if(it){SAVE.inv.push(it); got.push(it.name);}} if(r.bow){const b=bowItem('unique',null,12); b.lg=true; SAVE.inv.push(b); got.push(b.name);}
+    persist(); banner(`Quest complete: ${q.n}`,'Reward: '+got.join(', ')); if(typeof sfx==='function') sfx('win'); return;}}}
+function lgmQuests(){lgUnlock(); let el=$('#lgQuests'); if(!el){el=document.createElement('div'); el.id='lgQuests'; el.className='lgt-panel'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Quests'); document.body.appendChild(el); ['keydown','keyup'].forEach(k=>el.addEventListener(k,e=>{e.stopPropagation(); if(e.key==='Escape') el.hidden=true;}));}
+  const S0=lgQS(), mq=lgMQ(), M0=lgMounts(), rew=r=>Object.entries(r).map(([k,v])=>k==='item'?`${v} Legends item${v>1?'s':''}`:k==='bow'?'a unique bow':`${v} ${RES_ICO[k]||''} ${k}`).join(' · ');
+  el.innerHTML=`<h2>📜 Quests</h2><h3 class="qh">Wild mounts</h3>${Object.entries(LG_MQ).map(([k,q])=>{const T0=LG_MOUNTS[k], done=M0[k], st=mq[k].st; return `<div class="lgq${done?' done':''}"><b>${T0.ico} ${q.n}</b><span>${done?`✓ ${T0.n} tamed`:st==='none'?`Find the ${T0.n}'s den (🐾 on your compass and map)`:`${q.d} (${Math.min(q.need,mq[k].n)}/${q.need})`}</span></div>`;}).join('')}
+    <h3 class="qh">Quests</h3>${LG_QUESTS.map(q=>{const p=Math.min(q.need,lgQProg(q)), d=S0.qd[q.id]; return `<div class="lgq${d?' done':''}"><b>${d?'✓ ':''}${q.n}</b><span>${q.d} (${p}/${q.need}) · reward: ${rew(q.r)}</span></div>`;}).join('')}<button class="lgt-b" id="lgQX">Close</button>`;
+  el.hidden=false; el.querySelector('#lgQX').onclick=()=>{el.hidden=true;}; el.querySelector('#lgQX').focus();}
+// wild mount dens: meet the mount, do its quest, and it's yours
+function lgmMountMeshes(){const D=L.lgWorld; if(!D.msites) return; L.lgMS={}; const M0=lgMounts(), mq=lgMQ();
+  for(const [k,s] of Object.entries(D.msites)){const g=new THREE.Group(); g.position.set(s.x*S,0,s.y*S); levelGroup.add(g); const m=buildMountM(k,0); if(k==='fish') m.position.y=-.2; g.add(m);
+    const mk=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0xffd36a,transparent:true,opacity:.8,depthWrite:false,blending:THREE.AdditiveBlending,fog:false})); mk.position.y=4.5; mk.scale.set(3,3,1); g.add(mk); g.visible=!M0[k]; const items=s.items.map((it,i)=>{const im=new THREE.Mesh(k==='bird'?gCone:gSph,new THREE.MeshStandardMaterial({color:k==='bird'?0xffd36a:0xf0f8ff,emissive:new THREE.Color(k==='bird'?'#aa7a10':'#7ad8ff'),emissiveIntensity:.8,metalness:.4,roughness:.2})); im.position.set(it.x*S,.6,it.y*S); im.scale.set(.18,k==='bird'?.6:.18,.18); levelGroup.add(im); im.visible=!M0[k]&&!(mq[k].got||[]).includes(i); return im;});
+    L.lgMS[k]={g,m,items};}
+  // deep-pond treasure chests
+  const S0=lgmSave(), key=String(L.seed), got=(S0.tre=S0.tre||{})[key]=(S0.tre[key]||[]); L.lgTre=D.ponds.map(p=>{const c=new THREE.Group(); c.position.set(p.x+.5,-1.3,p.y+.5); levelGroup.add(c); const b=new THREE.Mesh(gBox,new THREE.MeshStandardMaterial({color:0x8a5a2a,roughness:.7})); b.scale.set(1.4,.9,1); c.add(b); const l=new THREE.Mesh(gBox,new THREE.MeshStandardMaterial({color:0xe8c050,metalness:.6,roughness:.3,emissive:new THREE.Color('#6a4a00'),emissiveIntensity:.5})); l.position.y=.5; l.scale.set(1.5,.2,1.1); c.add(l);
+    const gl=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:0xffe08a,transparent:true,opacity:.7,depthWrite:false,blending:THREE.AdditiveBlending})); gl.position.y=.6; gl.scale.set(3.5,3.5,1); c.add(gl); c.userData.taken=got.includes(p.i); c.visible=!c.userData.taken; (L.lgFar=L.lgFar||[]).push(c); return c;});}
+function lgmMountTick(dt){const C=LGMS, D=C.D; if(!D.msites||!L.lgMS) return; const M0=lgMounts(), mq=lgMQ();
+  for(const [k,s] of Object.entries(D.msites)){if(M0[k]) continue; const q=mq[k], LM=L.lgMS[k], d=Math.hypot(s.x-P.x,s.y-P.y); if(LM){LM.m.rotation.y=Math.atan2(P.x-s.x,P.y-s.y); if(k==='bird'&&LM.m.userData.wings) LM.m.userData.wings.forEach((w,i)=>w.rotation.z=(i?1:-1)*(.5+Math.sin(time*3)*.3));}
+    if(q.st==='none'&&d<300){q.st='active'; persist(); lgUnlock(); banner(`${LG_MOUNTS[k].ico} ${LG_MQ[k].n}`,LG_MQ[k].d); if(typeof sfx==='function') sfx('cine');}
+    if(q.st!=='active') continue;
+    if(k==='beetle'&&d<240&&(C.res.stone||0)>=40&&lgSupCount()>=8){C.res.stone-=40; lgSpendSup(8); q.n=1;}
+    if((k==='bird'||k==='fish')&&LM) s.items.forEach((it,i)=>{if(q.got.includes(i)) return; if(Math.abs(it.x-P.x)<55&&Math.abs(it.y-P.y)<55){q.got.push(i); q.n=q.got.length; LM.items[i].visible=false; ftext(P.x,P.y-40,`${k==='bird'?'Feather':'Pearl'} ${q.n}/5`,'#ffd36a',true); if(typeof sfx==='function') sfx('loot','rare');}});
+    if(q.n>=LG_MQ[k].need){q.st='done'; M0[k]=true; persist(); if(LM){LM.g.visible=false; LM.items.forEach(m=>m.visible=false);} flashT=.4; flashCol='#ffd36a'; banner(`You tamed the ${LG_MOUNTS[k].n}!`,`Press 0 to choose it as your mount and R to ride${k==='fish'?' on water':k==='bird'?' into the sky':''}`); if(typeof sfx==='function') sfx('win');}}
+  // diving for treasure
+  if(C.dive&&L.lgTre){const p=lgPondAt(P.x,P.y); if(p){const c=L.lgTre[p.i], S0=lgmSave(), got=S0.tre[String(L.seed)]; if(c&&!c.userData.taken&&Math.hypot((p.x+.5)*T-P.x,(p.y+.5)*T-P.y)<110){c.userData.taken=true; c.visible=false; got.push(p.i); const dm=rint(3,6); C.res.diamond=(C.res.diamond||0)+dm; C.res.gold+=40; const it=lgLoot(Math.max(L.tier,lgmProgressTier()),2); if(it) SAVE.inv.push(it); lgmQ('treasure',1); persist(); banner('Sunken treasure!',`+${dm} diamonds · +40 gold${it?' · '+it.name:''}`); if(typeof sfx==='function') sfx('chest');}}}}
+function lgmDive(){const C=LGMS; if(!lgSwim()) return false; if(!C.dive&&!lgPondAt(P.x,P.y)){toast('Dive in a deep pond (the big round ones with a glow under the water)','#9fd0ff'); return true;} C.dive=!C.dive; puff(P.x,P.y,'#9fefff',16,120,.5,5); return true;}
+// cheats
+function adminAllSkins(){const s=shopSave(); for(const k of SKINS) s.skins.own[k.id]=1; persist(); toast(`All ${SKINS.length} player skins unlocked, and every mount skin is yours`,'#ffd36a');}
+function adminAllMounts(){const M0=lgMounts(); for(const k in LG_MOUNTS) M0[k]=true; persist(); if(L&&L.lgMS) for(const k in L.lgMS) L.lgMS[k].g.visible=false; toast('Every mount is tamed: horse, tiger, beetle, Great Bird and Spiritfin','#ffd36a');}
+// the stable: only tamed mounts can be ridden
+lgmStable=function(){lgUnlock(); let el=$('#lgStable'); if(!el){el=document.createElement('div'); el.id='lgStable'; el.className='lgt-panel'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Mounts'); document.body.appendChild(el); ['keydown','keyup'].forEach(k=>el.addEventListener(k,e=>{e.stopPropagation(); if(e.key==='Escape') el.hidden=true;}));}
+  const mt=lgMount(), M0=lgMounts(); if(!M0[mt.type]) mt.type='horse'; mt.skin.fish=mt.skin.fish||0;
+  el.innerHTML=`<h2>🐾 Mounts</h2><p class="sp">Choose a tamed mount and its look, then press R to ride. Wild mounts live in dens around the island: find them (🐾 on your compass) and finish their quests to tame them.</p>${Object.entries(LG_MOUNTS).map(([k,T0])=>{const own=!!M0[k]; return `<div class="lgst${mt.type===k?' on':''}${own?'':' locked'}"><button class="lgt-b" data-t="${k}"${own?'':' disabled'}>${T0.ico} ${T0.n}${mt.type===k?' ✓':''}<small>${own?T0.d:'🔒 '+(LG_MQ[k]?LG_MQ[k].n+': find its den and finish its quest':'')}</small></button><div class="lgsk">${T0.skins.map((s,i)=>`<button class="sk${(mt.skin[k]||0)===i?' sel':''}" data-t="${k}" data-s="${i}" title="${esc(s[0])}" aria-label="${esc(s[0])}"${own?'':' disabled'} style="background:linear-gradient(135deg,${s[1]} 55%,${s[2]} 56%)"></button>`).join('')}</div></div>`;}).join('')}<button class="lgt-b" id="lgStX">Close</button>`;
+  el.hidden=false; el.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const t=b.dataset.t; if(!M0[t]) return; mt.type=t; if(b.dataset.s!=null) mt.skin[t]=+b.dataset.s; persist(); if(LGMS){LGMS.mount={walk:0}; if(LGMS.ride){LGMS.ride=false; toast('Press R to ride your new mount','#ffd36a');}} lgmStable();});
+  el.querySelector('#lgStX').onclick=()=>{el.hidden=true;};};
+// getting on and off: the Spiritfin needs water, the bird needs open ground to land
+function lgmMountToggle(){const C=LGMS, mt=lgMount(), M0=lgMounts(); if(!M0[mt.type]) mt.type='horse'; const T0=LG_MOUNTS[mt.type];
+  if(!C.ride){if(T0.fly&&lgInMine(P.x,P.y)){toast('The Great Bird can\'t fly in the mine','#ffd36a'); return false;}
+    if(T0.swim){if(!lgWaterAt(P.x,P.y)){let best=null; for(let r=20;r<=140&&!best;r+=20) for(let k=0;k<16;k++){const a=k/16*TAU, x=P.x+Math.cos(a)*r, y=P.y+Math.sin(a)*r; if(lgWaterAt(x,y)){best={x,y}; break;}} if(!best){toast('Stand at the edge of a river, lake or pond to call the Spiritfin','#9fd0ff'); return false;} P.x=best.x; P.y=best.y;}}
+    C.ride=true; toast(`${T0.ico} ${T0.n}: ${T0.d}`,'#ffd36a'); return true;}
+  if(lgFlying()&&blocked(P.x,P.y,P.r)){toast('Fly over open ground to land','#ffd36a'); return false;}
+  if(lgSwim()){C.dive=false; if(blocked(P.x,P.y,P.r)){let best=null; for(let r=30;r<=200&&!best;r+=20) for(let k=0;k<16;k++){const a=k/16*TAU, x=P.x+Math.cos(a)*r, y=P.y+Math.sin(a)*r; if(!blocked(x,y,P.r)){best={x,y}; break;}} if(!best){toast('Swim closer to the shore to get off','#9fd0ff'); return false;} P.x=best.x; P.y=best.y;}}
+  C.ride=false; P.jz=0; return true;}
+// online arena: duel or team fight against your friends
+function arenaTeams(){const T={}; if(!MP.party) return T; MP.party.members.forEach((m,i)=>{T[m.code]=i%2;}); return T;}
+function arenaPvpHit(d){if(!ARENA||!ARENA.pvp||P.dead) return; const my=ARENA.team[MP.code];
+  for(const [code,o] of MP.others){if(ARENA.team[code]===my||o.dead) continue; const dd=Math.hypot(o.x-P.x,o.y-P.y); if(dd>ST.reach+20) continue; if(dd>30&&Math.abs(angDiff(P.face,Math.atan2(o.y-P.y,o.x-P.x)))>ST.arc/2) continue;
+    const m={t:'pvp',to:code,d:Math.round(d*.5),from:MP.code}; if(MP.role==='host') send(code,m); else toHost(m); sparks(o.x,o.y-10,P.face,'#ffe9a0',9,16);}}
+function arenaPvpMsg(code,m){if(m.to===MP.code){if(ARENA&&ARENA.pvp&&!P.dead){hurtP(m.d,{pvp:true});}} else if(MP.role==='host') send(m.to,m);}
+function arenaPvpDead(code,m){if(!ARENA||!ARENA.pvp) return; ARENA.dead.add(m.who); if(MP.role==='host'&&code!==MP.code) for(const c of partyOthers()) if(c!==code) send(c,m);}
+// new enchantments, each with an effect of its own
+Object.assign(W_ENCH,{Soulreaper:'Each kill heals you for 6% of your health',Shockwave:'Every 4th swing sends out a shockwave that hits everything nearby'}); Object.assign(A_ENCH,{Phoenix:'Once per level, a hit that would defeat you leaves you at 30% health instead'}); Object.assign(R_ENCH,{Echoing:'20% chance to recharge instantly after use'}); Object.assign(ENCH_DESC,W_ENCH,A_ENCH,R_ENCH);
+{const _ua=useArt; useArt=function(s){const it=SAVE&&SAVE.eq[s], before=P&&P.acd?P.acd[s]:0; const r=_ua.apply(this,arguments); if(it&&it.ench&&it.ench.includes('Echoing')&&P&&P.acd&&P.acd[s]>before&&Math.random()<.2){P.acd[s]=0; ftext(P.x,P.y-44,'Echo!','#b45cff',true);} return r;};}
+// sky predators look like dark birds
+function buildSkyBird(R,B){const c1=M('#2e2638',{roughness:.6}), c2=M('#5a3a6a',{roughness:.7}), c3=M('#ffb030',{roughness:.4}), ey=M('#ff3a3a',{emissive:new THREE.Color('#ff2a2a'),emissiveIntensity:1});
+  R.userData.legType='quad'; R.userData.legs=[]; R.userData.arms=[];
+  add(B,gSph,c1,0,.55,0,.3,.26,.48); add(B,gSph,c1,0,.68,.42,.19,.19,.2); add(B,gCone,c3,0,.64,.66,.06,.2,.06).rotation.x=Math.PI/2; add(B,gSph,ey,.09,.74,.55,.04); add(B,gSph,ey,-.09,.74,.55,.04);
+  for(let i=0;i<3;i++) add(B,gBox,c2,(i-1)*.08,.55,-.55,.07,.03,.32).rotation.x=-.3;
+  R.userData.wings=[-1,1].map(s=>{const w=new THREE.Group(); w.position.set(s*.28,.62,0); B.add(w); add(w,gBox,c2,s*.45,0,0,.9,.05,.42); add(w,gBox,c1,s*.9,0,-.08,.4,.04,.3); return w;});}
+// riding: tap Space to climb and hold Shift to dive while flying
+function lgFlyAlt(dt){const C=LGMS; if(C.alt==null) C.alt=5; if(keys[' ']) C.alt=Math.min(14,C.alt+dt*5); if(keys['shift']||keys['control']) C.alt=Math.max(1.6,C.alt-dt*5); return C.alt;}
+// arena: look for real players online, otherwise fight smart bots
+let ARENA_MM=null;
+function arenaFind(m){if(m==='raid'||(MP.party&&MP.party.members.length>1)||!MP.peer||MP.status!=='online'){if(m!=='raid'&&!(MP.party&&MP.party.members.length>1)) toast('No one online right now: you face AI bots','#9fd0ff'); startArena(m); return;}
+  const id=PEER_PREFIX+'arena-'+m; let done=false, lob=null, n=10; const box=document.createElement('div'); box.id='arenaMM'; box.className='stpanel'; box.setAttribute('role','dialog'); box.setAttribute('aria-label','Finding players');
+  box.innerHTML=`<div class="stBox modesbox"><h2>🏟️ Looking for players online…</h2><p class="sp">Waiting for another player to join the ${ARENA_MODES.find(x=>x.id===m).n}. If no one comes in <b>${n}</b> seconds, you fight AI bots instead.</p><button class="btn small gold mmB">Fight bots now</button> <button class="btn small mmX">Cancel</button></div>`; document.body.appendChild(box);
+  const stop=()=>{if(done) return false; done=true; clearInterval(tk); box.remove(); ARENA_MM=null; setTimeout(()=>{try{lob&&lob.destroy();}catch(e){}},2500); return true;};
+  const bots=()=>{if(stop()){MP.arenaWait=null; toast('No one joined: you face AI bots','#9fd0ff'); startArena(m);}};
+  ARENA_MM={stop}; const tk=setInterval(()=>{n--; const b=box.querySelector('b'); if(b) b.textContent=n; if(n<=0) bots();},1000);
+  box.querySelector('.mmB').onclick=bots; box.querySelector('.mmX').onclick=()=>{stop(); MP.arenaWait=null;};
+  try{lob=new Peer(id,mpOpts());}catch(e){bots(); return;}
+  lob.on('open',()=>{lob.on('connection',c=>{c.on('open',()=>{const code=c.metadata&&c.metadata.code; if(!code||done) return; ensureParty(); MP.arenaWait={m,code}; c.send({t:'mm',host:MP.code});});});});
+  lob.on('error',err=>{if(done) return; if(err&&err.type==='unavailable-id'){let c; try{c=MP.peer.connect(id,{reliable:true,serialization:'json',metadata:{code:MP.code}});}catch(e){return;}
+      c.on('data',d=>{if(d&&d.t==='mm'&&stop()){MP.invite={host:d.host,name:'an arena rival'}; acceptInvite(); toast('Found a player! The match starts in a moment…','#8fd06a');} try{c.close();}catch(e){}});}
+    else bots();});}
+function arenaJoined(code){const w=MP.arenaWait; if(!w||w.code!==code) return; MP.arenaWait=null; if(ARENA_MM) ARENA_MM.stop(); toast('A player joined! The match is starting…','#8fd06a'); setTimeout(()=>startArena(w.m),1500);}
+// AI bots: dodge your swings, strafe, and drink a potion when hurt
+function arenaBots(dt){for(const e of ents){if(!e.arena||!e.bot||e.hp<=0) continue; e.dodgeCd=(e.dodgeCd||0)-dt; const d=Math.hypot(e.x-P.x,e.y-P.y);
+  if(P.swing>0&&d<ST.reach+50&&e.dodgeCd<=0&&Math.random()<.55){const a=Math.atan2(e.y-P.y,e.x-P.x)+(Math.random()<.5?1:-1)*Math.PI/2, nx=e.x+Math.cos(a)*70, ny=e.y+Math.sin(a)*70; if(!blocked(nx,ny,e.r)){puff(e.x,e.y,'#cfd8e8',8,90,.35,4); e.x=nx; e.y=ny; e.dodgeCd=1.3; ftext(e.x,e.y-40,'Dodge!','#cfd8e8');}}
+  if(!e.potion&&e.hp<e.max*.3){e.potion=true; e.hp=Math.min(e.max,e.hp+e.max*.3); ftext(e.x,e.y-44,'Potion!','#ff6a8a',true); puff(e.x,e.y,'#ff6a8a',12,100,.5,5);}}}
+// cheats: infinite supplies, unlock both Legends
+function adminLegendsBoth(){SAVE.lg2unlock=true; SAVE.lg2anim=false; SAVE.lgBoth=true; persist(); toast('Legends 1 and Legends 2 are both unlocked. Pick one from Modes → Legends.','#ffd36a');}
+function lgPickCamp(){let p=$('#lgPick'); if(!p){p=document.createElement('div'); p.id='lgPick'; p.className='stpanel'; p.setAttribute('role','dialog'); p.setAttribute('aria-label','Choose Legends'); document.body.appendChild(p); ['keydown','keyup'].forEach(t=>p.addEventListener(t,e=>{e.stopPropagation(); if(e.type==='keydown'){if(e.key==='1') go(1); else if(e.key==='2') go(2); else if(e.key==='Escape') p.hidden=true;}}));}
+  const go=c=>{p.hidden=true; LG_CAMP=c; openLegends();};
+  p.innerHTML=`<div class="stBox modesbox"><h2>🛡️ Legends</h2><div class="modegrid"><button class="modecard" data-c="1"><span class="mico">🛡️</span><b>Legends 1</b><span class="md">Free the island from the six hordes</span><span class="msub">Key 1</span></button><button class="modecard" data-c="2"><span class="mico">🌑</span><b>Legends 2</b><span class="md">The sculk has returned</span><span class="msub">Key 2</span></button></div><button class="btn small" id="lgPkX">Close</button></div>`;
+  p.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>go(+b.dataset.c)); p.querySelector('#lgPkX').onclick=()=>{p.hidden=true;}; p.hidden=false; p.querySelector('[data-c]').focus();}
 /* ---------------- starting, the title screen and quitting ---------------- */
 function openLegends(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} const party=MP.party&&MP.party.members.length>1; if(party&&MP.role!=='host'){toast('The party leader starts Legends','#ffd36a'); return;}
   $('#modesPanel')&&($('#modesPanel').hidden=true); lgmLoading(true); setTimeout(()=>{try{openLegends2(party);} finally{lgmLoading(false);}},40);}
@@ -7783,6 +7937,7 @@ function lgmDayLight(){const C=LGMS, t=C.day%300, k=t<200?1:t<215?1-(t-200)/15*.
   sun.intensity=(C.envSi||1)*(.25+.75*k); hemi.intensity=(C.envHi||.85)*.85*(.45+.55*k); const night=new THREE.Color('#0b1430'), col=(C.sky||new THREE.Color('#bfe0ff')).clone().lerp(night,1-k);
   scene.background=col; if(scene.fog){scene.fog.color.copy(col); scene.fog.near=QT==='low'?30:40; scene.fog.far=QT==='low'?88:118;}
   if(C.region===-2){const dk=new THREE.Color('#161a22'); scene.background=dk; if(scene.fog){scene.fog.color.copy(dk); scene.fog.near=20; scene.fog.far=80;} sun.intensity=.6; hemi.intensity=1.4;}
+  if(C.dive){const w=new THREE.Color('#0a3a5a'); scene.background=w; if(scene.fog){scene.fog.color.copy(w); scene.fog.near=3; scene.fog.far=22;} hemi.intensity=.8;}
   else if(C.region===-4){const dk=new THREE.Color('#060a16'); scene.background=dk; if(scene.fog){scene.fog.color.copy(dk); scene.fog.near=12; scene.fog.far=56;} sun.intensity=.3; hemi.intensity=.85;}
   else if(C.region===-3){const dk=new THREE.Color('#020407'); scene.background=dk; if(scene.fog){scene.fog.color.copy(dk); scene.fog.near=6; scene.fog.far=30;} sun.intensity=.14; hemi.intensity=.42;}}
 function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.max(0,C.lookT-dt);
@@ -7793,7 +7948,7 @@ function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.ma
   if(P.dead){run.endT=0; C.deadT=(C.deadT||3.2)-dt; if(C.deadT<=0){C.deadT=0; P.dead=false; P.hp=ST.maxhp; P.iframe=2; const D=C.D, wl=lgmNearestWell(); P.x=wl.x; P.y=wl.y+110; C.ride=false; for(const a of allies){a.x=P.x+rand(-50,50); a.y=P.y+rand(20,60);} C.rally=null; toast(`You wake beside ${wl.name}. Your army regroups around you.`,'#9fe0ff'); lgmRegion(true);} return;}
   C.day+=dt; lgmDayLight(); if(C.night&&C.wasNight===false) lgmNightfall(); C.wasNight=C.night; if(C.day%300<dt*1.5) {const S0=lgmSave(); S0.days++;}
   const swing=P.atk>C.lastAtk+.01; C.lastAtk=P.atk;
-  C.regT=(C.regT||0)-dt; if(C.regT<=0){C.regT=.4; lgmRegion(); lgmArea(); lgmBaseIntro(); lgmWellsTick();}
+  C.regT=(C.regT||0)-dt; if(C.regT<=0){C.regT=.4; lgmRegion(); lgmArea(); lgmBaseIntro(); lgmWellsTick(); lgmQuestTick();}
   for(const e of ents) if(!e.st&&!e.lgp&&!e.ally){e.lgp=true; e.max=Math.round(e.max*1.25); e.hp=Math.round(e.hp*1.25); e.dmg*=1.1;}
   // far-away monsters that are not fighting go to sleep
   const CLI=MP.role==='client'&&MP.inGame; if(CLI) lgmClientRefs(); else for(const e of ents) if(!e.st&&!e.ally&&e.hp>0&&!e.raid&&!e.mirror&&Math.hypot(e.x-P.x,e.y-P.y)>2600&&![...MP.others.values()].some(o=>Math.hypot(e.x-o.x,e.y-o.y)<2600)) {e.hp=0; e.slept=true;}
@@ -7802,7 +7957,7 @@ function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.ma
   // gathering by hand
   for(const n of C.nodes){if(n.hp<=0){n.regrow-=dt; if(n.regrow<=0) n.hp=n.max; continue;}
     if(swing&&Math.abs(n.x-P.x)<78&&Math.abs(n.y-P.y)<78&&Math.hypot(n.x-P.x,n.y-P.y)<78) lgmHarvest(n,1);}
-  lgmSprites(dt); lgmMineTick(dt); lgmSkyTick(dt); lgmTraders(); lgmSupTick(); if(lgL2A()) lgmL2Tick(dt);
+  lgmSprites(dt); lgmMineTick(dt); lgmSkyTick(dt); lgmMountTick(dt); lgmTraders(); lgmSupTick(); if(lgL2A()) lgmL2Tick(dt);
   // hazards near fortresses
   C.zt=(C.zt||0)-dt; for(const b of C.bases){if(b.beaten||b.hidden||Math.hypot(b.B.heart.x-P.x,b.B.heart.y-P.y)>3000) continue; for(const z of b.B.zones){if(Math.hypot(z.x-P.x,z.y-P.y)>z.r) continue; const zn=b.tr.zone; if(zn==='sand'||zn==='ice') P.slow=Math.max(P.slow,.25); else if(C.zt<=0){C.zt=.6; hurtP(Math.round((zn==='lava'?6:zn==='void'?5:3)*(1+.3*b.tier)),{});} break;}
     if(b.tr.zone==='poison'&&b.spawners.some(s=>s.hp>0)) for(const e of ents) if(e.st&&e.base===b.i&&e.hp>0&&e.hp<e.max) e.hp=Math.min(e.max,e.hp+e.max*.006*dt);
@@ -7828,19 +7983,22 @@ function lgmAct(a){const C=LGMS; if(!C||mode!=='play'||!P||P.dead) return;
   if(a==='house'||a==='recruit'){lgmVillageAct(a); lgmHud(); lgmBar(true); return;}
   if(a==='travel'){lgmTravel(); return;}
   if(a==='craft'){lgmCraft(); return;}
+  if(a.startsWith('lgx_')){lgmLegendGolem(a); lgmHud(); lgmBar(true); return;}
+  if(a==='quests'){lgmQuests(); return;}
   if(a==='camp'){lgmCamp(); lgmHud(); lgmBar(true); return;}
   if(a==='mega'){lgmMega(); return;}
   if(a==='trade'){lgmTrade(); return;}
+  if(a==='cobble'||a==='plank'||a==='moss'){const sp=lgmGolemSpawner(a); if(!sp) return; if(allies.length>=20){toast('Your army is full (20 golems)','#ffd36a'); return;} const px=P.x,py=P.y; P.x=sp.x; P.y=sp.y+50; summonAllies({minion:'lg_'+a,count:1,pot:1+.35*Math.max(L.tier,lgmProgressTier())}); P.x=px; P.y=py; lgmQ('golem',1); puff(sp.x,sp.y,'#5fb3ff',12,120,.5,5); if(typeof sfx==='function') sfx('summon'); lgmHud(); lgmBar(true); return;}
   if(LG_COST[a]){const c=LG_COST[a]; if(!Object.entries(c).every(([r,v])=>C.res[r]>=v)){toast(`Not enough: needs ${Object.entries(c).map(([r,v])=>v+' '+r).join(' and ')}`,'#ff8a6a'); return;}
     if(a==='tower'){if(C.ptowers.length>=8){toast('You can build up to 8 towers','#ffd36a'); return;} const x=P.x+Math.cos(C.yaw)*50, y=P.y+Math.sin(C.yaw)*50; if(blocked(x,y,14)){toast('No room for a tower here','#ffd36a'); return;} C.ptowers.push({x,y,cd:1,id:'pt'+Math.random()}); puff(x,y,'#5fb3ff',20,140,.6,5); shake(3);}
-    else {const sp=lgmGolemSpawner(a); if(!sp) return; if(allies.length>=20){toast('Your army is full (20 golems)','#ffd36a'); return;} const px=P.x,py=P.y; P.x=sp.x; P.y=sp.y+50; summonAllies({minion:'lg_'+a,count:1,pot:1+.35*Math.max(L.tier,lgmProgressTier())}); P.x=px; P.y=py; puff(sp.x,sp.y,'#5fb3ff',12,120,.5,5);}
+    else {const sp=lgmGolemSpawner(a); if(!sp) return; if(allies.length>=20){toast('Your army is full (20 golems)','#ffd36a'); return;} const px=P.x,py=P.y; P.x=sp.x; P.y=sp.y+50; summonAllies({minion:'lg_'+a,count:1,pot:1+.35*Math.max(L.tier,lgmProgressTier())}); P.x=px; P.y=py; lgmQ('golem',1); puff(sp.x,sp.y,'#5fb3ff',12,120,.5,5);}
     for(const [r,v] of Object.entries(c)) C.res[r]-=v; if(typeof sfx==='function') sfx('summon');}
   else if(a==='rally'){if(!allies.length){toast('Build some golems first (Z, X or C)','#ffd36a'); return;} const d=260, x=P.x+Math.cos(C.yaw)*d, y=P.y+Math.sin(C.yaw)*d; C.rally={x,y,t:25}; toast('Charge! Your army rallies to the banner.','#5fb3ff'); puff(x,y,'#5fb3ff',16,120,.5,5);}
   else if(a==='recall'){C.rally=null; toast('Your army falls back to you.','#5fb3ff');}
   else if(a==='gather'){const free=lgNodesNear(C.D,P.x,P.y,700).filter(n=>n.hp>0&&!C.sprites.some(s=>s.node===n)&&Math.hypot(n.x-P.x,n.y-P.y)<700).sort((a,b)=>Math.hypot(a.x-P.x,a.y-P.y)-Math.hypot(b.x-P.x,b.y-P.y)); const room=3-C.sprites.length; if(room<=0){toast('All three sprites are busy','#ffd36a'); return;} if(!free.length){toast('Nothing to gather nearby','#ffd36a'); return;}
     free.slice(0,room).forEach(n=>C.sprites.push({x:P.x,y:P.y,node:n,state:'go',t:Math.random()*6})); toast('Your sprites fly off to gather','#9fe0ff');}
   else if(a==='stable'){lgmStable(); return;}
-  else if(a==='mount'){const T0=LG_MOUNTS[lgMount().type]; if(!C.ride&&T0.fly&&lgInMine(P.x,P.y)){toast('The Great Bird can\'t fly in the mine. Pick another mount (0).','#ffd36a'); return;} if(C.ride&&lgFlying()&&blocked(P.x,P.y,P.r)){toast('Fly over open ground to land','#ffd36a'); return;} C.ride=!C.ride; if(C.ride) toast(`${T0.ico} ${T0.n}: ${T0.d}`,'#ffd36a'); puff(P.x,P.y,'#ffd36a',14,120,.5,5); if(typeof sfx==='function') sfx('summon');}
+  else if(a==='mount'){if(!lgmMountToggle()) return; puff(P.x,P.y,'#ffd36a',14,120,.5,5); if(typeof sfx==='function') sfx('summon');}
   lgmHud(); lgmBar(true);}
 const lgmProgressTier=()=>{const B=lgmSave().beaten; return TRIBES.filter(t=>B[t.id]).length;};
 function lgmStructTick(e,dt){const b=LGMS&&LGMS.bases[e.base]; if(!b) return; e.kx=e.ky=0; e.t+=dt; const near=[P,...MP.others.values()].some(o=>Math.hypot(e.x-o.x,e.y-o.y)<1400); if(!near) return; const tr=b.tr, V=LG_LV[lgLv(b)];
@@ -7891,7 +8049,7 @@ function lgmMini(){const S2=mini.width, D=LGMS.D, RES=Math.max(2,Math.ceil(L.w/6
   if(!bigMap&&lgInMine(P.x,P.y)){mg.fillStyle='#0b0b10'; mg.fillRect(0,0,S2,S2);}
   const X=o=>(o.x/T-ox)*sc, Y=o=>(o.y/T-oy)*sc, dot=(o,c,s)=>{mg.fillStyle=c; mg.fillRect(X(o)-s/2,Y(o)-s/2,s,s);};
   if(!lgInMine(P.x,P.y)||bigMap) lgmMapHordes(X,Y,sc);
-  for(const V of D.villages) dot(V,'#ffe0a0',bigMap?3:5); dot(D.hub,'#7ae8ff',bigMap?5:8); if(D.mine){const inM=lgInMine(P.x,P.y); for(const d of D.mine.doors){if(!inM) dot(d,'#c89a5a',bigMap?4:7); else if(!bigMap) dot(d.ex,'#fff0c0',6);} dot(D.mine.hut,'#ffd38a',bigMap?4:7);}
+  for(const V of D.villages) dot(V,'#ffe0a0',bigMap?3:5); dot(D.hub,'#7ae8ff',bigMap?5:8); if(D.mine){const inM=lgInMine(P.x,P.y); for(const d of D.mine.doors){if(!inM) dot(d,'#c89a5a',bigMap?4:7); else if(!bigMap) dot(d.ex,'#fff0c0',6);} dot(D.mine.hut,'#ffd38a',bigMap?4:7);} if(D.msites){const M0=lgMounts(); for(const k in D.msites) if(!M0[k]) dot(D.msites[k],'#ff9aff',bigMap?5:8);}
   for(const e of ents) if(e.hp>0&&!e.st&&Math.hypot(e.x-P.x,e.y-P.y)<1500) dot(e,'#ff4a4a',2);
   if(LGMS.raid){mg.strokeStyle='#ff4a4a'; mg.lineWidth=2; mg.beginPath(); mg.arc(X(LGMS.raid.V),Y(LGMS.raid.V),8+Math.sin(time*6)*2,0,TAU); mg.stroke();}
   for(const a of allies) dot(a,'#5fb3ff',2); if(LGMS.rally) dot(LGMS.rally,'#5fb3ff',5); for(const o of MP.others.values()) dot(o,'#7aff8a',5);
@@ -8002,7 +8160,7 @@ function lgmBossFx(m,b){const u=m.userData; if(!LGMS||u.lgfx) return; u.lgfx=tru
   const ring2=new THREE.Mesh(thinTor(),glow(col,1.6)); ring2.rotation.x=Math.PI/2; ring2.position.y=.06; ring2.scale.setScalar(h*1.0); m.add(ring2); u.lgRing=ring2;
   u.lgOrb=[0,1,2,3,4,5].map(i=>{const c=add(m,crystal(3200+i,6),glow(i%2?col:'#ffe08a',2.4),0,1.4,0,.08,.2,.08); c.castShadow=false; return c;}); u.lgH=h;}
 function lgmSync(){const C=LGMS; if(!C||!L) return; lgmChunkTick(); lgmCompass();
-  if(L.lgFar){const cx=camera.position.x, cz=camera.position.z; for(const g of L.lgFar){const dx=g.position.x-cx, dz=g.position.z-cz; g.visible=dx*dx+dz*dz<150*150;}}
+  if(L.lgFar){const cx=camera.position.x, cz=camera.position.z; for(const g of L.lgFar){const dx=g.position.x-cx, dz=g.position.z-cz; g.visible=!g.userData.taken&&dx*dx+dz*dz<150*150;}}
   for(const n of lgNodesNear(C.D,P.x,P.y,2200)){ const m=ensure(n,()=>buildNodeM(n.kind),'nd'+n.kind); m.position.set(n.x*S,0,n.y*S); m.scale.setScalar((n.hp>0?.6+.4*n.hp/n.max:.25)*(n.kind==='wood'?2.4:1.6));}
   for(const t of C.ptowers){const m=ensure(t,()=>buildTowerM('#5fb3ff',true),'ptw'); m.position.set(t.x*S,0,t.y*S); m.scale.setScalar(1.9);}
   for(const v of C.villagers){if(Math.hypot(v.x-P.x,v.y-P.y)>1800) continue; const m=ensure(v,()=>buildPlayer(v.skin),'vl'+v.skin); m.position.set(v.x*S,0,v.y*S); m.rotation.y=yawOf(v.face); animLimbs(m,v.walk,!!v.moving);}
@@ -8010,7 +8168,7 @@ function lgmSync(){const C=LGMS; if(!C||!L) return; lgmChunkTick(); lgmCompass()
   if(!C.gsp){const S0=lgmSave(); C.gsp=S0.gsp=S0.gsp||[];} for(const s of C.gsp){if(Math.abs(s.x-P.x)>2000||Math.abs(s.y-P.y)>2000) continue; const m=ensure(s,()=>buildGolemSpawnerM(s.t),'gsp'+s.t); m.position.set(s.x*S,0,s.y*S); if(m.userData.disc){m.userData.disc.rotation.z=time*2; m.userData.disc.material.opacity=.45+.2*Math.sin(time*4);}}
   for(const s of C.sprites){const m=ensure(s,buildSpriteM,'spr'); m.position.set(s.x*S,1.1+Math.sin(time*6+s.t)*.15,s.y*S); m.rotation.y=time*4;}
   if(C.rally){const m=ensure(C.rally,buildBannerM,'rally'); m.position.set(C.rally.x*S,0,C.rally.y*S); m.rotation.y=Math.sin(time*2)*.2;}
-  if(C.ride&&P&&!P.dead){const mt=lgMount(), sk=mt.skin[mt.type]||0, m=ensure(C.mount,()=>buildMountM(mt.type,sk),'mt'+mt.type+sk); m.position.set(P.x*S,P.jz||0,P.y*S); if(m.userData.wings) m.userData.wings.forEach((w,i)=>{w.rotation.z=(i?1:-1)*(lgFlying()?Math.sin(time*7)*.55:.9);}); m.rotation.y=yawOf(P.face); const mv=moveVec(); C.mount.walk+=(mv.x||mv.y)?.35:0; animLimbs(m,C.mount.walk,!!(mv.x||mv.y));}
+  if(C.ride&&P&&!P.dead){const mt=lgMount(), sk=mt.skin[mt.type]||0, m=ensure(C.mount,()=>buildMountM(mt.type,sk),'mt'+mt.type+sk); m.position.set(P.x*S,P.jz||0,P.y*S); if(m.userData.wings) m.userData.wings.forEach((w,i)=>{w.rotation.z=(i?1:-1)*(lgFlying()?Math.sin(time*7)*.55:.9);}); if(m.userData.tail) m.userData.tail.rotation.y=Math.sin(time*(moveVec().x||moveVec().y?8:3))*.4; m.rotation.y=yawOf(P.face); const mv=moveVec(); C.mount.walk+=(mv.x||mv.y)?.35:0; animLimbs(m,C.mount.walk,!!(mv.x||mv.y));}
   if(boss&&!boss.dead&&boss.lgp){const m=REG.get(boss); if(m){lgmBossFx(m,boss); const u=m.userData, sc=m.scale.x||1; if(u.lgHalo){u.lgHalo.rotation.z=time*.6; u.lgAura.material.opacity=.32+.14*Math.sin(time*3); u.lgRing.rotation.z=-time*.8; u.lgCrown.rotation.y=time*.9; u.lgCrown.position.y=(u.lgH||2)+.3+Math.sin(time*2)*.06;}
     if(u.lgOrb) u.lgOrb.forEach((o,i)=>{const a=time*1.3+i*TAU/u.lgOrb.length, rr=(u.lgH||2)*.55; o.position.set(Math.cos(a)*rr,(u.lgH||2)*.75+Math.sin(time*2+i)*.15,Math.sin(a)*rr); o.rotation.y=time*2;});}}
   const th=C.thief; if(th&&!th.gone){const m=ensure(th,()=>buildPlayer(th.skin),'thief'+th.skin); m.position.set(th.x*S,0,th.y*S); m.rotation.y=yawOf(th.face); animLimbs(m,0,false); m.scale.setScalar(1+.25*(th.glow||0)); setFlash(m,th.glow>.5&&Math.sin(time*30)>0?1:0);}
@@ -8059,7 +8217,7 @@ function lgmVillageAct(a){const C=LGMS, c=LG_COST[a]; if(!Object.entries(c).ever
   if(a==='house'){const d=170, x=P.x+Math.cos(C.yaw)*d, y=P.y+Math.sin(C.yaw)*d, tx=Math.floor(x/T)-2, ty=Math.floor(y/T)-2; if(!lgmPlaceHouse(tx,ty,true)){toast('No room for a house here. Find open, flat ground away from fortresses.','#ffd36a'); return;}}
   else {let best=null,bd=130; for(const v of C.villagers){if(v.lore) continue; const d=Math.hypot(v.x-P.x,v.y-P.y); if(d<bd){bd=d; best=v;}} if(!best){toast('Walk up to a villager to recruit them','#ffd36a'); return;}
     if(allies.length>=10) toast('Your army is full (10). The oldest one heads home.','#ffd36a'); C.villagers=C.villagers.filter(v=>v!==best); const px=P.x,py=P.y; P.x=best.x; P.y=best.y; summonAllies({minion:'lg_militia',count:1,pot:1+.35*Math.max(L.tier,lgmProgressTier())}); P.x=px; P.y=py;
-    toast('A villager joins your army!','#ffd38a'); if(best.mine||!best.lore) setTimeout(()=>{if(LGMS&&best.hx) LGMS.villagers.push(Object.assign({},best,{x:best.hx,y:best.hy,skin:choice(lgSkins()),tx:null}));},90000);}
+    toast('A villager joins your army!','#ffd38a'); lgmQ('recruit',1); if(best.mine||!best.lore) setTimeout(()=>{if(LGMS&&best.hx) LGMS.villagers.push(Object.assign({},best,{x:best.hx,y:best.hy,skin:choice(lgSkins()),tx:null}));},90000);}
   for(const [r,v] of Object.entries(c)) C.res[r]-=v; if(typeof sfx==='function') sfx('summon');}
 function lgmMirrorStruct(r){const base=r[10], B=LGMS&&LGMS.bases[base], tr=B?B.tr:TRIBES[0], type=r[1];
   return {st:true,base,type,ai:type,name:{tower:tr.name.replace(/Horde of (the )?/,'')+' Tower',spawner:'Horde Spawner',gate:tr.fort+' Gate',heart:'Heart of '+tr.fort}[type],c1:tr.c2,c2:tr.col,x:r[2],y:r[3],tx:r[2],ty:r[3],r:{tower:20,spawner:26,gate:52,heart:36}[type]||20,hp:r[4],max:r[5],mirror:true,face:0,walk:0,flash:0,inv:!!(r[8]&32),state:'idle',horiz:B?B.B.gates[0].horiz:true,t:0};}
