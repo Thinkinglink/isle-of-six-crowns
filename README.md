@@ -19,6 +19,12 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🗿 Version 6.2.1
+- **Legend Golems must be found:** each of the 4 lies broken somewhere on the island (🗿 on your compass and map). Walk up to it and press its key to repair it. After that you can call it back for free, one of each at a time.
+- **Riding:** you sit right on the saddle of every mount.
+- **Mount skins:** 8 skins for each mount, chosen in the Mounts menu (0).
+- **Fusing:** the Fuse button opens its window again, with a preview of the 3 items you picked and the Mega item you'll get.
+
 ## 🐟 Version 6.2
 - **Rivers and ponds:** every lake flows down a river to a deep pond, and each deep pond hides sunken treasure.
 - **Wild mounts:** only the horse starts tamed. The tiger, beetle, Great Bird and the new **Spiritfin** (a water mount that swims and dives) live in dens marked 🐾. Find each one and finish its quest to tame it.
