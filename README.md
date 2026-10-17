@@ -19,6 +19,10 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🗼 Version 7.1: The Tower at the Crown Well
+- **The Tower now stands right beside the Crown Well** in Legends 1 and Legends 2: a tall stone spire with lit windows, a blue roof, a gold crown and a glowing orb, with a light beam you can see from far away. Walk up to its glowing door to open the weekly Tower run. The `-` key still works too.
+- **The Crown Well and the Tower are marked on the Legends map**, with labels on both the minimap and the big map (M). The Tower is also on the compass bar.
+
 ## 🎵 Version 7.0.1: The full soundtrack download
 - **Download soundtrack** in the game now gets the complete, newest soundtrack: all 320 tracks, including every Legends track, the Deep Caverns, Sky Siege and the Blood Moon. The soundtrack apps already installed on Windows, Mac and Android update to it automatically.
 - New download option: the **MP3 album**, the Legends soundtrack as 66 MP3 files for any music player.
