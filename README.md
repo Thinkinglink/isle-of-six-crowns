@@ -19,6 +19,9 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🗿 Version 6.2.2
+- Legend Golems you repaired in Legends 1 are already repaired in Legends 2, and the other way around.
+
 ## 🗿 Version 6.2.1
 - **Legend Golems must be found:** each of the 4 lies broken somewhere on the island (🗿 on your compass and map). Walk up to it and press its key to repair it. After that you can call it back for free, one of each at a time.
 - **Riding:** you sit right on the saddle of every mount.

@@ -1311,7 +1311,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='6.2.1', SAVE_VERSION=7;
+const APP_VERSION='6.2.2', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -7880,7 +7880,7 @@ function lgPickCamp(){let p=$('#lgPick'); if(!p){p=document.createElement('div')
   fish:[['Abyss Fin','#1a2a5a','#0a0a2a','#7af0ff'],['Coral Fin','#ff7a6a','#ffd0a0','#ff3a8a'],['Golden Koi','#f0b030','#ffffff','#e04a1a'],['Ghost Fin','#d8e8f0','#8aa8c8','#b8f0ff']]};
   for(const k in X) if(LG_MOUNTS[k]&&LG_MOUNTS[k].skins.length<=4) LG_MOUNTS[k].skins.push(...X[k]);}
 // legend golems: find each broken one on the island and repair it, then summon it (one of each)
-const lgxRep=()=>{const S0=lgmSave(); S0.lgxr=S0.lgxr||{}; return S0.lgxr;};
+const lgxRep=()=>{const S1=SAVE.lgm=SAVE.lgm||{}; S1.lgxr=S1.lgxr||{}; const S2=SAVE.lgm2; if(S2&&S2.lgxr){Object.assign(S1.lgxr,S2.lgxr); delete S2.lgxr;} return S1.lgxr;}; // shared by Legends 1 and 2
 lgmLegendGolem=function(a){const C=LGMS, d=LGX.find(x=>x[0]===a), R0=lgxRep(), s=C.D.gsites&&C.D.gsites[a];
   if(!R0[a]){if(!s){toast(`The ${d[3]} sleeps on another island`,'#ffd36a'); return;} const dd=Math.hypot(s.x-P.x,s.y-P.y);
     if(dd>280){toast(`Find the broken ${d[3]} first (🗿 on your compass, ${Math.round(dd/T)} m away) and repair it`,'#ffd36a'); return;}
