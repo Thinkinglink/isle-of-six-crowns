@@ -292,7 +292,7 @@ function makeSong(key){const r=srand(strHash(key)), pick=a=>a[Math.floor(r()*a.l
   if(menu){mood={sc:['major'],root:[55,55]}; style='heroic';}
   else {const bi=+key.split(':')[boss?2:1], mk=moodOf(bi); mood=MOODS[mk]||MOODS.nature;
     style=boss?pick(mk==='fire'||mk==='infect'?['metal','rock','choir']:mk==='holy'||mk==='royal'?['choir','orchestral','organ']:mk==='void'||mk==='forms'?['choir','synth','rock','metal']:['choir','rock','orchestral','metal']):pick(mood.styles);}
-  if(key.startsWith('lgm:')){const tg=key.split(':')[2], opts={day:['orchestral','heroic','folk','march'],night:['choir','ambient','orchestral'],war:['metal','rock','tribal','orchestral'],deep:['ambient','synth','choir'],mine:['ambient','organ','synth'],dream:['synth','heroic','jazz','piano'],tower:['choir','metal','orchestral','organ'],glitch:['synth','metal','ambient']}[tg]||['orchestral']; const ok=opts.filter(x=>STYLES[x]); if(ok.length) style=pick(ok); if(tg==='deep') mood=MOODS.water||mood; else if(tg==='mine') mood=key.endsWith(':2')?(MOODS.sculk||mood):(MOODS.dark||mood); else if(tg==='war') mood=MOODS.storm||mood; else if(tg==='glitch') mood=MOODS.forms||mood; else if(tg==='tower') mood=MOODS.royal||mood;}
+  if(key.startsWith('lgm:')){const tg=key.split(':')[2], opts={day:['orchestral','heroic','folk','march'],night:['choir','ambient','orchestral'],war:['metal','rock','tribal','orchestral'],deep:['ambient','synth','choir'],mine:['ambient','organ','synth'],dream:['synth','heroic','jazz','piano'],tower:['choir','metal','orchestral','organ'],glitch:['synth','metal','ambient'],dim:['ambient','choir','synth','metal']}[tg]||['orchestral']; const ok=opts.filter(x=>STYLES[x]); if(ok.length) style=pick(ok); if(tg==='deep') mood=MOODS.water||mood; else if(tg==='mine') mood=key.endsWith(':2')?(MOODS.sculk||mood):(MOODS.dark||mood); else if(tg==='war') mood=MOODS.storm||mood; else if(tg==='glitch') mood=MOODS.forms||mood; else if(tg==='tower') mood=MOODS.royal||mood; else if(tg==='dim') mood=key.endsWith(':2')?(MOODS.infect||mood):(MOODS.void||mood);}
   const ST=STYLES[style], S={key,boss,menu,style,styleName:ST.name};
   S.scale=SCALES[pick(mood.sc)]; if(boss) S.scale=SCALES[pick(['harm','phrygian','minor','dim','hijaz','minor'])];
   S.bpm=rint2(ST.bpm[0],ST.bpm[1])+(boss&&style!=='metal'?12:0); S.root=rint2(mood.root[0],mood.root[1]); S.stepDur=60/S.bpm/4;
@@ -341,7 +341,7 @@ function playStep(S,i,t,bus){const st=i%16, bar=Math.floor(i/16), ch=S.prog[bar]
   // lead
   const m=S.mel[i]; if(m&&!(sec===0&&!S.menu&&bar<2)) {minst(S.lead,bus,t,m.n,m.d,v.lead*(sec===3?1.1:1)); if(S.menu&&sec>=1) minst('strings',bus,t,m.n-12,m.d,.35);}}
 
-const VER='6.7.0';
+const VER='6.8.0';
 // ---- the album ----
 const T=[]; const scaleName=a=>Object.keys(SCALES).find(k=>SCALES[k]===a)||'';
 const NICE={major:'major',minor:'minor',dorian:'dorian',phrygian:'phrygian',harm:'harmonic minor',lydian:'lydian',mixo:'mixolydian',whole:'whole-tone',dim:'diminished',hijaz:'hijaz'};

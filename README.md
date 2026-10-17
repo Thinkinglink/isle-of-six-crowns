@@ -19,6 +19,19 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🌀 Version 6.8: Dimensions, the Legends texture pack, bows and quivers
+- **The Obsidian Portal:** a dead gateway on the Legends map (🌀 on your compass). Sacrifice a weapon, a piece of armor and an artifact from your pack to wake it forever.
+- **The Dimension:** step through, alone with your Legends gear, into the Shattered Frontier, floating islands joined by narrow bridges over the void. Claim 3 void shards from altars guarded by Void Sentinels, then dive through the rift into the Toxic Abyss, a cave of poison pools ruled by the Blight Mother.
+  - **Low gravity:** you keep drifting after you stop, rolls are floaty, and struck foes slide much further.
+  - **Short sight:** heavy fog and a dark vignette mean you can barely see.
+  - **Rewards:** the Voidstring Longbow, the Abyssal Recurve, 90 alchemical arrows and an Ancient Relic.
+- **The Legends texture pack:** every block, building and mob in Legends now has a mythic cel-shaded look. You can switch it off in the Travel menu.
+- **Bows and quivers:**
+  - **New bows:** craft Longbows (harder hitting, longer range) and Recurve bows (faster) at the crafting hut.
+  - **Alchemical arrows:** Blast arrows explode, Wind arrows pierce and knock foes back, and Frost volleys fire three freezing arrows.
+  - **Quiver:** a detailed quiver on your back shows the arrows you have ready. Press ` to switch arrow type.
+  - **High ground:** shots from high up (flying on the bird) hit 40% harder and fly further.
+
 ## ⚠️ Version 6.7: Corrupted Worlds and the Tower
 - **Corrupted Worlds (new mode):** an unstable reality where broken world generation fuses three mismatched biomes (layout, lighting and monsters each come from a different one), warps and glitches the buildings, and covers the screen in scanlines and colour tearing.
   - Rule-breaking rifts can teleport you, invert your controls, shrink you, duplicate monsters, overflow or cut your health, or stutter time.
