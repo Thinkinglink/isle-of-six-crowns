@@ -19,6 +19,17 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🌊 Version 6.6: The Deep Sea
+- **The Deep Sea:** world generation now carves a great blue sea that fills exactly 30% of the Legends island. Bases, villages, golem sites and dens are kept on islands, with shallow fords back to the mainland.
+- **Marauder Outposts:** fortified naval hubs on islets along the coast. They keep sending raiders until you break their War Horn, and claiming one gives diamonds, gold, gear and sometimes an Ancient Relic.
+- **Sunken Monuments:** temples on the seabed, guarded by a watching eye that fires beams. Dive to their three chambers for high-tier loot and a relic.
+- **Hazards and advantages:** whirlpools pull swimmers in; sea currents speed up the Spiritfin; enemies can't follow you into deep water.
+- **The underwater dimension:** entering the water shifts the whole screen, with caustic light, sun shafts, bubbles and plankton, teal lighting that darkens as you dive, muffled music and its own soundscape (deep rumble, whale calls, bubbles).
+- **Spiritfin controls:** Space rises and Shift dives, just like the bird flies.
+- **Detailed models:** outposts, monuments, ships and chests use dense, smooth geometry, and every round shape in the game now has about twice the detail.
+- **Legends music:** Legends has its own score for day, night, sieges, the mine and the deep sea (plus Legends 2 and Creator's Dream themes), and the soundtrack page lists all the new tracks.
+- **The Creator's Dream** is now only the game studio. The Legends island sandbox has been removed from it.
+
 ## 🛠️ Version 6.5: The Creator's Dream Studio
 - **The Creator's Dream is now its own game mode** where you build your own games, a bit like a game studio.
   - **Editor:** paint terrain (floor, wall, lava, ice, pit) and place objects from the toolbox: spawn, goal portal, coins, checkpoints, chests, potions, keys and doors, jump pads, spikes, teleporters, enemies, champions, golem allies, signs, trigger zones and decorations.
