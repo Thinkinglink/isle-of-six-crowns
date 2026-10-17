@@ -19,6 +19,13 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🎖️ Version 6.3
+- **Tactics (`,`):** choose a formation (Loose, Line, Wedge, Ring) and give orders: Follow, Hold here, Focus fire (`.` targets the enemy in front of you) and Flank, which splits your army to hit the target from both sides. Each golem type has its own special ability: Shield Bash, Volley, Bloom, Charge, Ground Slam, Arrow Rain, Fortify and Chain Lightning.
+- **Smarter hordes:** raids pick the village you defend least and march in from their base in two or three flanking groups. They bring siege beasts when you have towers there, attack your towers, and strike back at your camps and towers after you break a base.
+- **Biome hazards:** snow freezes you unless you warm up at a village or camp, swamps slow you down, and lava fields erupt under your feet.
+- **Village jobs (`/`):** a village you defend or free can become a Blacksmith Village, Engineers Guild, Farm Village, Quarry Town or Herbalist Village. Ship supplies to raise its level, or send caravans between villages.
+- **Weather:** rain, blizzards that cut how far you and your golems can see, and lightning storms that can overcharge or short out your towers.
+
 ## 🗿 Version 6.2.2
 - Legend Golems you repaired in Legends 1 are already repaired in Legends 2, and the other way around.
 
