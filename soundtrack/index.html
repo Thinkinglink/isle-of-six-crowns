@@ -12,6 +12,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Six Crowns Music">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Six Crowns Soundtrack</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -341,7 +342,7 @@ function playStep(S,i,t,bus){const st=i%16, bar=Math.floor(i/16), ch=S.prog[bar]
   // lead
   const m=S.mel[i]; if(m&&!(sec===0&&!S.menu&&bar<2)) {minst(S.lead,bus,t,m.n,m.d,v.lead*(sec===3?1.1:1)); if(S.menu&&sec>=1) minst('strings',bus,t,m.n-12,m.d,.35);}}
 
-const VER='7.0.0';
+const VER='7.0.1';
 // ---- the album ----
 const T=[]; const scaleName=a=>Object.keys(SCALES).find(k=>SCALES[k]===a)||'';
 const NICE={major:'major',minor:'minor',dorian:'dorian',phrygian:'phrygian',harm:'harmonic minor',lydian:'lydian',mixo:'mixolydian',whole:'whole-tone',dim:'diminished',hijaz:'hijaz'};
@@ -352,6 +353,25 @@ for(const w of Object.keys(DATA.worlds).map(Number)){for(const I of BIOMES.filte
   I.levels.forEach((nm,li)=>addT('lvl:'+I.bi+':'+li,nm,I.name+' · level '+(li+1),'level',w,I.name));
   addT('lvl:'+I.bi+':'+I.levels.length,I.bossName?I.bossName.replace(/^The /,'')+"'s Lair":'Boss Arena',I.name+' · boss arena','arena',w,I.name);
   for(const id of [I.boss,...(TF[I.boss]||[])]) addT('boss:'+id+':'+I.bi,DATA.bosses[id]||id,I.name+' · boss battle','boss',w,I.name);}}
+// ---- Legends: the open-world campaigns, the Deep Sea and the Creator's Dream
+DATA.worlds[11]='Legends'; DATA.worlds[12]='Legends 2'; DATA.worlds[13]="The Creator's Dream";
+const LG1=[[0,'Thistle Meadows'],[1,'Sunscour Dunes'],[2,'Murkfen'],[3,'Rimewall Peaks'],[4,'Cinder Caldera'],[5,'The Hollow Spire']], LG2=[[11,'Sculk Obsession'],[12,'Monarch Kingdom'],[13,'Grass of Harmony'],[14,"Singer's Meadows"]];
+for(const [bi,nm] of LG1){addT('lgm:'+bi+':day:1',nm+' by Day',"Legends · "+nm,'level',11,nm); addT('lgm:'+bi+':night:1',nm+' by Night',"Legends · "+nm+' at night','level',11,nm); addT('lgm:'+bi+':war:1','Siege of '+nm,"Legends · horde raids and Mega hordes",'arena',11,nm);}
+addT('lgm:0:mine:1','The Great Mineshaft',"Legends · the mine",'level',11,'Below the Island'); addT('lgm:1:deep:1','The Deep Sea',"Legends · swimming and diving",'level',11,'Below the Island'); addT('lgm:4:deep:1','Sunken Monument',"Legends · the ocean depths",'level',11,'Below the Island');
+for(const [bi,nm] of LG2){addT('lgm:'+bi+':day:2',nm+' by Day',"Legends 2 · "+nm,'level',12,nm); addT('lgm:'+bi+':night:2',nm+' by Night',"Legends 2 · "+nm+' at night','level',12,nm); addT('lgm:'+bi+':war:2','Siege of '+nm,"Legends 2 · the Shift attacks",'arena',12,nm);}
+addT('lgm:0:mine:2','Sculk in the Mine',"Legends 2 · the sculk-filled mine",'level',12,'Below the Island'); addT('lgm:11:deep:2','Drowned Echoes',"Legends 2 · the Deep Sea",'level',12,'Below the Island');
+addT('lgm:0:dream:0',"The Creator's Dream","Playing a game you built in the studio",'theme',13,'Studio'); addT('lgm:3:dream:0','Build Mode',"The Creator's Dream · studio",'theme',13,'Studio'); addT('lgm:5:dream:0','Shared Worlds',"The Creator's Dream · a friend's game",'theme',13,'Studio');
+DATA.worlds[14]='Corrupted Worlds'; DATA.worlds[15]='The Tower';
+[[7,'Thunder.dat'],[0,'Singer_Gate.dat'],[19,'Null_Expanse.dat'],[24,'Crater.tmp'],[33,'Door_404'],[9,'Reef.bak']].forEach(([bi,nm],i)=>addT('lgm:'+bi+':glitch:'+(i+1),nm,'Corrupted Worlds · depth '+(i+1),'level',14,'Corrupted fragments'));
+[[11,'Floor of Echoes'],[3,'The Frozen Stair'],[17,'Iron Landing'],[29,'Moonlit Gallery'],[5,'The Crown Floor']].forEach(([bi,nm])=>addT('lgm:'+bi+':tower:9',nm,'The Tower · Legends','arena',15,'The weekly Tower'));
+DATA.worlds[16]='Dimensions';
+addT('lgm:20:dim:1','The Shattered Frontier','Dimensions · floating islands over the void','level',16,'Beyond the Obsidian Portal'); addT('lgm:19:dim:1','Void Shards','Dimensions · the shard altars','level',16,'Beyond the Obsidian Portal'); addT('lgm:26:dim:2','The Toxic Abyss','Dimensions · deep below','level',16,'Beyond the Obsidian Portal'); addT('lgm:21:dim:2','Low Gravity','Dimensions · drifting through the dark','level',16,'Beyond the Obsidian Portal');
+DATA.worlds[17]='The Deep Caverns';
+[[10,'Crystallized Echo Caves'],[4,'Volcanic Magma Vents'],[2,'Bioluminescent Fungal Forest'],[3,'The Frozen Hollows']].forEach(([bi,nm])=>addT('lgm:'+bi+':mine:1',nm,'Legends · the Deep Caverns','level',17,'Under the island'));
+DATA.worlds[18]='Sky Siege';
+[[1,'Raise the Sails'],[2,'Flak over the Walls'],[3,'Paratroopers Away'],[4,'The Fortress Falls']].forEach(([n,nm])=>addT('lgm:17:sky:'+n,nm,'Sky Siege · airship battles','level',18,'Above the fortresses'));
+DATA.worlds[19]='The Blood Moon';
+[[0,1,'The Blood Moon Rises'],[4,1,'Sacrificial Altars'],[10,1,'Crimson Howl'],[2,2,'Until Dawn']].forEach(([bi,c,nm])=>addT('lgm:'+bi+':blood:'+c,nm,'Legends · every third night','level',19,'Under the red moon'));
 T.forEach((t,i)=>t.no=i+1);
 const fmt=s=>{s=Math.max(0,Math.round(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
 const total=T.reduce((a,t)=>a+t.len,0);
@@ -415,10 +435,11 @@ function draw(){requestAnimationFrame(draw); const W=cv.width, H=cv.height, cx=W
   // loop position arc
   g.strokeStyle='rgba(98,198,182,.85)'; g.lineWidth=W*.006; g.beginPath(); g.arc(cx,cy,r0*.86,-Math.PI/2,-Math.PI/2+pos*TAU); g.stroke();}
 show(); render(); draw();
-window.__jb={makeSong,playStep,AU,T};
+window.__jb={makeSong,playStep,AU,T,minst,drum};
 })();
 </script>
 
+</body></html>
 <script>if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});</script>
 </body>
 </html>

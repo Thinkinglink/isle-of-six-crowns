@@ -19,6 +19,10 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🎵 Version 7.0.1: The full soundtrack download
+- **Download soundtrack** in the game now gets the complete, newest soundtrack: all 320 tracks, including every Legends track, the Deep Caverns, Sky Siege and the Blood Moon. The soundtrack apps already installed on Windows, Mac and Android update to it automatically.
+- New download option: the **MP3 album**, the Legends soundtrack as 66 MP3 files for any music player.
+
 ## ⛵ Version 7.0: Sky Siege and the Blood Moon
 - **Sky Siege (new mode, ⛵ in Modes):** build your own airship at the Shipyard, then besiege a fortress from the sky.
   - **Hull frames:** Skiff (fast, 2 paratroopers), Galleon (balanced, 4) and Dreadnought (armored, 6, with a war balloon).

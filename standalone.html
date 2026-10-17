@@ -1318,7 +1318,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='7.0.0', SAVE_VERSION=7;
+const APP_VERSION='7.0.1', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -6618,12 +6618,14 @@ const SFX={
    const OPTS={win:['Windows','Six-Crowns-Soundtrack-Setup.exe',GH+'Six-Crowns-Soundtrack-Setup.exe','Run it. If Windows warns you, choose More info, then Run anyway.'],
      mac:['Mac','Six-Crowns-Soundtrack.dmg',GH+'Six-Crowns-Soundtrack.dmg','Open it and drag the app into Applications. The first time, right-click it and choose Open.'],
      android:['Android and Chromebook','Six-Crowns-Soundtrack.apk',GH+'Six-Crowns-Soundtrack.apk','Open the file and tap Install.'],
-     web:['iPhone, iPad and any browser','Soundtrack web app',WEB,'Open it, then use Share, Add to Home Screen (or Install) to keep it as an app.']};
+     web:['iPhone, iPad and any browser','Soundtrack web app',WEB,'Open it, then use Share, Add to Home Screen (or Install) to keep it as an app.'],
+     mp3:['MP3 album','Six-Crowns-Soundtrack-MP3.zip',GH+'Six-Crowns-Soundtrack-MP3.zip','The Legends soundtrack as MP3 files for any music player, plus the full soundtrack player.']};
+   for(const k in OPTS) OPTS[k][2]+='?v='+APP_VERSION;
    const ua=navigator.userAgent||''; const os=typeof NL_OS!=='undefined'?NL_OS:'';
    const mine=window.IsleAndroid?'android':os==='Windows'?'win':os==='Darwin'?'mac':/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1)?'web':/Android/.test(ua)?'android':/CrOS/.test(ua)?'web':/Windows/.test(ua)?'win':/Macintosh/.test(ua)?'mac':'web';
    const openLink=u=>{try{if(window.IsleAndroid&&IsleAndroid.openUrl) IsleAndroid.openUrl(u); else if(DESK.on) Neutralino.os.open(u); else window.open(u,'_blank');}catch(e){try{location.href=u;}catch(_){}}};
    const sp=document.createElement('div'); sp.id='stPanel'; sp.hidden=true; const order=[mine,...Object.keys(OPTS).filter(k=>k!==mine)];
-   sp.innerHTML=`<div class="volBox stBox"><h3>Download the soundtrack</h3><p class="stp">Every piece of music from the game in its own app: every level theme, every boss battle and the main theme. It updates itself when new music comes out.</p>`+order.map((k,i)=>`<div class="strow${i?'':' mine'}"><div><b>${OPTS[k][0]}${i?'':' · recommended for this device'}</b><small>${OPTS[k][3]}</small></div><button class="btn small${i?'':' gold'}" data-st="${k}">${k==='web'?'Open':'Download'}</button></div>`).join('')+`<button class="btn small" id="stClose">Close</button></div>`;
+   sp.innerHTML=`<div class="volBox stBox"><h3>Download the soundtrack</h3><p class="stp">Every piece of music from the game (version ${APP_VERSION}) in its own app: every level theme, every boss battle, all the Legends music and the main theme. It updates itself when new music comes out.</p>`+order.map((k,i)=>`<div class="strow${i?'':' mine'}"><div><b>${OPTS[k][0]}${i?'':' · recommended for this device'}</b><small>${OPTS[k][3]}</small></div><button class="btn small${i?'':' gold'}" data-st="${k}">${k==='web'?'Open':'Download'}</button></div>`).join('')+`<button class="btn small" id="stClose">Close</button></div>`;
    document.body.appendChild(sp); sp.querySelectorAll('[data-st]').forEach(b=>b.onclick=()=>{openLink(OPTS[b.dataset.st][2]); b.textContent=b.dataset.st==='web'?'Opened':'Downloading…';});
    $('#stClose').onclick=()=>{sp.hidden=true;}; sp.addEventListener('click',e=>{if(e.target===sp) sp.hidden=true;}); ['keydown','keyup'].forEach(t=>sp.addEventListener(t,e=>e.stopPropagation()));
    const mb2=document.querySelector('#menu .menu-btns'); if(mb2){const b=document.createElement('button'); b.className='btn'; b.id='btnSoundtrack'; b.textContent='Download soundtrack'; b.onclick=()=>{sp.hidden=false; const f=sp.querySelector('.mine button'); if(f) f.focus();}; mb2.appendChild(b);}}
