@@ -19,6 +19,18 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🌌 Version 6.4: The Creator's Dream
+- **The Creator's Dream:** a new game mode (Modes → The Creator's Dream, or `-` inside Legends) with a mythic look: pastel skies, floating islands and drifting light. You can visit it any time.
+  - Press `-` in the Dream to bend its rules: time (flowing, endless day, endless night, racing), weather, hordes (peaceful, normal, Mega), hero size (giant or tiny), speed (1× to 3×), army size (up to 60 golems) and infinite materials.
+  - You can also summon golems, a Mega horde or a relic straight from your dream.
+- **Mega hordes (Legends only):** armies of 100 to 300+ foes, drawn efficiently so the game doesn't lag. They march across biomes in 2 to 4 fronts on your weakest towers, camps, golem spawners and villages, and lay siege when they arrive. A front changes course after heavy losses or once it destroys its target. They can come from day 3 onward, at night.
+- **Ancient Relics (`\`):** found at 8 guarded shrines (🔮), dropped by horde leaders, and rewarded for breaking a Mega horde.
+  - Sigils give your golems elemental hits: fire splash, frost stun, storm chains, void drain.
+  - Chalices drain health back to you.
+  - Crowns unleash an elemental nova from every golem (`=`).
+  - Cores go into towers: automatic chain lightning, fire bombs, frost fields or void drain.
+  - Upgrade relics with diamonds, or reforge them into another element.
+
 ## 🎖️ Version 6.3
 - **Tactics (`,`):** choose a formation (Loose, Line, Wedge, Ring) and give orders: Follow, Hold here, Focus fire (`.` targets the enemy in front of you) and Flank, which splits your army to hit the target from both sides. Each golem type has its own special ability: Shield Bash, Volley, Bloom, Charge, Ground Slam, Arrow Rain, Fortify and Chain Lightning.
 - **Smarter hordes:** raids pick the village you defend least and march in from their base in two or three flanking groups. They bring siege beasts when you have towers there, attack your towers, and strike back at your camps and towers after you break a base.

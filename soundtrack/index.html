@@ -340,7 +340,7 @@ function playStep(S,i,t,bus){const st=i%16, bar=Math.floor(i/16), ch=S.prog[bar]
   // lead
   const m=S.mel[i]; if(m&&!(sec===0&&!S.menu&&bar<2)) {minst(S.lead,bus,t,m.n,m.d,v.lead*(sec===3?1.1:1)); if(S.menu&&sec>=1) minst('strings',bus,t,m.n-12,m.d,.35);}}
 
-const VER='6.3.0';
+const VER='6.4.0';
 // ---- the album ----
 const T=[]; const scaleName=a=>Object.keys(SCALES).find(k=>SCALES[k]===a)||'';
 const NICE={major:'major',minor:'minor',dorian:'dorian',phrygian:'phrygian',harm:'harmonic minor',lydian:'lydian',mixo:'mixolydian',whole:'whole-tone',dim:'diminished',hijaz:'hijaz'};
