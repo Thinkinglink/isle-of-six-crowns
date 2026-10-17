@@ -19,6 +19,32 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## ⛰️ Version 7.2: The Skyreach Highlands, demolition and the Devotion Paths
+- **The Skyreach Highlands (Legends):** a new land in the north-east corner of the island, reached by a stone causeway from the coast. One height field blends every kind of terrain into the next:
+  - **Soaring mountains:** ridged peaks over 30 m tall, capped with snow, and a ring of sheer rock around the edge.
+  - **Tiered rolling hills:** grassy terraces with smooth ramps between some tiers and cliffs between others, scattered with pine forests.
+  - **Precipitous cliffs:** long escarpments where the land drops three metres in one step.
+  - **A city of tower blocks:** a mesa with vertical drop-offs on every side, a grid of streets with lane markings and sidewalks, plazas with trees, a sunken boulevard with ramps at both ends, and 285 tower blocks with setbacks, glowing window bands, rooftop water tanks, antennas and beacons. Sky vaults in the plazas hold treasure.
+  - You, your army and the monsters stand on the real height of the ground, so you climb the road, look down from the terraces and get the high-ground bow bonus.
+- **The demolition engine:**
+  - **Fortress walls** are now made of individual stones that take damage. Exploding arrows and the Stone Titan's Ground Slam smash them, and your cobble golems batter any wall that blocks their way.
+  - **Structural support:** a stone left with no neighbours falls, and a cracked stone held by only one neighbour falls too, so breaches spread along the wall.
+  - **Tower blocks** crack and lose their top floors at half health, then crumble into a pile of rubble.
+  - Everything that breaks throws real debris that bounces and settles on the ground.
+  - **The ground changes:** blasts leave craters, and broken walls and towers leave rubble. Craters slow movement a little and rubble slows it a lot.
+  - **Pathfinding:** when a unit is blocked, it follows a flow field around walls, through new breaches and around rubble. The field is rebuilt as soon as anything breaks, so a new gap becomes a new route.
+- **The Devotion Paths:** three altars beside the Crown Well, each with its own high-detail design.
+  - **Path of the Earth:** mossy monoliths, roots and a glowing amber geode with floating stones. Offer stone or wood, or sacrifice armor. Blessing: tougher golems.
+  - **Path of the Storm:** an iron spire wrapped in copper coils, crackling with lightning arcs to a storm orb. Offer gold or sacrifice a weapon. Blessing: lightning strikes nearby foes.
+  - **Path of the Void:** an obsidian base with spikes, a floating inverted pyramid and a black hole with a glowing accretion disc. Offer diamonds or sacrifice an artifact. Blessing: your hits heal you.
+- **The balance:** the spirits are jealous. Every gift lowers the other two, and all favour fades each night.
+  - Over-sacrificing (above 90) or neglecting (below 10) a spirit brings a calamity on every land you have liberated:
+    - **Earth:** Petrification (too much) or the Great Quake (too little), which also cracks walls.
+    - **Storm:** the Endless Tempest (too much) or the Dead Calm (too little).
+    - **Void:** Rift Bloom (too much) or the Unbound Shadow (too little).
+  - Three small bars on the left of the screen show where each spirit stands.
+- **The compass bar** now shows only the 5 nearest landmarks, and never stacks two on top of each other.
+
 ## 🗼 Version 7.1: The Tower at the Crown Well
 - **The Tower now stands right beside the Crown Well** in Legends 1 and Legends 2: a tall stone spire with lit windows, a blue roof, a gold crown and a glowing orb, with a light beam you can see from far away. Walk up to its glowing door to open the weekly Tower run. The `-` key still works too.
 - **The Crown Well and the Tower are marked on the Legends map**, with labels on both the minimap and the big map (M). The Tower is also on the compass bar.

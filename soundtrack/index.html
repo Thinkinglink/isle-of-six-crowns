@@ -342,7 +342,7 @@ function playStep(S,i,t,bus){const st=i%16, bar=Math.floor(i/16), ch=S.prog[bar]
   // lead
   const m=S.mel[i]; if(m&&!(sec===0&&!S.menu&&bar<2)) {minst(S.lead,bus,t,m.n,m.d,v.lead*(sec===3?1.1:1)); if(S.menu&&sec>=1) minst('strings',bus,t,m.n-12,m.d,.35);}}
 
-const VER='7.1.0';
+const VER='7.2.0';
 // ---- the album ----
 const T=[]; const scaleName=a=>Object.keys(SCALES).find(k=>SCALES[k]===a)||'';
 const NICE={major:'major',minor:'minor',dorian:'dorian',phrygian:'phrygian',harm:'harmonic minor',lydian:'lydian',mixo:'mixolydian',whole:'whole-tone',dim:'diminished',hijaz:'hijaz'};
@@ -370,6 +370,8 @@ DATA.worlds[17]='The Deep Caverns';
 [[10,'Crystallized Echo Caves'],[4,'Volcanic Magma Vents'],[2,'Bioluminescent Fungal Forest'],[3,'The Frozen Hollows']].forEach(([bi,nm])=>addT('lgm:'+bi+':mine:1',nm,'Legends · the Deep Caverns','level',17,'Under the island'));
 DATA.worlds[18]='Sky Siege';
 [[1,'Raise the Sails'],[2,'Flak over the Walls'],[3,'Paratroopers Away'],[4,'The Fortress Falls']].forEach(([n,nm])=>addT('lgm:17:sky:'+n,nm,'Sky Siege · airship battles','level',18,'Above the fortresses'));
+DATA.worlds[20]='The Skyreach Highlands';
+[[1,'Skyreach Highlands'],[2,'Skyreach under the Shift']].forEach(([c,nm])=>addT('lgm:0:sky:'+c,nm,'Legends · the Skyreach Highlands','level',20,'Above the clouds'));
 DATA.worlds[19]='The Blood Moon';
 [[0,1,'The Blood Moon Rises'],[4,1,'Sacrificial Altars'],[10,1,'Crimson Howl'],[2,2,'Until Dawn']].forEach(([bi,c,nm])=>addT('lgm:'+bi+':blood:'+c,nm,'Legends · every third night','level',19,'Under the red moon'));
 T.forEach((t,i)=>t.no=i+1);
