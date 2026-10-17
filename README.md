@@ -19,6 +19,19 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## ⛵ Version 7.0: Sky Siege and the Blood Moon
+- **Sky Siege (new mode, ⛵ in Modes):** build your own airship at the Shipyard, then besiege a fortress from the sky.
+  - **Hull frames:** Skiff (fast, 2 paratroopers), Galleon (balanced, 4) and Dreadnought (armored, 6, with a war balloon).
+  - **Sails:** Silk (+20% speed), Stormcloth (Shift to dash), Ironweave (+15% armor) and the Sunfire balloon (repairs the hull).
+  - **Two deck weapon mounts:** the Redstone Flak Cannon (shells burst where you aim), the Freeze Harpoon (pierces and freezes), the Storm Ballista (fast long-range bolts) and the Bomb Bay (a string of bombs below the ship).
+  - **The siege:** fly freely over the walls. Sky-Flak Towers on the corners shoot at your ship. Break the gate so your ground army, which marches in waves from the south, can storm in. Press **F** to drop paratrooper golems right behind the walls. Destroy the Heart of the Fortress to win diamonds and gear. Every win makes the next fortress bigger.
+  - Detailed models: curved hulls with rails and gold trim, billowing sails, masts, propellers, balloons, and every weapon has its own turret that follows your aim.
+- **The Blood Moon (Legends only):** every third night the moon turns red.
+  - Sacrificial altars rise near your three closest villages and summon variants that only appear on that night: **Blood Howlers** (fast, regenerate), **Crimson Brutes** (enrage at half health), **Hemomancers** and **Altar Wraiths** (blink toward villages).
+  - Blood-red spikes erupt from the ground around you. Watch for the red rings.
+  - Survive until dawn without losing a village to unlock a **legendary alchemical bow design**: the Crimson Eclipse Longbow (exploding arrows), Moonfang Longbow (freezing arrows), Heartstring Recurve (piercing wind arrows) or Sanguine Recurve (arrows that heal you). Craft them at the crafting hut.
+- New music for Sky Siege and the Blood Moon.
+
 ## 🕳️ Version 6.9: The Deep Caverns
 - **Four underground biomes** under the Legends island, reached through cave mouths on the surface (🕳️ on your compass). Light shafts with rope ladders lead back up.
   - **Crystallized Echo Caves:** singing crystals light the dark. Walk past one and its echo reveals every foe around you.
