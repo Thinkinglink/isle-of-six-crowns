@@ -19,6 +19,18 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🕳️ Version 6.9: The Deep Caverns
+- **Four underground biomes** under the Legends island, reached through cave mouths on the surface (🕳️ on your compass). Light shafts with rope ladders lead back up.
+  - **Crystallized Echo Caves:** singing crystals light the dark. Walk past one and its echo reveals every foe around you.
+  - **Volcanic Magma Vents:** basalt vents erupt without warning (watch the glowing rings), and their heat keeps you warm.
+  - **Bioluminescent Fungal Forest:** giant glowing mushrooms heal you nearby, while spore clouds poison and slow you.
+  - **Frozen Hollows:** slippery ice floors and creeping cold, with ice spires and frozen ponds.
+- **Cave generation:** a connected cave system in its own underground layer, so nothing clips through the surface. Bottomless chasms cut across it, crossed by rope-and-plank bridges on stone arches.
+- **Ancient ruins:** 12 colonnades with treasure chests. Caves also have their own ores, monsters, music and lighting.
+- **Detailed models:** smooth, high-detail stalagmites, hanging stalactites, crystal clusters, magma vents, giant mushrooms, ice spires, bridges, ruins and cave mouths.
+- **The Gloomstrider:** a giant climbing insect mount, tamed by feeding it 6 glowcaps in the Fungal Forest. It walks up and over walls, cliffs and cave rock (not fortress walls), tilting as it climbs.
+- Fixed: the Obsidian Portal could clash with the Ancient City portal in Legends 2.
+
 ## 🌀 Version 6.8: Dimensions, the Legends texture pack, bows and quivers
 - **The Obsidian Portal:** a dead gateway on the Legends map (🌀 on your compass). Sacrifice a weapon, a piece of armor and an artifact from your pack to wake it forever.
 - **The Dimension:** step through, alone with your Legends gear, into the Shattered Frontier, floating islands joined by narrow bridges over the void. Claim 3 void shards from altars guarded by Void Sentinels, then dive through the rift into the Toxic Abyss, a cave of poison pools ruled by the Blight Mother.
