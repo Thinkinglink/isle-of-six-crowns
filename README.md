@@ -19,6 +19,17 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## ⚠️ Version 6.7: Corrupted Worlds and the Tower
+- **Corrupted Worlds (new mode):** an unstable reality where broken world generation fuses three mismatched biomes (layout, lighting and monsters each come from a different one), warps and glitches the buildings, and covers the screen in scanlines and colour tearing.
+  - Rule-breaking rifts can teleport you, invert your controls, shrink you, duplicate monsters, overflow or cut your health, or stutter time.
+  - Every 20 to 30 seconds a REALITY REWRITE changes a rule for a while: inverted controls, overclocked monsters, slowed or racing time, or a failing screen.
+  - Reach the exit to go one level deeper. Every few depths you find Corrupted gear, stronger than normal.
+- **The Tower (Legends only, `-` in the Travel menu):** a 10-floor gauntlet with its own gear.
+  - You start with a fresh Tower Blade and Tower Mail and pick an upgrade after every floor. Nothing from your pack comes in.
+  - Room shapes, biomes, monsters and the bosses on floors 5 and 10 are re-rolled every Sunday.
+  - Beat floor 10 for 3 ultra-rare Tower-forged items, an Ancient Relic and 25 diamonds, all added to your Legends pack.
+- New music for Corrupted Worlds and the Tower, with 11 new soundtrack tracks.
+
 ## 🌊 Version 6.6: The Deep Sea
 - **The Deep Sea:** world generation now carves a great blue sea that fills exactly 30% of the Legends island. Bases, villages, golem sites and dens are kept on islands, with shallow fords back to the mainland.
 - **Marauder Outposts:** fortified naval hubs on islets along the coast. They keep sending raiders until you break their War Horn, and claiming one gives diamonds, gold, gear and sometimes an Ancient Relic.
