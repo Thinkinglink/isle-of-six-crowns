@@ -97,6 +97,19 @@ kbd{font-family:var(--display);font-size:12px;background:var(--rim);color:var(--
 .lgt-foot{margin:6px 0 0;font-size:13px;color:#9fb0c8}
 .lgt-panel{position:absolute;right:max(24px,env(safe-area-inset-right));top:50%;transform:translateY(-50%);width:min(460px,calc(100vw - 48px));max-height:calc(100vh - 48px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:18px;background:rgba(8,16,34,.95);border:2px solid #4a6aa8}
 .lgt-panel[hidden]{display:none}
+#studio{position:fixed;inset:0;z-index:75;background:#0b1020;color:#e8eef8;font:14px/1.35 system-ui,sans-serif;display:flex;flex-direction:column}#studio[hidden]{display:none}
+.stbar{display:flex;gap:6px;align-items:center;padding:8px 10px;background:#141c34;border-bottom:2px solid #2a3a5a;flex-wrap:wrap}.stbar input{font:inherit;background:#0b1020;color:#fff;border:1px solid #2a3a5a;padding:4px 8px;width:220px}
+.sthub,.sted{display:flex;flex-direction:column;height:100%;min-height:0}.sthubg{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px;overflow:auto;flex:1}.sthubg h3{margin:12px 0 8px}
+.sttpl{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}.stimp{display:flex;gap:6px}.stimp input{flex:1;font:inherit;padding:6px;background:#0b1020;color:#fff;border:1px solid #2a3a5a}
+.stlist{display:flex;flex-direction:column;gap:8px}.stg{padding:10px;background:#141c34;border-left:4px solid #b06aff;display:flex;flex-direction:column;gap:4px}.stg small{opacity:.8}.stg div{display:flex;gap:6px;flex-wrap:wrap}
+.stmain{flex:1;display:grid;grid-template-columns:184px 1fr 290px;min-height:0}.sttool,.stside{overflow:auto;padding:8px;background:#10172c}.sttool h4,.stside h4{margin:8px 0 4px;font-size:12px;color:#9fd0ff;text-transform:uppercase;letter-spacing:.06em}
+.sttg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.stt{height:34px;font-size:18px;background:#1a2440;border:2px solid #2a3a5a;color:#fff;cursor:pointer;border-radius:4px}.stt.on{border-color:#ffd36a;box-shadow:0 0 0 1px #ffd36a}
+.stcv{position:relative;min-width:0;min-height:0;overflow:hidden}.stcv canvas{width:100%;height:100%;display:block;cursor:crosshair}.sthint{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,.65);padding:4px 8px;font-size:12px;border-radius:4px;pointer-events:none}
+.stexp{max-height:40%;overflow:auto}.stx0{font-weight:bold;margin-bottom:4px}.stexp summary{cursor:pointer;color:#cfd8e8;margin:4px 0}.stx{display:block;width:100%;text-align:left;background:none;border:0;color:#e8eef8;padding:3px 6px;font:inherit;font-size:13px;cursor:pointer}.stx.on,.stx:hover{background:#2a3a5a}
+.stf{display:flex;flex-direction:column;gap:2px;margin:6px 0;font-size:12px}.stf input,.stf select,.stf textarea{font:inherit;font-size:13px;background:#0b1020;color:#fff;border:1px solid #2a3a5a;padding:4px}
+.sth{margin:10px 0 4px;font-weight:bold;color:#d8a8ff}.strule{display:flex;flex-wrap:wrap;gap:4px;align-items:center;padding:6px;background:#1a2440;margin:4px 0;border-left:3px solid #b06aff}.strule select,.strule input{font:inherit;font-size:12px;background:#0b1020;color:#fff;border:1px solid #2a3a5a;padding:3px}.strule .stt{height:24px;font-size:12px;padding:0 6px}.strep{font-size:11px}
+#stuHud{position:fixed;top:58px;left:50%;transform:translateX(-50%);z-index:30;display:flex;gap:8px;align-items:center;background:rgba(10,16,32,.85);border:2px solid #b06aff;padding:6px 10px;color:#fff;font-size:14px;max-width:calc(100vw - 32px)}#stuHud[hidden]{display:none}
+@media(max-width:800px){.stmain{grid-template-columns:1fr;grid-template-rows:auto 50vh auto}.sttool,.stside{max-height:30vh}.sthubg{grid-template-columns:1fr}}
 #lgTravel{position:fixed;z-index:40}.lgtac .lgt-b small{display:block;margin-top:2px}#lgVil .lgq{display:flex;flex-direction:column;padding:6px 8px;margin:4px 0;background:rgba(12,24,48,.85);border-left:4px solid #4a6aa8}#lgVil .lgq span{font-size:12.5px;color:#cfd8e8}#lgVil .qh,#lgTac .qh{margin:8px 0 4px;font-size:13px;color:#9fd0ff}.lgtac{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.lgtac .lgt-b.on{border-color:#ffd36a;background:rgba(60,50,20,.9)}.lgvr{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:4px}.lgvr .sk2{width:34px;height:30px;font-size:16px;background:rgba(10,18,30,.8);border:2px solid #2a3a5a;cursor:pointer}.lgvr .sk2.sel{border-color:#ffd36a}.lgvr .lgt-b.sm{padding:4px 8px;font-size:12px}.lgvr select{font:inherit;font-size:12px;background:#0c1830;color:#e8eef8;border:1px solid #2a3a5a;padding:3px}body>.lgt-panel{position:fixed!important;z-index:45}#lgmBar .lgfly{grid-template-columns:repeat(3,64px)!important}
 #lgQuests .qh{margin:6px 0 0;font-size:13px;color:#9fd0ff}#lgQuests .lgq{display:flex;flex-direction:column;padding:6px 8px;background:rgba(12,24,48,.85);border-left:4px solid #4a6aa8}#lgQuests .lgq span{font-size:12.5px;color:#cfd8e8}#lgQuests .lgq.done{border-left-color:#7aff8a;opacity:.75}#lgStable .lgst.locked{opacity:.55}#lgStable{position:fixed;z-index:40}#lgStable .lgst{display:flex;gap:6px;align-items:center}#lgStable .lgst .lgt-b{flex:1}#lgStable .lgst.on .lgt-b{border-color:#ffd36a}#lgStable .lgsk{display:flex;gap:4px}#lgStable .sk{width:30px;height:30px;border:2px solid #2a3a5a;cursor:pointer;padding:0}#lgStable .sk.sel{border-color:#ffd36a;box-shadow:0 0 0 2px #ffd36a}#lgTrade,#lgMega{position:fixed;z-index:40}
 #fusePanel .fusebox{max-width:720px}#fusePanel .fuseout{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}#fusePanel .fuselist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;max-height:46vh;overflow:auto;margin-bottom:10px}
@@ -1304,7 +1317,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='6.4.0', SAVE_VERSION=7;
+const APP_VERSION='6.5.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1785,7 +1798,7 @@ function update(dt){
   if(MP.inGame) mpTick(dt);
   if(mode==='cutscene'){updCine(dt); return;}
   if(mode!=='play'&&!(MP.inGame&&(mode==='pause'||mode==='inv'))) return;
-  run.time+=dt; if(ARENA) arenaTick(dt); if(GAUNT) gauntTick(dt); if(DUN) dunTick(dt); if(LGMS) lgmTick(dt);
+  run.time+=dt; if(ARENA) arenaTick(dt); if(STU) stuTick(dt); if(GAUNT) gauntTick(dt); if(DUN) dunTick(dt); if(LGMS) lgmTick(dt);
   shakeT=Math.max(0,shakeT-dt); if(shakeT<=0) shakeA=0; flashT=Math.max(0,flashT-dt);
   updPlayer(dt); mpRespawn(dt);
   const coopHost=MP.role==='host'&&MP.inGame, coopClient=MP.role==='client'&&MP.inGame;
@@ -1857,7 +1870,7 @@ function updPlayer(dt){
   if(P.blades>0){P.blades-=dt; P.bladeT=(P.bladeT||0)+dt; if(P.bladeT>.25){P.bladeT=0; for(const e of targets()) if(dist(e,P)<82+e.r) hurtE(e,Math.max(1,Math.round(6*P.bladePow)),{});}}
   if(P.roll>0){P.roll-=dt; moveCirc(P,P.rdx*480*dt,P.rdy*480*dt); P.walk+=dt*20; if(Math.random()<.5) puff(P.x,P.y,'#cbbf9f',1,40,.3,3); return;}
   const m=moveVec(); const l=Math.hypot(m.x,m.y); MP.lastMove=l>0;
-  if(l>0){const sp=ST.spd*(LGMS&&LGMS.ride?LG_MOUNTS[lgMount().type].spd:1)*(LGMS&&SAVE.adminLgFast&&isAdmin()?2.4:1)*(P.jumpT>0?1.3:1)*(P.slow>0?.55:1)*(P.gale>0?1.6:1)*(P.atk>ST.rate*.5?.6:1)*(LGMS?lgHazSpd():1); if(lgSwim()){const dx=m.x/l*sp*dt*Math.min(1,l), dy=m.y/l*sp*dt*Math.min(1,l); if(lgWaterAt(P.x+dx,P.y+dy)){P.x+=dx; P.y+=dy;} else if(lgWaterAt(P.x+dx,P.y)) P.x+=dx; else if(lgWaterAt(P.x,P.y+dy)) P.y+=dy;} else if(lgFlying()){const nx=clamp(P.x+m.x/l*sp*dt*Math.min(1,l),200,L.w*T-200), ny=clamp(P.y+m.y/l*sp*dt*Math.min(1,l),200,L.h*T-200); if(!lgInMine(nx,ny)){P.x=nx; P.y=ny;}} else moveCirc(P,m.x/l*sp*dt*Math.min(1,l),m.y/l*sp*dt*Math.min(1,l)); P.walk+=dt*10; if(P.swing<=0){const want=Math.atan2(m.y,m.x); P.face+=angDiff(P.face,want)*Math.min(1,dt*18);}}
+  if(l>0){const sp=ST.spd*(LGMS&&LGMS.ride?LG_MOUNTS[lgMount().type].spd:1)*(LGMS&&SAVE.adminLgFast&&isAdmin()?2.4:1)*(P.jumpT>0?1.3:1)*(P.slow>0?.55:1)*(P.gale>0?1.6:1)*(P.atk>ST.rate*.5?.6:1)*(LGMS?lgHazSpd():1)*(STU?stuSpd():1); if(lgSwim()){const dx=m.x/l*sp*dt*Math.min(1,l), dy=m.y/l*sp*dt*Math.min(1,l); if(lgWaterAt(P.x+dx,P.y+dy)){P.x+=dx; P.y+=dy;} else if(lgWaterAt(P.x+dx,P.y)) P.x+=dx; else if(lgWaterAt(P.x,P.y+dy)) P.y+=dy;} else if(lgFlying()){const nx=clamp(P.x+m.x/l*sp*dt*Math.min(1,l),200,L.w*T-200), ny=clamp(P.y+m.y/l*sp*dt*Math.min(1,l),200,L.h*T-200); if(!lgInMine(nx,ny)){P.x=nx; P.y=ny;}} else moveCirc(P,m.x/l*sp*dt*Math.min(1,l),m.y/l*sp*dt*Math.min(1,l)); P.walk+=dt*10; if(P.swing<=0){const want=Math.atan2(m.y,m.x); P.face+=angDiff(P.face,want)*Math.min(1,dt*18);}}
   if(mouse.l||keys['j']||touchAtk) melee(mouse.l);
   if(mouse.r||keys['k']||touchBow) fireBow(mouse.r);
 }
@@ -1938,7 +1951,7 @@ const MODES=[
  {id:'dun',n:'Dungeons',d:'One huge puzzle dungeon. Reach the prisoner in 5 minutes, or become a prisoner yourself: break out of your cell, free the others and escape the Warden. The map changes every time you finish.',ico:'🗝️'},
  {id:'arena',n:'Arena',d:'Duels, team fights and wave raids against rival champions. Every win makes the next fight tougher and the prizes bigger.',ico:'🏟️'},
  {id:'leg',n:'Legends',d:'Gather wood, stone and gold, build an army of golems and towers, and break the fortresses of six legend-powered hordes. Then face the one who stole the three crystals.',ico:'🛡️'},
- {id:'dream',n:"The Creator's Dream",d:'Your own dream island, with a mythic look and rules you can bend: time, weather, hordes, hero size, speed and army size. Infinite materials, every mount and golem, and Mega hordes whenever you want them. Visit at any time.',ico:'🌌'}];
+ {id:'dream',n:"The Creator's Dream",d:'A game studio: build your own games with terrain, coins, enemies, traps, doors, teleporters and scripts, then play them and share them with a code. Also home to the Dream Island sandbox.',ico:'🌌'}];
 const L2DESC='The sculk has returned. Fight through the sculk-filled mine, wake the Ancient City portal with five note blocks, and break the four hordes of the Shift.';
 function lgModeSub(){if(!SAVE) return 'Start an expedition first'; if(SAVE.lg2unlock&&!SAVE.lg2anim){const L2=SAVE.lgm2||{}; if(L2.done) return 'Legends 2 complete!'; if(L2.phase==='shift') return `${LG_T2.filter(t=>(L2.beaten||{})[t.id]).length} of 4 Shift hordes defeated`; return 'The sculk has returned';}
   return `${SAVE.lgm?LG_T1.filter(t=>(SAVE.lgm.beaten||{})[t.id]).length:0} of 6 hordes defeated`;}
@@ -1957,7 +1970,7 @@ function openModes(){let p=$('#modesPanel'); if(!p){p=document.createElement('di
     if(id==='gaunt'){if(!SAVE||!gauntList().length){startGauntlet(); return;} p.hidden=true; startGauntlet(); return;}
     if(id==='dun'){p.hidden=true; startDungeon(); return;}
     if(id==='arena'){p.hidden=true; openArena(); return;}
-    if(id==='dream'){p.hidden=true; openDream(); return;}
+    if(id==='dream'){p.hidden=true; openStudioHub(); return;}
     if(id==='leg'){p.hidden=true; LG_DREAM=false; if(SAVE&&SAVE.lg2unlock&&!SAVE.lg2anim){lgPickCamp(); return;} LG_CAMP=1; openLegends(); return;}});
   p.hidden=false; const f=p.querySelector('.modecard'); if(f) f.focus();}
 /*GAUNT-END*/
@@ -5298,7 +5311,7 @@ $('#pGfx').onclick=()=>{const o=['auto','high','medium','low']; GFX_PREF=o[(o.in
 setTimeout(renderGfxBtn,0);
 $('#pInv').onclick=()=>{$('#pause').hidden=true; mode='play'; openInv();};
 $('#pQuit').onclick=()=>{$('#pause').hidden=true; persist(); openMap();};
-function showResult(kind){if(ARENA){arenaResult(kind); return;}if(LGMS&&kind==='dead'){run.endT=0; return;} if(GAUNT&&!GAUNT.over){gauntEnd(kind==='dead'?'dead':'time'); return;} if(DUN&&!DUN.over){if(DUN.phase==='dungeon') dunCaptured('dead'); else {P.dead=false; P.hp=ST.maxhp; run.endT=0; mode='play'; dunRespawn('Back to the last checkpoint.');} return;} persist(); mode='result'; $('#result').hidden=false; const B=BIOMES[run.bi]; if(run.guest&&kind!=='dead') setTimeout(()=>toast('You played this as a guest. Your loot is kept, but finish the earlier islands to unlock it for yourself.','#5fb3ff'),400);
+function showResult(kind){if(STU){stuResult(kind); return;} if(ARENA){arenaResult(kind); return;}if(LGMS&&kind==='dead'){run.endT=0; return;} if(GAUNT&&!GAUNT.over){gauntEnd(kind==='dead'?'dead':'time'); return;} if(DUN&&!DUN.over){if(DUN.phase==='dungeon') dunCaptured('dead'); else {P.dead=false; P.hp=ST.maxhp; run.endT=0; mode='play'; dunRespawn('Back to the last checkpoint.');} return;} persist(); mode='result'; $('#result').hidden=false; const B=BIOMES[run.bi]; if(run.guest&&kind!=='dead') setTimeout(()=>toast('You played this as a guest. Your loot is kept, but finish the earlier islands to unlock it for yourself.','#5fb3ff'),400);
   const t=Math.round(run.time), mm=Math.floor(t/60), ss=String(t%60).padStart(2,'0');
   if(kind==='clear'){$('#resTitle').textContent=L.boss?'Crown claimed':'Level cleared'; $('#resSub').textContent=L.boss?`${B.name} is free. ${run.bi===39?'The three legends are stopped. Every crystal is silent and every world is safe. You are the true legend.':run.bi===35?'The Grand Magician is stopped. Press → on the map to reach Creators Cataclysm and face the Supreme Creator.':run.bi===31?'The Omega Enchanter is stopped. Press → on the map to reach the Illusion Fortress.':run.bi>=28?BIOMES[run.bi+1].name+' is now open.':run.bi===27?'The Shapeless One is still at last. The Core of Creations is whole again, and every world is safe.':run.bi===18?'The Forge falls quiet. Every fire is out and every hammer is still.':run.bi===22?'The Void is sealed. Even the Endless has an ending.':run.bi===14?'The Shift Dimension is saved. Every land, every sea and every song is free.':run.bi===10?'The great portal is open. Choose the Shift, the Forge or the Void on the map.':run.bi===9?'The Outer Isles are safe. Press → on the map to descend into the Deep Dark.':run.bi>=7?BIOMES[run.bi+1].name+' is now open.':run.bi===6?'Hollowshade Isle is yours. Happy Halloween!':run.bi<4?BIOMES[run.bi+1].name+' is now open.':'The Hollow Spire is now open.'}`:`${L.name} · ${B.name}`;}
   else if(kind==='victory'){$('#resTitle').textContent='The isle is saved'; $('#resSub').textContent='All six crowns are free. A new map has opened: press the → button at the bottom right of the map to sail to the Outer Isles.';}
@@ -5306,7 +5319,7 @@ function showResult(kind){if(ARENA){arenaResult(kind); return;}if(LGMS&&kind==='
   $('#resStats').innerHTML=`<dt>Time</dt><dd>${mm}:${ss}</dd><dt>Enemies defeated</dt><dd>${run.kills}</dd><dt>Items found</dt><dd>${run.items}</dd><dt>Shards collected</dt><dd>${run.shards}</dd>`;
   $('#resRetry').hidden=kind==='victory'||(MP.party&&MP.party.members.length>1&&MP.role!=='host'); if(MP.inGame&&MP.role==='client') MP.inGame=false; else if(MP.inGame) MP.inGame=false; $('#resMap').focus();}
 $('#resMap').onclick=()=>{$('#result').hidden=true; if(GAUNT) gauntQuit(); if(DUN) dunQuit(); if(LGMS) lgmQuit(); if(run&&run.bi===10&&SAVE.portalOpen) mapWorld=3; openMap();};
-$('#resRetry').onclick=()=>{$('#result').hidden=true; if(ARENA){const m=ARENA.mode; ARENA=null; startArena(m); return;} if(GAUNT||(run&&run.gaunt)){gauntQuit(); startGauntlet(); return;} if(DUN||(run&&run.dun)){dunQuit(); startDungeon(); return;} if(run&&run.lgm){const i=LGMS?LGMS.ti:0, won=!!(LGMS&&LGMS.over); lgmQuit(); if(won){openMap(); openLegends();} else startLegendBattle(i); return;} playLevel(run.bi,run.li);};
+$('#resRetry').onclick=()=>{$('#result').hidden=true; if(STU){const g=STU.g, te=STU.test; stuHudOff(); STU=null; stuPlay(g.id,te); return;} if(ARENA){const m=ARENA.mode; ARENA=null; startArena(m); return;} if(GAUNT||(run&&run.gaunt)){gauntQuit(); startGauntlet(); return;} if(DUN||(run&&run.dun)){dunQuit(); startDungeon(); return;} if(run&&run.lgm){const i=LGMS?LGMS.ti:0, won=!!(LGMS&&LGMS.over); lgmQuit(); if(won){openMap(); openLegends();} else startLegendBattle(i); return;} playLevel(run.bi,run.li);};
 
 /* ---------------- cutscenes ---------------- */
 const STORY={
@@ -8026,7 +8039,7 @@ const DREAM_RULES=[['time','⏳','Time',[['flow','Flowing'],['day','Endless day'
   ['hordes','⚔️','Hordes',[['peaceful','Peaceful'],['normal','Normal'],['mega','Mega hordes']]],['size','🧍','Hero size',[['normal','Normal'],['giant','Giant'],['tiny','Tiny']]],['speed','💨','Speed',[[1,'1×'],[2,'2×'],[3,'3×']]],['army','🗿','Army size',[[false,'20 golems'],[true,'60 golems']]],['inf','♾️','Materials',[[true,'Infinite'],[false,'Gathered']]]];
 function openDream(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} if(MP.party&&MP.party.members.length>1){toast('The Creator\'s Dream is single-player for now. Leave your party to dream.','#ffd36a'); return;}
   if(LGMS) lgmQuit(); LG_DREAM=true; LG_CAMP=1; const S0=SAVE.lgmd=SAVE.lgmd||{}; if(!S0.res) S0.res={wood:999,stone:999,gold:999,diamond:50}; setTimeout(()=>{openLegends(); setTimeout(()=>{if(LGMS&&LG_DREAM) banner("🌌 The Creator's Dream","Bend the rules of this world: press - for Dream rules. Press - and choose Wake up to leave.");},2600);},LGMS?400:0);}
-function lgmDreamPanel(){if(!LG_DREAM){openDream(); return;} const R=lgDream(); lgUnlock(); document.querySelectorAll('body>.lgt-panel').forEach(p=>{if(p.id!=='lgDream') p.hidden=true;}); let el=$('#lgDream');
+function lgmDreamPanel(){if(!LG_DREAM){openStudioHub(); return;} const R=lgDream(); lgUnlock(); document.querySelectorAll('body>.lgt-panel').forEach(p=>{if(p.id!=='lgDream') p.hidden=true;}); let el=$('#lgDream');
   if(!el){el=document.createElement('div'); el.id='lgDream'; el.className='lgt-panel'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Dream rules'); document.body.appendChild(el); ['keydown','keyup'].forEach(k=>el.addEventListener(k,e=>{e.stopPropagation(); if(e.key==='Escape'||e.key==='-') el.hidden=true;}));}
   el.innerHTML=`<h2>🌌 Dream rules</h2><p class="sp">This is your dream. Change how the world works at any time.</p>${DREAM_RULES.map(([k,ic,n,opts])=>`<div class="qh">${ic} ${n}</div><div class="lgvr">${opts.map(([v,t])=>`<button class="lgt-b sm${R[k]===v?' on':''}" data-r="${k}" data-v="${JSON.stringify(v).replace(/"/g,'&quot;')}">${t}</button>`).join('')}</div>`).join('')}
    <div class="qh">✨ Create</div><div class="lgvr"><button class="lgt-b sm" data-c="mega">⚔️ Summon a Mega horde</button><button class="lgt-b sm" data-c="relic">🔮 Dream up a relic</button>${['cobble','plank','moss','lgx_stone','lgx_oak','lgx_brick','lgx_slate'].map(k=>`<button class="lgt-b sm" data-c="g:${k}">${LG_ACT.find(a=>a[0]===k)[2]} ${LG_ACT.find(a=>a[0]===k)[3]}</button>`).join('')}</div>
@@ -8163,6 +8176,233 @@ function mhRender(){if(!LGMS) return; if(L.lgDreamIsles) L.lgDreamIsles.children
   for(const m of L.mhMesh){m.count=Math.min(N,CAP); m.instanceMatrix.needsUpdate=true; m.visible=true;}}
 
 {const _q=lgmQuit; lgmQuit=function(){const r=_q.apply(this,arguments); LG_DREAM=false; MH=null; return r;};}
+/* ---------------- v6.5: The Creator's Dream — a game studio: build your own games, play them, share them ---------------- */
+let STU=null; // the game being played from the studio
+const STU_TILES=[[0,'Floor','#7a8a6a'],[1,'Wall','#4a4a58'],[2,'Lava','#ff5a1a'],[3,'Ice','#9fe0ff'],[4,'Pit','#0a0a12']];
+const STU_OBJ={spawn:['🏁','Player spawn','Gameplay'],goal:['🌀','Goal portal','Gameplay'],coin:['🪙','Coin','Gameplay'],checkpoint:['🚩','Checkpoint','Gameplay'],chest:['🎁','Treasure chest','Gameplay'],heal:['❤️','Health potion','Gameplay'],key:['🔑','Key','Gameplay'],door:['🚪','Door','Gameplay'],
+  jump:['⏫','Jump pad','Obstacles'],spikes:['🔺','Spike trap','Obstacles'],teleport:['🌐','Teleporter','Obstacles'],
+  enemy:['👹','Enemy','Characters'],champion:['💀','Champion','Characters'],ally:['🗿','Golem ally','Characters'],
+  sign:['🪧','Sign','Logic'],trigger:['⭕','Trigger zone','Logic'],
+  tree:['🌳','Tree','Decor'],rock:['🪨','Rock','Decor'],crystal:['💎','Crystal','Decor'],torch:['🔥','Torch','Decor'],pillar:['🏛️','Pillar','Decor']};
+const STU_WHEN=[['touch','is touched'],['start','the game starts'],['every','every N seconds'],['defeated','this enemy is defeated'],['allEnemies','all enemies are defeated'],['coins','coins reach N']];
+const STU_DO=[['msg','Show message'],['coins','Give coins'],['hurt','Damage player'],['heal','Heal player'],['tp','Teleport player to (name)'],['spawn','Spawn enemy here (kind)'],['open','Open door (name)'],['show','Show object (name)'],['hide','Hide this object'],['speed','Speed boost (seconds)'],['win','Win the game'],['lose','Lose the game']];
+const STU_ENEMY=['melee','ranged','lunge','bomb','caster','brute'];
+const stuData=()=>{const D=SAVE.dream=SAVE.dream||{}; D.games=D.games||[]; return D;};
+const stuUid=()=>Math.random().toString(36).slice(2,9);
+function stuNew(name,w,h,tpl){const g={id:stuUid(),name:name||'My Game',w:w||40,h:h||30,tiles:'',objs:[],set:{goal:'portal',coins:10,time:60,lives:3,theme:0,speed:1,intro:'Welcome to my game!'},made:Date.now()};
+  const t=new Array(g.w*g.h).fill(0); for(let y=0;y<g.h;y++) for(let x=0;x<g.w;x++) if(x===0||y===0||x===g.w-1||y===g.h-1) t[y*g.w+x]=1; g.tiles=t.join('');
+  const add=(type,x,y,p)=>g.objs.push(Object.assign({id:stuUid(),type,x,y,name:STU_OBJ[type][1]+' '+(g.objs.filter(o=>o.type===type).length+1),props:{},script:[]},p||{}));
+  const set=(x,y,v)=>{const a=g.tiles.split(''); a[y*g.w+x]=v; g.tiles=a.join('');};
+  add('spawn',3,Math.floor(g.h/2));
+  if(tpl==='obby'){g.name=name||'Lava Obby'; g.set.goal='portal'; g.set.intro='Cross the lava! Touch the flags to save your progress.'; for(let x=8;x<g.w-6;x++) for(let y=2;y<g.h-2;y++) if(x%7<4) set(x,y,2); for(let x=8;x<g.w-6;x+=7) for(let k=0;k<3;k++) set(x+1+k,Math.floor(g.h/2)+((x/7|0)%2?-3:3),0);
+    for(let x=8;x<g.w-6;x+=7) {for(let k=0;k<4;k++) set(x+k,Math.floor(g.h/2),k===1?0:2); add('jump',x-1,Math.floor(g.h/2),{props:{power:1}});} for(let x=12;x<g.w-6;x+=14) add('checkpoint',x,Math.floor(g.h/2)); for(let i=0;i<8;i++) add('coin',10+i*3,Math.floor(g.h/2)-1); add('goal',g.w-4,Math.floor(g.h/2)); for(let x=11;x<g.w-6;x+=7) add('spikes',x,Math.floor(g.h/2)+1);}
+  else if(tpl==='arena'){g.name=name||'Monster Arena'; g.set.goal='survive'; g.set.time=60; g.set.intro='Survive for 60 seconds!'; for(let i=0;i<6;i++){const a=i/6*TAU; add('pillar',Math.round(g.w/2+Math.cos(a)*8),Math.round(g.h/2+Math.sin(a)*6));}
+    const sp=g.objs.find(o=>o.type==='spawn'); sp.x=Math.floor(g.w/2); sp.y=Math.floor(g.h/2); for(const [x,y] of [[4,4],[g.w-5,4],[4,g.h-5],[g.w-5,g.h-5]]){const o={id:stuUid(),type:'trigger',x,y,name:'Monster gate '+(g.objs.length),props:{r:1},script:[{when:'every',n:8,do:'spawn',a:'melee',rep:true}]}; g.objs.push(o); add('torch',x+1,y);} add('heal',Math.floor(g.w/2)+3,Math.floor(g.h/2)); add('ally',Math.floor(g.w/2)-2,Math.floor(g.h/2));}
+  else if(tpl==='maze'){g.name=name||'Treasure Maze'; g.set.goal='coins'; g.set.coins=12; g.set.intro='Find 12 coins hidden in the maze. A key opens the treasure room.';
+    const W=g.w, H=g.h, a=new Array(W*H).fill(1), cw=Math.floor((W-1)/2), ch=Math.floor((H-1)/2), seen=new Set(), st=[[0,0]]; seen.add('0,0'); a[1*W+1]=0;
+    while(st.length){const [cx,cy]=st[st.length-1], nb=[[1,0],[-1,0],[0,1],[0,-1]].map(([dx,dy])=>[cx+dx,cy+dy]).filter(([x,y])=>x>=0&&y>=0&&x<cw&&y<ch&&!seen.has(x+','+y)); if(!nb.length){st.pop(); continue;} const [nx,ny]=nb[(Math.random()*nb.length)|0]; seen.add(nx+','+ny); a[(2*cy+1+ny-cy)*W+2*cx+1+nx-cx]=0; a[(2*ny+1)*W+2*nx+1]=0; st.push([nx,ny]);}
+    for(let y=2;y<H-2;y+=4) for(let x=2;x<W-2;x+=6) if(Math.random()<.35) a[y*W+x]=0; g.tiles=a.join(''); const free=[]; for(let y=1;y<H-1;y++) for(let x=1;x<W-1;x++) if(!a[y*W+x]) free.push([x,y]); const pick=()=>free.splice((Math.random()*free.length)|0,1)[0];
+    const sp=g.objs.find(o=>o.type==='spawn'); sp.x=1; sp.y=1; for(let i=0;i<14;i++){const [x,y]=pick(); add('coin',x,y);} for(let i=0;i<5;i++){const [x,y]=pick(); add('enemy',x,y,{props:{kind:choice(['melee','ranged','lunge'])}});} {const [x,y]=pick(); add('key',x,y,{name:'Gold key'});} {const [x,y]=pick(); add('chest',x,y);} {const [x,y]=pick(); add('heal',x,y);}}
+  else {add('goal',g.w-4,Math.floor(g.h/2)); add('sign',6,Math.floor(g.h/2)-2,{props:{text:'Build anything you like!'}});}
+  return g;}
+function stuGame(id){return stuData().games.find(g=>g.id===id);}
+// ---- the hub: your games, templates and the Dream Island
+function openStudioHub(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} const D=stuData(); if(LGMS) lgmQuit(); STU=null; stuHudOff(); mode='studio'; showOnly(); let el=$('#studio'); if(!el){el=document.createElement('div'); el.id='studio'; el.setAttribute('role','dialog'); el.setAttribute('aria-label',"The Creator's Dream"); document.body.appendChild(el); ['keydown','keyup'].forEach(k=>el.addEventListener(k,e=>e.stopPropagation()));} el.hidden=false;
+  el.onkeydown=null; el.innerHTML=`<div class="sthub"><div class="stbar"><b>🌌 The Creator's Dream</b><span class="sp">Build your own games, play them and share them.</span><span style="flex:1"></span><button class="btn small" id="stHubX">Exit</button></div>
+   <div class="sthubg"><section><h3>✨ Start a new game</h3><div class="sttpl">${[['blank','📄','Blank world','An empty island to build on'],['obby','🔥','Lava obby','Jump pads, lava and checkpoints'],['arena','⚔️','Monster arena','Survive the waves'],['maze','🧭','Treasure maze','Coins, keys and monsters']].map(([k,ic,n,d])=>`<button class="modecard" data-tpl="${k}"><span class="mico">${ic}</span><b>${n}</b><span class="md">${d}</span></button>`).join('')}</div>
+    <h3>🎮 Play a shared game</h3><div class="stimp"><input id="stCode" placeholder="Paste a game code here" aria-label="Game code"><button class="btn small gold" id="stImp">Load game</button></div>
+    <h3>🏝️ Dream Island</h3><div class="sttpl"><button class="modecard" id="stIsle"><span class="mico">🏝️</span><b>Dream Island</b><span class="md">The Legends sandbox: bend time, weather and hordes, with infinite materials</span></button></div></section>
+   <section><h3>📁 My games (${D.games.length})</h3><div class="stlist">${D.games.length?D.games.slice().reverse().map(g=>`<div class="stg"><b>${esc(g.name)}</b><small>${g.w}×${g.h} · ${g.objs.length} objects · goal: ${({portal:'reach the portal',enemies:'defeat all enemies',coins:'collect '+g.set.coins+' coins',survive:'survive '+g.set.time+'s',none:'free play'})[g.set.goal]}${g.plays?' · played '+g.plays+'×':''}${g.best?' · best '+g.best+'s':''}</small><div><button class="btn small gold" data-play="${g.id}">▶ Play</button><button class="btn small" data-edit="${g.id}">✏️ Edit</button><button class="btn small" data-dup="${g.id}">⧉ Copy</button><button class="btn small" data-del="${g.id}">🗑</button></div></div>`).join(''):'<p class="sp">No games yet. Start one from a template!</p>'}</div></section></div></div>`;
+  el.querySelector('#stHubX').onclick=()=>{el.hidden=true; openMap();};
+  el.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{const g=stuNew(null,b.dataset.tpl==='maze'?41:44,b.dataset.tpl==='maze'?31:28,b.dataset.tpl); D.games.push(g); persist(); stuEdit(g.id);});
+  el.querySelector('#stIsle').onclick=()=>{el.hidden=true; openDream();};
+  el.querySelector('#stImp').onclick=()=>{const g=stuDecode(el.querySelector('#stCode').value); if(!g){toast('That game code is not valid','#ff8a6a'); return;} g.id=stuUid(); D.games.push(g); persist(); toast(`Loaded “${g.name}”`,'#8fd06a'); openStudioHub();};
+  el.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>stuPlay(b.dataset.play,false));
+  el.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>stuEdit(b.dataset.edit));
+  el.querySelectorAll('[data-dup]').forEach(b=>b.onclick=()=>{const g=JSON.parse(JSON.stringify(stuGame(b.dataset.dup))); g.id=stuUid(); g.name+=' (copy)'; D.games.push(g); persist(); openStudioHub();});
+  el.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const g=stuGame(b.dataset.del); if(b.dataset.sure){D.games=D.games.filter(x=>x!==g); persist(); openStudioHub();} else {b.dataset.sure=1; b.textContent='Sure?';}});
+  const f=el.querySelector('[data-tpl]'); if(f) f.focus();}
+function stuEncode(g){try{const j=JSON.stringify({n:g.name,w:g.w,h:g.h,t:g.tiles,o:g.objs,s:g.set}); return 'ISLE1-'+btoa(unescape(encodeURIComponent(j)));}catch(e){return '';}}
+function stuDecode(c){try{c=String(c||'').trim(); if(!c.startsWith('ISLE1-')) return null; const j=JSON.parse(decodeURIComponent(escape(atob(c.slice(6))))); if(!j.w||!j.h||j.w>120||j.h>120||typeof j.t!=='string'||j.t.length!==j.w*j.h||!Array.isArray(j.o)) return null;
+  const objs=j.o.filter(o=>o&&STU_OBJ[o.type]&&Number.isFinite(o.x)&&Number.isFinite(o.y)).slice(0,600).map(o=>({id:stuUid(),type:o.type,x:clamp(o.x|0,0,j.w-1),y:clamp(o.y|0,0,j.h-1),name:String(o.name||STU_OBJ[o.type][1]).slice(0,40),props:typeof o.props==='object'&&o.props?o.props:{},script:Array.isArray(o.script)?o.script.slice(0,12):[]}));
+  return {id:'',name:String(j.n||'Shared game').slice(0,40),w:j.w,h:j.h,tiles:j.t.replace(/[^0-4]/g,'0'),objs,set:Object.assign({goal:'portal',coins:10,time:60,lives:3,theme:0,speed:1,intro:''},j.s||{}),made:Date.now()};}catch(e){return null;}}
+// ---- the editor: toolbox, canvas, explorer and properties, like a real game studio
+function stuEdit(id){const g=stuGame(id); if(!g) return openStudioHub(); STU=null; stuHudOff(); mode='studio'; showOnly(); const el=$('#studio'); el.hidden=false;
+  const E=stuEdit.E={g,tool:'select',tile:1,obj:'coin',sel:null,zoom:18,ox:0,oy:0,undo:[],redo:[],grid:true};
+  el.innerHTML=`<div class="sted"><div class="stbar"><b>🌌</b><input id="stName" value="${esc(g.name)}" aria-label="Game name" maxlength="40">
+    <button class="btn small gold" id="stPlay" title="Play test (P)">▶ Play</button><button class="btn small" id="stUndo" title="Undo (Ctrl+Z)">↶</button><button class="btn small" id="stRedo" title="Redo (Ctrl+Y)">↷</button>
+    <button class="btn small" id="stSet">⚙️ Game settings</button><button class="btn small" id="stShare">📤 Share code</button><button class="btn small" id="stSave">💾 Save</button><button class="btn small" id="stBack">⬅ My games</button></div>
+   <div class="stmain"><aside class="sttool"><h4>Tools</h4><div class="sttg">${[['select','🖱️','Select / move (V)'],['paint','🖌️','Paint terrain (B)'],['fill','🪣','Fill (G)'],['place','➕','Place object (O)'],['erase','🧽','Erase (E)']].map(([k,ic,n])=>`<button class="stt" data-tool="${k}" title="${n}" aria-label="${n}">${ic}</button>`).join('')}</div>
+     <h4>Terrain</h4><div class="sttg">${STU_TILES.map(([v,n,c])=>`<button class="stt stile" data-tile="${v}" title="${n}" aria-label="${n}" style="background:${c}"></button>`).join('')}</div>
+     ${['Gameplay','Obstacles','Characters','Logic','Decor'].map(cat=>`<h4>${cat}</h4><div class="sttg">${Object.entries(STU_OBJ).filter(([,o])=>o[2]===cat).map(([k,o])=>`<button class="stt" data-obj="${k}" title="${o[1]}" aria-label="${o[1]}">${o[0]}</button>`).join('')}</div>`).join('')}</aside>
+    <div class="stcv"><canvas id="stCanvas" tabindex="0" aria-label="Game map editor"></canvas><div class="sthint" id="stHint"></div></div>
+    <aside class="stside"><h4>Explorer</h4><div class="stexp" id="stExp"></div><h4>Properties</h4><div class="stprop" id="stProp"></div></aside></div></div>`;
+  const cv=el.querySelector('#stCanvas'), ctx=cv.getContext('2d'), tl=g.tiles.split('').map(Number);
+  const snap=()=>{E.undo.push(JSON.stringify({t:tl.join(''),o:g.objs})); if(E.undo.length>60) E.undo.shift(); E.redo=[];};
+  const commit=()=>{g.tiles=tl.join(''); persist();};
+  const restore=s=>{const d=JSON.parse(s); const a=d.t.split('').map(Number); for(let i=0;i<a.length;i++) tl[i]=a[i]; g.objs=d.o; E.sel=null; commit(); draw(); explorer(); props();};
+  const fit=()=>{const r=cv.parentElement.getBoundingClientRect(); cv.width=Math.max(200,r.width); cv.height=Math.max(200,r.height); if(!E.fitted){E.fitted=true; E.zoom=Math.max(8,Math.min(30,Math.floor(Math.min(cv.width/g.w,cv.height/g.h)))); E.ox=(cv.width-g.w*E.zoom)/2; E.oy=(cv.height-g.h*E.zoom)/2;} draw();};
+  const draw=()=>{const z=E.zoom; ctx.fillStyle='#0b1020'; ctx.fillRect(0,0,cv.width,cv.height);
+    for(let y=0;y<g.h;y++) for(let x=0;x<g.w;x++){ctx.fillStyle=STU_TILES[tl[y*g.w+x]][2]; ctx.fillRect(E.ox+x*z,E.oy+y*z,z,z);}
+    if(E.grid&&z>=10){ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.beginPath(); for(let x=0;x<=g.w;x++){ctx.moveTo(E.ox+x*z,E.oy); ctx.lineTo(E.ox+x*z,E.oy+g.h*z);} for(let y=0;y<=g.h;y++){ctx.moveTo(E.ox,E.oy+y*z); ctx.lineTo(E.ox+g.w*z,E.oy+y*z);} ctx.stroke();}
+    ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font=`${Math.round(z*.8)}px sans-serif`;
+    for(const o of g.objs){const cx=E.ox+(o.x+.5)*z, cy=E.oy+(o.y+.5)*z; if(o.type==='trigger'){ctx.strokeStyle='#ffd36a'; ctx.setLineDash([4,3]); ctx.beginPath(); ctx.arc(cx,cy,((o.props.r||1)+.5)*z,0,TAU); ctx.stroke(); ctx.setLineDash([]);} ctx.fillText(STU_OBJ[o.type][0],cx,cy+1); if(o.script&&o.script.length){ctx.fillStyle='#b06aff'; ctx.fillRect(cx+z*.25,cy-z*.5,z*.25,z*.25);} if(E.sel===o){ctx.strokeStyle='#ffd36a'; ctx.lineWidth=2; ctx.strokeRect(cx-z/2,cy-z/2,z,z); ctx.lineWidth=1;}}
+    el.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool===E.tool)); el.querySelectorAll('[data-tile]').forEach(b=>b.classList.toggle('on',+b.dataset.tile===E.tile&&(E.tool==='paint'||E.tool==='fill'))); el.querySelectorAll('[data-obj]').forEach(b=>b.classList.toggle('on',b.dataset.obj===E.obj&&E.tool==='place'));
+    el.querySelector('#stHint').textContent={select:'Click an object to select it, drag to move it. Delete removes it.',paint:'Click and drag to paint '+STU_TILES[E.tile][1].toLowerCase()+'. Right-drag or arrow keys to pan, wheel to zoom.',fill:'Click to fill an area with '+STU_TILES[E.tile][1].toLowerCase()+'.',place:'Click to place: '+STU_OBJ[E.obj][1]+'.',erase:'Click to remove objects (or terrain back to floor).'}[E.tool];};
+  const cell=ev=>{const r=cv.getBoundingClientRect(); return [Math.floor((ev.clientX-r.left-E.ox)/E.zoom),Math.floor((ev.clientY-r.top-E.oy)/E.zoom)];};
+  const inG=(x,y)=>x>=0&&y>=0&&x<g.w&&y<g.h, objAt=(x,y)=>g.objs.slice().reverse().find(o=>o.x===x&&o.y===y);
+  const place=(x,y)=>{if(!inG(x,y)) return; const t=E.obj; if(t==='spawn') g.objs=g.objs.filter(o=>o.type!=='spawn'); if(objAt(x,y)&&objAt(x,y).type===t) return; const o={id:stuUid(),type:t,x,y,name:STU_OBJ[t][1]+' '+(g.objs.filter(q=>q.type===t).length+1),props:{},script:[]}; if(t==='enemy') o.props.kind='melee'; if(t==='sign') o.props.text='Hello!'; if(t==='door') o.props.key=''; if(t==='trigger') o.props.r=1; if(tl[y*g.w+x]===1) tl[y*g.w+x]=0; g.objs.push(o); E.sel=o; explorer(); props();};
+  let drag=null;
+  cv.onmousedown=ev=>{ev.preventDefault(); cv.focus(); if(ev.button===2||ev.button===1){drag={pan:true,x:ev.clientX,y:ev.clientY,ox:E.ox,oy:E.oy}; return;} const [x,y]=cell(ev);
+    if(E.tool==='select'){E.sel=objAt(x,y)||null; if(E.sel){snap(); drag={move:E.sel};} explorer(); props();}
+    else if(E.tool==='paint'){snap(); drag={paint:true}; if(inG(x,y)){tl[y*g.w+x]=E.tile; if(E.tile===1) g.objs=g.objs.filter(o=>!(o.x===x&&o.y===y&&o.type!=='door'));}}
+    else if(E.tool==='fill'&&inG(x,y)){snap(); const from=tl[y*g.w+x], to=E.tile; if(from!==to){const st=[[x,y]]; while(st.length){const [a,b]=st.pop(); if(!inG(a,b)||tl[b*g.w+a]!==from) continue; tl[b*g.w+a]=to; st.push([a+1,b],[a-1,b],[a,b+1],[a,b-1]);}} commit();}
+    else if(E.tool==='place'){snap(); place(x,y); drag={place:true};}
+    else if(E.tool==='erase'){snap(); drag={erase:true}; const o=objAt(x,y); if(o){g.objs=g.objs.filter(q=>q!==o); if(E.sel===o) E.sel=null; explorer(); props();} else if(inG(x,y)) tl[y*g.w+x]=0;}
+    draw();};
+  cv.onmousemove=ev=>{if(!drag) return; if(drag.pan){E.ox=drag.ox+ev.clientX-drag.x; E.oy=drag.oy+ev.clientY-drag.y; draw(); return;} const [x,y]=cell(ev); if(!inG(x,y)) return;
+    if(drag.move){drag.move.x=x; drag.move.y=y;} else if(drag.paint){tl[y*g.w+x]=E.tile;} else if(drag.erase){const o=objAt(x,y); if(o){g.objs=g.objs.filter(q=>q!==o); explorer();} else tl[y*g.w+x]=0;} else if(drag.place&&['coin','spikes','tree','rock','crystal','torch','pillar'].includes(E.obj)) place(x,y); draw();};
+  window.addEventListener('mouseup',stuEdit._up=()=>{if(drag){drag=null; commit(); props();}});
+  cv.oncontextmenu=e=>e.preventDefault();
+  cv.onwheel=ev=>{ev.preventDefault(); const r=cv.getBoundingClientRect(), mx=ev.clientX-r.left, my=ev.clientY-r.top, z0=E.zoom; E.zoom=clamp(Math.round(E.zoom*(ev.deltaY<0?1.15:.87)),6,48); E.ox=mx-(mx-E.ox)*E.zoom/z0; E.oy=my-(my-E.oy)*E.zoom/z0; draw();};
+  el.onkeydown=ev=>{if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT') return; const k=ev.key.toLowerCase();
+    if((ev.ctrlKey||ev.metaKey)&&k==='z'){ev.preventDefault(); if(E.undo.length){E.redo.push(JSON.stringify({t:tl.join(''),o:g.objs})); restore(E.undo.pop());} return;} if((ev.ctrlKey||ev.metaKey)&&k==='y'){ev.preventDefault(); if(E.redo.length){E.undo.push(JSON.stringify({t:tl.join(''),o:g.objs})); restore(E.redo.pop());} return;}
+    const tk={v:'select',b:'paint',g:'fill',o:'place',e:'erase'}[k]; if(tk){E.tool=tk; draw(); return;} if(k==='p'){stuPlay(g.id,true); return;} if((k==='delete'||k==='backspace')&&E.sel){snap(); g.objs=g.objs.filter(o=>o!==E.sel); E.sel=null; commit(); explorer(); props(); draw(); return;}
+    const pan={arrowleft:[40,0],arrowright:[-40,0],arrowup:[0,40],arrowdown:[0,-40]}[k]; if(pan){ev.preventDefault(); E.ox+=pan[0]; E.oy+=pan[1]; draw();}};
+  el.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{E.tool=b.dataset.tool; draw();}); el.querySelectorAll('[data-tile]').forEach(b=>b.onclick=()=>{E.tile=+b.dataset.tile; if(E.tool!=='fill') E.tool='paint'; draw();}); el.querySelectorAll('[data-obj]').forEach(b=>b.onclick=()=>{E.obj=b.dataset.obj; E.tool='place'; draw();});
+  el.querySelector('#stName').oninput=e=>{g.name=e.target.value.slice(0,40)||'My Game'; persist();};
+  el.querySelector('#stPlay').onclick=()=>stuPlay(g.id,true); el.querySelector('#stUndo').onclick=()=>el.onkeydown({key:'z',ctrlKey:true,target:cv,preventDefault(){}}); el.querySelector('#stRedo').onclick=()=>el.onkeydown({key:'y',ctrlKey:true,target:cv,preventDefault(){}});
+  el.querySelector('#stSave').onclick=()=>{commit(); toast('Saved','#8fd06a');}; el.querySelector('#stBack').onclick=()=>{commit(); window.removeEventListener('mouseup',stuEdit._up); openStudioHub();};
+  el.querySelector('#stShare').onclick=()=>{commit(); const c=stuEncode(g); stuModal('📤 Share your game',`<p class="sp">Copy this code and send it to a friend. They paste it into “Play a shared game” in The Creator's Dream.</p><textarea readonly rows="5" style="width:100%">${esc(c)}</textarea>`,box=>{const ta=box.querySelector('textarea'); ta.select(); try{navigator.clipboard&&navigator.clipboard.writeText(c); toast('Code copied','#8fd06a');}catch(e){}});};
+  el.querySelector('#stSet').onclick=()=>stuSettings(g);
+  function explorer(){const ex=el.querySelector('#stExp'); const by={}; for(const o of g.objs) (by[STU_OBJ[o.type][2]]=by[STU_OBJ[o.type][2]]||[]).push(o);
+    ex.innerHTML=`<div class="stx0">🗺️ Workspace · ${g.w}×${g.h}</div>`+Object.entries(by).map(([cat,os])=>`<details open><summary>${cat} (${os.length})</summary>${os.map(o=>`<button class="stx${E.sel===o?' on':''}" data-sel="${o.id}">${STU_OBJ[o.type][0]} ${esc(o.name)}${o.script.length?' 📜':''}</button>`).join('')}</details>`).join('');
+    ex.querySelectorAll('[data-sel]').forEach(b=>b.onclick=()=>{E.sel=g.objs.find(o=>o.id===b.dataset.sel); E.tool='select'; explorer(); props(); draw();});}
+  function props(){const pr=el.querySelector('#stProp'), o=E.sel; if(!o){pr.innerHTML='<p class="sp">Select an object to edit its properties and scripts.</p>'; return;}
+    const f=(k,label,html)=>`<label class="stf"><span>${label}</span>${html}</label>`, inp=(k,v,t)=>`<input data-p="${k}" value="${esc(String(v==null?'':v))}"${t?` type="${t}"`:''}>`, names=g.objs.map(q=>q.name);
+    let h=f('name','Name',`<input data-name value="${esc(o.name)}">`)+`<div class="sp">${STU_OBJ[o.type][0]} ${STU_OBJ[o.type][1]} at ${o.x}, ${o.y}</div>`;
+    if(o.type==='enemy') h+=f('kind','Kind',`<select data-p="kind">${STU_ENEMY.map(k=>`<option${o.props.kind===k?' selected':''}>${k}</option>`).join('')}</select>`)+f('hp','Health ×',inp('hp',o.props.hp||1,'number'));
+    if(o.type==='champion') h+=f('hp','Health ×',inp('hp',o.props.hp||8,'number'));
+    if(o.type==='sign') h+=f('text','Text',`<textarea data-p="text" rows="3">${esc(o.props.text||'')}</textarea>`);
+    if(o.type==='teleport') h+=f('to','Teleport to',`<select data-p="to"><option value="">(choose)</option>${names.filter(n=>n!==o.name).map(n=>`<option${o.props.to===n?' selected':''}>${esc(n)}</option>`).join('')}</select>`);
+    if(o.type==='door') h+=f('key','Opened by key',`<select data-p="key"><option value="">(any key)</option>${g.objs.filter(q=>q.type==='key').map(q=>`<option${o.props.key===q.name?' selected':''}>${esc(q.name)}</option>`).join('')}</select>`);
+    if(o.type==='jump') h+=f('power','Power',inp('power',o.props.power||1,'number'));
+    if(o.type==='spikes') h+=f('dmg','Damage',inp('dmg',o.props.dmg||10,'number'));
+    if(o.type==='trigger') h+=f('r','Radius (tiles)',inp('r',o.props.r||1,'number'));
+    if(o.type==='coin') h+=f('value','Value',inp('value',o.props.value||1,'number'));
+    if(['tree','rock','crystal','torch','pillar','sign'].includes(o.type)) h+=f('col','Color',`<input data-p="col" type="color" value="${o.props.col||({tree:'#3a8a3a',rock:'#8a8a8a',crystal:'#b06aff',torch:'#ffb030',pillar:'#d8d0c0',sign:'#a8743a'})[o.type]}">`);
+    h+=`<div class="sth">📜 Script <small>When … do …</small></div>`+o.script.map((r,i)=>`<div class="strule"><select data-r="${i}" data-k="when">${STU_WHEN.map(([k,n])=>`<option value="${k}"${r.when===k?' selected':''}>When ${n}</option>`).join('')}</select>${r.when==='every'||r.when==='coins'?`<input data-r="${i}" data-k="n" type="number" value="${r.n||5}" aria-label="N" style="width:56px">`:''}
+      <select data-r="${i}" data-k="do">${STU_DO.map(([k,n])=>`<option value="${k}"${r.do===k?' selected':''}>${n}</option>`).join('')}</select>${['msg','coins','hurt','heal','tp','spawn','open','show','speed'].includes(r.do)?(r.do==='spawn'?`<select data-r="${i}" data-k="a">${STU_ENEMY.map(k=>`<option${r.a===k?' selected':''}>${k}</option>`).join('')}</select>`:['tp','open','show'].includes(r.do)?`<select data-r="${i}" data-k="a"><option value="">(choose)</option>${names.map(n=>`<option${r.a===n?' selected':''}>${esc(n)}</option>`).join('')}</select>`:`<input data-r="${i}" data-k="a" value="${esc(String(r.a==null?'':r.a))}" aria-label="Value">`):''}
+      <label class="strep"><input type="checkbox" data-r="${i}" data-k="rep"${r.rep?' checked':''}> repeat</label><button class="stt" data-rdel="${i}" aria-label="Delete rule">✕</button></div>`).join('')+`<button class="btn small" id="stAddR">+ Add rule</button> <button class="btn small" id="stDelO">🗑 Delete object</button>`;
+    pr.innerHTML=h;
+    pr.querySelector('[data-name]').oninput=e=>{o.name=e.target.value.slice(0,40); explorer(); persist();};
+    pr.querySelectorAll('[data-p]').forEach(i=>i.onchange=i.oninput=e=>{const v=e.target.type==='number'?+e.target.value:e.target.value; o.props[i.dataset.p]=v; persist(); draw();});
+    pr.querySelectorAll('[data-r]').forEach(i=>i.onchange=e=>{const r=o.script[+i.dataset.r], k=i.dataset.k; r[k]=i.type==='checkbox'?i.checked:i.type==='number'?+i.value:i.value; persist(); if(k==='when'||k==='do') props(); explorer(); draw();});
+    pr.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{o.script.splice(+b.dataset.rdel,1); persist(); props(); explorer(); draw();});
+    pr.querySelector('#stAddR').onclick=()=>{o.script.push({when:o.type==='enemy'||o.type==='champion'?'defeated':'touch',do:'msg',a:'Hello!',n:5}); persist(); props(); explorer(); draw();};
+    pr.querySelector('#stDelO').onclick=()=>{snap(); g.objs=g.objs.filter(q=>q!==o); E.sel=null; commit(); explorer(); props(); draw();};}
+  E.draw=draw; explorer(); props(); requestAnimationFrame(fit); window.addEventListener('resize',fit); cv.focus();}
+function stuModal(title,html,after){let m=$('#stModal'); if(!m){m=document.createElement('div'); m.id='stModal'; m.className='stpanel'; m.setAttribute('role','dialog'); document.body.appendChild(m); m.addEventListener('keydown',e=>{e.stopPropagation(); if(e.key==='Escape') m.hidden=true;});}
+  m.innerHTML=`<div class="stBox modesbox"><h2>${title}</h2>${html}<div class="row" style="margin-top:10px"><button class="btn" id="stMX">Done</button></div></div>`; m.hidden=false; m.querySelector('#stMX').onclick=()=>{m.hidden=true;}; if(after) after(m);}
+function stuSettings(g){const s=g.set; stuModal('⚙️ Game settings',`<label class="stf"><span>Goal</span><select id="sgGoal">${[['portal','Reach the goal portal'],['enemies','Defeat every enemy'],['coins','Collect coins'],['survive','Survive for a time'],['none','Free play (no goal)']].map(([k,n])=>`<option value="${k}"${s.goal===k?' selected':''}>${n}</option>`).join('')}</select></label>
+   <label class="stf"><span>Coins needed</span><input id="sgCoins" type="number" min="1" value="${s.coins}"></label><label class="stf"><span>Survive / time limit (seconds, 0 = none)</span><input id="sgTime" type="number" min="0" value="${s.time}"></label>
+   <label class="stf"><span>Lives (0 = unlimited)</span><input id="sgLives" type="number" min="0" value="${s.lives}"></label><label class="stf"><span>World theme</span><select id="sgTheme">${BIOMES.map((B,i)=>`<option value="${i}"${+s.theme===i?' selected':''}>${esc(B.name)}</option>`).join('')}</select></label>
+   <label class="stf"><span>Player speed ×</span><input id="sgSpd" type="number" step=".25" min=".5" max="3" value="${s.speed}"></label><label class="stf"><span>Intro message</span><input id="sgIntro" value="${esc(s.intro||'')}"></label>
+   <label class="stf"><span>Map size (width × height)</span><span><input id="sgW" type="number" min="12" max="120" value="${g.w}" style="width:70px"> × <input id="sgH" type="number" min="12" max="120" value="${g.h}" style="width:70px"></span></label>`,m=>{
+   const sv=()=>{s.goal=m.querySelector('#sgGoal').value; s.coins=Math.max(1,+m.querySelector('#sgCoins').value||1); s.time=Math.max(0,+m.querySelector('#sgTime').value||0); s.lives=Math.max(0,+m.querySelector('#sgLives').value||0); s.theme=+m.querySelector('#sgTheme').value; s.speed=clamp(+m.querySelector('#sgSpd').value||1,.5,3); s.intro=m.querySelector('#sgIntro').value.slice(0,120);
+     const nw=clamp(+m.querySelector('#sgW').value|0,12,120), nh=clamp(+m.querySelector('#sgH').value|0,12,120); if(nw!==g.w||nh!==g.h){const old=g.tiles, a=[]; for(let y=0;y<nh;y++) for(let x=0;x<nw;x++) a.push(x<g.w&&y<g.h?old[y*g.w+x]:(x===0||y===0||x===nw-1||y===nh-1?'1':'0')); g.tiles=a.join(''); g.w=nw; g.h=nh; g.objs=g.objs.filter(o=>o.x<nw&&o.y<nh); persist(); stuEdit(g.id); return;} persist();};
+   m.querySelectorAll('input,select').forEach(i=>i.onchange=sv);});}
+// ---- playing a game made in the studio
+function stuGen(){const g=STU.g, w=g.w+2, h=g.h+2, G=new Uint8Array(w*h).fill(1); for(let y=0;y<g.h;y++) for(let x=0;x<g.w;x++){const v=+g.tiles[y*g.w+x]; G[(y+1)*w+x+1]=v===1?1:0;}
+  const sp=g.objs.find(o=>o.type==='spawn')||{x:1,y:1}; return {w,h,g:G,start:{x:(sp.x+1.5)*T,y:(sp.y+1.5)*T},exit:null,chests:[],spawns:[],bossAt:{x:(sp.x+1.5)*T,y:(sp.y+1.5)*T},gates:[],keys:[],rooms:[],rects:[]};}
+const stuPos=o=>({x:(o.x+1.5)*T,y:(o.y+1.5)*T});
+function stuPlay(id,test){const g=stuGame(id); if(!g) return; if(LGMS) lgmQuit(); ARENA=null; DUN=null; GAUNT=null; const el=$('#studio'); if(el){el.hidden=true; el.onkeydown=null;} if(stuEdit._up) window.removeEventListener('mouseup',stuEdit._up);
+  STU={g,test,t:0,coins:0,lives:g.set.lives||0,deaths:0,keys:[],objs:[],over:false,cp:null,fired:new Set(),spd:0};
+  const bi=clamp(+g.set.theme||0,0,BIOMES.length-1); GEN_OVERRIDE=stuGen; GEN_NAME=g.name; GEN_THEME={wall:[],scatter:[],plat:[],name:''}; try{startLevel(bi,1,false,(Math.random()*1e9)|0);} finally{GEN_OVERRIDE=null; GEN_NAME=null; GEN_THEME=null;}
+  run.studio=true; ents=[]; L.reinf=0; g.plays=(g.plays||0)+1; persist();
+  for(const o of g.objs){const p=stuPos(o), S2={o,x:p.x,y:p.y,on:true,m:null,cd:0,timers:{}}; STU.objs.push(S2);
+    if(o.type==='enemy'||o.type==='champion'){const e=spawnEnemy(o.type==='champion'?'brute':(o.props.kind||'melee'),p.x,p.y); if(e){const f=Math.max(.2,+o.props.hp||(o.type==='champion'?8:1)); e.max=Math.round(e.max*f); e.hp=e.max; if(o.type==='champion') e.name=o.name; S2.e=e;}}
+    else if(o.type==='ally'){const px=P.x,py=P.y; P.x=p.x; P.y=p.y; summonAllies({minion:'lg_cobble',count:1,pot:1+.35*L.tier}); P.x=px; P.y=py;}
+    else if(o.type==='door'){L.g[(o.y+1)*L.w+o.x+1]=1;}
+    const m=stuMesh(o); if(m){m.position.set(p.x*S,0,p.y*S); levelGroup.add(m); S2.m=m;}
+    const ty=+g.tiles[o.y*g.w+o.x];}
+  // lava, ice and pits get their own floor tiles
+  const geo=new THREE.PlaneGeometry(1,1); geo.rotateX(-Math.PI/2); const mats={2:M('#ff5a1a',{emissive:new THREE.Color('#ff3a00'),emissiveIntensity:.8}),3:M('#bfeaff',{roughness:.15,metalness:.2}),4:M('#05050a',{roughness:1})};
+  for(let y=0;y<g.h;y++) for(let x=0;x<g.w;x++){const v=+g.tiles[y*g.w+x]; if(v>=2){const q=new THREE.Mesh(geo,mats[v]); q.position.set(x+1.5,.03,y+1.5); levelGroup.add(q);}}
+  STU.hud=stuHudOn(); if(g.set.intro) setTimeout(()=>{if(STU) banner(g.name,g.set.intro);},400); for(const S2 of STU.objs) stuFire(S2,'start');}
+function stuMesh(o){const c=o.props.col, R=new THREE.Group(), add2=(geo,mat,x,y,z,sx,sy,sz)=>{const m=new THREE.Mesh(geo,mat); m.position.set(x,y,z); m.scale.set(sx,sy,sz); R.add(m); return m;}, glow=(col,s,y)=>{const g=new THREE.Sprite(new THREE.SpriteMaterial({map:BTEX.glow,color:new THREE.Color(col),transparent:true,opacity:.7,depthWrite:false,blending:THREE.AdditiveBlending})); g.position.y=y; g.scale.set(s,s,1); R.add(g);};
+  switch(o.type){
+  case 'coin': {const m=add2(gCyl,M('#ffd36a',{metalness:.7,roughness:.25,emissive:new THREE.Color('#6a4a00'),emissiveIntensity:.6}),0,.6,0,.32,.06,.32); m.rotation.x=Math.PI/2; R.userData.spin=m; glow('#ffd36a',1.2,.6); break;}
+  case 'goal': add2(gCyl,M('#7ae8ff',{emissive:new THREE.Color('#2ab8ff'),emissiveIntensity:1}),0,.05,0,1.1,.1,1.1); for(let i=0;i<8;i++){const a=i/8*TAU; add2(gBox,M('#d8f4ff',{emissive:new THREE.Color('#7ae8ff'),emissiveIntensity:.8}),Math.cos(a)*1,1.2,Math.sin(a)*1,.12,2.4,.12);} glow('#7ae8ff',4,1.2); break;
+  case 'checkpoint': add2(gCyl,M('#8a8a8a'),0,1,0,.06,2,.06); R.userData.flag=add2(gBox,M('#e2504a'),.3,1.75,0,.55,.35,.04); break;
+  case 'chest': add2(gBox,M('#8a5a2a'),0,.3,0,.8,.55,.55); add2(gBox,M('#e8c050',{metalness:.6}),0,.62,0,.85,.12,.6); break;
+  case 'heal': add2(gSph,M('#ff4a6a',{emissive:new THREE.Color('#8a0a2a'),emissiveIntensity:.6,transparent:true,opacity:.9}),0,.5,0,.28,.32,.28); add2(gCyl,M('#d8c8a8'),0,.85,0,.08,.12,.08); glow('#ff6a8a',1.2,.5); break;
+  case 'key': add2(gBox,M('#ffd36a',{metalness:.7,emissive:new THREE.Color('#6a4a00'),emissiveIntensity:.6}),0,.7,0,.12,.5,.08); add2(gBox,M('#ffd36a',{metalness:.7}),.12,.55,0,.2,.06,.08); R.userData.spin=R.children[0]; glow('#ffd36a',1.2,.7); break;
+  case 'door': add2(gBox,M('#6a4a2a',{roughness:.8}),0,1.2,0,1,2.4,1); add2(gBox,M('#ffd36a',{metalness:.7}),0,1.2,.52,.3,.3,.04); break;
+  case 'jump': add2(gCyl,M('#4ad06a',{emissive:new THREE.Color('#1a8a3a'),emissiveIntensity:.7}),0,.06,0,.5,.1,.5); add2(gCone,M('#bfffcf'),0,.4,0,.18,.3,.18); break;
+  case 'spikes': for(let i=0;i<4;i++) add2(gCone,M('#c8c8d0',{metalness:.6,roughness:.3}),((i%2)-.5)*.5,.25,((i>>1)-.5)*.5,.12,.5,.12); add2(gBox,M('#5a5a60'),0,.03,0,1,.06,1); break;
+  case 'teleport': add2(gCyl,M('#b06aff',{emissive:new THREE.Color('#6a2aff'),emissiveIntensity:1}),0,.05,0,.8,.08,.8); glow('#b06aff',2.4,.6); break;
+  case 'sign': add2(gBox,M(c||'#a8743a'),0,.6,0,.08,1.2,.08); add2(gBox,M(c||'#a8743a'),0,1.15,0,.9,.5,.08); break;
+  case 'trigger': break;
+  case 'tree': add2(gCyl,M('#6a4a2a'),0,.9,0,.22,1.8,.22); add2(gCone,M(c||'#3a8a3a',{roughness:.8}),0,2.3,0,1.1,1.8,1.1); add2(gCone,M(c||'#3a8a3a',{roughness:.8}),0,3.1,0,.8,1.4,.8); break;
+  case 'rock': add2(gSph,M(c||'#8a8a8a',{roughness:1}),0,.35,0,.7,.5,.6); break;
+  case 'crystal': add2(gCone,M(c||'#b06aff',{emissive:new THREE.Color(c||'#b06aff'),emissiveIntensity:.5,metalness:.3,roughness:.2}),0,.9,0,.35,1.8,.35); glow(c||'#b06aff',2,1); break;
+  case 'torch': add2(gCyl,M('#5a3a1a'),0,.6,0,.08,1.2,.08); add2(gSph,M(c||'#ffb030',{emissive:new THREE.Color(c||'#ff8a1a'),emissiveIntensity:1.2}),0,1.3,0,.18,.25,.18); glow(c||'#ffb030',2.2,1.3); break;
+  case 'pillar': add2(gCyl,M(c||'#d8d0c0',{roughness:.8}),0,1.5,0,.4,3,.4); add2(gBox,M(c||'#d8d0c0'),0,3.05,0,1,.2,1); break;
+  default: return null;}
+  return R;}
+function stuFind(name){return STU&&STU.objs.find(s=>s.o.name===name);}
+function stuFire(S2,when,arg){const o=S2.o; o.script.forEach((r,i)=>{if(r.when!==when) return; if(when==='coins'&&STU.coins<(+r.n||1)) return; const key=o.id+':'+i; if(!r.rep&&STU.fired.has(key)) return; STU.fired.add(key); stuDo(S2,r);});}
+function stuDo(S2,r){const a=r.a; switch(r.do){
+  case 'msg': banner(S2.o.name,String(a||'')); break; case 'coins': STU.coins+=(+a||1); ftext(P.x,P.y-40,'+'+(+a||1)+' 🪙','#ffd36a',true); break;
+  case 'hurt': hurtP(+a||10,{}); break; case 'heal': P.hp=Math.min(ST.maxhp,P.hp+(+a||25)); ftext(P.x,P.y-40,'+'+(+a||25),'#8fd06a'); break;
+  case 'tp': {const t=stuFind(a); if(t){puff(P.x,P.y,'#b06aff',16,140,.5,5); P.x=t.x; P.y=t.y+30; puff(P.x,P.y,'#b06aff',16,140,.5,5);} break;}
+  case 'spawn': {const e=spawnEnemy(STU_ENEMY.includes(a)?a:'melee',S2.x+rand(-20,20),S2.y+rand(-20,20)); if(e) puff(e.x,e.y,'#ff4a4a',10,100,.5,4); break;}
+  case 'open': {const t=stuFind(a); if(t&&t.o.type==='door') stuOpenDoor(t); break;}
+  case 'show': {const t=stuFind(a); if(t){t.on=true; if(t.m) t.m.visible=true;} break;}
+  case 'hide': S2.on=false; if(S2.m) S2.m.visible=false; break;
+  case 'speed': STU.spd=Math.max(STU.spd,+a||5); toast('💨 Speed boost!','#9fe0ff'); break;
+  case 'win': stuEnd(true); break; case 'lose': stuEnd(false); break;}}
+function stuOpenDoor(S2){if(!S2.on) return; S2.on=false; if(S2.m) S2.m.visible=false; L.g[(S2.o.y+1)*L.w+S2.o.x+1]=0; puff(S2.x,S2.y,'#c8a070',20,160,.6,5); if(typeof sfx==='function') sfx('gate');}
+const stuSpd=()=>STU?(+STU.g.set.speed||1)*(STU.spd>0?1.6:1)*(stuTile(P.x,P.y)===3?1.4:1):1;
+function stuTile(x,y){if(!STU) return 0; const g=STU.g, tx=Math.floor(x/T)-1, ty=Math.floor(y/T)-1; if(tx<0||ty<0||tx>=g.w||ty>=g.h) return 0; return +g.tiles[ty*g.w+tx];}
+function stuTick(dt){const U=STU; if(!U||U.over||mode!=='play'||P.dead) return; U.t+=dt; U.spd=Math.max(0,U.spd-dt); const g=U.g, set=g.set;
+  const tile=stuTile(P.x,P.y); if(tile===2&&P.roll<=0){U.lavaT=(U.lavaT||0)-dt; if(U.lavaT<=0){U.lavaT=.5; hurtP(Math.round(ST.maxhp*.18),{}); puff(P.x,P.y,'#ff6a1a',8,90,.4,4);}} if(tile===4&&P.roll<=0){ftext(P.x,P.y-40,'You fell!','#ff8a6a',true); hurtP(Math.round(ST.maxhp*.25),{}); stuRespawn();}
+  for(const S2 of U.objs){if(!S2.on) continue; const o=S2.o, d=Math.hypot(S2.x-P.x,S2.y-P.y); S2.cd=Math.max(0,S2.cd-dt); if(S2.m&&S2.m.userData.spin) S2.m.userData.spin.rotation.z=time*3; if(S2.m&&S2.m.userData.flag) S2.m.userData.flag.rotation.y=Math.sin(time*3)*.3;
+    for(const r of o.script) if(r.when==='every'){const k=o.script.indexOf(r); S2.timers[k]=(S2.timers[k]||0)+dt; if(S2.timers[k]>=Math.max(.5,+r.n||5)){S2.timers[k]=0; const key=o.id+':'+k; if(r.rep||!U.fired.has(key)){U.fired.add(key); stuDo(S2,r);}}}
+    if(S2.e&&S2.e.hp<=0&&!S2.dead){S2.dead=true; stuFire(S2,'defeated');}
+    const touchR=o.type==='trigger'?((+o.props.r||1)+.5)*T:o.type==='goal'?44:o.type==='door'?50:30;
+    if(d<touchR){if(!S2.inside){S2.inside=true; stuTouch(S2);}} else S2.inside=false;}
+  // goals
+  const left=ents.filter(e=>!e.ally&&e.hp>0).length; if(!U.allDone&&U.t>1&&left===0&&U.objs.some(s=>s.e)){U.allDone=true; for(const s of U.objs) stuFire(s,'allEnemies');}
+  for(const s of U.objs) stuFire(s,'coins');
+  if(set.goal==='enemies'&&U.t>1&&left===0) stuEnd(true); if(set.goal==='coins'&&U.coins>=set.coins) stuEnd(true); if(set.goal==='survive'&&U.t>=(set.time||60)) stuEnd(true); else if(set.goal!=='survive'&&set.time>0&&U.t>=set.time) stuEnd(false);
+  U.hudT=(U.hudT||0)-dt; if(U.hudT<=0){U.hudT=.25; stuHudDraw();}}
+function stuTouch(S2){const o=S2.o; stuFire(S2,'touch'); if(!S2.on) return;
+  switch(o.type){case 'coin': S2.on=false; if(S2.m) S2.m.visible=false; STU.coins+=(+o.props.value||1); if(typeof sfx==='function') sfx('shard'); puff(S2.x,S2.y,'#ffd36a',8,80,.4,4); break;
+  case 'goal': if(STU.g.set.goal==='portal') stuEnd(true); break;
+  case 'checkpoint': if(STU.cp!==S2){STU.cp=S2; if(S2.m&&S2.m.userData.flag) S2.m.userData.flag.material=M('#7aff8a'); toast('🚩 Checkpoint!','#8fd06a');} break;
+  case 'chest': S2.on=false; if(S2.m) S2.m.children.forEach(c=>c.rotation.x=-.3); STU.coins+=5; banner('Treasure!','+5 coins'); if(typeof sfx==='function') sfx('chest'); break;
+  case 'heal': S2.on=false; if(S2.m) S2.m.visible=false; P.hp=Math.min(ST.maxhp,P.hp+ST.maxhp*.4); ftext(P.x,P.y-40,'+Health','#8fd06a',true); break;
+  case 'key': S2.on=false; if(S2.m) S2.m.visible=false; STU.keys.push(o.name); toast(`🔑 You found the ${o.name}`,'#ffd36a'); break;
+  case 'door': if(!o.props.key&&STU.keys.length||STU.keys.includes(o.props.key)) stuOpenDoor(S2); else toast(`🚪 Locked${o.props.key?': you need the '+o.props.key:': find a key'}`,'#ffd36a'); break;
+  case 'jump': {const pw=Math.max(.5,+o.props.power||1), m=moveVec(), l=Math.hypot(m.x,m.y); P.rdx=l?m.x/l:Math.cos(P.face); P.rdy=l?m.y/l:Math.sin(P.face); P.roll=.35*pw; P.iframe=Math.max(P.iframe,.4*pw); puff(P.x,P.y,'#7aff8a',12,140,.4,5); if(typeof sfx==='function') sfx('swing'); break;}
+  case 'spikes': hurtP(+o.props.dmg||10,{}); S2.inside=false; S2.cd=.8; break;
+  case 'teleport': {const t=stuFind(o.props.to); if(t&&t!==S2){t.inside=true; puff(P.x,P.y,'#b06aff',16,140,.5,5); P.x=t.x; P.y=t.y; puff(P.x,P.y,'#b06aff',16,140,.5,5);} break;}
+  case 'sign': banner('🪧',o.props.text||''); break;}}
+function stuRespawn(){const p=STU.cp||STU.objs.find(s=>s.o.type==='spawn'); P.x=p?p.x:L.start.x; P.y=p?p.y+(STU.cp?30:0):L.start.y; P.roll=0; puff(P.x,P.y,'#ffffff',14,120,.5,5);}
+function stuDied(){const U=STU; U.deaths++; if(U.g.set.lives>0&&U.deaths>=U.g.set.lives){stuEnd(false); return false;} P.dead=false; P.hp=ST.maxhp; run.endT=0; mode='play'; stuRespawn(); toast(U.g.set.lives>0?`💀 ${U.g.set.lives-U.deaths} ${U.g.set.lives-U.deaths===1?'life':'lives'} left`:'💀 Try again!','#ff8a6a'); return true;}
+function stuEnd(won){const U=STU; if(!U||U.over) return; U.over=true; U.won=won; run.victory=won; run.endT=won?1.2:.6; if(won){const t=Math.round(U.t); if(!U.g.best||t<U.g.best) U.g.best=t; persist(); flashT=.4; flashCol='#ffd36a'; if(typeof sfx==='function') sfx('win');}}
+function stuResult(kind){const U=STU; if(kind==='dead'&&!U.over&&stuDied()) return; mode='result'; $('#result').hidden=false; const won=U.won&&kind!=='dead', t=Math.round(U.t);
+  $('#resTitle').textContent=won?`You beat “${U.g.name}”!`:`Game over: ${U.g.name}`; $('#resSub').textContent=won?'Nice! Play again to beat your best time.':'So close. Give it another try.';
+  $('#resStats').innerHTML=`<dt>Time</dt><dd>${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}</dd><dt>Coins</dt><dd>${U.coins}</dd><dt>Deaths</dt><dd>${U.deaths}</dd>${U.g.best?`<dt>Best time</dt><dd>${U.g.best}s</dd>`:''}`;
+  $('#resRetry').hidden=false; $('#resRetry').textContent='Play again'; let b=$('#resStudio'); if(!b){b=document.createElement('button'); b.id='resStudio'; b.className='btn'; $('#resRetry').after(b);} b.hidden=false; b.textContent=U.test?'✏️ Back to editing':'🌌 Back to the Dream'; b.onclick=()=>{$('#result').hidden=true; b.hidden=true; const g=U.g, te=U.test; stuHudOff(); STU=null; if(te) stuEdit(g.id); else openStudioHub();}; b.focus(); stuHudOff();}
+function stuHudOn(){let h=$('#stuHud'); if(!h){h=document.createElement('div'); h.id='stuHud'; document.body.appendChild(h);} h.hidden=false; h.innerHTML=`<span id="stuHT"></span><button class="btn small" id="stuStop">■ ${STU.test?'Stop':'Leave'}</button>`; h.querySelector('#stuStop').onclick=()=>{const g=STU.g, te=STU.test; stuHudOff(); STU=null; if(te) stuEdit(g.id); else openStudioHub();}; return h;}
+function stuHudOff(){const h=$('#stuHud'); if(h) h.hidden=true; const b=$('#resStudio'); if(b) b.hidden=true;}
+function stuHudDraw(){const U=STU, s=U.g.set, el=$('#stuHT'); if(!el) return; const left=ents.filter(e=>!e.ally&&e.hp>0).length, t=Math.floor(U.t);
+  el.textContent=`🎮 ${U.g.name} · ${({portal:'🌀 Reach the portal',enemies:`👹 Enemies left: ${left}`,coins:`🪙 ${U.coins}/${s.coins}`,survive:`⏳ Survive ${Math.max(0,Math.ceil((s.time||60)-U.t))}s`,none:'Free play'})[s.goal]}${s.goal!=='coins'?` · 🪙 ${U.coins}`:''}${s.goal!=='survive'&&s.time>0?` · ⏱ ${Math.max(0,Math.ceil(s.time-U.t))}s`:` · ⏱ ${t}s`}${s.lives>0?` · ❤️ ${s.lives-U.deaths}`:''}${U.keys.length?' · 🔑'+U.keys.length:''}`;}
+
+{const _om=openMap; openMap=function(){if(STU){STU=null; stuHudOff();} const st=$('#studio'); if(st) st.hidden=true; return _om.apply(this,arguments);};}
 /* ---------------- starting, the title screen and quitting ---------------- */
 function openLegends(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} const party=MP.party&&MP.party.members.length>1; if(party&&MP.role!=='host'){toast('The party leader starts Legends','#ffd36a'); return;}
   $('#modesPanel')&&($('#modesPanel').hidden=true); lgmLoading(true); setTimeout(()=>{try{openLegends2(party);} finally{lgmLoading(false);}},40);}

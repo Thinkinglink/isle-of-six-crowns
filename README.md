@@ -19,6 +19,17 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🛠️ Version 6.5: The Creator's Dream Studio
+- **The Creator's Dream is now its own game mode** where you build your own games, a bit like a game studio.
+  - **Editor:** paint terrain (floor, wall, lava, ice, pit) and place objects from the toolbox: spawn, goal portal, coins, checkpoints, chests, potions, keys and doors, jump pads, spikes, teleporters, enemies, champions, golem allies, signs, trigger zones and decorations.
+  - **Explorer and Properties panels:** select any object to rename it, change its settings and give it a script.
+  - **Scripts:** simple *When … do …* rules, such as "when touched, open door", "every 5 seconds, spawn an enemy" or "when coins reach 10, show the portal".
+  - **Game settings:** goal (reach the portal, defeat every enemy, collect coins, survive), time limit, lives, world theme, speed, intro message and map size. Undo and redo are supported.
+  - **Play test** with ▶ (P), then jump straight back into the editor.
+  - **Templates:** blank world, lava obby, monster arena and treasure maze.
+  - **Share codes:** copy a game's code and send it to a friend, who pastes it into "Play a shared game".
+- The Legends sandbox from 6.4 is now **Dream Island**, inside the same hub.
+
 ## 🌌 Version 6.4: The Creator's Dream
 - **The Creator's Dream:** a new game mode (Modes → The Creator's Dream, or `-` inside Legends) with a mythic look: pastel skies, floating islands and drifting light. You can visit it any time.
   - Press `-` in the Dream to bend its rules: time (flowing, endless day, endless night, racing), weather, hordes (peaceful, normal, Mega), hero size (giant or tiny), speed (1× to 3×), army size (up to 60 golems) and infinite materials.
