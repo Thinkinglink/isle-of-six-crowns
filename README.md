@@ -19,6 +19,11 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🔒 Version 7.3: Tamper protection
+- **Signed saves:** every save is now signed by the game. If a save is edited outside the game, the edited numbers (diamonds, resources and other counters) are put back to their last real values, items added from outside are removed, and the save is flagged as modified. Real progress is never deleted.
+- **Inspect shortcuts closed:** the developer-tools keys (F12, Ctrl/Cmd+Shift+I/J/C/K), view source (Ctrl/Cmd+U), save page (Ctrl/Cmd+S) and the right-click menu are blocked in the game. Text inputs still work normally.
+- The game's code already runs sealed in its own private scope, so its values can't be changed from the browser console. The desktop app has its inspector switched off, and the Android app does not allow web debugging.
+
 ## ⛰️ Version 7.2: The Skyreach Highlands, demolition and the Devotion Paths
 - **The Skyreach Highlands (Legends):** a new land in the north-east corner of the island, reached by a stone causeway from the coast. One height field blends every kind of terrain into the next:
   - **Soaring mountains:** ridged peaks over 30 m tall, capped with snow, and a ring of sheer rock around the edge.
