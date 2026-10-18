@@ -19,6 +19,10 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🌙 Version 7.4.1: towns that work while you're away, and hills everywhere
+- **Offline production:** your Town Hall keeps working while you're gone, for up to 24 hours. Farms, mills and mines keep producing (up to your storage caps), building upgrades finish, caravans arrive, citizens grow and raiders are fought off. When you come back, a **"While you were away"** report shows everything that happened.
+- **Rolling hills across the whole island:** in Legends 1 and 2, the ground now rises and falls everywhere, not only in the Highlands corner. There are more mountains and ranges too. Trees, rocks, shrines, resources and camps all sit on the slopes, and the minimap shows the shading of the hills.
+
 ## 🏛️ Version 7.4: Town Halls and a reshaped Legends island
 - **Town Halls (new mode, 🏛️ in Modes):** run your own town from a high, angled city view with no hero on screen. Drag or use WASD to pan, scroll to zoom, and click any building (or its name tag) to manage it.
   - **Citizens panel (C):** assign every citizen as a guard, a warrior (trained at the Barracks) or a worker in a specific factory, with −5/−/+/+5 controls, caps, staffing efficiency, output per minute and food upkeep on every row. Auto-assign, Release workers and Garrison do it in bulk.
