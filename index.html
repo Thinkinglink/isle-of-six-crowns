@@ -1328,7 +1328,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='7.4.2', SAVE_VERSION=7;
+const APP_VERSION='7.5.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -5859,6 +5859,80 @@ async function closeGame(){if(closing) return; closing=true; const ov=$('#closeU
   if(DESK.pkg){say(`Installing version ${DESK.pkg.m.version}…`); try{await withTimeout(writePkg(DESK.pkg.buf),4000);}catch(e){}}
   clearTimeout(slow); try{Neutralino.app.exit();}catch(e){window.close();}}
 
+/* ---------------- v7.5: custom keybinds. Every key in the game can be moved to another key; the game's own handlers see the original key ---------------- */
+const KB={b:{},fwd:{},src:undefined,wait:null,open:false};
+const KB_NO=['escape','f5','f12','meta','os','unidentified','capslock','contextmenu'];
+const KB_SECT=[['move','🏃 Moving and fighting'],['menu','📜 Menus'],['lg','👑 Legends'],['town','🏛️ Town Halls']];
+function kbCanon(k){const m={' ':' ',shift:'Shift',control:'Control',alt:'Alt',tab:'Tab',enter:'Enter',backspace:'Backspace',arrowup:'ArrowUp',arrowdown:'ArrowDown',arrowleft:'ArrowLeft',arrowright:'ArrowRight',home:'Home',end:'End',pageup:'PageUp',pagedown:'PageDown',insert:'Insert',delete:'Delete'}; if(k in m) return m[k]; if(/^f\d+$/.test(k)) return k.toUpperCase(); return k;}
+function kbName(k){const m={' ':'Space',shift:'Shift',control:'Ctrl',alt:'Alt',tab:'Tab',enter:'Enter',backspace:'Backspace',arrowup:'↑',arrowdown:'↓',arrowleft:'←',arrowright:'→',delete:'Del',insert:'Ins',pageup:'PgUp',pagedown:'PgDn',home:'Home',end:'End'}; if(k in m) return m[k]; return k.length===1?k.toUpperCase():k.charAt(0).toUpperCase()+k.slice(1);}
+function kbCur(d){return KB.b[d]!=null?KB.b[d]:d;}
+function kbLab(d){return kbName(kbCur(d));}
+function kbBuild(){const f={}; for(const d in KB.b){const p=KB.b[d]; if(p!==d) f[p]=d;} for(const d in KB.b) if(KB.b[d]!==d&&!(d in f)) f[d]=null; KB.fwd=f;}
+function kbLoad(){let b=null; try{b=JSON.parse(localStorage.getItem(KEY+'.keys')||'null');}catch(e){} if(typeof SAVE!=='undefined'&&SAVE&&SAVE.binds&&typeof SAVE.binds==='object') b=SAVE.binds;
+  KB.b={}; if(b) for(const d in b) if(typeof b[d]==='string'&&b[d]!==d) KB.b[d]=b[d]; KB.src=(typeof SAVE!=='undefined')?SAVE:null; kbBuild();}
+function kbStore(){const c=Object.assign({},KB.b); try{localStorage.setItem(KEY+'.keys',JSON.stringify(c));}catch(e){} if(typeof SAVE!=='undefined'&&SAVE){SAVE.binds=c; KB.src=SAVE; try{persist();}catch(e){}} kbBuild(); kbdFixAll();}
+function kbSet(d,p){if(kbCur(d)===p) return; const old=kbCur(d); for(const x of kbActs().map(r=>r.k)) if(x!==d&&kbCur(x)===p) KB.b[x]=old; KB.b[d]=p; for(const x in KB.b) if(KB.b[x]===x) delete KB.b[x]; kbStore();}
+function kbTyping(t){return t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);}
+// the list of every key the game uses, with everything each key does
+function kbActs(){const rows=new Map(), add=(k,txt,sec)=>{if(!k) return; k=String(k).toLowerCase(); let r=rows.get(k); if(!r){r={k,sec,does:[]}; rows.set(k,r);} if(!r.does.includes(txt)) r.does.push(txt); if(KB_SECT.findIndex(s=>s[0]===sec)<KB_SECT.findIndex(s=>s[0]===r.sec)) r.sec=sec;};
+  [['w','Move up'],['a','Move left'],['s','Move down'],['d','Move right'],['j','Melee attack'],['k','Fire bow'],[' ','Dodge roll · fly or swim up'],['shift','Dodge roll · fly or swim down'],['q','Healing potion'],['`','Change arrow type']].forEach(([k,t])=>add(k,t,'move'));
+  for(let i=1;i<=8;i++) add(String(i),'Artifact '+i,'move');
+  [['arrowup','Move up'],['arrowleft','Move left'],['arrowdown','Move down'],['arrowright','Move right']].forEach(([k,t])=>add(k,t,'move'));
+  [['i','Open your pack'],['tab','Open your pack'],['m','Big map'],['p','Pause'],['f','Friends (on the isle map)'],['b','Shop (on the isle map)']].forEach(([k,t])=>add(k,t,'menu'));
+  try{for(const g of LG_GROUPS) add(g.key,'Legends: '+g.n+' menu','lg'); for(const a of LG_ACT) add(a[1],'Legends: '+a[3],'lg');}catch(e){}
+  [['c','Town: Citizens'],['u','Town: Buildings'],['r','Town: Realm']].forEach(([k,t])=>add(k,t,'town'));
+  return [...rows.values()];}
+// the remap layer: runs before every other key handler in the game
+function kbEv(e){
+  if(KB.wait&&e.type==='keydown'){e.preventDefault(); e.stopImmediatePropagation(); const k=(e.key||'').toLowerCase(), d=KB.wait; KB.wait=null;
+    if(k==='escape'){kbDraw(); return;} if(KB_NO.includes(k)){kbDraw('That key is reserved'); return;} kbSet(d,k); kbDraw(); return;}
+  if(KB.open){if(e.type==='keydown'&&(e.key==='Escape')){e.preventDefault(); kbClose();} if(!kbTyping(e.target)) e.stopImmediatePropagation(); return;}
+  if(KB.src!==((typeof SAVE!=='undefined')?SAVE:null)) kbLoad();
+  if(kbTyping(e.target)||(typeof mode!=='undefined'&&mode==='studio')) return;
+  const k=(e.key||'').toLowerCase(); if(!(k in KB.fwd)) return; const v=KB.fwd[k];
+  try{Object.defineProperty(e,'key',{value:v==null?'Unidentified':kbCanon(v),configurable:true});}catch(err){}}
+addEventListener('keydown',kbEv,true); addEventListener('keyup',kbEv,true);
+// the keybinds panel
+function kbStyle(){if($('#kbCss')) return; const st=document.createElement('style'); st.id='kbCss'; st.textContent=`
+#kbPanel{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(4,8,18,.72);backdrop-filter:blur(3px)}
+#kbPanel .kbw{width:min(680px,94vw);max-height:88vh;display:flex;flex-direction:column;background:linear-gradient(#1a2238,#121a2c);border:1px solid #3a4a72;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6);color:#e8ecf6;font-family:inherit}
+#kbPanel h2{margin:0;padding:16px 20px 4px;font-size:22px}
+#kbPanel .kbs{padding:0 20px 10px;color:#9aa6c4;font-size:13px}
+#kbPanel .kbl{overflow:auto;padding:4px 20px 10px;flex:1}
+#kbPanel h3{margin:14px 0 6px;font-size:14px;color:#ffd36a;letter-spacing:.02em}
+#kbPanel .kbr{display:flex;align-items:center;gap:12px;padding:6px 8px;border-radius:8px}
+#kbPanel .kbr:nth-child(odd){background:rgba(255,255,255,.03)}
+#kbPanel .kbd{flex:1;font-size:13px;line-height:1.35}
+#kbPanel .kbd small{display:block;color:#8a96b4;font-size:11px}
+#kbPanel .kbk{min-width:84px;padding:6px 10px;border-radius:8px;border:1px solid #4a5a86;background:#202a44;color:#fff;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+#kbPanel .kbk.ch{border-color:#ffd36a;color:#ffd36a}
+#kbPanel .kbk.wait{background:#3a2e10;border-color:#ffd36a;animation:kbp 1s infinite}
+@keyframes kbp{50%{opacity:.55}}
+#kbPanel .kbf{display:flex;gap:10px;justify-content:flex-end;align-items:center;padding:12px 20px;border-top:1px solid #2a3654}
+#kbPanel .kbmsg{flex:1;color:#ff9a6a;font-size:13px}
+#kbPanel input{width:100%;box-sizing:border-box;margin:0 0 4px;padding:8px 10px;border-radius:8px;border:1px solid #3a4a72;background:#0e1424;color:#fff;font-family:inherit}`; document.head.appendChild(st);}
+function kbOpen(){kbStyle(); if(KB.src!==((typeof SAVE!=='undefined')?SAVE:null)) kbLoad(); let el=$('#kbPanel'); if(!el){el=document.createElement('div'); el.id='kbPanel'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Keybinds'); document.body.appendChild(el);}
+  el.innerHTML=`<div class="kbw"><h2>⌨️ Keybinds</h2><div class="kbs">Click a key, then press the new key for it. If that key is already used, the two swap. Esc cancels. Mouse buttons always attack and fire too.</div>
+   <div style="padding:0 20px"><input id="kbFind" placeholder="Search actions…" aria-label="Search actions"></div><div class="kbl" id="kbList"></div>
+   <div class="kbf"><span class="kbmsg" id="kbMsg"></span><button class="btn" id="kbReset">Reset all</button><button class="btn gold" id="kbDone">Done</button></div></div>`;
+  el.hidden=false; KB.open=true; $('#kbDone').onclick=kbClose; $('#kbReset').onclick=()=>{KB.b={}; kbStore(); kbDraw('All keys are back to the defaults');};
+  el.onclick=e=>{if(e.target===el) kbClose();}; $('#kbFind').oninput=()=>kbDraw(); kbDraw();}
+function kbDraw(msg){const el=$('#kbList'); if(!el) return; const q=(($('#kbFind')||{}).value||'').trim().toLowerCase(), acts=kbActs();
+  el.innerHTML=KB_SECT.map(([s,n])=>{const rs=acts.filter(r=>r.sec===s&&(!q||r.does.join(' ').toLowerCase().includes(q)||kbLab(r.k).toLowerCase()===q)); if(!rs.length) return '';
+    return `<h3>${n}</h3>`+rs.map(r=>`<div class="kbr"><div class="kbd">${esc(r.does[0])}${r.does.length>1?`<small>${esc(r.does.slice(1).join(' · '))}</small>`:''}</div><button class="kbk${kbCur(r.k)!==r.k?' ch':''}${KB.wait===r.k?' wait':''}" data-k="${esc(r.k)}" title="Default: ${esc(kbName(r.k))}">${KB.wait===r.k?'Press a key…':esc(kbLab(r.k))}</button></div>`).join('');}).join('')||'<p style="color:#8a96b4">No actions match.</p>';
+  el.querySelectorAll('.kbk').forEach(b=>b.onclick=()=>{KB.wait=b.dataset.k; kbDraw();});
+  const m=$('#kbMsg'); if(m) m.textContent=msg||'';}
+function kbClose(){KB.wait=null; KB.open=false; const el=$('#kbPanel'); if(el) el.hidden=true; for(const k in keys) keys[k]=false; kbdFixAll();}
+// on-screen key hints follow your keybinds
+const KB_TXT={'space':' ','shift':'shift','tab':'tab','wasd':'wasd','w a s d':'wasd'};
+function kbdFix(n){const t0=n.dataset.k0!=null?n.dataset.k0:(n.dataset.k0=n.textContent); const t=t0.trim().toLowerCase(); let d=KB_TXT[t]; if(d==null&&t.length===1) d=t; if(d==null) return;
+  const out=d==='wasd'?(['w','a','s','d'].every(x=>kbLab(x).length===1)?['w','a','s','d'].map(kbLab).join(t0.includes(' ')?' ':''):['w','a','s','d'].map(kbLab).join(' ')):kbLab(d); if(n.textContent!==out) n.textContent=out;}
+function kbdFixAll(){if(!Object.keys(KB.b).length&&!document.querySelector('kbd[data-k0]')) return; document.querySelectorAll('kbd').forEach(kbdFix);}
+{let pend=false; const mo=new MutationObserver(()=>{if(pend||!Object.keys(KB.b).length) return; pend=true; requestAnimationFrame(()=>{pend=false; kbdFixAll();});}); mo.observe(document.documentElement,{childList:true,subtree:true});}
+// buttons on the title screen, the isle map, the pause menu and the How to Play page
+{const mk=(after,id,cls,txt)=>{const a=$(after); if(!a||$('#'+id)) return; const b=document.createElement('button'); b.className=cls; b.id=id; b.innerHTML=txt; b.onclick=e=>{e.preventDefault(); kbOpen();}; a.insertAdjacentElement('afterend',b);};
+  mk('#btnHow','btnKeys','btn','⌨️ Keybinds'); mk('#mapInv','mapKeys','btn small','⌨️ Keys'); mk('#pGfx','pKeys','btn','⌨️ Keybinds'); mk('#howClose','howKeys','btn','⌨️ Change keybinds');}
+
 /* ---------------- input ---------------- */
 const keys={}; const mouse={x:0,y:0,l:false,r:false}; let touchAtk=false,touchBow=false; const joy={on:false,x:0,y:0,id:null};
 addEventListener('keydown',e=>{const k=e.key.toLowerCase();
@@ -9811,11 +9885,11 @@ function lgmHud(){let el=$('#lgmHud'); if(!el){el=document.createElement('div');
   el.innerHTML=`<div class="lr"><span>${RES_ICO.wood}<b>${R0.wood}</b></span><span>${RES_ICO.stone}<b>${R0.stone}</b></span><span>${RES_ICO.gold}<b>${R0.gold}</b></span><span>${RES_ICO.diamond}<b>${R0.diamond||0}</b></span></div><div class="la">🎒 ${lgSupCount()} supplies · ⚔ ${allies.length} golem${allies.length===1?'':'s'} · ✨ ${3-LGMS.sprites.length}/3 sprites${LGMS.ride?' · 🐎 riding':''}${LGMS.rally?(LGMS.rally.hold?' · 🛑 holding':' · 🚩 charging'):''}${LGMS.tac&&LGMS.tac.focus?' · 🎯 focus':''}${LGMS.tac&&LGMS.tac.form!=='loose'?' · '+LG_FORMS.find(f=>f[0]===LGMS.tac.form)[1]+' '+LGMS.tac.form:''}${LGMS.wx&&LGMS.wx.k!=='clear'?' · '+LG_WX[LGMS.wx.k][0]+' '+LG_WX[LGMS.wx.k][1]:''}${(LGMS.cold||0)>1?' · ❄️ cold '+Math.round(LGMS.cold)+'%':''}${MH?' · ⚔️ Mega horde '+MH.units.length:''}${' · '+ARROW_T[quiver().sel][0]+(quiver().sel==='normal'?'':' '+quiver()[quiver().sel])}${LG_DREAM?' · 🌌 Dream':''}</div><ul class="lo">${lgmObjective().map(o=>`<li>${esc(o)}</li>`).join('')}</ul>`;
   let d=$('#lgmDay'); if(!d){d=document.createElement('div'); d.id='lgmDay'; $('#hud').appendChild(d);} d.hidden=!$('#bossBar').hidden; const t=LGMS.day%300; d.innerHTML=`${LGMS.night?'🌙 Night':'☀️ Day'} ${lgmSave().days}<span>${LGMS.night?'Hordes raid by night':`Night in ${Math.max(0,Math.ceil((210-t)/60))} min`}</span>`;}
 function lgmBar(on){let el=$('#lgmBar'); if(!el){el=document.createElement('div'); el.id='lgmBar'; $('#hud').appendChild(el);
-    el.innerHTML=LG_GROUPS.map(gp=>`<button type="button" class="lgb lgg" data-g="${gp.id}" aria-label="${gp.n}: ${gp.hint}" aria-expanded="false" title="${gp.hint} (${gp.key.toUpperCase()})"><span class="ic">${gp.ico}</span><i>${gp.key.toUpperCase()}</i><small>${gp.n}</small></button>`).join('')+'<div class="lgfly" hidden role="menu"></div>';
+    el.innerHTML=LG_GROUPS.map(gp=>`<button type="button" class="lgb lgg" data-g="${gp.id}" aria-label="${gp.n}: ${gp.hint}" aria-expanded="false" title="${gp.hint} (${kbLab(gp.key)})"><span class="ic">${gp.ico}</span><i>${kbLab(gp.key)}</i><small>${gp.n}</small></button>`).join('')+'<div class="lgfly" hidden role="menu"></div>';
     const fly=el.querySelector('.lgfly');
     const close=()=>{el.dataset.open=''; fly.hidden=true; el.querySelectorAll('.lgg').forEach(b=>{b.setAttribute('aria-expanded','false'); b.classList.remove('sel');});};
     const open=id=>{if(el.dataset.open===id) return close(); const gp=LG_GROUPS.find(g=>g.id===id); close(); el.dataset.open=id; const gb=el.querySelector(`[data-g="${id}"]`); gb.setAttribute('aria-expanded','true'); gb.classList.add('sel');
-      fly.innerHTML=`<div class="lgft">${gp.ico} ${gp.n}</div>`+gp.acts.map(k=>{const a=LG_ACT.find(x=>x[0]===k); if(!a) return ''; const [,key,ico,name]=a; return `<button type="button" class="lgb" role="menuitem" data-b="${k}" aria-label="${name} (${key.toUpperCase()})" title="${name}"><span class="ic">${ico}</span><i>${key.toUpperCase()}</i><small>${LG_COST[k]?Object.entries(LG_COST[k]).map(([r,v])=>RES_ICO[r]+v).join(''):name}</small></button>`;}).join('');
+      fly.innerHTML=`<div class="lgft">${gp.ico} ${gp.n}</div>`+gp.acts.map(k=>{const a=LG_ACT.find(x=>x[0]===k); if(!a) return ''; const [,key,ico,name]=a; return `<button type="button" class="lgb" role="menuitem" data-b="${k}" aria-label="${name} (${key?kbLab(key):''})" title="${name}"><span class="ic">${ico}</span><i>${key?kbLab(key):''}</i><small>${LG_COST[k]?Object.entries(LG_COST[k]).map(([r,v])=>RES_ICO[r]+v).join(''):name}</small></button>`;}).join('');
       fly.hidden=false; fly.querySelectorAll('.lgb').forEach(b=>{const fire=ev=>{ev.preventDefault(); ev.stopPropagation(); lgmAct(b.dataset.b); if(b.dataset.b!=='rally') close(); lgmBar(true);}; b.addEventListener('click',fire); b.addEventListener('touchstart',fire,{passive:false});}); lgmBar(true);};
     el.querySelectorAll('.lgg').forEach(b=>{const fire=ev=>{ev.preventDefault(); ev.stopPropagation(); open(b.dataset.g);}; b.addEventListener('click',fire); b.addEventListener('touchstart',fire,{passive:false});});
     el.addEventListener('keydown',e=>{if(e.key==='Escape') close();}); el._close=close; el._open=open;}

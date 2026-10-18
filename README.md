@@ -19,6 +19,12 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## ⌨️ Version 7.5: custom keybinds
+- A new **⌨️ Keybinds** screen lets you move any key in the whole game to any other key: moving, attacking, rolling, potions, artifacts, the pack and map, every Legends build, army and travel key, and the Town Halls panels.
+- Open it from the title screen, the isle map (**⌨️ Keys**), the pause menu, or How to Play. Click an action, then press the new key. If that key is already in use, the two keys swap so nothing is lost. **Reset all** puts the defaults back.
+- The key hints on screen (the hotbar, the control tips and the Legends menu buttons) change to show your keys.
+- Your keybinds are saved with your progress.
+
 ## 🔦 Version 7.4.2: a lighter Deep Dark
 - The Deep Dark is now **twice as bright**, both the Legends mine (all of it in Legends 2) and the Deep Dark island in the main adventure. The sculk still glows, but you can see the floor, the walls and the monsters coming much further away.
 
