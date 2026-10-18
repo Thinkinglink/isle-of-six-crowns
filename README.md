@@ -19,6 +19,16 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🏛️ Version 7.4: Town Halls and a reshaped Legends island
+- **Town Halls (new mode, 🏛️ in Modes):** run your own town from a high, angled city view with no hero on screen. Drag or use WASD to pan, scroll to zoom, and click any building (or its name tag) to manage it.
+  - **Citizens panel (C):** assign every citizen as a guard, a warrior (trained at the Barracks) or a worker in a specific factory, with −5/−/+/+5 controls, caps, staffing efficiency, output per minute and food upkeep on every row. Auto-assign, Release workers and Garrison do it in bulk.
+  - **Buildings (U):** the Town Hall, Farms, Mineshafts, Lumber Mills, Houses, Market Stalls, Watchtowers, Ballista Bastions, Spiked Barricades, a Barracks and a Trading Post, each with 10 levels. Costs are paid in gold, wood, stone and minerals, with build timers and 1 to 3 builders. No building may pass the Town Hall's level.
+  - **Invasions:** each dusk bell (every 150 seconds), a town or territory with fewer than 3 defenses has a 30% chance of being raided. Raiders storm a gate and loot the market stalls, then the Town Hall. Guards hold their posts and rush to any stall under attack, warriors hunt the raiders nearest the Town Hall, and the towers and ballistas shoot.
+  - **Realm (R):** march warriors to conquer five lands, each making food, wood, stone, minerals or gold. Develop and fortify them, and send caravans home with travel times, load limits, escorts against bandits, and auto-shipping when a land's stores fill up. Every conquest pushes your town border out and opens new building plots.
+  - Production, construction, training, marches and caravans keep running while you are away, for up to 4 hours.
+- **Mountains, hills and cliffs on the main island (Legends 1 and 2):** about 40 terrain areas now rise out of the wilderness across every land. They include mountain ranges with snowy peaks, terraced hills with ramps and cliffs, and cliff-ringed mesas with one ramp up. They take on each land's own colours and trees, and stay clear of fortresses, villages, wells, mines and water. Everything else stays reachable on foot.
+- **Sky Siege has been removed.**
+
 ## 🔒 Version 7.3: Tamper protection
 - **Signed saves:** every save is now signed by the game. If a save is edited outside the game, the edited numbers (diamonds, resources and other counters) are put back to their last real values, items added from outside are removed, and the save is flagged as modified. Real progress is never deleted.
 - **Inspect shortcuts closed:** the developer-tools keys (F12, Ctrl/Cmd+Shift+I/J/C/K), view source (Ctrl/Cmd+U), save page (Ctrl/Cmd+S) and the right-click menu are blocked in the game. Text inputs still work normally.
