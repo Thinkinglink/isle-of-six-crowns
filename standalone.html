@@ -1321,7 +1321,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='7.4.1', SAVE_VERSION=7;
+const APP_VERSION='7.4.2', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -4290,7 +4290,7 @@ const B3={
  tempest:{void:0x0e1218,sky:0xb8c8dc,gnd:0x2a3240,sun:0xd8e8ff,hi:.75,si:.8,rock:0x4a525e,top:0x8a94a4,tree:'stormpillar',floorDeco:['pebble','shardD','pebble'],fl:[0x5a6270,0x4e5664,0x666e7c]},
  temple:{void:0x0c140a,sky:0xd8e8b0,gnd:0x2a3a1a,sun:0xfff0b0,hi:.8,si:.95,rock:0x6a6650,top:0x6a8a3a,tree:'jungletree',floorDeco:['tuft','vineD','flower','tuft'],fl:[0x4a5a3a,0x5a6a42,0x6a6248]},
  reef:{void:0x041a24,sky:0x7fd8e8,gnd:0x0a2a3a,sun:0x9fefff,hi:.85,si:.7,rock:0x1e4a52,top:0x3a8a8a,tree:'coral',floorDeco:['kelpD','shellD','coralbit','kelpD'],fl:[0x2a5a6a,0x245262,0x346a72],pool:0x0a3a4a,fogN:9,fogF:30},
- deepdark:{void:0x070e13,sky:0x7295ac,gnd:0x121b22,sun:0xb5d0eb,hi:1.07,si:.95,bright:1,rock:0x252f38,top:0x354854,tree:'gloomspire',floorDeco:['veinD','pebble','veinD','boneD'],fl:[0x2a363f,0x232e37,0x313d46],pool:0x123a3a,fogN:12,fogF:35},
+ deepdark:{void:0x0e1c26,sky:0x7295ac,gnd:0x24364a,sun:0xb5d0eb,hi:1.6,si:1.4,bright:1,rock:0x3a4a58,top:0x50687a,tree:'gloomspire',floorDeco:['veinD','pebble','veinD','boneD'],fl:[0x3e505e,0x34454f,0x485a68],pool:0x1c5454,fogN:24,fogF:70},
  sculk:{void:0x01080a,sky:0x3a8a8a,gnd:0x041010,sun:0x8affff,hi:.85,si:.75,rock:0x0a1e22,top:0x123a40,tree:'veintree',floorDeco:['veinD','veinD','pebble'],fl:[0x10242a,0x0c1e22,0x163036],pool:0x04302e,fogN:8,fogF:28},
  monarch:{void:0x120a1a,sky:0xe8c8ff,gnd:0x2a1a3a,sun:0xffe0a0,hi:.8,si:.95,rock:0x3a2a4a,top:0x6a4a8a,tree:'royalbanner',floorDeco:['flower','pebble','tuft'],fl:[0x3a2a4a,0x42304f,0x4c3a5a]},
  harmony:{void:0x0e1a0a,sky:0xe8fff0,gnd:0x3a6a2a,sun:0xfff8e0,hi:.9,si:1.05,rock:0x6a8a4a,top:0x7ac04a,tree:'bigflower',floorDeco:['flower','tuft','flower','tuft'],fl:[0x5a9a3a,0x68a844,0x7ab04e]},
@@ -7578,7 +7578,7 @@ function lgTowerTop(B,sty){const ST=LG_STYLE[sty]||LG_STYLE[0], cc=M(ST.crenC,{r
   add(B,gCone,M('#1e1830',{flatShading:true}),0,2.3,0,.3,1,.3); return add(B,gSph,glow('#b48aff',2),0,2.95,0,.13,.2,.13);}
 /* ---------------- the mineshaft and the crafting hut ---------------- */
 const MINE_ENV={void:0x050507,sky:0x07080c,gnd:0x2a2622,sun:0xffe0b0,hi:.7,si:.45,rock:0x4a4440,top:0x2e2a28,tree:'stalag',floorDeco:['pebble','rubbleD','stalag','crate','lantern','pebble'],fl:[0x4a4038,0x544a40,0x3e3630]};
-const DEEP_ENV={void:0x020306,sky:0x020306,gnd:0x0a1418,sun:0x60d0e0,hi:.4,si:.2,rock:0x10181c,top:0x0b2026,tree:'stalag',floorDeco:['sculkD','sculkD','sculkVein','sculkVein','sculkSensor','shrieker','sculkD','pebble'],fl:[0x0c1c22,0x0a161c,0x10262c]};
+const DEEP_ENV={void:0x121e26,sky:0x121e26,gnd:0x1c3440,sun:0x60d0e0,hi:1.1,si:.55,rock:0x2a3c46,top:0x1e5060,tree:'stalag',floorDeco:['sculkD','sculkD','sculkVein','sculkVein','sculkSensor','shrieker','sculkD','pebble'],fl:[0x22485a,0x1c3c4a,0x2a5a6c]};
 const lgInMine=(x,y)=>{const m=LGMS&&LGMS.D.mine; if(!m) return false; const tx=x/T, ty=y/T; return tx>=m.x0-3&&ty>=m.y0-3&&tx<m.x1+3&&ty<m.y1+3;};
 function lgmMineGo(d,into){const C=LGMS; C.mineCd=2.5; const tx=into?d.ex.x:d.x, ty=into?d.ex.y:d.y;
   puff(P.x,P.y,'#8a7a6a',30,160,.7,6); P.x=tx; P.y=ty+(into?110:130); P.iframe=Math.max(P.iframe||0,1.5); for(const a of allies){a.x=P.x+rand(-50,50); a.y=P.y+rand(10,50);} for(const s of C.sprites) s.done=true; C.rally=null; C.ride=false;
@@ -9708,7 +9708,7 @@ function lgmDayLight(){const C=LGMS, t=C.day%300, k=t<200?1:t<215?1-(t-200)/15*.
   if(C.region===-2){const dk=new THREE.Color('#161a22'); scene.background=dk; if(scene.fog){scene.fog.color.copy(dk); scene.fog.near=20; scene.fog.far=80;} sun.intensity=.6; hemi.intensity=1.4;}
   if(C.dive){const w=new THREE.Color('#0a3a5a'); scene.background=w; if(scene.fog){scene.fog.color.copy(w); scene.fog.near=3; scene.fog.far=22;} hemi.intensity=.8;}
   else if(C.region===-4){const dk=new THREE.Color('#060a16'); scene.background=dk; if(scene.fog){scene.fog.color.copy(dk); scene.fog.near=12; scene.fog.far=56;} sun.intensity=.3; hemi.intensity=.85;}
-  else if(C.region===-3){const dk=new THREE.Color('#020407'); scene.background=dk; if(scene.fog){scene.fog.color.copy(dk); scene.fog.near=6; scene.fog.far=30;} sun.intensity=.14; hemi.intensity=.42;}}
+  else if(C.region===-3){const dk=new THREE.Color('#121e26'); scene.background=dk; if(scene.fog){scene.fog.color.copy(dk); scene.fog.near=14; scene.fog.far=70;} sun.intensity=.4; hemi.intensity=1.15;}}
 function lgmTick(dt){const C=LGMS; if(!C||mode!=='play') return; C.lookT=Math.max(0,C.lookT-dt);
   // camera: keys turn it, and without the mouse lock it slowly swings behind you as you run
   if(keys['arrowleft']) C.yaw-=dt*2.2; if(keys['arrowright']) C.yaw+=dt*2.2; if(keys['arrowup']) C.pitch=clamp(C.pitch-dt,.18,.95); if(keys['arrowdown']) C.pitch=clamp(C.pitch+dt,.18,.95);

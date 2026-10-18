@@ -19,6 +19,9 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🔦 Version 7.4.2: a lighter Deep Dark
+- The Deep Dark is now **twice as bright**, both the Legends mine (all of it in Legends 2) and the Deep Dark island in the main adventure. The sculk still glows, but you can see the floor, the walls and the monsters coming much further away.
+
 ## 🌙 Version 7.4.1: towns that work while you're away, and hills everywhere
 - **Offline production:** your Town Hall keeps working while you're gone, for up to 24 hours. Farms, mills and mines keep producing (up to your storage caps), building upgrades finish, caravans arrive, citizens grow and raiders are fought off. When you come back, a **"While you were away"** report shows everything that happened.
 - **Rolling hills across the whole island:** in Legends 1 and 2, the ground now rises and falls everywhere, not only in the Highlands corner. There are more mountains and ranges too. Trees, rocks, shrines, resources and camps all sit on the slopes, and the minimap shows the shading of the hills.
