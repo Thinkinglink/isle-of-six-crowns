@@ -1,0 +1,9 @@
+{
+  "v": 1,
+  "t": 0,
+  "bans": [],
+  "resets": [],
+  "nerf": { "dmg": 1, "taken": 1, "shards": 1 },
+  "off": [],
+  "msg": ""
+}

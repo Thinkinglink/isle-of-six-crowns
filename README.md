@@ -19,6 +19,12 @@ Want it as an app with its own icon? Click **Install the app** in the game's men
 | **Android phones and tablets** | [Isle-of-Six-Crowns.apk](https://github.com/Thinkinglink/isle-of-six-crowns/raw/main/Isle-of-Six-Crowns.apk) | Open the file on your phone or tablet and tap **Install**. If asked, allow installing apps from your browser or Files app. |
 | **iPhone and iPad** | [Play in Safari](https://thinkinglink.github.io/isle-of-six-crowns/) | Open the link in **Safari**, tap the **Share** button, then **Add to Home Screen**. It gets its own icon and runs full screen. |
 
+## 🛡️ Version 7.6: admin control and safer publishing
+* **Your progress stays on your device.** Stats, upgrades and everything you earn are saved only on your own computer, phone or browser. Nothing about you is uploaded.
+* **Admin control:** the game's admin can ban or unban accounts, reset an account's progress, tune balance for everyone (damage dealt, damage taken, shards earned), pause game modes and send a message to all players. The game checks for these settings at most once every 5 minutes.
+* **Fewer update checks:** the apps look for updates every 5 minutes instead of every 3.
+* **Security:** Google code sign in is switched off and its secret was removed from the game. Sign in with your account name, email and account code instead. Accounts that were already signed in keep working.
+
 ## ⌨️ Version 7.5: custom keybinds
 - A new **⌨️ Keybinds** screen lets you move any key in the whole game to any other key: moving, attacking, rolling, potions, artifacts, the pack and map, every Legends build, army and travel key, and the Town Halls panels.
 - Open it from the title screen, the isle map (**⌨️ Keys**), the pause menu, or How to Play. Click an action, then press the new key. If that key is already in use, the two keys swap so nothing is lost. **Reset all** puts the defaults back.

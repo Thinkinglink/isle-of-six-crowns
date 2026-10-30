@@ -1328,7 +1328,7 @@ function persist(){if(!SAVE) return; try{localStorage.setItem(KEY,JSON.stringify
 /* Desktop app: save progress as a file on the computer */
 const DESK={on:typeof window.Neutralino!=='undefined'&&typeof window.NL_PORT!=='undefined',dir:null,t:0,writing:null};
 const isSave=s=>s&&s.eq&&s.eq.weapon;
-const APP_VERSION='7.5.0', SAVE_VERSION=7;
+const APP_VERSION='7.6.0', SAVE_VERSION=7;
 /* Upgrade saves from any older version in place: keep every bit of progress, add whatever new fields this version needs */
 function migrateSave(s){if(!isSave(s)) return null; if(s.lgSwap){try{s.lgm=s.lgm||{}; s.lgm.gear={eq:s.eq,inv:s.inv,shards:s.shards,arrows:s.arrows}; s.eq=s.lgSwap.eq; s.inv=s.lgSwap.inv; s.shards=s.lgSwap.shards; s.arrows=s.lgSwap.arrows; delete s.lgSwap;}catch(e){}} const old=s.v||1;
   s.cleared=s.cleared&&typeof s.cleared==='object'?s.cleared:{}; s.inv=Array.isArray(s.inv)?s.inv.filter(Boolean):[];
@@ -1908,7 +1908,7 @@ function updLoot(dt){
   for(const o of loot){o.t+=dt; if(o.vz||o.z>0){o.z+=o.vz*dt; o.vz-=500*dt; moveCirc({x:o.x,y:o.y,r:4},0,0); const nx=o.x+o.vx*dt,ny=o.y+o.vy*dt; if(!solid(nx,ny)){o.x=nx;o.y=ny;} if(o.z<=0){o.z=0;o.vz=0;o.vx=o.vy=0;}}
     if(P.dead||o.t<.4) continue; const d=Math.hypot(P.x-o.x,P.y-o.y);
     if(o.kind!=='item'&&d<90){o.x+=(P.x-o.x)*dt*8; o.y+=(P.y-o.y)*dt*8;}
-    if(d<24){ if(o.kind==='shard'){const a=o.amt*(Math.random()<.1*upLv('for')?2:1); SAVE.shards+=a; run.shards+=a; o.gone=true; sfx('shard');}
+    if(d<24){ if(o.kind==='shard'){const a=o.amt*(Math.random()<.1*upLv('for')?2:1); SAVE.shards+=Math.round(ctlK('shards')*a); run.shards+=a; o.gone=true; sfx('shard');}
       else if(o.kind==='arrows'){SAVE.arrows=Math.min(arrowCap(),SAVE.arrows+o.amt); o.gone=true; toast('+'+o.amt+' arrows');}
       else if(o.kind==='item'){ {SAVE.inv.push(o.item); run.items++; sfx('loot',o.item.rar); if(o.item.cid){SAVE.found=SAVE.found||{}; if(!SAVE.found[o.item.cid]){SAVE.found[o.item.cid]=1; setTimeout(()=>toast('New Codex entry','#c9a6ff'),300);}} o.gone=true; toast(o.item.name,RAR[o.item.rar].col); persist();}}
       if(o.gone) refreshSlots(); } }
@@ -1947,7 +1947,7 @@ function gauntReward(n){const tierBi=Math.max(...GAUNT.list.slice(0,Math.max(1,M
   for(let k=0;k<nItems;k++){const bi=GAUNT.list[k%GAUNT.list.length]; const it=bossItem(choice(['weapon','armor','artifact']),BIOMES[bi].boss,tierBi); if(it) r.items.push(it);}
   if(n>=5) r.items.push(makeCursed(tierBi)); if(n>=8) r.items.push(randomItem(tierBi,2)); return r;}
 function gauntGrant(){if(!GAUNT||GAUNT.granted) return null; GAUNT.granted=true; const n=GAUNT.beaten, r=gauntReward(n), oldBest=SAVE.gBest||0;
-  SAVE.shards+=r.shards; for(const it of r.items) SAVE.inv.push(it); if(n>oldBest) SAVE.gBest=n; SAVE.gRuns=(SAVE.gRuns||0)+1; persist(); r.newBest=n>oldBest; r.oldBest=oldBest; return r;}
+  SAVE.shards+=Math.round(ctlK('shards')*r.shards); for(const it of r.items) SAVE.inv.push(it); if(n>oldBest) SAVE.gBest=n; SAVE.gRuns=(SAVE.gRuns||0)+1; persist(); r.newBest=n>oldBest; r.oldBest=oldBest; return r;}
 function gauntEnd(reason){if(!GAUNT||GAUNT.over) return; GAUNT.over=true; const r=gauntGrant()||{shards:0,items:[]}; const n=GAUNT.beaten;
   persist(); mode='result'; $('#result').hidden=false; gauntHud();
   $('#resTitle').textContent=reason==='dead'?'You fell in Infinite Bosses':'Infinite Bosses complete';
@@ -1980,7 +1980,7 @@ function openModes(){let p=$('#modesPanel'); if(!p){p=document.createElement('di
   p.innerHTML=`<div class="stBox modesbox"><h2 id="modesTitle">Game modes</h2><div class="modegrid">${MODES.map(m=>{const sub=m.id==='arena'?(SAVE?`${SAVE.arenaWins||0} arena wins`:'Start an expedition first'):m.id==='leg'?lgModeSub():m.id==='dun'?(SAVE?`${(SAVE.dun&&SAVE.dun.wins)||0} rescues · ${(SAVE.dun&&SAVE.dun.escapes)||0} escapes`:'Start an expedition first'):m.id==='gaunt'?(SAVE?(nb?`${nb} boss${nb>1?'es':''} ready · best run ${SAVE.gBest||0} · crest +${crestLv()}%`:'Beat an island boss to unlock'):'Start an expedition first'):m.id==='adv'?(SAVE?'Continue your expedition':'Start a new expedition'):'';
     return `<button class="modecard${m.soon?' soon':''}${m.id==='leg'&&SAVE&&SAVE.lg2anim?' stone':''}" data-mode="${m.id}" ${m.soon?'aria-disabled="true"':''}><span class="mico" aria-hidden="true">${m.ico}</span><b>${m.id==='leg'&&SAVE&&SAVE.lg2unlock&&!SAVE.lg2anim?'Legends 2':m.n}</b><span class="md">${m.id==='leg'&&SAVE&&SAVE.lg2unlock&&!SAVE.lg2anim?L2DESC:m.d}</span>${m.soon?`<span class="mtag">${m.id==='dun'?'Coming in the next update':'Coming soon'}</span>`:sub?`<span class="msub">${sub}</span>`:''}</button>`;}).join('')}</div><button class="btn small" id="modesClose">Close</button></div>`;
   p.querySelector('#modesClose').onclick=()=>{p.hidden=true;}; lgModeAnim(p);
-  p.querySelectorAll('.modecard').forEach(b=>b.onclick=()=>{const id=b.dataset.mode;
+  p.querySelectorAll('.modecard').forEach(b=>{if(ctlOff(b.dataset.mode)){b.classList.add('soon'); const t=document.createElement('span'); t.className='mtag'; t.textContent='Paused by the admin'; b.appendChild(t);}}); p.querySelectorAll('.modecard').forEach(b=>b.onclick=()=>{const id=b.dataset.mode; if(ctlOff(id)){toast('🔒 This mode is paused by the admin for now'); return;}
     if(id==='adv'){p.hidden=true; if(SAVE) openMap(); else $('#btnNew').click(); return;}
     if(id==='gaunt'){if(!SAVE||!gauntList().length){startGauntlet(); return;} p.hidden=true; startGauntlet(); return;}
     if(id==='dun'){p.hidden=true; startDungeon(); return;}
@@ -2099,7 +2099,7 @@ function dunReward(kind){const tier=L?L.tier:0, r={shards:0,items:[]};
   else {r.shards=60+30*(DUN.freed||0); r.items.push(randomItem(tier,DUN.freed>=DUN.total?2:1)); if(DUN.freed>=DUN.total) r.items.push(randomItem(tier,1));}
   return r;}
 function dunEnd(kind){if(!DUN||DUN.over) return; DUN.over=true; const D=dunSave(), r=dunReward(kind);
-  SAVE.shards+=r.shards; for(const it of r.items) if(it) SAVE.inv.push(it); if(kind==='rescue'){D.wins++; D.best=Math.max(D.best||0,Math.round(DUN.left));} else D.escapes++;
+  SAVE.shards+=Math.round(ctlK('shards')*r.shards); for(const it of r.items) if(it) SAVE.inv.push(it); if(kind==='rescue'){D.wins++; D.best=Math.max(D.best||0,Math.round(DUN.left));} else D.escapes++;
   D.seed=(Math.random()*1e9)|0; persist(); mode='result'; $('#result').hidden=false; dunHud();
   $('#resTitle').textContent=kind==='rescue'?'Prisoner rescued!':'You escaped!';
   $('#resSub').textContent=(kind==='rescue'?`${DUN.prisoner.name} is free, with ${Math.floor(DUN.left/60)}:${String(Math.floor(DUN.left%60)).padStart(2,'0')} to spare.`:`You broke out of the Prison Below with ${DUN.freed} of ${DUN.total} prisoners.`)+' Your rewards are in your pack. The dungeon has shifted: next time the whole map will be different.';
@@ -5230,7 +5230,7 @@ $('#invTools').addEventListener('click',e=>{const f=e.target.closest('[data-f]')
 $('#invSort').onchange=e=>{invSort=e.target.value; renderInv();};
 $('#salvCommon').onclick=()=>{const b=$('#salvCommon'); const cs=SAVE.inv.filter(it=>it.rar==='common'); if(!cs.length) return;
   if(!b.dataset.armed){b.dataset.armed='1'; b.textContent=`Click again to salvage ${cs.length}`; setTimeout(()=>{delete b.dataset.armed; renderInv();},5000); return;}
-  delete b.dataset.armed; let got=0; for(const it of cs) got+=Math.round(it.pow/4*RAR.common.m); SAVE.inv=SAVE.inv.filter(it=>it.rar!=='common'); SAVE.shards+=got; if(invSel&&invSel.where==='bag'&&!SAVE.inv.find(x=>x.id===invSel.id)) invSel=null; persist(); renderInv(); if(P) refreshSlots();};
+  delete b.dataset.armed; let got=0; for(const it of cs) got+=Math.round(it.pow/4*RAR.common.m); SAVE.inv=SAVE.inv.filter(it=>it.rar!=='common'); SAVE.shards+=Math.round(ctlK('shards')*got); if(invSel&&invSel.where==='bag'&&!SAVE.inv.find(x=>x.id===invSel.id)) invSel=null; persist(); renderInv(); if(P) refreshSlots();};
 $('#equipBest').onclick=()=>{const E=SAVE.eq, pool=SAVE.inv, slots=['a1','a2','a3','a4','a5','a6','a7','a8']; let n=0;
   for(const sl of ['weapon','armor']){let best=E[sl]; for(const it of pool) if(it.slot===sl&&(!best||it.pow>best.pow)) best=it; if(best&&best!==E[sl]){pool.splice(pool.indexOf(best),1); if(E[sl]) pool.push(E[sl]); E[sl]=best; n++;}}
   const arts=slots.map(k=>E[k]).filter(Boolean).concat(pool.filter(it=>it.slot==='artifact')).sort((a,b)=>b.pow-a.pow), keep=arts.slice(0,8);
@@ -5644,7 +5644,7 @@ function victoryCine(b){const bx=b.x*S,bz=b.y*S,px=P.x*S,pz=P.y*S, cols=['#c9e27
    {dur:3.6,text:'Far beyond the reef, storm clouds gather over islands no map has named. A new map has opened.',cam:dolly([px,3,pz+4,px,1,pz-20],[px,6,pz+2,px,2,pz-40])}];}
 /* ---------------- Google sign-in + account name ---------------- */
 // Fill these in to switch Google sign-in on. Web = "Web application" client, Device = "TVs and Limited Input devices" client.
-const GOOGLE_AUTH={webClientId:'',deviceClientId:'613022041641-ncjhv5n6a3jvt46v22r5v2fbesi1p22u.apps.googleusercontent.com',deviceClientSecret:'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'};
+const GOOGLE_AUTH={webClientId:'',deviceClientId:'',deviceClientSecret:''};
 const NAME_RE=/^[A-Za-z0-9 _\-]{3,16}$/;
 let authBusy=null, pendingGoogle=null;
 function authEnv(){ if(window.__forceAuth) return window.__forceAuth;
@@ -5791,8 +5791,8 @@ async function safeInstall(m){await writePkg(await downloadPkg(m));}
 const withTimeout=(p,ms)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),ms))]);
 async function getJSON(url,headers){const r=await withTimeout(fetch(url,{cache:'no-store',headers:headers||{}}),5000); if(!r.ok) throw new Error('http '+r.status); return JSON.parse(await r.text());}
 // Ask GitHub two ways and keep the newest answer: its raw copy can lag up to 5 minutes after an upload.
-async function getManifest(){const tries=[getJSON(UPDATE_URL+'?t='+Date.now())];
-  if(/raw\.githubusercontent\.com/.test(UPDATE_URL)) tries.push(getJSON(UPDATE_API+'update.json?ref=main&t='+Date.now(),{Accept:'application/vnd.github.raw'}));
+async function getManifest(full){const tries=[getJSON(UPDATE_URL+'?t='+Date.now())];
+  if(full&&/raw\.githubusercontent\.com/.test(UPDATE_URL)) tries.push(getJSON(UPDATE_API+'update.json?ref=main&t='+Date.now(),{Accept:'application/vnd.github.raw'}));
   const ok=(await Promise.allSettled(tries)).filter(r=>r.status==='fulfilled'&&r.value&&r.value.version&&r.value.resourcesURL&&(!window.NL_APPID||r.value.applicationId===NL_APPID)).map(r=>r.value);
   if(!ok.length) throw new Error('no manifest'); return ok.reduce((a,b)=>isNewer(b.version,a.version)?b:a);}
 async function fetchManifest(){if((!DESK.on&&!ANDROID)||!UPDATE_URL) return null; try{const m=await getManifest(); return isNewer(m.version,APP_VERSION)?m:null;}catch(e){return null;}}
@@ -5826,7 +5826,7 @@ async function manualUpdate(){const btn=$('#updBtn');
   btn.disabled=true;
   if(DESK.pkg&&isNewer(DESK.pkg.m.version,APP_VERSION)){btn.textContent='Updating…'; try{await applyUpdate(DESK.pkg); return;}catch(e){$('#closeUpd').hidden=true; btn.disabled=false; btn.textContent='Update'; installFailMsg(DESK.pkg.m.version); return;}}
   btn.textContent='Checking…';
-  let m; try{m=await getManifest();}catch(e){btn.disabled=false; btn.textContent='Update'; updMsg('Couldn\'t check for updates','Make sure you\'re connected to the internet, then try again.'); return;}
+  let m; try{m=await getManifest(true);}catch(e){btn.disabled=false; btn.textContent='Update'; updMsg('Couldn\'t check for updates','Make sure you\'re connected to the internet, then try again.'); return;}
   if(!m||!m.version||!isNewer(m.version,APP_VERSION)){btn.disabled=false; btn.textContent='Update'; updMsg('You\'re up to date',`Version ${APP_VERSION} is the newest version.`); return;}
   const ov=$('#closeUpd'); ov.hidden=false; ov.querySelector('b').textContent=`Updating to version ${m.version}…`; ov.querySelector('p').textContent='Installing the newest changes. Your progress is saved and will be kept. The game restarts by itself when it\'s done.';
   try{const buf=await withTimeout(downloadPkg(m),120000); await applyUpdate({m,buf});}
@@ -5845,7 +5845,7 @@ async function androidUpdate(auto){let m; try{m=await getManifest();}catch(e){if
   catch(e){DESK.updating=false; $('#closeUpd').hidden=true; if(!auto) updMsg('The update didn\'t install',`Version ${w.version} couldn't be downloaded. Check your connection and press Update again. Your progress is kept.`,0); return false;}}
 async function prepareUpdate(){const m=await fetchManifest(); if(!m) return null; if(DESK.pkg&&DESK.pkg.m.version===m.version) return DESK.pkg;
   try{const buf=await withTimeout(downloadPkg(m),180000); DESK.pkg={m,buf}; return DESK.pkg;}catch(e){return null;}}
-setInterval(()=>{if(DESK.on) prepareUpdate();},3*60000);
+setInterval(()=>{if(DESK.on) prepareUpdate();},5*60000);
 // Right after launch, on the main menu: if a newer version is ready, put it in place straight away (about a second).
 async function checkForUpdate(){if(ANDROID){androidUpdate(true); return;} const t0=performance.now(); const p=await prepareUpdate(); if(!p) return;
   if(mode==='menu'&&$('#signin').hidden&&performance.now()-t0<45000){try{await applyUpdate(p,true); return;}catch(e){$('#closeUpd').hidden=true;}}
@@ -8004,9 +8004,9 @@ function arenaWave(){const A=ARENA; A.wave++; const cx=21.5*T, cy=10*T;
   else if(A.mode==='team') ['melee','ranged','lunge','brute'].forEach((t,i)=>arenaChamp(t,cx+(i-1.5)*90,cy,3.5));
   else {const n=3+A.wave*2; for(let i=0;i<n;i++){const a=i/n*Math.PI, e=arenaChamp(choice(['melee','ranged','lunge','bomb']),cx+Math.cos(a)*260,cy+Math.sin(a)*120,1+.3*A.wave); if(e&&i>0) e.name=null;} if(A.wave===5) arenaChamp('brute',cx,cy,10); banner(`Wave ${A.wave} of 5`,A.wave===5?'The arena champion enters!':'Here they come');}}
 function arenaTick(dt){const A=ARENA; if(!A||A.over||mode!=='play') return; A.t+=dt; if(!A.pvp) arenaBots(dt);
-  if(A.pvp){if(P.dead){const mm={t:'pvpdead',who:MP.code}; if(MP.role==='host') bcast(mm); else toHost(mm); A.over=true; A.won=false; run.victory=false; run.endT=1.4; return;} const my=A.team[MP.code], foes=Object.keys(A.team).filter(c=>A.team[c]!==my); if(foes.length&&foes.every(c=>A.dead.has(c))){A.over=true; A.won=true; SAVE.arenaWins=(SAVE.arenaWins||0)+1; const sh=200; SAVE.shards+=sh; A.rew={sh,it:null}; persist(); run.victory=true; run.endT=1.4; if(typeof sfx==='function') sfx('win');} return;} if(ents.some(e=>e.arena&&e.hp>0)) return;
+  if(A.pvp){if(P.dead){const mm={t:'pvpdead',who:MP.code}; if(MP.role==='host') bcast(mm); else toHost(mm); A.over=true; A.won=false; run.victory=false; run.endT=1.4; return;} const my=A.team[MP.code], foes=Object.keys(A.team).filter(c=>A.team[c]!==my); if(foes.length&&foes.every(c=>A.dead.has(c))){A.over=true; A.won=true; SAVE.arenaWins=(SAVE.arenaWins||0)+1; const sh=200; SAVE.shards+=Math.round(ctlK('shards')*sh); A.rew={sh,it:null}; persist(); run.victory=true; run.endT=1.4; if(typeof sfx==='function') sfx('win');} return;} if(ents.some(e=>e.arena&&e.hp>0)) return;
   if(A.mode==='raid'&&A.wave<5){arenaWave(); return;}
-  A.over=true; A.won=true; SAVE.arenaWins=(SAVE.arenaWins||0)+1; const sh=120+40*A.tier; SAVE.shards+=sh; const it=randomItem(Math.min(27,A.tier),2); if(it) SAVE.inv.push(it); A.rew={sh,it}; persist(); run.victory=true; run.endT=1.4; if(typeof sfx==='function') sfx('win');}
+  A.over=true; A.won=true; SAVE.arenaWins=(SAVE.arenaWins||0)+1; const sh=120+40*A.tier; SAVE.shards+=Math.round(ctlK('shards')*sh); const it=randomItem(Math.min(27,A.tier),2); if(it) SAVE.inv.push(it); A.rew={sh,it}; persist(); run.victory=true; run.endT=1.4; if(typeof sfx==='function') sfx('win');}
 function arenaResult(kind){const A=ARENA; A.over=true; mode='result'; $('#result').hidden=false; const won=kind!=='dead'&&A.won, m=ARENA_MODES.find(x=>x.id===A.mode);
   $('#resTitle').textContent=won?`${m.n} won!`:`You fell in the Arena`; $('#resSub').textContent=won?'The crowd roars. Your prize is in your pack.':'The rival champions win this round. Train, upgrade your gear and try again.';
   const t=Math.round(A.t); $('#resStats').innerHTML=`<dt>Mode</dt><dd>${m.n}</dd>${A.mode==='raid'?`<dt>Waves</dt><dd>${A.wave} of 5</dd>`:''}<dt>Fight time</dt><dd>${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}</dd><dt>Arena wins</dt><dd>${SAVE.arenaWins||0}</dd>${won&&A.rew?`<dt>Diamonds won</dt><dd>${A.rew.sh}</dd><dt>Gear won</dt><dd>${A.rew.it?esc(A.rew.it.name):'none'}</dd>`:''}`;
@@ -8793,7 +8793,7 @@ function corrTick(dt){const C=CORR; if(!C||mode!=='play') return; C.t+=dt; C.inv
   C.rwT-=dt; if(C.rwT<=0){C.rwT=rand(18,30); const r=choice(CORR_RULES); C.rule=r[0]; C.ruleT=9; banner('⚠ REALITY REWRITE',r[1]); flashT=.3; flashCol='#ff2adf'; shake(5); if(C.rule==='slow'){C.ts=.6; C.tsT=9;} if(C.rule==='fast'){C.ts=1.5; C.tsT=9;} if(C.rule==='inv') C.inv=9;}
   if(C.ruleT>0){C.ruleT-=dt; if(C.rule==='haste') for(const e of ents) if(!e.st&&e.hp>0) e.stun=0; if(C.ruleT<=0) C.rule=null;}
   corrFx(.45+(C.rule?.4:0)+(C.inv>0?.2:0)); const el=$('#corrFx'); if(el) el.classList.toggle('dark',C.rule==='dark');}
-function corrNext(){const C=CORR; C.depth++; const sh=10+C.depth*4; SAVE.shards+=sh; let msg=`+${sh} diamonds`;
+function corrNext(){const C=CORR; C.depth++; const sh=10+C.depth*4; SAVE.shards+=Math.round(ctlK('shards')*sh); let msg=`+${sh} diamonds`;
   if(C.depth%3===1){const it=randomItem(Math.min(27,C.depth*3+4),2); if(it){it.name='Corrupted '+it.name; it.pow=Math.round(it.pow*1.25); it.corrupt=true; SAVE.inv.push(it); C.items.push(it.name); msg+=` · ${it.name}`;}}
   SAVE.corrBest=Math.max(SAVE.corrBest||0,C.depth); persist(); banner(`Fragment restored · depth ${C.depth}`,msg); setTimeout(()=>{if(CORR) corrLevel();},1400);}
 function corrResult(kind){const C=CORR; mode='result'; $('#result').hidden=false; $('#resTitle').textContent='Your file was corrupted'; $('#resSub').textContent=`You reached depth ${C.depth}. Corrupted gear you found is in your pack.`;
@@ -9110,7 +9110,7 @@ function skyTick(dt){const S2=SKY; if(!S2||mode!=='play') return; S2.t+=dt; S2.c
 function skyHurt(d,o){const S2=SKY; if(!o||(!o.proj&&!o.aa)) return; d*=1-S2.armor; S2.hp-=d; P.flash=.12; ftext(P.x,P.y-50,'-'+Math.round(d),'#ff9a8a'); shake(2); if(S2.hp<=0&&!P.dead){P.dead=true; run.victory=false; run.endT=1.6; puff(P.x,P.y,'#ff6a2a',60,300,.9,8); if(S2.mesh) S2.mesh.visible=false; banner('Your airship goes down!','');}}
 function skyHud(){let el=$('#skyHud'); if(!el){el=document.createElement('div'); el.id='skyHud'; el.setAttribute('role','status'); $('#hud').appendChild(el);} if(!SKY){el.hidden=true; return;} const S2=SKY; el.hidden=false; const W1=SHIP_WPN[S2.cfg.w1], W2=SHIP_WPN[S2.cfg.w2], tw=S2.towers.filter(t=>t.hp>0).length;
   el.innerHTML=`<b>⛵ ${SHIP_HULL[S2.cfg.hull].n}</b> <span class="sbar"><i style="width:${Math.max(0,S2.hp/S2.max*100)}%"></i></span> ${Math.max(0,Math.round(S2.hp))}/${Math.round(S2.max)}<br>🖱️L ${W1.n} ${S2.cd[0]>0?'⏳':'✅'} · 🖱️R ${W2.n} ${S2.cd[1]>0?'⏳':'✅'} · F 🪂 ${S2.drop>0?Math.ceil(S2.drop)+'s':'ready'}<br>🚪 Gate ${S2.gateDown?'broken ✓':'standing'} · 🗼 Towers ${tw} · ❤️ Heart ${S2.heart?Math.max(0,Math.round(S2.heart.hp/S2.heart.max*100)):0}%`;}
-function skyResult(kind){const S2=SKY, C=skySave(); mode='result'; $('#result').hidden=false; const won=S2.won&&kind!=='dead'; let rew=''; if(won){const sh=80+30*C.mission; SAVE.shards+=sh; C.wins++; C.mission++; const it=randomItem(Math.max(0,L.bi),2); if(it) SAVE.inv.push(it); rew=`${sh} diamonds${it?' · '+esc(it.name):''}`;}
+function skyResult(kind){const S2=SKY, C=skySave(); mode='result'; $('#result').hidden=false; const won=S2.won&&kind!=='dead'; let rew=''; if(won){const sh=80+30*C.mission; SAVE.shards+=Math.round(ctlK('shards')*sh); C.wins++; C.mission++; const it=randomItem(Math.max(0,L.bi),2); if(it) SAVE.inv.push(it); rew=`${sh} diamonds${it?' · '+esc(it.name):''}`;}
   $('#resTitle').textContent=won?`Mission ${C.mission-1} won!`:'Your airship was shot down'; $('#resSub').textContent=won?'The fortress has fallen. The next mission has a bigger fortress.':'Try a sturdier hull, armored sails or a different weapon mix.';
   $('#resStats').innerHTML=`<dt>Ship</dt><dd>${SHIP_HULL[S2.cfg.hull].n} · ${SHIP_SAIL[S2.cfg.sail].n}</dd><dt>Weapons</dt><dd>${SHIP_WPN[S2.cfg.w1].n} + ${SHIP_WPN[S2.cfg.w2].n}</dd><dt>Time</dt><dd>${Math.floor(S2.t/60)}:${String(Math.round(S2.t)%60).padStart(2,'0')}</dd>${won?`<dt>Reward</dt><dd>${rew}</dd>`:''}`;
   $('#resRetry').hidden=false; $('#resRetry').textContent='Back to the shipyard'; persist();}
@@ -9718,6 +9718,111 @@ function townLabels(){const lb=$('#townLbl'); if(!lb||!TOWN) return; const S0=to
   for(const k in TOWN.lbl) if(!seen.has(k)){TOWN.lbl[k].remove(); delete TOWN.lbl[k];}}
 
 {const _om=openMap; openMap=function(){const r=_om.apply(this,arguments); try{if(SAVE&&SAVE.town&&!TOWN){townCatchUp(SAVE.town,true); const a=SAVE.town.away; if(a&&a.t>=60){const g=TRES.map(q=>{const v=Math.round(a.res[q]||0); return v>0?TICO[q]+'+'+v:'';}).filter(Boolean).join(' '); if(g) toast('🏛️ Your town produced '+g+' while you were away','#9fe0ff');}}}catch(e){} return r;};}
+/* ---------------- v7.6: admin control. Player progress lives only on each player's device. The admin steers the game through one small
+   file, control.json, in the game's GitHub repository. PERMANENT RULE: nothing ever writes to GitHub more than once every 5 minutes,
+   and players read the file at most once every 5 minutes per device. ---------------- */
+const GH_REPO='Thinkinglink/isle-of-six-crowns', GH_GAP=5*60*1000;
+const CTL_URL='https://raw.githubusercontent.com/'+GH_REPO+'/main/control.json';
+const CTL_API='https://api.github.com/repos/'+GH_REPO;
+const CTL_DEF={v:1,t:0,bans:[],resets:[],nerf:{dmg:1,taken:1,shards:1},off:[],msg:''};
+let CTL=JSON.parse(JSON.stringify(CTL_DEF));
+const ctlLS=(k,v)=>{try{if(v===undefined) return localStorage.getItem(KEY+'.'+k); localStorage.setItem(KEY+'.'+k,v);}catch(e){return null;}};
+function ctlNorm(c){const o=JSON.parse(JSON.stringify(CTL_DEF)); if(!c||typeof c!=='object') return o; o.t=+c.t||0; o.msg=String(c.msg||'').slice(0,300);
+  o.bans=Array.isArray(c.bans)?c.bans.filter(b=>b&&(b.code||b.name)).slice(0,500).map(b=>({code:String(b.code||'').trim().toUpperCase(),name:String(b.name||'').trim(),why:String(b.why||'').slice(0,140)})):[];
+  o.resets=Array.isArray(c.resets)?c.resets.filter(r=>r&&r.code).slice(0,200).map(r=>({code:String(r.code).trim().toUpperCase(),t:+r.t||0})):[];
+  const n=c.nerf||{}; for(const k of ['dmg','taken','shards']){const x=+n[k]; o.nerf[k]=isFinite(x)&&x>0?Math.min(5,Math.max(.1,x)):1;}
+  o.off=Array.isArray(c.off)?c.off.filter(x=>typeof x==='string').slice(0,20):[]; return o;}
+function ctlMe(){const p=SAVE&&SAVE.profile; return p?{code:String(p.code||'').toUpperCase(),name:String(p.name||'').toLowerCase()}:null;}
+function ctlBanned(){const me=ctlMe(); if(!me) return null; return CTL.bans.find(b=>(b.code&&b.code===me.code)||(!b.code&&b.name&&b.name.toLowerCase()===me.name))||null;}
+const ctlK=k=>(typeof isAdmin==='function'&&isAdmin())?1:(CTL.nerf[k]||1);
+const ctlOff=id=>CTL.off.includes(id)&&!(typeof isAdmin==='function'&&isAdmin());
+function ctlApply(){const b=ctlBanned(); let el=$('#banScr');
+  if(b){if(!el){el=document.createElement('div'); el.id='banScr'; el.setAttribute('role','alertdialog'); document.body.appendChild(el);}
+    el.innerHTML=`<div class="banbox"><div style="font-size:46px">⛔</div><h2>This account is banned</h2><p>The game's admin has banned <b>${esc(SAVE.profile.name)}</b> (code ${esc(SAVE.profile.code||'')}).</p>${b.why?`<p>Reason: ${esc(b.why)}</p>`:''}<p class="sm">If you think this is a mistake, ask the game's creator.</p></div>`;
+    el.hidden=false; if(typeof mode!=='undefined'&&mode==='play'){try{pause();}catch(e){}}}
+  else if(el) el.hidden=true;
+  // a one time progress reset the admin asked for, applied once per request
+  const me=ctlMe(); if(me&&me.code){const r=CTL.resets.find(x=>x.code===me.code); if(r&&r.t>(SAVE.ctlReset||0)){const prof=SAVE.profile, binds=SAVE.binds; SAVE=migrateSave(newSave()); delete SAVE._oldV; SAVE.profile=prof; if(binds) SAVE.binds=binds; SAVE.ctlReset=r.t; persist(); setTimeout(()=>{toast('🛡️ The admin reset this account\'s progress','#ffd36a'); try{location.reload();}catch(e){}},300); return;}}
+  if(CTL.msg&&ctlLS('ctlMsg')!==CTL.t+':'+CTL.msg){ctlLS('ctlMsg',CTL.t+':'+CTL.msg); setTimeout(()=>{try{banner('📣 From the admin',CTL.msg);}catch(e){toast('📣 '+CTL.msg);}},1200);}}
+// players: read control.json at most once every 5 minutes per device; the last copy is kept so it still applies offline
+function ctlLoadCache(){try{const c=JSON.parse(ctlLS('ctl')||'null'); if(c) CTL=ctlNorm(c);}catch(e){}}
+async function ctlFetch(force){const last=+ctlLS('ctlT')||0; if(!force&&Date.now()-last<GH_GAP) return false; ctlLS('ctlT',String(Date.now()));
+  try{const r=await withTimeout(fetch(CTL_URL+'?t='+Math.floor(Date.now()/GH_GAP),{cache:'no-store'}),8000); if(!r.ok) return false; const c=ctlNorm(JSON.parse(await r.text())); CTL=c; ctlLS('ctl',JSON.stringify(c)); if(SAVE) ctlApply(); return true;}catch(e){return false;}}
+ctlLoadCache(); setTimeout(()=>{if(SAVE) ctlApply(); ctlFetch();},2500); setInterval(()=>{if(SAVE) ctlApply(); ctlFetch();},60000);
+// nerfs: damage you deal, damage you take, shards you earn; modes the admin pauses
+{const _he=hurtE; hurtE=function(e,d,o){if(!(o&&o.enemy)&&e!==P) d*=ctlK('dmg'); return _he(e,d,o);};}
+{const _hp=hurtP; hurtP=function(d,o){return _hp(d*ctlK('taken'),o);};}
+// ---- the admin panel (only the admin sees it). Changes are collected, then published as one write, never more than once every 5 minutes
+const ADM={draft:null,busy:false,last:0,msg:''};
+function admNextOk(){return Math.max(+ctlLS('admPubT')||0,ADM.last||0)+GH_GAP;}
+async function admRemoteLast(tok){const r=await withTimeout(fetch(CTL_API+'/commits/main',{cache:'no-store',headers:Object.assign({Accept:'application/vnd.github+json'},tok?{Authorization:'Bearer '+tok}:{})}),8000); if(!r.ok) throw new Error('GitHub answered '+r.status); const j=await r.json(); return Date.parse(j.commit&&j.commit.committer&&j.commit.committer.date)||0;}
+function admStyle(){if($('#admCss')) return; const st=document.createElement('style'); st.id='admCss'; st.textContent=`
+#banScr{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background:rgba(10,4,8,.94);color:#fff}
+#banScr .banbox{max-width:440px;padding:28px;text-align:center;border:1px solid #7a2a3a;border-radius:16px;background:#1e0e16}
+#banScr .sm{color:#b89aa6;font-size:13px}
+#admPanel{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(4,8,18,.75)}
+#admPanel .aw{width:min(720px,95vw);max-height:90vh;overflow:auto;background:linear-gradient(#1a2238,#121a2c);border:1px solid #3a4a72;border-radius:14px;color:#e8ecf6;padding:18px 22px}
+#admPanel h2{margin:0 0 4px} #admPanel h3{margin:16px 0 6px;color:#ffd36a;font-size:15px}
+#admPanel .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0}
+#admPanel input,#admPanel textarea{padding:7px 9px;border-radius:8px;border:1px solid #3a4a72;background:#0e1424;color:#fff;font-family:inherit}
+#admPanel textarea{width:100%;box-sizing:border-box;min-height:54px}
+#admPanel .li{display:flex;gap:10px;align-items:center;padding:5px 8px;border-radius:8px;background:rgba(255,255,255,.04);margin:3px 0;font-size:13px}
+#admPanel .li span{flex:1} #admPanel .mut{color:#8a96b4;font-size:12px}
+#admPanel .st{padding:10px 12px;border-radius:10px;background:#0e1424;border:1px solid #2a3654;font-size:13px}
+#admPanel .ok{color:#7af0a0} #admPanel .wait{color:#ffd36a} #admPanel .err{color:#ff9a6a}
+#admPanel label.tg{display:inline-flex;gap:6px;align-items:center;padding:5px 9px;border-radius:8px;background:rgba(255,255,255,.05);font-size:13px;cursor:pointer}`; document.head.appendChild(st);}
+function admOpen(){if(!isAdmin()) return; admStyle(); if(!ADM.draft) ADM.draft=JSON.parse(JSON.stringify(CTL)); let el=$('#admPanel'); if(!el){el=document.createElement('div'); el.id='admPanel'; el.setAttribute('role','dialog'); el.setAttribute('aria-label','Admin control'); document.body.appendChild(el); el.onclick=e=>{if(e.target===el) admClose();}; ['keydown','keyup'].forEach(t=>el.addEventListener(t,e=>{e.stopPropagation(); if(e.key==='Escape'&&t==='keydown') admClose();}));}
+  el.hidden=false; admDraw(); clearInterval(ADM.tick); ADM.tick=setInterval(()=>{if(!el.hidden) admStatus();},1000);}
+function admClose(){const el=$('#admPanel'); if(el) el.hidden=true; clearInterval(ADM.tick);}
+function admStatus(){const s=$('#admSt'); if(!s) return; const left=admNextOk()-Date.now(), dirty=JSON.stringify(ctlNorm(ADM.draft))!==JSON.stringify(ctlNorm(CTL));
+  const t=left>0?`<span class="wait">⏳ Next publish allowed in ${Math.floor(left/60000)}:${String(Math.ceil(left/1000)%60).padStart(2,'0')}</span>`:`<span class="ok">✅ Publishing is allowed now</span>`;
+  s.innerHTML=`${t} · ${dirty?'<b>Unpublished changes</b>':'No unpublished changes'}${ADM.msg?`<br>${ADM.msg}`:''}<br><span class="mut">Rule: GitHub is written at most once every 5 minutes. Players pick up changes within about 5 minutes.</span>`;
+  const b=$('#admPub'); if(b) b.disabled=ADM.busy||left>0||!dirty;}
+function admDraw(){const el=$('#admPanel'), D=ADM.draft; if(!el) return; const MODE_N=MODES.filter(m=>m.id!=='adv').map(m=>[m.id,m.n]);
+  el.innerHTML=`<div class="aw"><h2>🛡️ Admin control</h2><div class="mut">Player progress stays on each player's device. These settings reach every player through one file the game checks every 5 minutes.</div>
+  <h3>Publishing</h3><div class="st" id="admSt"></div>
+  <div class="row"><input id="admTok" type="password" placeholder="GitHub token (stays on this device)" style="flex:1" value="${esc(ctlLS('admTok')||'')}"><button class="btn small" id="admTokSave">Save token</button></div>
+  <div class="row"><button class="btn gold" id="admPub">Publish changes</button><button class="btn small" id="admDl">Download control.json</button><button class="btn small" id="admUndo">Discard changes</button></div>
+  <h3>Bans and account management</h3>
+  <div class="row"><input id="admCode" placeholder="Account code" style="width:140px"><input id="admName" placeholder="or player name" style="width:150px"><input id="admWhy" placeholder="Reason (optional)" style="flex:1"><button class="btn small" id="admBan">Ban</button><button class="btn small" id="admReset">Reset progress</button></div>
+  <div>${D.bans.length?D.bans.map((b,i)=>`<div class="li"><span>⛔ <b>${esc(b.name||'?')}</b> ${b.code?`<span class="mut">code ${esc(b.code)}</span>`:''} ${b.why?`<span class="mut">· ${esc(b.why)}</span>`:''}</span><button class="btn small" data-unban="${i}">Unban</button></div>`).join(''):'<div class="mut">No banned accounts.</div>'}</div>
+  <div>${D.resets.map((r,i)=>`<div class="li"><span>♻️ Progress reset for code <b>${esc(r.code)}</b> <span class="mut">${new Date(r.t).toLocaleString()}</span></span><button class="btn small" data-unreset="${i}">Cancel</button></div>`).join('')}</div>
+  <h3>Balance (nerfs and boosts for every player)</h3>
+  ${[['dmg','Damage players deal'],['taken','Damage players take'],['shards','Shards players earn']].map(([k,n])=>`<div class="row"><span style="width:200px">${n}</span><input type="range" min="10" max="300" step="5" value="${Math.round(D.nerf[k]*100)}" data-nerf="${k}" style="flex:1"><b style="width:56px;text-align:right" id="admN_${k}">${Math.round(D.nerf[k]*100)}%</b></div>`).join('')}
+  <h3>Game modes</h3><div class="row">${MODE_N.map(([id,n])=>`<label class="tg"><input type="checkbox" data-off="${id}" ${D.off.includes(id)?'':'checked'}> ${esc(n)}</label>`).join('')}</div><div class="mut">Unticked modes are paused for every player.</div>
+  <h3>Message to all players</h3><textarea id="admMsg" maxlength="300" placeholder="Shown once to every player">${esc(D.msg)}</textarea>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="admClose">Close</button></div></div>`;
+  const q=s=>el.querySelector(s), who=()=>({code:q('#admCode').value.trim().toUpperCase(),name:q('#admName').value.trim()});
+  q('#admClose').onclick=admClose; q('#admTokSave').onclick=()=>{ctlLS('admTok',q('#admTok').value.trim()); ADM.msg='<span class="ok">Token saved on this device.</span>'; admStatus();};
+  q('#admBan').onclick=()=>{const w=who(); if(!w.code&&!w.name){ADM.msg='<span class="err">Type an account code or a player name.</span>'; return admStatus();} D.bans=D.bans.filter(b=>!(w.code&&b.code===w.code)&&!(!w.code&&b.name.toLowerCase()===w.name.toLowerCase())); D.bans.push({code:w.code,name:w.name,why:q('#admWhy').value.trim()}); admDraw();};
+  q('#admReset').onclick=()=>{const w=who(); if(!w.code){ADM.msg='<span class="err">A progress reset needs the account code.</span>'; return admStatus();} if(!confirmReset(w.code)) return; D.resets=D.resets.filter(r=>r.code!==w.code); D.resets.push({code:w.code,t:Date.now()}); admDraw();};
+  el.querySelectorAll('[data-unban]').forEach(b=>b.onclick=()=>{D.bans.splice(+b.dataset.unban,1); admDraw();});
+  el.querySelectorAll('[data-unreset]').forEach(b=>b.onclick=()=>{D.resets.splice(+b.dataset.unreset,1); admDraw();});
+  el.querySelectorAll('[data-nerf]').forEach(r=>r.oninput=()=>{D.nerf[r.dataset.nerf]=+r.value/100; q('#admN_'+r.dataset.nerf).textContent=r.value+'%'; admStatus();});
+  el.querySelectorAll('[data-off]').forEach(c=>c.onchange=()=>{const id=c.dataset.off; D.off=D.off.filter(x=>x!==id); if(!c.checked) D.off.push(id); admStatus();});
+  q('#admMsg').oninput=()=>{D.msg=q('#admMsg').value; admStatus();};
+  q('#admUndo').onclick=()=>{ADM.draft=JSON.parse(JSON.stringify(CTL)); ADM.msg=''; admDraw();};
+  q('#admDl').onclick=()=>{const c=ctlNorm(ADM.draft); c.t=Date.now(); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(c,null,2)],{type:'application/json'})); a.download='control.json'; a.click();};
+  q('#admPub').onclick=admPublish; admStatus();}
+function confirmReset(code){const b=$('#admReset'); if(b.dataset.sure===code) return true; b.dataset.sure=code; b.textContent='Tap again to reset '+code; ADM.msg='<span class="wait">This wipes that player\'s progress the next time their game checks in.</span>'; admStatus(); return false;}
+async function admPublish(){if(ADM.busy||!isAdmin()) return; const tok=ctlLS('admTok'); if(!tok){ADM.msg='<span class="err">Save a GitHub token first, or use Download control.json.</span>'; return admStatus();}
+  if(Date.now()<admNextOk()){ADM.msg='<span class="err">Too soon: GitHub can be written once every 5 minutes.</span>'; return admStatus();}
+  ADM.busy=true; ADM.msg='<span class="wait">Checking the 5 minute rule with GitHub…</span>'; admStatus();
+  try{const last=await admRemoteLast(tok); if(Date.now()-last<GH_GAP){ADM.last=last; throw new Error('The repository was updated less than 5 minutes ago. Wait for the timer.');}
+    const H={Accept:'application/vnd.github+json',Authorization:'Bearer '+tok,'Content-Type':'application/json'};
+    let sha; const g=await withTimeout(fetch(CTL_API+'/contents/control.json?ref=main',{cache:'no-store',headers:H}),8000); if(g.ok) sha=(await g.json()).sha; else if(g.status!==404) throw new Error('GitHub answered '+g.status);
+    const c=ctlNorm(ADM.draft); c.t=Date.now(); const body=JSON.stringify(c,null,2)+'\n';
+    ctlLS('admPubT',String(Date.now())); ADM.last=Date.now();
+    const r=await withTimeout(fetch(CTL_API+'/contents/control.json',{method:'PUT',headers:H,body:JSON.stringify({message:'Admin control update',content:btoa(unescape(encodeURIComponent(body))),branch:'main',sha})}),15000);
+    if(!r.ok) throw new Error('GitHub answered '+r.status+(r.status===401?' (check the token)':''));
+    CTL=c; ADM.draft=JSON.parse(JSON.stringify(c)); ctlLS('ctl',JSON.stringify(c)); ADM.msg='<span class="ok">Published. Players get it within about 5 minutes.</span>';}
+  catch(e){ADM.msg='<span class="err">'+esc(e.message||'Publishing failed')+'</span>';}
+  ADM.busy=false; admDraw();}
+// the Admin button on the title screen and the isle map, shown only to the admin
+{const mk=(after,id,cls)=>{const a=$(after); if(!a||$('#'+id)) return; const b=document.createElement('button'); b.className=cls; b.id=id; b.textContent='🛡️ Admin'; b.hidden=true; b.onclick=e=>{e.preventDefault(); admOpen();}; a.insertAdjacentElement('afterend',b);};
+  mk('#btnKeys','btnAdmin','btn'); mk('#mapKeys','mapAdmin','btn small');
+  setInterval(()=>{const on=!!(SAVE&&isAdmin()); for(const id of ['#btnAdmin','#mapAdmin']){const b=$(id); if(b&&b.hidden===on) b.hidden=!on;}},1500);}
+
 /* ---------------- starting, the title screen and quitting ---------------- */
 function openLegends(){if(!SAVE){toast('Start an expedition first','#ffd36a'); return;} const party=MP.party&&MP.party.members.length>1; if(party&&MP.role!=='host'){toast('The party leader starts Legends','#ffd36a'); return;}
   $('#modesPanel')&&($('#modesPanel').hidden=true); lgmLoading(true); setTimeout(()=>{try{openLegends2(party);} finally{lgmLoading(false);}},40);}
@@ -9954,7 +10059,7 @@ function lgmThiefShots(){const bx=boss.x, by=boss.y, fa=Math.atan2(by-P.y,bx-P.x
    heroShot('No. A legend protects people. You are just a thief with shiny rocks.',3.2)];}
 function lgmBossDown(b){const C=LGMS, base=C.bases[C.bossBase], tr=base.tr; lgmB({k:'win',b:base.i}); collectAllLoot(); const bx=b.x*S, bz=b.y*S; base.beaten=true; const S0=lgmSave(), first=!S0.beaten[tr.id]; S0.beaten[tr.id]=true; S0.bases=S0.bases||{}; S0.bases[lgBaseKey(base)]=true; for(const m of base.B.meshes||[]) if(!m.isInstancedMesh) m.visible=false; lgmRuin(base.B);
   const r={shards:(first?200:80)+90*base.sec,items:[lgLoot(base.tier,2),lgLoot(base.tier,2),lgLoot(base.tier,first?2:1)]}; if(tr.boss==='threefold'&&first) r.items.push(lgLoot(base.tier,2),lgLoot(base.tier,2));
-  SAVE.shards+=r.shards; for(const it of r.items) if(it) SAVE.inv.push(it); C.res.gold+=40; C.res.stone+=30; C.res.wood+=30; S0.res=C.res; persist();
+  SAVE.shards+=Math.round(ctlK('shards')*r.shards); for(const it of r.items) if(it) SAVE.inv.push(it); C.res.gold+=40; C.res.stone+=30; C.res.wood+=30; S0.res=C.res; persist();
   const done=()=>{lgmWinCard(base,r); L.bi=tr.bi; lgmRegion(true);};
   if(tr.boss==='threefold'){C.cry={k:0,state:'out'};
     startCine([{dur:3.4,speaker:'The Threefold Legend',text:'No... no! The crystals... they are leaving me!',enter(){b.roar=1.2; shake(10);},tick(t,dt){C.cry.k=Math.min(1,C.cry.k+dt/3);},cam:orbit(bx,bz,4,2.4,.2,.8,1.6)},
